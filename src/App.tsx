@@ -1,46 +1,24 @@
+import { useState } from 'react';
 import { Header } from './components/Header';
-import { MetricsBar } from './components/MetricsBar';
-import { PortfolioChart, NiftyChart } from './components/Charts';
-import { Watchlist } from './components/Watchlist';
-import { SignalsPanel } from './components/SignalsPanel';
-import { TradeLog } from './components/TradeLog';
-import { StrategyBreakdown } from './components/StrategyBreakdown';
+import { OverviewPage } from './components/OverviewPage';
+import { TradesPage } from './components/TradesPage';
+import { StockAnalysisPage } from './components/StockAnalysisPage';
+import { SignalsPage } from './components/SignalsPage';
 
 export default function App() {
+  const [activeTab, setActiveTab] = useState('Overview');
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-
-      <main className="flex-1 p-4 md:p-6 space-y-4 max-w-[1600px] mx-auto w-full">
-        {/* Metrics Row */}
-        <MetricsBar />
-
-        {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-          {/* Left: Watchlist */}
-          <div className="lg:col-span-3">
-            <Watchlist />
-          </div>
-
-          {/* Center: Charts */}
-          <div className="lg:col-span-5 space-y-4">
-            <NiftyChart />
-            <PortfolioChart />
-          </div>
-
-          {/* Right: Signals + Strategy */}
-          <div className="lg:col-span-4 space-y-4">
-            <SignalsPanel />
-            <StrategyBreakdown />
-          </div>
-        </div>
-
-        {/* Trade Log (full width) */}
-        <TradeLog />
+    <div className="min-h-screen flex flex-col bg-[var(--background)]">
+      <Header activeTab={activeTab} onTabChange={setActiveTab} />
+      <main className="flex-1 p-4 md:p-5 overflow-y-auto">
+        {activeTab === 'Overview' && <OverviewPage />}
+        {activeTab === 'Trades' && <TradesPage />}
+        {activeTab === 'Stock Analysis' && <StockAnalysisPage />}
+        {activeTab === 'Signals' && <SignalsPage />}
       </main>
-
-      <footer className="text-center text-[10px] text-gray-600 py-3 border-t border-white/5">
-        AlgoTrader AI • Paper Trading Mode • Not Financial Advice • Data from NSE/BSE via Public APIs
+      <footer className="text-center text-[10px] text-[var(--muted-foreground)] py-2 border-t border-[var(--border)]">
+        AlgoTrader AI v1.0 • Paper Trading Mode • NSE/BSE • Not Financial Advice • Data refreshes every 5 min during market hours
       </footer>
     </div>
   );

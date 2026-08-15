@@ -1,38 +1,68 @@
-import { Bot, IndianRupee, Clock, Shield } from 'lucide-react';
+import { portfolio } from '../data/mockData';
 
-export function Header() {
+export function Header({ activeTab, onTabChange }: { activeTab: string; onTabChange: (t: string) => void }) {
   const now = new Date();
-  const marketOpen = now.getHours() >= 9 && now.getHours() < 16;
+  const h = now.getHours();
+  const marketOpen = h >= 9 && (h < 15 || (h === 15 && now.getMinutes() <= 30));
+
+  const tabs = ['Overview', 'Trades', 'Stock Analysis', 'Signals'];
 
   return (
-    <header className="flex items-center justify-between px-6 py-4 border-b border-white/5">
-      <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-          <Bot size={20} />
+    <header className="border-b border-[var(--border)] bg-[var(--primary)]">
+      <div className="flex items-center justify-between px-5 py-3">
+        {/* Left: Brand */}
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center text-white font-bold text-sm">AT</div>
+          <div>
+            <h1 className="text-sm font-bold text-white tracking-tight">AlgoTrader AI</h1>
+            <p className="text-[10px] text-[var(--muted-foreground)]">Indian Stock Market • NSE</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-lg font-bold gradient-text">AlgoTrader AI</h1>
-          <p className="text-[10px] text-gray-500">Indian Stock Market • Paper Trading</p>
+
+        {/* Center: Quick stats */}
+        <div className="hidden md:flex items-center gap-6">
+          <div className="text-center">
+            <div className="text-xs text-[var(--muted-foreground)]">Portfolio</div>
+            <div className="text-sm font-bold text-white">₹{(portfolio.currentValue / 100000).toFixed(2)}L</div>
+          </div>
+          <div className="text-center">
+            <div className="text-xs text-[var(--muted-foreground)]">Today</div>
+            <div className={`text-sm font-bold ${portfolio.todayPnl >= 0 ? 'text-[var(--accent)]' : 'text-[var(--destructive)]'}`}>
+              {portfolio.todayPnl >= 0 ? '+' : ''}₹{portfolio.todayPnl.toLocaleString()}
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-xs text-[var(--muted-foreground)]">Total P&L</div>
+            <div className={`text-sm font-bold ${portfolio.totalPnl >= 0 ? 'text-[var(--accent)]' : 'text-[var(--destructive)]'}`}>
+              +₹{portfolio.totalPnl.toLocaleString()} ({portfolio.totalPnlPct}%)
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-xs text-[var(--muted-foreground)]">Win Rate</div>
+            <div className="text-sm font-bold text-white">{portfolio.winRate}%</div>
+          </div>
+        </div>
+
+        {/* Right: Status */}
+        <div className="flex items-center gap-3">
+          <span className="text-[11px] text-[var(--muted-foreground)]">
+            {now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+          </span>
+          <span className={`badge ${marketOpen ? 'badge-green' : 'badge-red'}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${marketOpen ? 'bg-[var(--accent)] pulse' : 'bg-[var(--destructive)]'}`}></span>
+            {marketOpen ? 'LIVE' : 'CLOSED'}
+          </span>
+          <span className="badge badge-purple">PAPER</span>
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2 text-xs text-gray-400">
-          <IndianRupee size={12} />
-          <span>NSE / BSE</span>
-        </div>
-        <div className="flex items-center gap-2 text-xs">
-          <Clock size={12} className="text-gray-400" />
-          <span className="text-gray-400">{now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
-        </div>
-        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${marketOpen ? 'bg-green-900/40 text-green-400' : 'bg-red-900/40 text-red-400'}`}>
-          <span className={`w-2 h-2 rounded-full ${marketOpen ? 'bg-green-400 pulse-live' : 'bg-red-400'}`}></span>
-          {marketOpen ? 'MARKET OPEN' : 'MARKET CLOSED'}
-        </div>
-        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-900/40 text-purple-400 text-xs font-bold">
-          <Shield size={12} />
-          PAPER MODE
-        </div>
+      {/* Tabs */}
+      <div className="tab-bar px-5">
+        {tabs.map((t) => (
+          <div key={t} className={`tab ${activeTab === t ? 'active' : ''}`} onClick={() => onTabChange(t)}>
+            {t}
+          </div>
+        ))}
       </div>
     </header>
   );
