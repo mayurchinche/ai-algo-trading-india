@@ -26,10 +26,10 @@ export interface Metal {
 export const metals: Metal[] = [
   {
     name: 'Gold', symbol: 'XAU', icon: '🥇',
-    pricePerGram: 7245, pricePerOz: 225340,
-    change24h: 85, change24hPct: 1.19, change7d: 3.2, change30d: 8.4, change1y: 28.6,
-    high52w: 7680, low52w: 5640,
-    signal: 'STRONG BUY', trend: 'Uptrend', rsi: 64.2, support: 7050, resistance: 7450,
+    pricePerGram: 15513, pricePerOz: 482500,
+    change24h: 182, change24hPct: 1.19, change7d: 2.8, change30d: 7.2, change1y: 26.4,
+    high52w: 15980, low52w: 12280,
+    signal: 'STRONG BUY', trend: 'Uptrend', rsi: 64.2, support: 15100, resistance: 15800,
     aiScore: 92,
     outlook: 'Gold is in a secular bull market. Central bank buying at record levels (1,136 tonnes in 2025). India\'s gold demand up 18% YoY driven by weddings and investment. US rate cuts ahead = tailwind.',
     reasons: [
@@ -40,15 +40,15 @@ export const metals: Metal[] = [
       'Gold ETF inflows: ₹4,200 Cr in last 3 months — highest since COVID',
       'Rupee depreciation (₹86/USD) makes gold a natural inflation hedge'
     ],
-    investmentThesis: 'Allocate 10-15% of portfolio. Buy on dips near ₹7,000-7,100/g. Target ₹8,200/g in 12 months.',
+    investmentThesis: 'Allocate 10-15% of portfolio. Buy on dips near ₹15,000-15,200/g. Target ₹17,500/g in 12 months.',
     bestForm: 'Sovereign Gold Bonds (SGB) > Gold ETFs > Digital Gold > Physical'
   },
   {
     name: 'Silver', symbol: 'XAG', icon: '🥈',
-    pricePerGram: 92.50, pricePerOz: 2877,
-    change24h: 2.30, change24hPct: 2.55, change7d: 5.1, change30d: 12.8, change1y: 42.3,
-    high52w: 98.40, low52w: 65.00,
-    signal: 'STRONG BUY', trend: 'Uptrend', rsi: 68.7, support: 88, resistance: 96,
+    pricePerGram: 250, pricePerOz: 7776,
+    change24h: 5.80, change24hPct: 2.37, change7d: 4.6, change30d: 11.2, change1y: 38.5,
+    high52w: 268, low52w: 180,
+    signal: 'STRONG BUY', trend: 'Uptrend', rsi: 68.7, support: 240, resistance: 262,
     aiScore: 88,
     outlook: 'Silver is massively undervalued vs gold (Gold:Silver ratio at 78, historical avg 60). Industrial demand from solar panels + EVs growing 15% annually. Supply deficit widening for 4th consecutive year.',
     reasons: [
@@ -59,15 +59,15 @@ export const metals: Metal[] = [
       'Silver ETF holdings at 5-year highs — institutional accumulation phase',
       'India silver imports up 35% YoY — festive + industrial demand'
     ],
-    investmentThesis: 'Silver offers higher beta than gold. Best risk-reward in precious metals. Buy at ₹88-90/g, target ₹120/g in 12 months.',
+    investmentThesis: 'Silver offers higher beta than gold. Best risk-reward in precious metals. Buy at ₹240-245/g, target ₹320/g in 12 months.',
     bestForm: 'Silver ETFs > Physical bars (1kg) > Digital Silver'
   },
   {
     name: 'Platinum', symbol: 'XPT', icon: '💎',
-    pricePerGram: 3120, pricePerOz: 97050,
-    change24h: -18, change24hPct: -0.57, change7d: 1.8, change30d: 5.2, change1y: 15.4,
-    high52w: 3340, low52w: 2710,
-    signal: 'BUY', trend: 'Uptrend', rsi: 55.3, support: 3000, resistance: 3250,
+    pricePerGram: 8450, pricePerOz: 262800,
+    change24h: -48, change24hPct: -0.57, change7d: 1.8, change30d: 5.2, change1y: 15.4,
+    high52w: 9120, low52w: 7320,
+    signal: 'BUY', trend: 'Uptrend', rsi: 55.3, support: 8200, resistance: 8800,
     aiScore: 74,
     outlook: 'Platinum is trading at a historic discount to gold (60% below). Hydrogen economy catalyst: each fuel cell vehicle needs 30-60g of platinum. Auto catalyst demand recovering as emission norms tighten globally.',
     reasons: [
@@ -78,15 +78,15 @@ export const metals: Metal[] = [
       'Investment demand: platinum ETF inflows turned positive after 2 years',
       'Jewelry demand in Japan and China recovering post-COVID'
     ],
-    investmentThesis: 'Contrarian play on hydrogen economy. Small allocation (3-5%). Buy at ₹3,000-3,100/g, target ₹3,800/g in 18 months.',
+    investmentThesis: 'Contrarian play on hydrogen economy. Small allocation (3-5%). Buy at ₹8,200-8,400/g. Target ₹10,500/g in 18 months.',
     bestForm: 'Physical coins > International ETFs (no India platinum ETF yet)'
   },
   {
     name: 'Palladium', symbol: 'XPD', icon: '⚪',
-    pricePerGram: 3680, pricePerOz: 114440,
-    change24h: -42, change24hPct: -1.13, change7d: -2.4, change30d: -4.8, change1y: -18.2,
-    high52w: 4890, low52w: 3520,
-    signal: 'SELL', trend: 'Downtrend', rsi: 38.4, support: 3500, resistance: 3900,
+    pricePerGram: 8920, pricePerOz: 277400,
+    change24h: -102, change24hPct: -1.13, change7d: -2.4, change30d: -4.8, change1y: -18.2,
+    high52w: 11850, low52w: 8540,
+    signal: 'SELL', trend: 'Downtrend', rsi: 38.4, support: 8600, resistance: 9400,
     aiScore: 28,
     outlook: 'Palladium faces structural headwinds. EV adoption reduces auto catalyst demand (its primary use). Substitution with cheaper platinum accelerating. Russia supply normalization removed risk premium.',
     reasons: [
@@ -102,10 +102,10 @@ export const metals: Metal[] = [
   },
   {
     name: 'Copper', symbol: 'HG', icon: '🟤',
-    pricePerGram: 0.82, pricePerOz: 825,
-    change24h: 0.01, change24hPct: 1.23, change7d: 2.8, change30d: 6.4, change1y: 22.1,
-    high52w: 0.89, low52w: 0.67,
-    signal: 'BUY', trend: 'Uptrend', rsi: 62.1, support: 0.78, resistance: 0.86,
+    pricePerGram: 78.50, pricePerOz: 2442,
+    change24h: 0.95, change24hPct: 1.23, change7d: 2.8, change30d: 6.4, change1y: 22.1,
+    high52w: 84.60, low52w: 64.20,
+    signal: 'BUY', trend: 'Uptrend', rsi: 62.1, support: 75, resistance: 82,
     aiScore: 79,
     outlook: 'Copper is the "new oil" of the energy transition. EVs use 4x more copper than ICE vehicles. Data centers for AI need massive copper wiring. Supply growth minimal — new mines take 15 years to develop.',
     reasons: [
@@ -116,7 +116,7 @@ export const metals: Metal[] = [
       'Green energy: solar, wind, grid storage all copper-intensive',
       'Chile and Peru (50% of supply) facing water shortages — production constraints'
     ],
-    investmentThesis: 'Best industrial metal play on energy transition. Invest via Hindalco, Hindustan Copper stocks or MCX futures. Target 20% upside in 12 months.',
+    investmentThesis: 'Best industrial metal play on energy transition. Invest via Hindalco, Hindustan Copper stocks or MCX futures. Buy at ₹75-77/g. Target 20% upside in 12 months.',
     bestForm: 'Hindalco/Hindustan Copper stocks > MCX Copper futures > Physical'
   },
 ];
@@ -124,11 +124,11 @@ export const metals: Metal[] = [
 export const metalsPriceHistory = {
   gold: Array.from({ length: 30 }, (_, i) => ({
     date: new Date(2026, 6, 16 + i).toISOString().slice(5, 10),
-    price: Math.round((6800 + i * 15 + Math.sin(i * 0.4) * 80 + (Math.random() - 0.3) * 40) * 100) / 100,
+    price: Math.round((14400 + i * 38 + Math.sin(i * 0.4) * 180 + (Math.random() - 0.3) * 80) * 100) / 100,
   })),
   silver: Array.from({ length: 30 }, (_, i) => ({
     date: new Date(2026, 6, 16 + i).toISOString().slice(5, 10),
-    price: Math.round((80 + i * 0.45 + Math.sin(i * 0.35) * 2.5 + (Math.random() - 0.3) * 1.2) * 100) / 100,
+    price: Math.round((222 + i * 1.0 + Math.sin(i * 0.35) * 5 + (Math.random() - 0.3) * 3) * 100) / 100,
   })),
 };
 
