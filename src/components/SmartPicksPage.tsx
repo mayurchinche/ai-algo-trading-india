@@ -16,7 +16,7 @@ function PickCard({ pick, type }: { pick: Pick; type: 'short' | 'long' }) {
               {pick.riskLevel} RISK
             </span>
           </div>
-          <div className="text-[11px] text-[var(--muted-foreground)] mt-0.5">{pick.name} • {pick.sector}</div>
+          <div className="text-[11px] text-[var(--text-secondary)] mt-0.5">{pick.name} • {pick.sector}</div>
         </div>
         <div className="score-circle" style={{ borderColor: pick.confidenceScore >= 85 ? 'var(--green)' : pick.confidenceScore >= 75 ? 'var(--gold)' : 'var(--blue)', color: pick.confidenceScore >= 85 ? 'var(--green)' : pick.confidenceScore >= 75 ? 'var(--gold)' : 'var(--blue)' }}>
           {pick.confidenceScore}
@@ -26,19 +26,19 @@ function PickCard({ pick, type }: { pick: Pick; type: 'short' | 'long' }) {
       {/* Price targets */}
       <div className="grid grid-cols-4 gap-3 mb-3">
         <div>
-          <div className="text-[10px] text-[var(--muted-foreground)]">CMP</div>
+          <div className="text-[10px] text-[var(--text-secondary)]">CMP</div>
           <div className="text-sm font-bold font-mono">₹{pick.ltp.toLocaleString()}</div>
         </div>
         <div>
-          <div className="text-[10px] text-[var(--muted-foreground)]">Target</div>
+          <div className="text-[10px] text-[var(--text-secondary)]">Target</div>
           <div className="text-sm font-bold font-mono text-[var(--green)]">₹{pick.targetPrice.toLocaleString()}</div>
         </div>
         <div>
-          <div className="text-[10px] text-[var(--muted-foreground)]">Stop Loss</div>
+          <div className="text-[10px] text-[var(--text-secondary)]">Stop Loss</div>
           <div className="text-sm font-bold font-mono text-[var(--red)]">₹{pick.stopLoss.toLocaleString()}</div>
         </div>
         <div>
-          <div className="text-[10px] text-[var(--muted-foreground)]">Expected Return</div>
+          <div className="text-[10px] text-[var(--text-secondary)]">Expected Return</div>
           <div className={`text-sm font-bold ${type === 'short' ? 'text-gradient-green' : 'text-gradient-purple'}`}>+{pick.expectedReturn}%</div>
         </div>
       </div>
@@ -54,9 +54,9 @@ function PickCard({ pick, type }: { pick: Pick; type: 'short' | 'long' }) {
       {/* Smart Money Signal */}
       <div className="p-2.5 rounded-lg bg-[rgba(245,158,11,0.06)] border border-[rgba(245,158,11,0.15)] mb-3">
         <div className="flex items-center gap-1.5 mb-1">
-          <span className="text-[10px] font-bold text-[var(--gold)]">🦊 SMART MONEY</span>
+          <span className="text-[10px] font-bold text-[var(--amber)]">🦊 SMART MONEY</span>
         </div>
-        <p className="text-[11px] text-[var(--gold-light)]">{pick.smartMoneySignal}</p>
+        <p className="text-[11px] text-[var(--amber)]">{pick.smartMoneySignal}</p>
       </div>
 
       {/* Reasons (top 3 always shown) */}
@@ -64,38 +64,38 @@ function PickCard({ pick, type }: { pick: Pick; type: 'short' | 'long' }) {
         {pick.reasons.slice(0, expanded ? undefined : 3).map((r, i) => (
           <div key={i} className="flex items-start gap-2 text-[11px]">
             <span className="text-[var(--green)] mt-0.5">✦</span>
-            <span className="text-[var(--foreground)]">{r}</span>
+            <span className="text-[var(--text)]">{r}</span>
           </div>
         ))}
         {pick.reasons.length > 3 && (
-          <button onClick={() => setExpanded(!expanded)} className="text-[10px] text-[var(--purple-light)] font-medium hover:underline">
+          <button onClick={() => setExpanded(!expanded)} className="text-[10px] text-[var(--purple)] font-medium hover:underline">
             {expanded ? '▲ Show less' : `▼ +${pick.reasons.length - 3} more reasons`}
           </button>
         )}
       </div>
 
       {/* Institutional Activity */}
-      <div className="grid grid-cols-2 gap-2 text-[10px] p-2.5 rounded-lg bg-[var(--muted)]">
-        <div><span className="text-[var(--muted-foreground)]">FII:</span> <span className="text-[var(--foreground)] font-medium">{pick.institutionalActivity.fiiAction}</span></div>
-        <div><span className="text-[var(--muted-foreground)]">DII:</span> <span className="text-[var(--foreground)] font-medium">{pick.institutionalActivity.diiAction}</span></div>
-        <div><span className="text-[var(--muted-foreground)]">MF Holding:</span> <span className="text-[var(--foreground)] font-medium">{pick.institutionalActivity.mutualFundHolding}</span></div>
-        <div><span className="text-[var(--muted-foreground)]">Promoter:</span> <span className="text-[var(--foreground)] font-medium">{pick.institutionalActivity.promoterChange}</span></div>
+      <div className="grid grid-cols-2 gap-2 text-[10px] p-2.5 rounded-lg bg-[var(--bg-alt)]">
+        <div><span className="text-[var(--text-secondary)]">FII:</span> <span className="text-[var(--text)] font-medium">{pick.institutionalActivity.fiiAction}</span></div>
+        <div><span className="text-[var(--text-secondary)]">DII:</span> <span className="text-[var(--text)] font-medium">{pick.institutionalActivity.diiAction}</span></div>
+        <div><span className="text-[var(--text-secondary)]">MF Holding:</span> <span className="text-[var(--text)] font-medium">{pick.institutionalActivity.mutualFundHolding}</span></div>
+        <div><span className="text-[var(--text-secondary)]">Promoter:</span> <span className="text-[var(--text)] font-medium">{pick.institutionalActivity.promoterChange}</span></div>
       </div>
 
       {/* Technicals row */}
-      <div className="flex items-center gap-4 mt-3 text-[10px] text-[var(--muted-foreground)]">
-        <span>RSI: <strong className="text-white">{pick.technicals.rsi}</strong></span>
+      <div className="flex items-center gap-4 mt-3 text-[10px] text-[var(--text-secondary)]">
+        <span>RSI: <strong className="text-[var(--text)]">{pick.technicals.rsi}</strong></span>
         <span>Trend: <strong className="text-[var(--green)]">{pick.technicals.trend}</strong></span>
-        <span>Support: <strong className="text-white">₹{pick.technicals.support.toLocaleString()}</strong></span>
-        <span>Resistance: <strong className="text-white">₹{pick.technicals.resistance.toLocaleString()}</strong></span>
+        <span>Support: <strong className="text-[var(--text)]">₹{pick.technicals.support.toLocaleString()}</strong></span>
+        <span>Resistance: <strong className="text-[var(--text)]">₹{pick.technicals.resistance.toLocaleString()}</strong></span>
       </div>
 
       {/* Fundamentals (long-term only) */}
       {pick.fundamentals && (
-        <div className="flex items-center gap-4 mt-2 text-[10px] text-[var(--muted-foreground)]">
-          <span>P/E: <strong className="text-white">{pick.fundamentals.pe}</strong></span>
+        <div className="flex items-center gap-4 mt-2 text-[10px] text-[var(--text-secondary)]">
+          <span>P/E: <strong className="text-[var(--text)]">{pick.fundamentals.pe}</strong></span>
           <span>RoE: <strong className="text-[var(--green)]">{pick.fundamentals.roe}%</strong></span>
-          <span>D/E: <strong className="text-white">{pick.fundamentals.debtEquity}</strong></span>
+          <span>D/E: <strong className="text-[var(--text)]">{pick.fundamentals.debtEquity}</strong></span>
           <span>Rev Growth: <strong className="text-[var(--green)]">{pick.fundamentals.revenueGrowth}%</strong></span>
           <span>Profit Growth: <strong className="text-[var(--green)]">{pick.fundamentals.profitGrowth}%</strong></span>
         </div>
@@ -118,18 +118,18 @@ export function SmartPicksPage() {
     <div className="space-y-4">
       {/* View toggle */}
       <div className="card flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <button onClick={() => setView('short')} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${view === 'short' ? 'bg-gradient-to-r from-[var(--green)] to-[var(--cyan)] text-black' : 'bg-[var(--muted)] text-[var(--muted-foreground)] hover:text-white'}`}>
+        <div className="flex items-center gap-3">
+          <button onClick={() => setView('short')} className={`btn-filter ${view === 'short' ? 'btn-filter-active-green' : 'btn-filter-inactive'}`}>
             🚀 Short-Term (10-15 Days)
           </button>
-          <button onClick={() => setView('long')} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${view === 'long' ? 'bg-gradient-to-r from-[var(--purple)] to-[var(--blue)] text-white' : 'bg-[var(--muted)] text-[var(--muted-foreground)] hover:text-white'}`}>
+          <button onClick={() => setView('long')} className={`btn-filter ${view === 'long' ? 'btn-filter-active-purple' : 'btn-filter-inactive'}`}>
             💎 Long-Term (12-24 Months)
           </button>
-          <button onClick={() => setView('smartmoney')} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${view === 'smartmoney' ? 'bg-gradient-to-r from-[var(--gold)] to-[var(--orange)] text-black' : 'bg-[var(--muted)] text-[var(--muted-foreground)] hover:text-white'}`}>
+          <button onClick={() => setView('smartmoney')} className={`btn-filter ${view === 'smartmoney' ? 'btn-filter-active-amber' : 'btn-filter-inactive'}`}>
             🦊 Smart Money (1% Insights)
           </button>
         </div>
-        <div className="text-[11px] text-[var(--muted-foreground)]">
+        <div className="text-[11px] text-[var(--text-secondary)]">
           Last updated: 15 Aug 2026, 10:45 IST • AI + Multi-Strategy Analysis
         </div>
       </div>
@@ -140,7 +140,7 @@ export function SmartPicksPage() {
           <div className="section-header">
             <span className="text-gradient-green">🚀 Short-Term Best Picks</span>
             <span className="badge badge-green">HIGH PROBABILITY</span>
-            <span className="text-[11px] text-[var(--muted-foreground)] ml-auto">Target: 8-11% in 10-15 trading days</span>
+            <span className="text-[11px] text-[var(--text-secondary)] ml-auto">Target: 8-11% in 10-15 trading days</span>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {shortTermPicks.map((pick) => (
@@ -156,7 +156,7 @@ export function SmartPicksPage() {
           <div className="section-header">
             <span className="text-gradient-purple">💎 Long-Term Wealth Builders</span>
             <span className="badge badge-purple">COMPOUNDERS</span>
-            <span className="text-[11px] text-[var(--muted-foreground)] ml-auto">Target: 30-35% in 12-24 months</span>
+            <span className="text-[11px] text-[var(--text-secondary)] ml-auto">Target: 30-35% in 12-24 months</span>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {longTermPicks.map((pick) => (
@@ -180,9 +180,9 @@ export function SmartPicksPage() {
               <div key={i} className="smart-money-card">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-lg">{item.icon}</span>
-                  <span className="text-xs font-bold text-[var(--gold)]">{item.category}</span>
+                  <span className="text-xs font-bold text-[var(--amber)]">{item.category}</span>
                 </div>
-                <p className="text-[12px] text-[var(--foreground)] leading-relaxed">{item.insight}</p>
+                <p className="text-[12px] text-[var(--text)] leading-relaxed">{item.insight}</p>
               </div>
             ))}
           </div>
@@ -191,27 +191,27 @@ export function SmartPicksPage() {
           <div className="card">
             <h3 className="section-header text-gradient-gold">What Makes the Top 1% Different?</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="p-4 rounded-xl bg-[var(--muted)] border border-[var(--border)]">
-                <div className="text-sm font-bold mb-2 text-[var(--gold)]">📐 Position Sizing</div>
-                <ul className="space-y-1.5 text-[11px] text-[var(--foreground)]">
+              <div className="p-4 rounded-xl bg-[var(--bg-alt)] border border-[var(--border)]">
+                <div className="text-sm font-bold mb-2 text-[var(--amber)]">📐 Position Sizing</div>
+                <ul className="space-y-1.5 text-[11px] text-[var(--text)]">
                   <li>• Never risk more than 2% per trade</li>
                   <li>• Concentrated: 8-12 positions max</li>
                   <li>• Scale in: 30% → 30% → 40% on confirmation</li>
                   <li>• Largest position = highest conviction</li>
                 </ul>
               </div>
-              <div className="p-4 rounded-xl bg-[var(--muted)] border border-[var(--border)]">
+              <div className="p-4 rounded-xl bg-[var(--bg-alt)] border border-[var(--border)]">
                 <div className="text-sm font-bold mb-2 text-[var(--purple)]">🧠 Information Edge</div>
-                <ul className="space-y-1.5 text-[11px] text-[var(--foreground)]">
+                <ul className="space-y-1.5 text-[11px] text-[var(--text)]">
                   <li>• Track FII/DII flows daily — not weekly</li>
                   <li>• Monitor bulk deals + insider buying</li>
                   <li>• Read management commentary, not analyst notes</li>
                   <li>• Sector rotation signals before price moves</li>
                 </ul>
               </div>
-              <div className="p-4 rounded-xl bg-[var(--muted)] border border-[var(--border)]">
+              <div className="p-4 rounded-xl bg-[var(--bg-alt)] border border-[var(--border)]">
                 <div className="text-sm font-bold mb-2 text-[var(--green)]">⏳ Time Horizon</div>
-                <ul className="space-y-1.5 text-[11px] text-[var(--foreground)]">
+                <ul className="space-y-1.5 text-[11px] text-[var(--text)]">
                   <li>• Short-term: ride momentum, strict SL</li>
                   <li>• Long-term: buy quality at fair price, hold</li>
                   <li>• Never average down without thesis revalidation</li>
@@ -223,7 +223,7 @@ export function SmartPicksPage() {
 
           {/* Which stocks the 1% are buying now */}
           <div className="card">
-            <h3 className="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wide mb-3">Institutional Top Picks — August 2026</h3>
+            <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-3">Institutional Top Picks — August 2026</h3>
             <table className="data-table">
               <thead>
                 <tr>

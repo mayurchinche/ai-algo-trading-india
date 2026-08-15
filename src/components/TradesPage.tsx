@@ -27,14 +27,14 @@ export function TradesPage() {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${filter === f ? 'bg-[var(--blue)] text-white' : 'bg-[var(--muted)] text-[var(--muted-foreground)] hover:text-white'}`}
+              className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${filter === f ? 'bg-[var(--blue)] text-white' : 'bg-[var(--bg-alt)] text-[var(--text-secondary)] hover:text-[var(--text)]'}`}
             >
               {f === 'ALL' ? 'All Trades' : f.replace('_', ' ')}
             </button>
           ))}
         </div>
         <div className="flex items-center gap-4 text-xs">
-          <span className="text-[var(--muted-foreground)]">Showing: <strong className="text-white">{filtered.length}</strong> trades</span>
+          <span className="text-[var(--text-secondary)]">Showing: <strong className="text-[var(--text)]">{filtered.length}</strong> trades</span>
           <span className="text-[var(--green)]">Wins: {wins}</span>
           <span className="text-[var(--red)]">Losses: {losses}</span>
           <span className={totalPnl >= 0 ? 'text-[var(--green)] font-bold' : 'text-[var(--red)] font-bold'}>
@@ -70,7 +70,7 @@ export function TradesPage() {
           <tbody>
             {filtered.map((t) => (
               <tr key={t.id}>
-                <td className="text-[var(--muted-foreground)] font-mono text-[10px]">{t.id}</td>
+                <td className="text-[var(--text-secondary)] font-mono text-[10px]">{t.id}</td>
                 <td className="text-[11px] whitespace-nowrap">{t.entryTime.slice(5, 16)}</td>
                 <td className="font-medium">{t.symbol}</td>
                 <td><span className={`badge ${t.side === 'BUY' ? 'badge-green' : 'badge-red'}`}>{t.side}</span></td>
@@ -89,16 +89,16 @@ export function TradesPage() {
                   {t.pnlPct >= 0 ? '+' : ''}{t.pnlPct.toFixed(2)}%
                 </td>
                 <td className="text-center">{t.riskRewardRatio}</td>
-                <td className="text-[11px] text-[var(--muted-foreground)]">{t.strategy}</td>
+                <td className="text-[11px] text-[var(--text-secondary)]">{t.strategy}</td>
                 <td>
                   <div className="flex items-center gap-1">
                     <div className="progress-bar w-12">
                       <div className={`progress-fill ${t.confidence >= 0.8 ? 'bg-[var(--green)]' : t.confidence >= 0.7 ? 'bg-blue-400' : 'bg-amber-400'}`} style={{ width: `${t.confidence * 100}%` }} />
                     </div>
-                    <span className="text-[10px] text-[var(--muted-foreground)]">{(t.confidence * 100).toFixed(0)}%</span>
+                    <span className="text-[10px] text-[var(--text-secondary)]">{(t.confidence * 100).toFixed(0)}%</span>
                   </div>
                 </td>
-                <td className="text-[11px] text-[var(--muted-foreground)]">{t.holdingDuration}</td>
+                <td className="text-[11px] text-[var(--text-secondary)]">{t.holdingDuration}</td>
                 <td><span className={`badge ${statusConfig[t.status].class}`}>{statusConfig[t.status].label}</span></td>
               </tr>
             ))}
@@ -108,9 +108,9 @@ export function TradesPage() {
 
       {/* Trade detail expanded (shows for first trade) */}
       <div className="card border-l-4 border-l-blue-500">
-        <h3 className="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wide mb-2">Trade Reasoning — {allTrades[0].id} ({allTrades[0].symbol})</h3>
-        <p className="text-xs text-[var(--foreground)] leading-relaxed">{allTrades[0].reason}</p>
-        <div className="flex items-center gap-4 mt-2 text-[10px] text-[var(--muted-foreground)]">
+        <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-2">Trade Reasoning — {allTrades[0].id} ({allTrades[0].symbol})</h3>
+        <p className="text-xs text-[var(--text)] leading-relaxed">{allTrades[0].reason}</p>
+        <div className="flex items-center gap-4 mt-2 text-[10px] text-[var(--text-secondary)]">
           <span>Strategy: <strong>{allTrades[0].strategy}</strong></span>
           <span>Confidence: <strong>{(allTrades[0].confidence * 100).toFixed(0)}%</strong></span>
           <span>R:R: <strong>{allTrades[0].riskRewardRatio}</strong></span>

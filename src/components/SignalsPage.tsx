@@ -35,7 +35,7 @@ export function SignalsPage() {
           <span className="w-2 h-2 rounded-full bg-[var(--green)] pulse"></span>
           <span className="text-xs font-medium">AI Engine Active</span>
         </div>
-        <span className="text-xs text-[var(--muted-foreground)]">
+        <span className="text-xs text-[var(--text-secondary)]">
           Last scan: 10:50 IST • Next: 10:55 IST • Interval: 5 min
         </span>
         <div className="flex items-center gap-3 ml-auto text-xs">
@@ -59,12 +59,12 @@ export function SignalsPage() {
                     {sig.direction}
                   </span>
                 </div>
-                <span className="text-[10px] text-[var(--muted-foreground)]">{sig.timestamp}</span>
+                <span className="text-[10px] text-[var(--text-secondary)]">{sig.timestamp}</span>
               </div>
 
               {/* Price info */}
               <div className="flex items-center gap-3 mb-2 text-xs">
-                <span className="text-[var(--muted-foreground)]">LTP:</span>
+                <span className="text-[var(--text-secondary)]">LTP:</span>
                 <span className="font-mono font-medium">₹{stock?.ltp.toLocaleString()}</span>
                 <span className={stock && stock.changePct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}>
                   {stock && stock.changePct >= 0 ? '+' : ''}{stock?.changePct.toFixed(2)}%
@@ -73,7 +73,7 @@ export function SignalsPage() {
 
               {/* Confidence bar */}
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-[10px] text-[var(--muted-foreground)]">Confidence:</span>
+                <span className="text-[10px] text-[var(--text-secondary)]">Confidence:</span>
                 <div className="progress-bar flex-1">
                   <div
                     className={`progress-fill ${sig.confidence >= 0.8 ? 'bg-[var(--green)]' : sig.confidence >= 0.7 ? 'bg-blue-400' : sig.confidence >= 0.6 ? 'bg-amber-400' : 'bg-gray-500'}`}
@@ -85,21 +85,21 @@ export function SignalsPage() {
 
               {/* Indicators */}
               <div className="grid grid-cols-2 gap-1 mb-2 text-[10px]">
-                <div className="text-[var(--muted-foreground)]">RSI: <span className={`font-medium ${sig.indicators.rsi > 70 ? 'text-[var(--red)]' : sig.indicators.rsi < 30 ? 'text-[var(--green)]' : 'text-white'}`}>{sig.indicators.rsi}</span></div>
-                <div className="text-[var(--muted-foreground)]">Vol: <span className="text-white font-medium">{sig.indicators.volumeRatio}x</span></div>
+                <div className="text-[var(--text-secondary)]">RSI: <span className={`font-medium ${sig.indicators.rsi > 70 ? 'text-[var(--red)]' : sig.indicators.rsi < 30 ? 'text-[var(--green)]' : 'text-[var(--text)]'}`}>{sig.indicators.rsi}</span></div>
+                <div className="text-[var(--text-secondary)]">Vol: <span className="text-[var(--text)] font-medium">{sig.indicators.volumeRatio}x</span></div>
                 {sig.indicators.lstmProb !== undefined && (
-                  <div className="text-[var(--muted-foreground)]">LSTM: <span className={`font-medium ${sig.indicators.lstmProb >= 0.6 ? 'text-[var(--green)]' : sig.indicators.lstmProb <= 0.4 ? 'text-[var(--red)]' : 'text-amber-400'}`}>{(sig.indicators.lstmProb * 100).toFixed(0)}%</span></div>
+                  <div className="text-[var(--text-secondary)]">LSTM: <span className={`font-medium ${sig.indicators.lstmProb >= 0.6 ? 'text-[var(--green)]' : sig.indicators.lstmProb <= 0.4 ? 'text-[var(--red)]' : 'text-amber-400'}`}>{(sig.indicators.lstmProb * 100).toFixed(0)}%</span></div>
                 )}
-                <div className="text-[var(--muted-foreground)] truncate">{sig.indicators.smaSignal}</div>
+                <div className="text-[var(--text-secondary)] truncate">{sig.indicators.smaSignal}</div>
               </div>
 
               {/* Reason */}
-              <p className="text-[11px] text-[var(--muted-foreground)] leading-relaxed border-t border-[var(--border)] pt-2 mt-2">
+              <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed border-t border-[var(--border)] pt-2 mt-2">
                 {sig.reason}
               </p>
 
               {/* Strategy */}
-              <div className="mt-2 text-[10px] text-[var(--muted-foreground)]">
+              <div className="mt-2 text-[10px] text-[var(--text-secondary)]">
                 Strategy: <span className="text-blue-400 font-medium">{sig.strategy}</span>
               </div>
             </div>
