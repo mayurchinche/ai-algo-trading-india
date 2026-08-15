@@ -5,7 +5,7 @@ export function Header({ activeTab, onTabChange }: { activeTab: string; onTabCha
   const h = now.getHours();
   const marketOpen = h >= 9 && (h < 15 || (h === 15 && now.getMinutes() <= 30));
 
-  const tabs = ['Overview', 'Trades', 'Stock Analysis', 'Signals'];
+  const tabs = ['Smart Picks', 'Overview', 'Trades', 'Stock Analysis', 'Signals'];
 
   return (
     <header className="border-b border-[var(--border)] bg-[var(--primary)]">
@@ -27,13 +27,13 @@ export function Header({ activeTab, onTabChange }: { activeTab: string; onTabCha
           </div>
           <div className="text-center">
             <div className="text-xs text-[var(--muted-foreground)]">Today</div>
-            <div className={`text-sm font-bold ${portfolio.todayPnl >= 0 ? 'text-[var(--accent)]' : 'text-[var(--destructive)]'}`}>
+            <div className={`text-sm font-bold ${portfolio.todayPnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
               {portfolio.todayPnl >= 0 ? '+' : ''}₹{portfolio.todayPnl.toLocaleString()}
             </div>
           </div>
           <div className="text-center">
             <div className="text-xs text-[var(--muted-foreground)]">Total P&L</div>
-            <div className={`text-sm font-bold ${portfolio.totalPnl >= 0 ? 'text-[var(--accent)]' : 'text-[var(--destructive)]'}`}>
+            <div className={`text-sm font-bold ${portfolio.totalPnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
               +₹{portfolio.totalPnl.toLocaleString()} ({portfolio.totalPnlPct}%)
             </div>
           </div>
@@ -49,7 +49,7 @@ export function Header({ activeTab, onTabChange }: { activeTab: string; onTabCha
             {now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
           </span>
           <span className={`badge ${marketOpen ? 'badge-green' : 'badge-red'}`}>
-            <span className={`w-1.5 h-1.5 rounded-full ${marketOpen ? 'bg-[var(--accent)] pulse' : 'bg-[var(--destructive)]'}`}></span>
+            <span className={`w-1.5 h-1.5 rounded-full ${marketOpen ? 'bg-[var(--green)] pulse' : 'bg-[var(--red)]'}`}></span>
             {marketOpen ? 'LIVE' : 'CLOSED'}
           </span>
           <span className="badge badge-purple">PAPER</span>

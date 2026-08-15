@@ -4,14 +4,16 @@ import { OverviewPage } from './components/OverviewPage';
 import { TradesPage } from './components/TradesPage';
 import { StockAnalysisPage } from './components/StockAnalysisPage';
 import { SignalsPage } from './components/SignalsPage';
+import { SmartPicksPage } from './components/SmartPicksPage';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('Overview');
+  const [activeTab, setActiveTab] = useState('Smart Picks');
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--background)]">
       <Header activeTab={activeTab} onTabChange={setActiveTab} />
       <main className="flex-1 p-4 md:p-5 overflow-y-auto">
+        {activeTab === 'Smart Picks' && <SmartPicksPage />}
         {activeTab === 'Overview' && <OverviewPage />}
         {activeTab === 'Trades' && <TradesPage />}
         {activeTab === 'Stock Analysis' && <StockAnalysisPage />}

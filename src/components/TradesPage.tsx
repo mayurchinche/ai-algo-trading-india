@@ -27,7 +27,7 @@ export function TradesPage() {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${filter === f ? 'bg-[var(--ring)] text-white' : 'bg-[var(--muted)] text-[var(--muted-foreground)] hover:text-white'}`}
+              className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${filter === f ? 'bg-[var(--blue)] text-white' : 'bg-[var(--muted)] text-[var(--muted-foreground)] hover:text-white'}`}
             >
               {f === 'ALL' ? 'All Trades' : f.replace('_', ' ')}
             </button>
@@ -35,9 +35,9 @@ export function TradesPage() {
         </div>
         <div className="flex items-center gap-4 text-xs">
           <span className="text-[var(--muted-foreground)]">Showing: <strong className="text-white">{filtered.length}</strong> trades</span>
-          <span className="text-[var(--accent)]">Wins: {wins}</span>
-          <span className="text-[var(--destructive)]">Losses: {losses}</span>
-          <span className={totalPnl >= 0 ? 'text-[var(--accent)] font-bold' : 'text-[var(--destructive)] font-bold'}>
+          <span className="text-[var(--green)]">Wins: {wins}</span>
+          <span className="text-[var(--red)]">Losses: {losses}</span>
+          <span className={totalPnl >= 0 ? 'text-[var(--green)] font-bold' : 'text-[var(--red)] font-bold'}>
             Net: {totalPnl >= 0 ? '+' : ''}₹{totalPnl.toLocaleString()}
           </span>
         </div>
@@ -79,13 +79,13 @@ export function TradesPage() {
                 <td className="text-right font-mono">{t.exitPrice ? `₹${t.exitPrice.toLocaleString()}` : `₹${t.currentPrice.toLocaleString()}`}</td>
                 <td className="text-right font-mono text-red-400/70">₹{t.stopLoss.toLocaleString()}</td>
                 <td className="text-right font-mono text-green-400/70">₹{t.takeProfit.toLocaleString()}</td>
-                <td className={`text-right font-mono font-bold ${t.pnl >= 0 ? 'text-[var(--accent)]' : 'text-[var(--destructive)]'}`}>
+                <td className={`text-right font-mono font-bold ${t.pnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
                   {t.pnl >= 0 ? '+' : ''}₹{t.pnl.toLocaleString()}
                 </td>
-                <td className={`text-right font-mono ${t.netPnl >= 0 ? 'text-[var(--accent)]' : 'text-[var(--destructive)]'}`}>
+                <td className={`text-right font-mono ${t.netPnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
                   {t.netPnl >= 0 ? '+' : ''}₹{t.netPnl.toLocaleString()}
                 </td>
-                <td className={`text-right ${t.pnlPct >= 0 ? 'text-[var(--accent)]' : 'text-[var(--destructive)]'}`}>
+                <td className={`text-right ${t.pnlPct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
                   {t.pnlPct >= 0 ? '+' : ''}{t.pnlPct.toFixed(2)}%
                 </td>
                 <td className="text-center">{t.riskRewardRatio}</td>
@@ -93,7 +93,7 @@ export function TradesPage() {
                 <td>
                   <div className="flex items-center gap-1">
                     <div className="progress-bar w-12">
-                      <div className={`progress-fill ${t.confidence >= 0.8 ? 'bg-[var(--accent)]' : t.confidence >= 0.7 ? 'bg-blue-400' : 'bg-amber-400'}`} style={{ width: `${t.confidence * 100}%` }} />
+                      <div className={`progress-fill ${t.confidence >= 0.8 ? 'bg-[var(--green)]' : t.confidence >= 0.7 ? 'bg-blue-400' : 'bg-amber-400'}`} style={{ width: `${t.confidence * 100}%` }} />
                     </div>
                     <span className="text-[10px] text-[var(--muted-foreground)]">{(t.confidence * 100).toFixed(0)}%</span>
                   </div>

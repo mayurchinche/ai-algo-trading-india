@@ -16,14 +16,14 @@ export function OverviewPage() {
     <div className="space-y-4">
       {/* KPI Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
-        <div className="card"><KPI label="Portfolio Value" value={`₹${(portfolio.currentValue / 100000).toFixed(2)}L`} sub={`of ₹${(portfolio.totalCapital / 100000).toFixed(0)}L capital`} /></div>
-        <div className="card"><KPI label="Total P&L" value={`+₹${(portfolio.totalPnl / 1000).toFixed(1)}K`} sub={`+${portfolio.totalPnlPct}%`} color="text-[var(--accent)]" /></div>
-        <div className="card"><KPI label="Today's P&L" value={`+₹${(portfolio.todayPnl / 1000).toFixed(1)}K`} sub={`+${portfolio.todayPnlPct}%`} color="text-[var(--accent)]" /></div>
-        <div className="card"><KPI label="Win Rate" value={`${portfolio.winRate}%`} sub={`${portfolio.totalTrades} trades`} color="text-blue-400" /></div>
-        <div className="card"><KPI label="Sharpe Ratio" value={portfolio.sharpeRatio.toFixed(2)} sub="annualized" color="text-amber-400" /></div>
-        <div className="card"><KPI label="Profit Factor" value={portfolio.profitFactor.toFixed(2)} sub="gross W/L" color="text-purple-400" /></div>
-        <div className="card"><KPI label="Max Drawdown" value={`${portfolio.maxDrawdownPct}%`} sub={`₹${(portfolio.maxDrawdown / 1000).toFixed(1)}K`} color="text-[var(--destructive)]" /></div>
-        <div className="card"><KPI label="Avg R:R" value={portfolio.riskRewardRatio.toFixed(2)} sub={portfolio.avgHoldingPeriod} /></div>
+        <div className="kpi-card gold"><KPI label="Portfolio Value" value={`₹${(portfolio.currentValue / 100000).toFixed(2)}L`} sub={`of ₹${(portfolio.totalCapital / 100000).toFixed(0)}L capital`} /></div>
+        <div className="kpi-card green"><KPI label="Total P&L" value={`+₹${(portfolio.totalPnl / 1000).toFixed(1)}K`} sub={`+${portfolio.totalPnlPct}%`} color="text-[var(--green)]" /></div>
+        <div className="kpi-card green"><KPI label="Today's P&L" value={`+₹${(portfolio.todayPnl / 1000).toFixed(1)}K`} sub={`+${portfolio.todayPnlPct}%`} color="text-[var(--green)]" /></div>
+        <div className="kpi-card blue"><KPI label="Win Rate" value={`${portfolio.winRate}%`} sub={`${portfolio.totalTrades} trades`} color="text-blue-400" /></div>
+        <div className="kpi-card gold"><KPI label="Sharpe Ratio" value={portfolio.sharpeRatio.toFixed(2)} sub="annualized" color="text-amber-400" /></div>
+        <div className="kpi-card purple"><KPI label="Profit Factor" value={portfolio.profitFactor.toFixed(2)} sub="gross W/L" color="text-purple-400" /></div>
+        <div className="kpi-card red"><KPI label="Max Drawdown" value={`${portfolio.maxDrawdownPct}%`} sub={`₹${(portfolio.maxDrawdown / 1000).toFixed(1)}K`} color="text-[var(--red)]" /></div>
+        <div className="kpi-card blue"><KPI label="Avg R:R" value={portfolio.riskRewardRatio.toFixed(2)} sub={portfolio.avgHoldingPeriod} /></div>
       </div>
 
       {/* Charts Row */}
@@ -80,9 +80,9 @@ export function OverviewPage() {
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wide">NIFTY 50 Intraday</h3>
             <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] pulse"></span>
-              <span className="text-sm font-bold text-[var(--accent)]">24,856.40</span>
-              <span className="text-xs text-[var(--accent)]">+0.63%</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--green)] pulse"></span>
+              <span className="text-sm font-bold text-[var(--green)]">24,856.40</span>
+              <span className="text-xs text-[var(--green)]">+0.63%</span>
             </div>
           </div>
           <ResponsiveContainer width="100%" height={180}>
@@ -112,7 +112,7 @@ export function OverviewPage() {
               <div key={s.name} className="p-3 rounded-lg bg-[var(--muted)] border border-[var(--border)]">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-[11px] font-medium">{s.name}</span>
-                  <span className="text-xs font-bold text-[var(--accent)]">+₹{(s.pnl / 1000).toFixed(1)}K</span>
+                  <span className="text-xs font-bold text-[var(--green)]">+₹{(s.pnl / 1000).toFixed(1)}K</span>
                 </div>
                 <div className="grid grid-cols-3 gap-2 text-[10px] text-[var(--muted-foreground)]">
                   <div>WR: <span className="text-white font-medium">{s.winRate}%</span></div>
@@ -134,12 +134,12 @@ export function OverviewPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 text-xs">
           <div><span className="text-[var(--muted-foreground)]">Invested</span><div className="font-medium">₹{(portfolio.investedValue / 1000).toFixed(0)}K</div></div>
           <div><span className="text-[var(--muted-foreground)]">Available Margin</span><div className="font-medium">₹{(portfolio.availableMargin / 100000).toFixed(2)}L</div></div>
-          <div><span className="text-[var(--muted-foreground)]">Realized P&L</span><div className="font-medium text-[var(--accent)]">+₹{portfolio.realizedPnl.toLocaleString()}</div></div>
-          <div><span className="text-[var(--muted-foreground)]">Unrealized P&L</span><div className="font-medium text-[var(--accent)]">+₹{portfolio.unrealizedPnl.toLocaleString()}</div></div>
+          <div><span className="text-[var(--muted-foreground)]">Realized P&L</span><div className="font-medium text-[var(--green)]">+₹{portfolio.realizedPnl.toLocaleString()}</div></div>
+          <div><span className="text-[var(--muted-foreground)]">Unrealized P&L</span><div className="font-medium text-[var(--green)]">+₹{portfolio.unrealizedPnl.toLocaleString()}</div></div>
           <div><span className="text-[var(--muted-foreground)]">Avg Win / Loss</span><div className="font-medium">₹{portfolio.avgWin} / ₹{Math.abs(portfolio.avgLoss)}</div></div>
-          <div><span className="text-[var(--muted-foreground)]">Best / Worst</span><div className="font-medium"><span className="text-[var(--accent)]">+₹{portfolio.largestWin.toLocaleString()}</span> / <span className="text-[var(--destructive)]">-₹{Math.abs(portfolio.largestLoss).toLocaleString()}</span></div></div>
+          <div><span className="text-[var(--muted-foreground)]">Best / Worst</span><div className="font-medium"><span className="text-[var(--green)]">+₹{portfolio.largestWin.toLocaleString()}</span> / <span className="text-[var(--red)]">-₹{Math.abs(portfolio.largestLoss).toLocaleString()}</span></div></div>
           <div><span className="text-[var(--muted-foreground)]">Consec. Wins</span><div className="font-medium">{portfolio.consecutiveWins}</div></div>
-          <div><span className="text-[var(--muted-foreground)]">Consec. Losses</span><div className="font-medium text-[var(--destructive)]">{portfolio.consecutiveLosses}</div></div>
+          <div><span className="text-[var(--muted-foreground)]">Consec. Losses</span><div className="font-medium text-[var(--red)]">{portfolio.consecutiveLosses}</div></div>
           <div><span className="text-[var(--muted-foreground)]">Open Positions</span><div className="font-medium">{portfolio.openPositions}</div></div>
           <div><span className="text-[var(--muted-foreground)]">Avg Trades/Day</span><div className="font-medium">{portfolio.avgTradesPerDay}</div></div>
           <div><span className="text-[var(--muted-foreground)]">Profitable Days</span><div className="font-medium">{portfolio.profitableDays}/{portfolio.tradingDays} ({((portfolio.profitableDays/portfolio.tradingDays)*100).toFixed(0)}%)</div></div>

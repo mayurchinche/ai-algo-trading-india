@@ -56,35 +56,35 @@ export function StockAnalysisPage() {
                   <td className="font-medium">{s.symbol}</td>
                   <td className="text-[var(--muted-foreground)] text-[11px]">{stock?.sector || '-'}</td>
                   <td className="text-center">{s.totalTrades}</td>
-                  <td className="text-center text-[var(--accent)]">{s.wins}</td>
-                  <td className="text-center text-[var(--destructive)]">{s.losses}</td>
+                  <td className="text-center text-[var(--green)]">{s.wins}</td>
+                  <td className="text-center text-[var(--red)]">{s.losses}</td>
                   <td className="text-center">
                     <div className="flex items-center justify-center gap-1">
                       <div className="progress-bar w-10">
-                        <div className={`progress-fill ${s.winRate >= 70 ? 'bg-[var(--accent)]' : s.winRate >= 60 ? 'bg-blue-400' : s.winRate >= 50 ? 'bg-amber-400' : 'bg-[var(--destructive)]'}`} style={{ width: `${s.winRate}%` }} />
+                        <div className={`progress-fill ${s.winRate >= 70 ? 'bg-[var(--green)]' : s.winRate >= 60 ? 'bg-blue-400' : s.winRate >= 50 ? 'bg-amber-400' : 'bg-[var(--red)]'}`} style={{ width: `${s.winRate}%` }} />
                       </div>
                       <span className="text-[10px]">{s.winRate.toFixed(1)}%</span>
                     </div>
                   </td>
-                  <td className={`text-right font-mono font-bold ${s.totalPnl >= 0 ? 'text-[var(--accent)]' : 'text-[var(--destructive)]'}`}>
+                  <td className={`text-right font-mono font-bold ${s.totalPnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
                     {s.totalPnl >= 0 ? '+' : ''}₹{s.totalPnl.toLocaleString()}
                   </td>
-                  <td className={`text-right font-mono ${s.avgPnl >= 0 ? 'text-[var(--accent)]' : 'text-[var(--destructive)]'}`}>
+                  <td className={`text-right font-mono ${s.avgPnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
                     {s.avgPnl >= 0 ? '+' : ''}₹{s.avgPnl.toLocaleString()}
                   </td>
-                  <td className="text-right font-mono text-[var(--accent)]">+₹{s.bestTrade.toLocaleString()}</td>
-                  <td className="text-right font-mono text-[var(--destructive)]">-₹{Math.abs(s.worstTrade).toLocaleString()}</td>
-                  <td className={`text-center font-medium ${s.sharpe >= 2 ? 'text-[var(--accent)]' : s.sharpe >= 1.5 ? 'text-blue-400' : s.sharpe >= 1 ? 'text-amber-400' : 'text-[var(--destructive)]'}`}>
+                  <td className="text-right font-mono text-[var(--green)]">+₹{s.bestTrade.toLocaleString()}</td>
+                  <td className="text-right font-mono text-[var(--red)]">-₹{Math.abs(s.worstTrade).toLocaleString()}</td>
+                  <td className={`text-center font-medium ${s.sharpe >= 2 ? 'text-[var(--green)]' : s.sharpe >= 1.5 ? 'text-blue-400' : s.sharpe >= 1 ? 'text-amber-400' : 'text-[var(--red)]'}`}>
                     {s.sharpe.toFixed(2)}
                   </td>
-                  <td className={`text-center font-medium ${s.profitFactor >= 2 ? 'text-[var(--accent)]' : s.profitFactor >= 1.5 ? 'text-blue-400' : 'text-[var(--destructive)]'}`}>
+                  <td className={`text-center font-medium ${s.profitFactor >= 2 ? 'text-[var(--green)]' : s.profitFactor >= 1.5 ? 'text-blue-400' : 'text-[var(--red)]'}`}>
                     {s.profitFactor.toFixed(2)}
                   </td>
                   <td className="text-center">{s.maxConsecutiveLosses}</td>
                   <td className="text-[11px] text-[var(--muted-foreground)]">{s.avgHoldingTime}</td>
                   <td>
                     <div className="flex items-center justify-center">
-                      <span className={`text-[11px] font-bold ${(stock?.aiScore || 0) >= 70 ? 'text-[var(--accent)]' : (stock?.aiScore || 0) >= 50 ? 'text-amber-400' : 'text-[var(--destructive)]'}`}>
+                      <span className={`text-[11px] font-bold ${(stock?.aiScore || 0) >= 70 ? 'text-[var(--green)]' : (stock?.aiScore || 0) >= 50 ? 'text-amber-400' : 'text-[var(--red)]'}`}>
                         {stock?.aiScore || '-'}
                       </span>
                     </div>
@@ -129,10 +129,10 @@ export function StockAnalysisPage() {
               <tr key={s.symbol}>
                 <td className="font-medium">{s.symbol}</td>
                 <td className="text-right font-mono">₹{s.ltp.toLocaleString()}</td>
-                <td className={`text-right font-mono ${s.change >= 0 ? 'text-[var(--accent)]' : 'text-[var(--destructive)]'}`}>
+                <td className={`text-right font-mono ${s.change >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
                   {s.change >= 0 ? '+' : ''}{s.change.toFixed(2)}
                 </td>
-                <td className={`text-right font-mono font-medium ${s.changePct >= 0 ? 'text-[var(--accent)]' : 'text-[var(--destructive)]'}`}>
+                <td className={`text-right font-mono font-medium ${s.changePct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
                   {s.changePct >= 0 ? '+' : ''}{s.changePct.toFixed(2)}%
                 </td>
                 <td className="text-right font-mono text-[var(--muted-foreground)]">₹{s.open.toLocaleString()}</td>
@@ -140,7 +140,7 @@ export function StockAnalysisPage() {
                 <td className="text-right font-mono text-[var(--muted-foreground)]">₹{s.dayLow.toLocaleString()}</td>
                 <td className="text-right font-mono">{(s.volume / 100000).toFixed(1)}L</td>
                 <td className="text-right font-mono text-[var(--muted-foreground)]">{(s.avgVolume / 100000).toFixed(1)}L</td>
-                <td className={`text-center font-medium ${s.rsi > 70 ? 'text-[var(--destructive)]' : s.rsi < 30 ? 'text-[var(--accent)]' : 'text-white'}`}>{s.rsi.toFixed(1)}</td>
+                <td className={`text-center font-medium ${s.rsi > 70 ? 'text-[var(--red)]' : s.rsi < 30 ? 'text-[var(--green)]' : 'text-white'}`}>{s.rsi.toFixed(1)}</td>
                 <td className="text-right font-mono text-[var(--muted-foreground)]">₹{s.sma20.toLocaleString()}</td>
                 <td className="text-right font-mono text-[var(--muted-foreground)]">₹{s.weekHigh52.toLocaleString()}</td>
                 <td className="text-right font-mono text-[var(--muted-foreground)]">₹{s.weekLow52.toLocaleString()}</td>

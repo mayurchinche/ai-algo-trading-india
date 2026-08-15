@@ -32,7 +32,7 @@ export function SignalsPage() {
       {/* Summary */}
       <div className="card flex items-center gap-6">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-[var(--accent)] pulse"></span>
+          <span className="w-2 h-2 rounded-full bg-[var(--green)] pulse"></span>
           <span className="text-xs font-medium">AI Engine Active</span>
         </div>
         <span className="text-xs text-[var(--muted-foreground)]">
@@ -50,7 +50,7 @@ export function SignalsPage() {
         {signals.sort((a, b) => b.confidence - a.confidence).map((sig) => {
           const stock = watchlist.find(w => w.symbol === sig.symbol);
           return (
-            <div key={sig.symbol} className={`card border-l-4 ${sig.direction === 'BUY' ? 'border-l-[var(--accent)]' : sig.direction === 'SELL' ? 'border-l-[var(--destructive)]' : 'border-l-amber-400'}`}>
+            <div key={sig.symbol} className={`card border-l-4 ${sig.direction === 'BUY' ? 'border-l-[var(--green)]' : sig.direction === 'SELL' ? 'border-l-[var(--red)]' : 'border-l-amber-400'}`}>
               {/* Header */}
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
@@ -66,7 +66,7 @@ export function SignalsPage() {
               <div className="flex items-center gap-3 mb-2 text-xs">
                 <span className="text-[var(--muted-foreground)]">LTP:</span>
                 <span className="font-mono font-medium">₹{stock?.ltp.toLocaleString()}</span>
-                <span className={stock && stock.changePct >= 0 ? 'text-[var(--accent)]' : 'text-[var(--destructive)]'}>
+                <span className={stock && stock.changePct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}>
                   {stock && stock.changePct >= 0 ? '+' : ''}{stock?.changePct.toFixed(2)}%
                 </span>
               </div>
@@ -76,7 +76,7 @@ export function SignalsPage() {
                 <span className="text-[10px] text-[var(--muted-foreground)]">Confidence:</span>
                 <div className="progress-bar flex-1">
                   <div
-                    className={`progress-fill ${sig.confidence >= 0.8 ? 'bg-[var(--accent)]' : sig.confidence >= 0.7 ? 'bg-blue-400' : sig.confidence >= 0.6 ? 'bg-amber-400' : 'bg-gray-500'}`}
+                    className={`progress-fill ${sig.confidence >= 0.8 ? 'bg-[var(--green)]' : sig.confidence >= 0.7 ? 'bg-blue-400' : sig.confidence >= 0.6 ? 'bg-amber-400' : 'bg-gray-500'}`}
                     style={{ width: `${sig.confidence * 100}%` }}
                   />
                 </div>
@@ -85,10 +85,10 @@ export function SignalsPage() {
 
               {/* Indicators */}
               <div className="grid grid-cols-2 gap-1 mb-2 text-[10px]">
-                <div className="text-[var(--muted-foreground)]">RSI: <span className={`font-medium ${sig.indicators.rsi > 70 ? 'text-[var(--destructive)]' : sig.indicators.rsi < 30 ? 'text-[var(--accent)]' : 'text-white'}`}>{sig.indicators.rsi}</span></div>
+                <div className="text-[var(--muted-foreground)]">RSI: <span className={`font-medium ${sig.indicators.rsi > 70 ? 'text-[var(--red)]' : sig.indicators.rsi < 30 ? 'text-[var(--green)]' : 'text-white'}`}>{sig.indicators.rsi}</span></div>
                 <div className="text-[var(--muted-foreground)]">Vol: <span className="text-white font-medium">{sig.indicators.volumeRatio}x</span></div>
                 {sig.indicators.lstmProb !== undefined && (
-                  <div className="text-[var(--muted-foreground)]">LSTM: <span className={`font-medium ${sig.indicators.lstmProb >= 0.6 ? 'text-[var(--accent)]' : sig.indicators.lstmProb <= 0.4 ? 'text-[var(--destructive)]' : 'text-amber-400'}`}>{(sig.indicators.lstmProb * 100).toFixed(0)}%</span></div>
+                  <div className="text-[var(--muted-foreground)]">LSTM: <span className={`font-medium ${sig.indicators.lstmProb >= 0.6 ? 'text-[var(--green)]' : sig.indicators.lstmProb <= 0.4 ? 'text-[var(--red)]' : 'text-amber-400'}`}>{(sig.indicators.lstmProb * 100).toFixed(0)}%</span></div>
                 )}
                 <div className="text-[var(--muted-foreground)] truncate">{sig.indicators.smaSignal}</div>
               </div>
