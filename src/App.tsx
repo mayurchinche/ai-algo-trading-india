@@ -5,6 +5,7 @@ import { TradesPage } from './components/TradesPage';
 import { StockAnalysisPage } from './components/StockAnalysisPage';
 import { SignalsPage } from './components/SignalsPage';
 import { SmartPicksPage } from './components/SmartPicksPage';
+import { MetalsPage } from './components/MetalsPage';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('Smart Picks');
@@ -18,6 +19,7 @@ export default function App() {
         {activeTab === 'Trades' && <TradesPage />}
         {activeTab === 'Stock Analysis' && <StockAnalysisPage />}
         {activeTab === 'Signals' && <SignalsPage />}
+        {activeTab === 'Metals' && <MetalsPage />}
       </main>
       <footer className="text-center text-xs text-[var(--text-muted)] py-4 border-t border-[var(--border)] bg-white">
         AlgoTrader AI v1.0 • Paper Trading Mode • NSE/BSE • Not Financial Advice • Data refreshes every 5 min
