@@ -8,6 +8,7 @@ import { SmartPicksPage } from './components/SmartPicksPage';
 import { MetalsPage } from './components/MetalsPage';
 import { DiscoveryPage } from './components/DiscoveryPage';
 import { BacktestPage } from './components/BacktestPage';
+import { IPOPage } from './components/IPOPage';
 import { useLiveStocks } from './hooks/useLiveStocks';
 
 export default function App() {
@@ -51,6 +52,7 @@ export default function App() {
         {activeTab === 'Stock Analysis' && <StockAnalysisPage />}
         {activeTab === 'Signals' && <SignalsPage />}
         {activeTab === 'Backtest' && <BacktestPage />}
+        {activeTab === 'IPO Tracker' && <IPOPage />}
         {activeTab === 'Metals' && <MetalsPage />}
       </main>
       <footer className="text-center text-xs text-[var(--text-muted)] py-4 border-t border-[var(--border)] bg-white">

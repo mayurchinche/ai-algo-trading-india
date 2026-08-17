@@ -11,7 +11,7 @@ export function Header({ activeTab, onTabChange, nifty }: HeaderProps) {
   const now = new Date();
   const h = now.getHours();
   const marketOpen = h >= 9 && (h < 15 || (h === 15 && now.getMinutes() <= 30));
-  const tabs = ['AI Discovery', 'Smart Picks', 'Overview', 'Trades', 'Stock Analysis', 'Signals', 'Backtest', 'Metals'];
+  const tabs = ['AI Discovery', 'Smart Picks', 'Overview', 'Trades', 'Stock Analysis', 'Signals', 'Backtest', 'IPO Tracker', 'Metals'];
 
   return (
     <header className="bg-white border-b border-[var(--border)]">
