@@ -6,10 +6,11 @@ import { StockAnalysisPage } from './components/StockAnalysisPage';
 import { SignalsPage } from './components/SignalsPage';
 import { SmartPicksPage } from './components/SmartPicksPage';
 import { MetalsPage } from './components/MetalsPage';
+import { DiscoveryPage } from './components/DiscoveryPage';
 import { useLiveStocks } from './hooks/useLiveStocks';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('Smart Picks');
+  const [activeTab, setActiveTab] = useState('AI Discovery');
   const { stocks, nifty, loading, lastUpdated, refresh } = useLiveStocks();
 
   return (
@@ -44,6 +45,7 @@ export default function App() {
       </div>
 
       <main className="flex-1 p-6 overflow-y-auto max-w-[1400px] mx-auto w-full">
+        {activeTab === 'AI Discovery' && <DiscoveryPage />}
         {activeTab === 'Smart Picks' && <SmartPicksPage stocks={stocks} />}
         {activeTab === 'Overview' && <OverviewPage nifty={nifty} />}
         {activeTab === 'Trades' && <TradesPage stocks={stocks} />}

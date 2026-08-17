@@ -12,7 +12,7 @@ export function Header({ activeTab, onTabChange, stocks, nifty }: HeaderProps) {
   const now = new Date();
   const h = now.getHours();
   const marketOpen = h >= 9 && (h < 15 || (h === 15 && now.getMinutes() <= 30));
-  const tabs = ['Smart Picks', 'Overview', 'Trades', 'Stock Analysis', 'Signals', 'Metals'];
+  const tabs = ['AI Discovery', 'Smart Picks', 'Overview', 'Trades', 'Stock Analysis', 'Signals', 'Metals'];
 
   // Compute portfolio-level numbers from live stocks
   const gainers = stocks.filter(s => s.changePct > 0).length;
