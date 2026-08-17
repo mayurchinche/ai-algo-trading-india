@@ -1,5 +1,6 @@
 import { portfolio, dailyPnl, strategyStats, niftyIntraday } from '../data/mockData';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, CartesianGrid, ComposedChart } from 'recharts';
+import { useLiveStocks } from '../hooks/useLiveStocks';
 
 function KPI({ label, value, sub, color }: { label: string; value: string; sub?: string; color?: string }) {
   return (
@@ -11,7 +12,8 @@ function KPI({ label, value, sub, color }: { label: string; value: string; sub?:
   );
 }
 
-export function OverviewPage({ nifty: _nifty }: { nifty: import('../services/liveData').LiveStock | null }) {
+export function OverviewPage() {
+  const { nifty } = useLiveStocks();
   return (
     <div className="space-y-4">
       {/* KPI Row */}
@@ -81,8 +83,18 @@ export function OverviewPage({ nifty: _nifty }: { nifty: import('../services/liv
             <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">NIFTY 50 Intraday</h3>
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--green)] pulse"></span>
-              <span className="text-sm font-bold text-[var(--green)]">24,856.40</span>
-              <span className="text-xs text-[var(--green)]">+0.63%</span>
+              {nifty ? (
+                <>
+                  <span className="text-sm font-bold text-[var(--text)]" style={{ fontFamily: 'Poppins' }}>
+                    {nifty.ltp.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                  </span>
+                  <span className={`text-xs font-bold ${nifty.changePct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
+                    {nifty.changePct >= 0 ? '+' : ''}{nifty.changePct.toFixed(2)}%
+                  </span>
+                </>
+              ) : (
+                <span className="text-xs text-[var(--text-muted)]">Loading...</span>
+              )}
             </div>
           </div>
           <ResponsiveContainer width="100%" height={180}>

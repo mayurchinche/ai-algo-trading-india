@@ -1,15 +1,4 @@
-// ponytail: single file for all live data fetching from Yahoo Finance chart API via Vite proxy
-
-const SYMBOLS = [
-  'RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK',
-  'HINDUNILVR', 'SBIN', 'TMCV', 'TMPV', 'BAJFINANCE', 'MARUTI', 'WIPRO',
-];
-
-const SECTORS: Record<string, string> = {
-  RELIANCE: 'Energy', TCS: 'IT', HDFCBANK: 'Banking', INFY: 'IT',
-  ICICIBANK: 'Banking', HINDUNILVR: 'FMCG', SBIN: 'Banking',
-  TMCV: 'Auto - CV', TMPV: 'Auto - PV', BAJFINANCE: 'NBFC', MARUTI: 'Auto', WIPRO: 'IT',
-};
+// ponytail: only Nifty index fetching — stock discovery handled by stockDiscovery.ts
 
 export interface LiveStock {
   symbol: string;
@@ -42,7 +31,7 @@ interface YahooChartMeta {
 
 async function fetchSingleStock(symbol: string): Promise<LiveStock | null> {
   try {
-    const res = await fetch(`/api/yahoo/v8/finance/chart/${symbol}.NS?interval=1d&range=1d`);
+    const res = await fetch(`/api/yahoo/v8/finance/chart/${symbol}?interval=1d&range=1d`);
     if (!res.ok) return null;
     const data = await res.json();
     const meta: YahooChartMeta = data?.chart?.result?.[0]?.meta;
@@ -52,16 +41,14 @@ async function fetchSingleStock(symbol: string): Promise<LiveStock | null> {
     const ltp = meta.regularMarketPrice || 0;
     const change = ltp - prevClose;
     const changePct = prevClose > 0 ? (change / prevClose) * 100 : 0;
-
-    // Get open from first candle
     const opens = data?.chart?.result?.[0]?.indicators?.quote?.[0]?.open;
     const openPrice = opens?.[0] ?? prevClose;
+    const sym = symbol.replace('.NS', '').replace('^', '');
 
-    const sym = symbol.replace('.NS', '');
     return {
       symbol: sym,
       name: meta.longName || meta.shortName || sym,
-      sector: SECTORS[sym] || '',
+      sector: '',
       ltp: Math.round(ltp * 100) / 100,
       change: Math.round(change * 100) / 100,
       changePct: Math.round(changePct * 100) / 100,
@@ -78,18 +65,7 @@ async function fetchSingleStock(symbol: string): Promise<LiveStock | null> {
   }
 }
 
-export async function fetchAllStocks(): Promise<LiveStock[]> {
-  const results = await Promise.allSettled(
-    SYMBOLS.map((s) => fetchSingleStock(s))
-  );
-  return results
-    .map((r) => (r.status === 'fulfilled' ? r.value : null))
-    .filter((s): s is LiveStock => s !== null);
-}
-
-// Nifty 50 index
+// ponytail: only Nifty — individual stocks come from stockDiscovery.ts
 export async function fetchNifty(): Promise<LiveStock | null> {
-  return fetchSingleStock('^NSEI' as any);
+  return fetchSingleStock('^NSEI');
 }
-
-export { SYMBOLS };

@@ -3,34 +3,27 @@ import type { LiveStock } from '../services/liveData';
 interface HeaderProps {
   activeTab: string;
   onTabChange: (t: string) => void;
-  stocks: LiveStock[];
   nifty: LiveStock | null;
   lastUpdated: Date | null;
 }
 
-export function Header({ activeTab, onTabChange, stocks, nifty }: HeaderProps) {
+export function Header({ activeTab, onTabChange, nifty }: HeaderProps) {
   const now = new Date();
   const h = now.getHours();
   const marketOpen = h >= 9 && (h < 15 || (h === 15 && now.getMinutes() <= 30));
   const tabs = ['AI Discovery', 'Smart Picks', 'Overview', 'Trades', 'Stock Analysis', 'Signals', 'Metals'];
 
-  // Compute portfolio-level numbers from live stocks
-  const gainers = stocks.filter(s => s.changePct > 0).length;
-  const losers = stocks.filter(s => s.changePct < 0).length;
-
   return (
     <header className="bg-white border-b border-[var(--border)]">
       <div className="flex items-center justify-between px-6 py-4 max-w-[1400px] mx-auto">
-        {/* Brand */}
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-base shadow-lg shadow-blue-200">AT</div>
           <div>
             <h1 className="text-base font-bold text-[var(--text)]" style={{ fontFamily: 'Poppins' }}>AlgoTrader AI</h1>
-            <p className="text-xs text-[var(--text-muted)]">Indian Stock Market • NSE</p>
+            <p className="text-xs text-[var(--text-muted)]">Indian Stock Market • NSE • Live Discovery</p>
           </div>
         </div>
 
-        {/* Live market summary */}
         <div className="hidden lg:flex items-center gap-8">
           {nifty && (
             <div>
@@ -45,21 +38,8 @@ export function Header({ activeTab, onTabChange, stocks, nifty }: HeaderProps) {
               </div>
             </div>
           )}
-          <div>
-            <div className="text-xs text-[var(--text-muted)] font-medium">Market</div>
-            <div className="text-sm">
-              <span className="text-[var(--green)] font-bold">{gainers}↑</span>
-              <span className="text-[var(--text-muted)] mx-1">•</span>
-              <span className="text-[var(--red)] font-bold">{losers}↓</span>
-            </div>
-          </div>
-          <div>
-            <div className="text-xs text-[var(--text-muted)] font-medium">Stocks Tracked</div>
-            <div className="text-sm font-bold text-[var(--text)]" style={{ fontFamily: 'Poppins' }}>{stocks.length}</div>
-          </div>
         </div>
 
-        {/* Status */}
         <div className="flex items-center gap-3">
           <span className="text-xs text-[var(--text-muted)] font-medium">
             {now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
@@ -72,13 +52,10 @@ export function Header({ activeTab, onTabChange, stocks, nifty }: HeaderProps) {
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="px-6 pb-3 max-w-[1400px] mx-auto">
         <div className="tab-bar">
           {tabs.map((t) => (
-            <div key={t} className={`tab ${activeTab === t ? 'active' : ''}`} onClick={() => onTabChange(t)}>
-              {t}
-            </div>
+            <div key={t} className={`tab ${activeTab === t ? 'active' : ''}`} onClick={() => onTabChange(t)}>{t}</div>
           ))}
         </div>
       </div>

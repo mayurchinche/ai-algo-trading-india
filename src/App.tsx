@@ -11,24 +11,22 @@ import { useLiveStocks } from './hooks/useLiveStocks';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('AI Discovery');
-  const { stocks, nifty, loading, lastUpdated, refresh } = useLiveStocks();
+  const { nifty, loading, lastUpdated, refresh } = useLiveStocks();
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--bg)]">
-      <Header activeTab={activeTab} onTabChange={setActiveTab} stocks={stocks} nifty={nifty} lastUpdated={lastUpdated} />
+      <Header activeTab={activeTab} onTabChange={setActiveTab} nifty={nifty} lastUpdated={lastUpdated} />
 
       {/* Live data status bar */}
       <div className="bg-white border-b border-[var(--border)] px-6 py-2 flex items-center gap-4 max-w-[1400px] mx-auto w-full text-xs">
         <div className="flex items-center gap-1.5">
           <span className={`w-2 h-2 rounded-full ${loading ? 'bg-amber-400 pulse' : 'bg-[var(--green)]'}`}></span>
           <span className="text-[var(--text-secondary)] font-medium">
-            {loading ? 'Fetching live prices...' : `Live prices • ${stocks.length} stocks`}
+            {loading ? 'Connecting to NSE...' : 'Live • All data from Yahoo Finance'}
           </span>
         </div>
         {lastUpdated && (
-          <span className="text-[var(--text-muted)]">
-            Updated: {lastUpdated.toLocaleTimeString('en-IN')}
-          </span>
+          <span className="text-[var(--text-muted)]">Updated: {lastUpdated.toLocaleTimeString('en-IN')}</span>
         )}
         {nifty && (
           <div className="flex items-center gap-2 ml-auto">
@@ -46,15 +44,15 @@ export default function App() {
 
       <main className="flex-1 p-6 overflow-y-auto max-w-[1400px] mx-auto w-full">
         {activeTab === 'AI Discovery' && <DiscoveryPage />}
-        {activeTab === 'Smart Picks' && <SmartPicksPage stocks={stocks} />}
-        {activeTab === 'Overview' && <OverviewPage nifty={nifty} />}
-        {activeTab === 'Trades' && <TradesPage stocks={stocks} />}
-        {activeTab === 'Stock Analysis' && <StockAnalysisPage stocks={stocks} />}
-        {activeTab === 'Signals' && <SignalsPage stocks={stocks} />}
+        {activeTab === 'Smart Picks' && <SmartPicksPage />}
+        {activeTab === 'Overview' && <OverviewPage />}
+        {activeTab === 'Trades' && <TradesPage />}
+        {activeTab === 'Stock Analysis' && <StockAnalysisPage />}
+        {activeTab === 'Signals' && <SignalsPage />}
         {activeTab === 'Metals' && <MetalsPage />}
       </main>
       <footer className="text-center text-xs text-[var(--text-muted)] py-4 border-t border-[var(--border)] bg-white">
-        AlgoTrader AI v1.0 • Paper Trading Mode • NSE/BSE • Not Financial Advice • Live data from Yahoo Finance
+        AlgoTrader AI v1.0 • Paper Trading Mode • NSE • Not Financial Advice • Live data from Yahoo Finance
       </footer>
     </div>
   );

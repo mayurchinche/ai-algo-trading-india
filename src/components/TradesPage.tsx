@@ -1,121 +1,165 @@
-import { useState } from 'react';
-import { allTrades } from '../data/mockData';
+// ponytail: trades generated from live discovery — no hardcoded trade data
+import { useStockDiscovery } from '../hooks/useStockDiscovery';
+import type { DiscoveredStock } from '../services/stockDiscovery';
 
-type FilterStatus = 'ALL' | 'OPEN' | 'TARGET_HIT' | 'SL_HIT' | 'MANUAL_EXIT';
+interface PaperTrade {
+  stock: DiscoveredStock;
+  side: 'BUY' | 'SELL';
+  quantity: number;
+  entryPrice: number;
+  currentPrice: number;
+  stopLoss: number;
+  target: number;
+  pnl: number;
+  pnlPct: number;
+  strategy: string;
+  riskReward: number;
+}
 
-const statusConfig: Record<string, { label: string; class: string }> = {
-  OPEN: { label: '● OPEN', class: 'badge-blue' },
-  TARGET_HIT: { label: '✓ TARGET', class: 'badge-green' },
-  SL_HIT: { label: '✗ SL HIT', class: 'badge-red' },
-  MANUAL_EXIT: { label: '↗ MANUAL', class: 'badge-amber' },
-};
+function generatePaperTrades(stocks: DiscoveredStock[]): PaperTrade[] {
+  return stocks
+    .filter(s => Math.abs(s.overallScore) >= 25) // Only trade on conviction
+    .map(s => {
+      const side: 'BUY' | 'SELL' = s.overallScore > 0 ? 'BUY' : 'SELL';
+      // ponytail: simulate entry at previous close, current at LTP
+      const entryPrice = s.prevClose;
+      const currentPrice = s.ltp;
+      const quantity = Math.max(1, Math.floor(50000 / entryPrice)); // ~₹50K per position
+      const pnl = side === 'BUY'
+        ? (currentPrice - entryPrice) * quantity
+        : (entryPrice - currentPrice) * quantity;
+      const pnlPct = side === 'BUY'
+        ? ((currentPrice - entryPrice) / entryPrice) * 100
+        : ((entryPrice - currentPrice) / entryPrice) * 100;
+      return {
+        stock: s,
+        side,
+        quantity,
+        entryPrice,
+        currentPrice,
+        stopLoss: s.foAnalysis.suggestedStopLoss,
+        target: s.foAnalysis.suggestedTarget,
+        pnl: Math.round(pnl),
+        pnlPct: Math.round(pnlPct * 100) / 100,
+        strategy: s.strategies[0] || 'Multi-Strategy',
+        riskReward: s.foAnalysis.riskReward,
+      };
+    });
+}
 
-export function TradesPage({ stocks: _stocks }: { stocks: import('../services/liveData').LiveStock[] }) {
-  const [filter, setFilter] = useState<FilterStatus>('ALL');
+export function TradesPage() {
+  const { stocks, loading, lastScan, rescan } = useStockDiscovery();
+  const trades = generatePaperTrades(stocks);
 
-  const filtered = filter === 'ALL' ? allTrades : allTrades.filter(t => t.status === filter);
-  const totalPnl = filtered.reduce((acc, t) => acc + t.netPnl, 0);
-  const wins = filtered.filter(t => t.netPnl > 0).length;
-  const losses = filtered.filter(t => t.netPnl < 0).length;
+  const totalPnl = trades.reduce((a, t) => a + t.pnl, 0);
+  const wins = trades.filter(t => t.pnl > 0).length;
+  const losses = trades.filter(t => t.pnl < 0).length;
+  const totalInvested = trades.reduce((a, t) => a + t.entryPrice * t.quantity, 0);
 
   return (
     <div className="space-y-4">
-      {/* Filter + Summary bar */}
-      <div className="card flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          {(['ALL', 'OPEN', 'TARGET_HIT', 'SL_HIT', 'MANUAL_EXIT'] as FilterStatus[]).map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${filter === f ? 'bg-[var(--blue)] text-white' : 'bg-[var(--bg-alt)] text-[var(--text-secondary)] hover:text-[var(--text)]'}`}
-            >
-              {f === 'ALL' ? 'All Trades' : f.replace('_', ' ')}
-            </button>
-          ))}
+      {/* Summary */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div className="card text-center">
+          <div className="text-[10px] text-[var(--text-muted)] uppercase">Active Trades</div>
+          <div className="text-xl font-bold" style={{ fontFamily: 'Poppins' }}>{trades.length}</div>
         </div>
-        <div className="flex items-center gap-4 text-xs">
-          <span className="text-[var(--text-secondary)]">Showing: <strong className="text-[var(--text)]">{filtered.length}</strong> trades</span>
-          <span className="text-[var(--green)]">Wins: {wins}</span>
-          <span className="text-[var(--red)]">Losses: {losses}</span>
-          <span className={totalPnl >= 0 ? 'text-[var(--green)] font-bold' : 'text-[var(--red)] font-bold'}>
-            Net: {totalPnl >= 0 ? '+' : ''}₹{totalPnl.toLocaleString()}
-          </span>
+        <div className="card text-center">
+          <div className="text-[10px] text-[var(--text-muted)] uppercase">Today's P&L</div>
+          <div className={`text-xl font-bold ${totalPnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`} style={{ fontFamily: 'Poppins' }}>
+            {totalPnl >= 0 ? '+' : ''}₹{totalPnl.toLocaleString('en-IN')}
+          </div>
+        </div>
+        <div className="card text-center">
+          <div className="text-[10px] text-[var(--text-muted)] uppercase">Win / Loss</div>
+          <div className="text-xl font-bold" style={{ fontFamily: 'Poppins' }}>
+            <span className="text-[var(--green)]">{wins}</span>
+            <span className="text-[var(--text-muted)]"> / </span>
+            <span className="text-[var(--red)]">{losses}</span>
+          </div>
+        </div>
+        <div className="card text-center">
+          <div className="text-[10px] text-[var(--text-muted)] uppercase">Capital Deployed</div>
+          <div className="text-xl font-bold" style={{ fontFamily: 'Poppins' }}>₹{(totalInvested / 100000).toFixed(1)}L</div>
+        </div>
+        <div className="card text-center">
+          <div className="text-[10px] text-[var(--text-muted)] uppercase">Win Rate</div>
+          <div className="text-xl font-bold" style={{ fontFamily: 'Poppins' }}>
+            {trades.length > 0 ? ((wins / trades.length) * 100).toFixed(0) : 0}%
+          </div>
         </div>
       </div>
 
-      {/* Trades table */}
-      <div className="card overflow-x-auto">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Time</th>
-              <th>Symbol</th>
-              <th>Side</th>
-              <th>Qty</th>
-              <th className="text-right">Entry</th>
-              <th className="text-right">Exit/CMP</th>
-              <th className="text-right">SL</th>
-              <th className="text-right">Target</th>
-              <th className="text-right">P&L</th>
-              <th className="text-right">Net P&L</th>
-              <th className="text-right">%</th>
-              <th>R:R</th>
-              <th>Strategy</th>
-              <th>Confidence</th>
-              <th>Duration</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((t) => (
-              <tr key={t.id}>
-                <td className="text-[var(--text-secondary)] font-mono text-[10px]">{t.id}</td>
-                <td className="text-[11px] whitespace-nowrap">{t.entryTime.slice(5, 16)}</td>
-                <td className="font-medium">{t.symbol}</td>
-                <td><span className={`badge ${t.side === 'BUY' ? 'badge-green' : 'badge-red'}`}>{t.side}</span></td>
-                <td>{t.quantity}</td>
-                <td className="text-right font-mono">₹{t.entryPrice.toLocaleString()}</td>
-                <td className="text-right font-mono">{t.exitPrice ? `₹${t.exitPrice.toLocaleString()}` : `₹${t.currentPrice.toLocaleString()}`}</td>
-                <td className="text-right font-mono text-red-400/70">₹{t.stopLoss.toLocaleString()}</td>
-                <td className="text-right font-mono text-green-400/70">₹{t.takeProfit.toLocaleString()}</td>
-                <td className={`text-right font-mono font-bold ${t.pnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
-                  {t.pnl >= 0 ? '+' : ''}₹{t.pnl.toLocaleString()}
-                </td>
-                <td className={`text-right font-mono ${t.netPnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
-                  {t.netPnl >= 0 ? '+' : ''}₹{t.netPnl.toLocaleString()}
-                </td>
-                <td className={`text-right ${t.pnlPct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
-                  {t.pnlPct >= 0 ? '+' : ''}{t.pnlPct.toFixed(2)}%
-                </td>
-                <td className="text-center">{t.riskRewardRatio}</td>
-                <td className="text-[11px] text-[var(--text-secondary)]">{t.strategy}</td>
-                <td>
-                  <div className="flex items-center gap-1">
-                    <div className="progress-bar w-12">
-                      <div className={`progress-fill ${t.confidence >= 0.8 ? 'bg-[var(--green)]' : t.confidence >= 0.7 ? 'bg-blue-400' : 'bg-amber-400'}`} style={{ width: `${t.confidence * 100}%` }} />
-                    </div>
-                    <span className="text-[10px] text-[var(--text-secondary)]">{(t.confidence * 100).toFixed(0)}%</span>
-                  </div>
-                </td>
-                <td className="text-[11px] text-[var(--text-secondary)]">{t.holdingDuration}</td>
-                <td><span className={`badge ${statusConfig[t.status].class}`}>{statusConfig[t.status].label}</span></td>
+      {/* Info bar */}
+      <div className="card bg-blue-50 flex items-center justify-between">
+        <div className="text-xs text-blue-700">
+          <b>Paper Trading Mode</b> — AI discovers stocks from live NSE data, simulates entry at previous close, tracks against live LTP.
+          {lastScan && <span className="ml-2 text-blue-500">Last scan: {lastScan.toLocaleTimeString('en-IN')}</span>}
+        </div>
+        <button onClick={rescan} disabled={loading} className="text-xs font-semibold text-blue-700 hover:underline disabled:opacity-50">
+          {loading ? 'Scanning...' : '↻ Refresh'}
+        </button>
+      </div>
+
+      {/* Trade table */}
+      {loading && trades.length === 0 ? (
+        <div className="card text-center py-12">
+          <p className="text-sm text-[var(--text-secondary)]">Discovering stocks and generating paper trades...</p>
+        </div>
+      ) : (
+        <div className="card overflow-x-auto">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Symbol</th>
+                <th>Side</th>
+                <th className="text-right">Qty</th>
+                <th className="text-right">Entry</th>
+                <th className="text-right">LTP (Live)</th>
+                <th className="text-right">P&L</th>
+                <th className="text-right">%</th>
+                <th className="text-right">Stop Loss</th>
+                <th className="text-right">Target</th>
+                <th className="text-center">R:R</th>
+                <th>Strategy</th>
+                <th className="text-center">Signal</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Trade detail expanded (shows for first trade) */}
-      <div className="card border-l-4 border-l-blue-500">
-        <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-2">Trade Reasoning — {allTrades[0].id} ({allTrades[0].symbol})</h3>
-        <p className="text-xs text-[var(--text)] leading-relaxed">{allTrades[0].reason}</p>
-        <div className="flex items-center gap-4 mt-2 text-[10px] text-[var(--text-secondary)]">
-          <span>Strategy: <strong>{allTrades[0].strategy}</strong></span>
-          <span>Confidence: <strong>{(allTrades[0].confidence * 100).toFixed(0)}%</strong></span>
-          <span>R:R: <strong>{allTrades[0].riskRewardRatio}</strong></span>
+            </thead>
+            <tbody>
+              {trades.sort((a, b) => b.pnl - a.pnl).map(t => (
+                <tr key={t.stock.symbol}>
+                  <td>
+                    <div className="font-semibold">{t.stock.symbol}</div>
+                    <div className="text-[10px] text-[var(--text-muted)] max-w-[120px] truncate">{t.stock.name}</div>
+                  </td>
+                  <td>
+                    <span className={`badge ${t.side === 'BUY' ? 'badge-green' : 'badge-red'}`}>{t.side}</span>
+                  </td>
+                  <td className="text-right font-mono">{t.quantity}</td>
+                  <td className="text-right font-mono">₹{t.entryPrice.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                  <td className="text-right font-mono font-semibold">₹{t.currentPrice.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                  <td className={`text-right font-mono font-bold ${t.pnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
+                    {t.pnl >= 0 ? '+' : ''}₹{t.pnl.toLocaleString('en-IN')}
+                  </td>
+                  <td className={`text-right font-mono font-bold ${t.pnlPct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
+                    {t.pnlPct >= 0 ? '+' : ''}{t.pnlPct.toFixed(2)}%
+                  </td>
+                  <td className="text-right font-mono text-[var(--red)]">₹{t.stopLoss.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                  <td className="text-right font-mono text-[var(--green)]">₹{t.target.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                  <td className="text-center text-xs font-bold">1:{t.riskReward}</td>
+                  <td className="text-xs">{t.strategy}</td>
+                  <td className="text-center">
+                    <span className={`badge text-[9px] ${t.stock.signal.includes('BUY') ? 'badge-green' : t.stock.signal.includes('SELL') ? 'badge-red' : 'badge-amber'}`}>
+                      {t.stock.signal.replace('_', ' ')}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {trades.length === 0 && <p className="text-center text-[var(--text-muted)] py-8 text-sm">No trades generated — no stocks met the conviction threshold (score ≥ 25)</p>}
         </div>
-      </div>
+      )}
     </div>
   );
 }
