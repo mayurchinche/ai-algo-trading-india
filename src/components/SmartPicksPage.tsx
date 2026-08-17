@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useStockDiscovery } from '../hooks/useStockDiscovery';
 import type { DiscoveredStock } from '../services/stockDiscovery';
+import { generateOptionsPicks, type OptionsPick } from '../services/optionsEngine';
 
 function ScoreBar({ label, value, color }: { label: string; value: number; color: string }) {
   return (
@@ -134,7 +135,7 @@ function StockCard({ stock, variant }: { stock: DiscoveredStock; variant: 'short
 
 export function SmartPicksPage() {
   const { stocks, loading, lastScan, error, rescan } = useStockDiscovery();
-  const [view, setView] = useState<'short' | 'long' | 'smartmoney'>('short');
+  const [view, setView] = useState<'short' | 'long' | 'smartmoney' | 'options'>('short');
 
   const shortTerm = stocks.filter(s => s.scores.momentum > 30 || s.scores.breakout > 30)
     .sort((a, b) => (b.scores.momentum + b.scores.breakout) - (a.scores.momentum + a.scores.breakout));
@@ -142,6 +143,7 @@ export function SmartPicksPage() {
     .sort((a, b) => b.scores.trendFollowing - a.scores.trendFollowing);
   const smartMoney = stocks.filter(s => s.scores.smartMoney > 30)
     .sort((a, b) => b.scores.smartMoney - a.scores.smartMoney);
+  const optionsPicks = generateOptionsPicks(stocks);
 
   return (
     <div className="space-y-4">
@@ -156,6 +158,9 @@ export function SmartPicksPage() {
           </button>
           <button onClick={() => setView('smartmoney')} className={`btn-filter ${view === 'smartmoney' ? 'btn-filter-active-amber' : 'btn-filter-inactive'}`}>
             🦊 Smart Money ({smartMoney.length})
+          </button>
+          <button onClick={() => setView('options')} className={`btn-filter ${view === 'options' ? 'btn-filter-active-blue' : 'btn-filter-inactive'}`}>
+            📊 Options F&O ({optionsPicks.length})
           </button>
         </div>
         <div className="flex items-center gap-3">
@@ -270,6 +275,163 @@ export function SmartPicksPage() {
           )}
         </div>
       )}
+
+      {/* Options Trading */}
+      {view === 'options' && !loading && (
+        <div className="space-y-4">
+          <div className="section-header">
+            <span className="text-gradient-blue">📊 Options Trading Picks (F&O)</span>
+            <span className="badge badge-blue">TOP 1% STRATEGIES</span>
+            <span className="text-[11px] text-[var(--text-secondary)] ml-auto">{optionsPicks.length} setups found</span>
+          </div>
+
+          {/* How top 1% trade options */}
+          <div className="card bg-gradient-to-r from-indigo-50 to-blue-50">
+            <h4 className="text-xs font-bold text-indigo-800 uppercase tracking-wide mb-2">How Top 1% Traders Pick Options</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-[11px] text-indigo-700">
+              <div><span className="font-bold">1. IV Regime:</span> Sell premium when IV &gt; 70th percentile (overpriced); buy when IV &lt; 30th (cheap)</div>
+              <div><span className="font-bold">2. Probability:</span> Prefer 65-75% PoP trades. Sell beyond 1σ expected move. Small profits, high win rate.</div>
+              <div><span className="font-bold">3. Risk Mgmt:</span> Never risk &gt;2% capital per trade. Always defined risk (spreads). Exit at 50% profit or 2x loss.</div>
+            </div>
+          </div>
+
+          {optionsPicks.length === 0 ? (
+            <div className="card text-center py-8 text-[var(--text-secondary)] text-sm">No options setups meeting criteria in current scan</div>
+          ) : (
+            <div className="space-y-4">
+              {optionsPicks.map((pick, idx) => (
+                <OptionsCard key={pick.stock.symbol + idx} pick={pick} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function OptionsCard({ pick }: { pick: OptionsPick }) {
+  const [expanded, setExpanded] = useState(false);
+  const s = pick.stock;
+
+  return (
+    <div className="card border-l-4 border-l-blue-500">
+      {/* Header */}
+      <div className="flex items-start justify-between mb-3 cursor-pointer" onClick={() => setExpanded(!expanded)}>
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="font-bold text-[var(--text)]" style={{ fontFamily: 'Poppins' }}>{s.symbol}</span>
+            <span className="badge badge-blue text-[9px]">{pick.strategy}</span>
+            <span className={`text-[10px] font-bold ${pick.probabilityOfProfit >= 0.6 ? 'text-[var(--green)]' : 'text-amber-500'}`}>
+              {(pick.probabilityOfProfit * 100).toFixed(0)}% PoP
+            </span>
+          </div>
+          <p className="text-[11px] text-[var(--text-muted)] max-w-[400px] truncate">{s.name}</p>
+        </div>
+        <div className="text-right">
+          <div className="text-base font-bold" style={{ fontFamily: 'Poppins' }}>₹{s.ltp.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
+          <div className={`text-xs font-bold ${s.changePct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
+            {s.changePct >= 0 ? '+' : ''}{s.changePct.toFixed(2)}%
+          </div>
+        </div>
+      </div>
+
+      {/* Key metrics */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mb-3">
+        <div className="bg-gray-50 rounded-lg px-2 py-1.5 text-center">
+          <div className="text-[9px] text-[var(--text-muted)]">IV Percentile</div>
+          <div className={`text-sm font-bold ${pick.ivPercentile > 60 ? 'text-[var(--red)]' : pick.ivPercentile < 30 ? 'text-[var(--green)]' : 'text-amber-500'}`}>
+            {pick.ivPercentile}th
+          </div>
+        </div>
+        <div className="bg-gray-50 rounded-lg px-2 py-1.5 text-center">
+          <div className="text-[9px] text-[var(--text-muted)]">Weekly Move</div>
+          <div className="text-sm font-bold text-[var(--text)]">±{pick.expectedMoveWeekly}%</div>
+        </div>
+        <div className="bg-green-50 rounded-lg px-2 py-1.5 text-center">
+          <div className="text-[9px] text-[var(--text-muted)]">Max Profit</div>
+          <div className="text-sm font-bold text-[var(--green)]">
+            {pick.maxProfit === -1 ? '∞' : `₹${pick.maxProfit.toLocaleString('en-IN')}`}
+          </div>
+        </div>
+        <div className="bg-red-50 rounded-lg px-2 py-1.5 text-center">
+          <div className="text-[9px] text-[var(--text-muted)]">Max Loss</div>
+          <div className="text-sm font-bold text-[var(--red)]">
+            {pick.maxLoss === -1 ? '∞ ⚠️' : `₹${pick.maxLoss.toLocaleString('en-IN')}`}
+          </div>
+        </div>
+        <div className="bg-blue-50 rounded-lg px-2 py-1.5 text-center">
+          <div className="text-[9px] text-[var(--text-muted)]">Risk:Reward</div>
+          <div className="text-sm font-bold text-[var(--blue)]">1:{pick.riskReward}</div>
+        </div>
+      </div>
+
+      {/* Option legs */}
+      <div className="mb-3">
+        <h5 className="text-[10px] font-semibold text-[var(--text-secondary)] uppercase mb-1">Trade Legs</h5>
+        <div className="flex flex-wrap gap-2">
+          {pick.legs.map((leg, i) => (
+            <div key={i} className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[11px] font-medium ${leg.action === 'BUY' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+              <span>{leg.action}</span>
+              <span className="font-bold">₹{leg.strike}</span>
+              <span>{leg.type}</span>
+              <span className="text-[9px] opacity-70">@₹{leg.premium.toFixed(1)}</span>
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-4 mt-1.5 text-[10px] text-[var(--text-secondary)]">
+          <span>Breakeven: {pick.breakeven.map(b => `₹${b.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`).join(', ')}</span>
+          <span>Expiry: {pick.suggestedExpiry}</span>
+        </div>
+      </div>
+
+      {/* Expanded section */}
+      {expanded && (
+        <div className="space-y-3 pt-3 border-t border-[var(--border)]">
+          {/* Trade Rationale */}
+          <div>
+            <h5 className="text-[10px] font-semibold text-[var(--text-secondary)] uppercase mb-1">Why This Trade (Top 1% Logic)</h5>
+            {pick.tradeRationale.map((r, i) => (
+              <p key={i} className="text-[11px] text-[var(--text)] flex items-start gap-1.5 mb-0.5">
+                <span className="text-blue-500">▸</span> {r}
+              </p>
+            ))}
+          </div>
+
+          {/* Edge Factors */}
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-3">
+            <h5 className="text-[10px] font-semibold text-green-700 uppercase mb-1">Statistical Edge</h5>
+            {pick.edgeFactors.map((e, i) => (
+              <p key={i} className="text-[11px] text-green-800 flex items-start gap-1.5 mb-0.5">
+                <span className="text-green-500">✦</span> {e}
+              </p>
+            ))}
+          </div>
+
+          {/* Risk Warnings */}
+          {pick.riskWarnings.length > 0 && (
+            <div className="bg-red-50 rounded-lg p-3">
+              <h5 className="text-[10px] font-semibold text-red-700 uppercase mb-1">Risk Warnings</h5>
+              {pick.riskWarnings.map((w, i) => (
+                <p key={i} className="text-[11px] text-red-700">{w}</p>
+              ))}
+            </div>
+          )}
+
+          {/* Technical context */}
+          <div className="flex items-center gap-4 text-[10px] text-[var(--text-secondary)]">
+            <span>RSI: <b>{s.rsi.toFixed(1)}</b></span>
+            <span>Trend: <b>{s.trend.replace('_', ' ')}</b></span>
+            <span>Vol: <b>{s.volumeRatio}x</b></span>
+            <span>Score: <b>{s.overallScore}</b></span>
+            <span>Monthly Move: <b>±{pick.expectedMoveMonthly}%</b></span>
+          </div>
+        </div>
+      )}
+
+      <button onClick={() => setExpanded(!expanded)} className="mt-2 text-[10px] text-[var(--blue)] font-medium hover:underline">
+        {expanded ? '▲ Less detail' : '▼ Show trade logic & edge'}
+      </button>
     </div>
   );
 }

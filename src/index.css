@@ -191,6 +191,7 @@ h1, h2, h3, h4, h5, h6 {
 .btn-filter-active-green { background: var(--green); color: white; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3); }
 .btn-filter-active-purple { background: var(--purple); color: white; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); }
 .btn-filter-active-amber { background: var(--amber); color: white; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3); }
+.btn-filter-active-blue { background: var(--blue); color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
 .btn-filter-inactive { background: var(--card); color: var(--text-secondary); border: 1px solid var(--border); }
 .btn-filter-inactive:hover { background: var(--bg); color: var(--text); }
 
