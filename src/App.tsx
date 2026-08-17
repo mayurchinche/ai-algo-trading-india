@@ -19,32 +19,35 @@ export default function App() {
     <div className="min-h-screen flex flex-col bg-[var(--bg)]">
       <Header activeTab={activeTab} onTabChange={setActiveTab} nifty={nifty} lastUpdated={lastUpdated} />
 
-      {/* Live data status bar */}
-      <div className="bg-white border-b border-[var(--border)] px-6 py-2 flex items-center gap-4 max-w-[1400px] mx-auto w-full text-xs">
-        <div className="flex items-center gap-1.5">
-          <span className={`w-2 h-2 rounded-full ${loading ? 'bg-amber-400 pulse' : 'bg-[var(--green)]'}`}></span>
-          <span className="text-[var(--text-secondary)] font-medium">
-            {loading ? 'Connecting to NSE...' : 'Live • All data from Yahoo Finance'}
-          </span>
-        </div>
-        {lastUpdated && (
-          <span className="text-[var(--text-muted)]">Updated: {lastUpdated.toLocaleTimeString('en-IN')}</span>
-        )}
-        {nifty && (
-          <div className="flex items-center gap-2 ml-auto">
-            <span className="font-semibold text-[var(--text)]">NIFTY 50</span>
-            <span className="font-bold" style={{ fontFamily: 'Poppins' }}>
-              {nifty.ltp.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-            </span>
-            <span className={`font-bold ${nifty.changePct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
-              {nifty.changePct >= 0 ? '+' : ''}{nifty.changePct.toFixed(2)}%
+      {/* Live data status bar — full-width background */}
+      <div className="bg-white border-b border-[var(--border)]">
+        <div className="px-8 xl:px-12 py-2.5 flex items-center gap-4 max-w-[1600px] mx-auto w-full text-xs">
+          <div className="flex items-center gap-1.5">
+            <span className={`w-2 h-2 rounded-full ${loading ? 'bg-amber-400 pulse' : 'bg-[var(--green)]'}`}></span>
+            <span className="text-[var(--text-secondary)] font-medium">
+              {loading ? 'Connecting to NSE...' : 'Live • All data from Yahoo Finance'}
             </span>
           </div>
-        )}
-        <button onClick={refresh} className="text-[var(--blue)] font-semibold hover:underline ml-2">↻ Refresh</button>
+          {lastUpdated && (
+            <span className="text-[var(--text-muted)]">Updated: {lastUpdated.toLocaleTimeString('en-IN')}</span>
+          )}
+          {nifty && (
+            <div className="flex items-center gap-2 ml-auto">
+              <span className="font-semibold text-[var(--text)]">NIFTY 50</span>
+              <span className="font-bold" style={{ fontFamily: 'Poppins' }}>
+                {nifty.ltp.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+              </span>
+              <span className={`font-bold ${nifty.changePct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
+                {nifty.changePct >= 0 ? '+' : ''}{nifty.changePct.toFixed(2)}%
+              </span>
+            </div>
+          )}
+          <button onClick={refresh} className="text-[var(--blue)] font-semibold hover:underline ml-2">↻ Refresh</button>
+        </div>
       </div>
 
-      <main className="flex-1 p-6 overflow-y-auto max-w-[1400px] mx-auto w-full">
+      <main className="flex-1 py-8 px-8 xl:px-12 overflow-y-auto max-w-[1600px] mx-auto w-full">
+        <div className="space-y-6">
         {activeTab === 'AI Discovery' && <DiscoveryPage />}
         {activeTab === 'Smart Picks' && <SmartPicksPage />}
         {activeTab === 'Overview' && <OverviewPage />}
@@ -54,9 +57,12 @@ export default function App() {
         {activeTab === 'Backtest' && <BacktestPage />}
         {activeTab === 'IPO Tracker' && <IPOPage />}
         {activeTab === 'Metals' && <MetalsPage />}
+        </div>
       </main>
-      <footer className="text-center text-xs text-[var(--text-muted)] py-4 border-t border-[var(--border)] bg-white">
-        AlgoTrader AI v1.0 • Paper Trading Mode • NSE • Not Financial Advice • Live data from Yahoo Finance
+      <footer className="text-center text-xs text-[var(--text-muted)] py-6 border-t border-[var(--border)] bg-white">
+        <div className="max-w-[1600px] mx-auto px-8">
+          AlgoTrader AI v1.0 • Paper Trading Mode • NSE • Not Financial Advice • Live data from Yahoo Finance
+        </div>
       </footer>
     </div>
   );

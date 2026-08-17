@@ -57,9 +57,9 @@ export function TradesPage() {
   const totalInvested = trades.reduce((a, t) => a + t.entryPrice * t.quantity, 0);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <div className="card text-center">
           <div className="text-[10px] text-[var(--text-muted)] uppercase">Active Trades</div>
           <div className="text-xl font-bold" style={{ fontFamily: 'Poppins' }}>{trades.length}</div>

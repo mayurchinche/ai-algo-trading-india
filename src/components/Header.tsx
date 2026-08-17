@@ -15,21 +15,21 @@ export function Header({ activeTab, onTabChange, nifty }: HeaderProps) {
 
   return (
     <header className="bg-white border-b border-[var(--border)]">
-      <div className="flex items-center justify-between px-6 py-4 max-w-[1400px] mx-auto">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-base shadow-lg shadow-blue-200">AT</div>
+      <div className="flex items-center justify-between px-8 xl:px-12 py-5 max-w-[1600px] mx-auto">
+        <div className="flex items-center gap-4">
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-200">AT</div>
           <div>
-            <h1 className="text-base font-bold text-[var(--text)]" style={{ fontFamily: 'Poppins' }}>AlgoTrader AI</h1>
-            <p className="text-xs text-[var(--text-muted)]">Indian Stock Market • NSE • Live Discovery</p>
+            <h1 className="text-lg font-bold text-[var(--text)]" style={{ fontFamily: 'Poppins' }}>AlgoTrader AI</h1>
+            <p className="text-[11px] text-[var(--text-muted)] tracking-wide">Indian Stock Market • NSE • Live Discovery</p>
           </div>
         </div>
 
         <div className="hidden lg:flex items-center gap-8">
           {nifty && (
             <div>
-              <div className="text-xs text-[var(--text-muted)] font-medium">NIFTY 50</div>
+              <div className="text-[10px] text-[var(--text-muted)] font-medium uppercase tracking-wider">NIFTY 50</div>
               <div className="flex items-center gap-2">
-                <span className="text-base font-bold text-[var(--text)]" style={{ fontFamily: 'Poppins' }}>
+                <span className="text-lg font-bold text-[var(--text)]" style={{ fontFamily: 'Poppins' }}>
                   {nifty.ltp.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                 </span>
                 <span className={`text-sm font-bold ${nifty.changePct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
@@ -52,10 +52,10 @@ export function Header({ activeTab, onTabChange, nifty }: HeaderProps) {
         </div>
       </div>
 
-      <div className="px-6 pb-3 max-w-[1400px] mx-auto">
-        <div className="tab-bar">
+      <div className="px-8 xl:px-12 pb-4 max-w-[1600px] mx-auto">
+        <div className="tab-bar overflow-x-auto">
           {tabs.map((t) => (
-            <div key={t} className={`tab ${activeTab === t ? 'active' : ''}`} onClick={() => onTabChange(t)}>{t}</div>
+            <div key={t} className={`tab whitespace-nowrap ${activeTab === t ? 'active' : ''}`} onClick={() => onTabChange(t)}>{t}</div>
           ))}
         </div>
       </div>

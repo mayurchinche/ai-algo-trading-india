@@ -45,7 +45,7 @@ function StockCard({ stock, variant }: { stock: DiscoveredStock; variant: 'short
       </div>
 
       {/* Price row */}
-      <div className="grid grid-cols-4 gap-3 mb-3">
+      <div className="grid grid-cols-4 gap-4 mb-3">
         <div>
           <div className="text-[10px] text-[var(--text-secondary)]">LTP</div>
           <div className="text-sm font-bold font-mono">₹{stock.ltp.toLocaleString(undefined, { maximumFractionDigits: 2 })}</div>
@@ -146,10 +146,10 @@ export function SmartPicksPage() {
   const optionsPicks = generateOptionsPicks(stocks);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* View toggle */}
-      <div className="card flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
+      <div className="card flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
           <button onClick={() => setView('short')} className={`btn-filter ${view === 'short' ? 'btn-filter-active-green' : 'btn-filter-inactive'}`}>
             🚀 Short-Term ({shortTerm.length})
           </button>
@@ -163,7 +163,7 @@ export function SmartPicksPage() {
             📊 Options F&O ({optionsPicks.length})
           </button>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <div className="text-[11px] text-[var(--text-secondary)]">
             {lastScan ? `Last scan: ${lastScan.toLocaleTimeString('en-IN')}` : 'Scanning...'} • Live Discovery
           </div>
@@ -192,7 +192,7 @@ export function SmartPicksPage() {
 
       {/* Short-term */}
       {view === 'short' && !loading && (
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div className="section-header">
             <span className="text-gradient-green">🚀 Short-Term Picks (10-15 Days)</span>
             <span className="badge badge-green">MOMENTUM + BREAKOUT</span>
@@ -210,7 +210,7 @@ export function SmartPicksPage() {
 
       {/* Long-term */}
       {view === 'long' && !loading && (
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div className="section-header">
             <span className="text-gradient-purple">💎 Long-Term Picks (Trend + SMA200)</span>
             <span className="badge badge-purple">TREND FOLLOWING</span>
@@ -228,7 +228,7 @@ export function SmartPicksPage() {
 
       {/* Smart Money */}
       {view === 'smartmoney' && !loading && (
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div className="section-header">
             <span className="text-gradient-gold">🦊 Smart Money Flow</span>
             <span className="badge badge-amber">VOLUME + INSTITUTIONAL</span>
@@ -278,7 +278,7 @@ export function SmartPicksPage() {
 
       {/* Options Trading */}
       {view === 'options' && !loading && (
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div className="section-header">
             <span className="text-gradient-blue">📊 Options Trading Picks (F&O)</span>
             <span className="badge badge-blue">TOP 1% STRATEGIES</span>
@@ -288,7 +288,7 @@ export function SmartPicksPage() {
           {/* How top 1% trade options */}
           <div className="card bg-gradient-to-r from-indigo-50 to-blue-50">
             <h4 className="text-xs font-bold text-indigo-800 uppercase tracking-wide mb-2">How Top 1% Traders Pick Options</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-[11px] text-indigo-700">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-[11px] text-indigo-700">
               <div><span className="font-bold">1. IV Regime:</span> Sell premium when IV &gt; 70th percentile (overpriced); buy when IV &lt; 30th (cheap)</div>
               <div><span className="font-bold">2. Probability:</span> Prefer 65-75% PoP trades. Sell beyond 1σ expected move. Small profits, high win rate.</div>
               <div><span className="font-bold">3. Risk Mgmt:</span> Never risk &gt;2% capital per trade. Always defined risk (spreads). Exit at 50% profit or 2x loss.</div>
@@ -298,7 +298,7 @@ export function SmartPicksPage() {
           {optionsPicks.length === 0 ? (
             <div className="card text-center py-8 text-[var(--text-secondary)] text-sm">No options setups meeting criteria in current scan</div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {optionsPicks.map((pick, idx) => (
                 <OptionsCard key={pick.stock.symbol + idx} pick={pick} />
               ))}
@@ -387,7 +387,7 @@ function OptionsCard({ pick }: { pick: OptionsPick }) {
 
       {/* Expanded section */}
       {expanded && (
-        <div className="space-y-3 pt-3 border-t border-[var(--border)]">
+        <div className="space-y-5 pt-3 border-t border-[var(--border)]">
           {/* Trade Rationale */}
           <div>
             <h5 className="text-[10px] font-semibold text-[var(--text-secondary)] uppercase mb-1">Why This Trade (Top 1% Logic)</h5>

@@ -39,7 +39,7 @@ export function BacktestPage() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Input section */}
       <div className="card">
         <div className="flex items-center gap-4">
@@ -89,7 +89,7 @@ export function BacktestPage() {
       )}
 
       {result && (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {/* Hero stats */}
           <div className="card bg-gradient-to-r from-blue-50 to-purple-50">
             <div className="flex items-center justify-between mb-4">
@@ -104,7 +104,7 @@ export function BacktestPage() {
                 <div className="text-xs text-[var(--text-secondary)]">₹{result.initialCapital.toLocaleString('en-IN')} → ₹{result.finalCapital.toLocaleString('en-IN')}</div>
               </div>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-5">
               <div className="bg-white rounded-xl p-3 text-center shadow-sm">
                 <div className="text-[9px] text-[var(--text-muted)] uppercase">Total P&L</div>
                 <div className={`text-base font-bold ${result.totalReturn >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>

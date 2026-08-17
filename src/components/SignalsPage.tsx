@@ -22,7 +22,7 @@ export function SignalsPage() {
   const holdSignals = signals.filter(s => s.direction === 'HOLD');
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Summary */}
       <div className="card flex items-center gap-6">
         <div className="flex items-center gap-2">
@@ -34,7 +34,7 @@ export function SignalsPage() {
             Last scan: {lastScan.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })} IST • Auto-refresh: 5 min
           </span>
         )}
-        <div className="flex items-center gap-3 ml-auto text-xs">
+        <div className="flex items-center gap-4 ml-auto text-xs">
           <span className="badge badge-green">{buySignals.length} BUY</span>
           <span className="badge badge-red">{sellSignals.length} SELL</span>
           <span className="badge badge-amber">{holdSignals.length} HOLD</span>
@@ -47,7 +47,7 @@ export function SignalsPage() {
           <p className="text-sm text-[var(--text-secondary)]">Scanning NSE for signals...</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {signals.sort((a, b) => b.confidence - a.confidence).map(({ stock: s, direction, confidence }) => (
             <div key={s.symbol} className={`card border-l-4 ${direction === 'BUY' ? 'border-l-[var(--green)]' : direction === 'SELL' ? 'border-l-[var(--red)]' : 'border-l-amber-400'}`}>
               {/* Header */}
@@ -62,7 +62,7 @@ export function SignalsPage() {
               </div>
 
               {/* Price */}
-              <div className="flex items-center gap-3 mb-2 text-xs">
+              <div className="flex items-center gap-4 mb-2 text-xs">
                 <span className="text-[var(--text-secondary)]">LTP:</span>
                 <span className="font-mono font-semibold">₹{s.ltp.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
                 <span className={s.changePct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}>
@@ -94,7 +94,7 @@ export function SignalsPage() {
               <div className="bg-purple-50 rounded-lg px-2 py-1.5 mb-2 text-[10px]">
                 <span className="text-purple-600 font-semibold">F&O: </span>
                 <span className="text-purple-800">{s.foAnalysis.optionStrategy}</span>
-                <div className="flex gap-3 mt-0.5 text-purple-600">
+                <div className="flex gap-4 mt-0.5 text-purple-600">
                   <span>SL: ₹{s.foAnalysis.suggestedStopLoss.toLocaleString('en-IN')}</span>
                   <span>Target: ₹{s.foAnalysis.suggestedTarget.toLocaleString('en-IN')}</span>
                   <span>R:R 1:{s.foAnalysis.riskReward}</span>

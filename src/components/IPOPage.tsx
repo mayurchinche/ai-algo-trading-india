@@ -73,9 +73,9 @@ export function IPOPage() {
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Summary cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-5">
         <div className="card text-center">
           <div className="text-2xl font-bold text-[var(--green)]" style={{ fontFamily: 'Poppins' }}>{ipos.filter(i => i.status === 'open').length}</div>
           <div className="text-[10px] text-[var(--text-muted)] uppercase">Open Now</div>
@@ -149,7 +149,7 @@ export function IPOPage() {
       )}
 
       {/* IPO Cards */}
-      <div className="space-y-3">
+      <div className="space-y-5">
         {filtered.map((ipo, idx) => (
           <motion.div
             key={ipo.name}
@@ -214,7 +214,7 @@ export function IPOPage() {
               <motion.div
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
-                className="mt-4 pt-4 border-t border-[var(--border)] space-y-3"
+                className="mt-4 pt-4 border-t border-[var(--border)] space-y-5"
               >
                 <div>
                   <h4 className="text-[10px] font-bold text-[var(--text-muted)] uppercase mb-1.5">AI Analysis</h4>

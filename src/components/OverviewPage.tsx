@@ -15,9 +15,9 @@ function KPI({ label, value, sub, color }: { label: string; value: string; sub?:
 export function OverviewPage() {
   const { nifty } = useLiveStocks();
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* KPI Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
         <div className="kpi-card gold"><KPI label="Portfolio Value" value={`₹${(portfolio.currentValue / 100000).toFixed(2)}L`} sub={`of ₹${(portfolio.totalCapital / 100000).toFixed(0)}L capital`} /></div>
         <div className="kpi-card green"><KPI label="Total P&L" value={`+₹${(portfolio.totalPnl / 1000).toFixed(1)}K`} sub={`+${portfolio.totalPnlPct}%`} color="text-[var(--green)]" /></div>
         <div className="kpi-card green"><KPI label="Today's P&L" value={`+₹${(portfolio.todayPnl / 1000).toFixed(1)}K`} sub={`+${portfolio.todayPnlPct}%`} color="text-[var(--green)]" /></div>
@@ -119,7 +119,7 @@ export function OverviewPage() {
         {/* Strategy Performance */}
         <div className="card">
           <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-3">Strategy Performance</h3>
-          <div className="space-y-3">
+          <div className="space-y-5">
             {strategyStats.map((s) => (
               <div key={s.name} className="p-3 rounded-lg bg-[var(--bg-alt)] border border-[var(--border)]">
                 <div className="flex justify-between items-center mb-2">

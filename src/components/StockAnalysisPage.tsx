@@ -12,7 +12,7 @@ export function StockAnalysisPage() {
   }));
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Score chart */}
       <div className="card">
         <div className="flex items-center justify-between mb-3">

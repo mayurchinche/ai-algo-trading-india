@@ -32,7 +32,7 @@ function StockCard({ stock, expanded, onToggle }: { stock: DiscoveredStock; expa
     <div className="card hover:shadow-lg transition-shadow cursor-pointer" onClick={onToggle}>
       {/* Header row */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
             <span className="text-xs font-bold text-blue-600">{stock.symbol.slice(0, 3)}</span>
           </div>
@@ -63,7 +63,7 @@ function StockCard({ stock, expanded, onToggle }: { stock: DiscoveredStock; expa
 
       {/* Expanded details */}
       {expanded && (
-        <div className="mt-4 pt-4 border-t border-[var(--border)] space-y-4" onClick={e => e.stopPropagation()}>
+        <div className="mt-4 pt-4 border-t border-[var(--border)] space-y-6" onClick={e => e.stopPropagation()}>
           {/* Strategy Scores */}
           <div>
             <h4 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-2">Strategy Analysis</h4>
@@ -91,7 +91,7 @@ function StockCard({ stock, expanded, onToggle }: { stock: DiscoveredStock; expa
           {/* F&O Analysis */}
           <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-4">
             <h4 className="text-xs font-semibold text-purple-700 uppercase tracking-wide mb-2">F&O Strategy</h4>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
               <div>
                 <div className="text-[10px] text-purple-500">Expected Move</div>
                 <div className="text-sm font-bold text-purple-800">±{stock.foAnalysis.expectedMove}%</div>
@@ -159,7 +159,7 @@ export function DiscoveryPage() {
   const sellCount = stocks.filter(s => s.overallScore < -20).length;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Scanner status */}
       <div className="card flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -183,7 +183,7 @@ export function DiscoveryPage() {
       {/* How it works */}
       <div className="card bg-gradient-to-r from-blue-50 to-indigo-50">
         <h3 className="text-xs font-bold text-blue-800 uppercase tracking-wide mb-2">How the AI Scanner Works</h3>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-3 text-[11px] text-blue-700">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 text-[11px] text-blue-700">
           <div className="flex items-start gap-1.5"><span className="font-bold text-blue-500">1.</span> Scans top volume leaders, gainers & losers on NSE in real-time</div>
           <div className="flex items-start gap-1.5"><span className="font-bold text-blue-500">2.</span> Fetches 3-month historical data for technical analysis</div>
           <div className="flex items-start gap-1.5"><span className="font-bold text-blue-500">3.</span> Computes RSI, MACD, SMA, Bollinger Bands, ATR for each stock</div>
@@ -193,7 +193,7 @@ export function DiscoveryPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
         <div className="tab-bar">
           <div className={`tab ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>All ({stocks.length})</div>
           <div className={`tab ${filter === 'buy' ? 'active' : ''}`} onClick={() => setFilter('buy')}>🟢 Buy Signals ({buyCount})</div>
@@ -209,7 +209,7 @@ export function DiscoveryPage() {
           <p className="text-xs text-[var(--text-muted)] mt-1">Analyzing volume leaders, gainers, losers • Computing technicals • Scoring strategies</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-5">
           {filtered.map((stock, idx) => (
             <StockCard
               key={stock.symbol}
