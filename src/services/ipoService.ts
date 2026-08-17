@@ -41,15 +41,17 @@ function toFloat(val: any): number | null {
 }
 
 function parseStatus(nameHtml: string): 'open' | 'upcoming' | 'listed' | 'closed' | 'unknown' {
-  const lower = nameHtml.toLowerCase();
-  if (/l@[\d.]+/i.test(lower) || lower.includes('listed')) return 'listed';
-  if (lower.includes('open')) return 'open';
-  if (lower.includes('upcoming') || lower.includes('coming')) return 'upcoming';
-  if (lower.includes('closed') || lower.includes('close')) return 'closed';
+  if (/L@[\d.]+/i.test(nameHtml)) return 'listed';
+  const badges = nameHtml.match(/class="badge[^"]*"[^>]*>([^<]+)/g) || [];
+  const statusBadge = badges.length > 1 ? badges[1].replace(/.*>/, '').trim() : '';
+  if (statusBadge === 'O') return 'open';
+  if (statusBadge === 'U') return 'upcoming';
+  if (statusBadge === 'C') return 'closed';
   return 'unknown';
 }
 
-function parseBoard(nameHtml: string): 'mainboard' | 'sme' {
+function parseBoard(nameHtml: string, category?: string): 'mainboard' | 'sme' {
+  if (category === 'SME') return 'sme';
   return /sme/i.test(nameHtml) ? 'sme' : 'mainboard';
 }
 
@@ -145,26 +147,30 @@ export async function fetchLiveIPOs(): Promise<IPOData[]> {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const payload = await res.json();
 
-    const rows: any[] = payload?.data || payload?.d || payload || [];
-    if (!Array.isArray(rows) || rows.length === 0) throw new Error('No data');
+    const rows: any[] = payload?.reportTableData || [];
+    if (!Array.isArray(rows) || rows.length === 0) throw new Error('No data in reportTableData');
 
     return rows.map(row => {
-      const nameHtml = String(row['Name'] || row['name'] || '');
-      const name = stripHtml(row['~ipo_name'] || nameHtml);
+      const nameHtml = String(row['Name'] || '');
+      const name = String(row['~ipo_name'] || stripHtml(nameHtml));
+      const category = String(row['~IPO_Category'] || '');
       const status = parseStatus(nameHtml);
-      const board = parseBoard(nameHtml);
-      const price = toFloat(row['Price (₹)'] || row['price']);
-      const gmpValue = toFloat(stripHtml(String(row['GMP'] || row['gmp'] || '')).match(/[-\d.]+/)?.[0]);
-      const gmpPct = toFloat(row['GMP(%)'] || row['Est Listing'] || row['gmp_pct']);
-      const sub = toFloat(row['Total'] || row['Sub(x)'] || row['subscription']);
-      const lot = toFloat(row['Lot'] || row['lot_size']);
-      const issueSize = toFloat(stripHtml(String(row['IPO Size'] || row['issue_size'] || '')));
-      const pe = toFloat(row['~P/E'] || row['pe']);
+      const board = parseBoard(nameHtml, category);
+      const price = toFloat(row['Price (₹)']);
+      const gmpHtml = String(row['GMP'] || '');
+      const gmpMatch = stripHtml(gmpHtml).match(/([-\d,.]+)/);
+      const gmpValue = gmpMatch ? toFloat(gmpMatch[1]) : null;
+      const gmpPct = toFloat(row['~gmp_percent_calc']);
+      const subStr = String(row['Sub'] || '-');
+      const sub = subStr === '-' ? null : toFloat(subStr);
+      const lot = toFloat(row['Lot']);
+      const issueSize = toFloat(stripHtml(String(row['IPO Size'] || '')));
+      const pe = toFloat(row['~P/E']);
       const rating = parseRating(String(row['Rating'] || ''));
       const listingGain = parseListingGain(nameHtml);
-      const openDate = row['~Srt_Open'] || row['open_date'] || null;
-      const closeDate = row['~Srt_Close'] || row['close_date'] || null;
-      const listingDate = row['~Str_Listing'] || row['listing_date'] || null;
+      const openDate = row['~Srt_Open'] || null;
+      const closeDate = row['~Srt_Close'] || null;
+      const listingDate = row['~Str_Listing'] || null;
       const urlPath = row['~urlrewrite_folder_name'];
 
       const partial: Partial<IPOData> = {
