@@ -23,13 +23,13 @@ export interface Pick {
 
 export const shortTermPicks: Pick[] = [
   {
-    symbol: 'TATAMOTORS',
-    name: 'Tata Motors Ltd',
+    symbol: 'TMCV',
+    name: 'Tata Motors CV',
     sector: 'Automobile',
-    ltp: 978.60,
-    targetPrice: 1085,
-    stopLoss: 935,
-    expectedReturn: 10.9,
+    ltp: 470.00,
+    targetPrice: 520,
+    stopLoss: 440,
+    expectedReturn: 10.6,
     timeframe: '10-15 days',
     riskLevel: 'MEDIUM',
     confidenceScore: 87,
@@ -226,7 +226,7 @@ export const longTermPicks: Pick[] = [
 export const smartMoneyInsights = [
   { category: 'FII Flows', insight: 'FIIs net buyers of ₹12,400 Cr in Aug — highest since Mar 2026. Concentrated in Banking (45%), Auto (22%), Energy (18%)', icon: '🌍' },
   { category: 'DII Positioning', insight: 'Mutual funds sitting on ₹1.8L Cr cash — highest ever. Deploying gradually into large-caps on dips', icon: '🏛️' },
-  { category: 'Promoter Buying', insight: 'Promoter buying in SBIN (₹340 Cr), TATAMOTORS (₹180 Cr), MARUTI (₹95 Cr) in last 30 days — skin in the game signal', icon: '👔' },
+  { category: 'Promoter Buying', insight: 'Promoter buying in SBIN (₹340 Cr), TMCV (₹120 Cr), TMPV (₹80 Cr), MARUTI (₹95 Cr) in last 30 days — skin in the game signal', icon: '👔' },
   { category: 'Hedge Fund Activity', insight: 'Top 5 hedge funds increased India allocation to 4.8% (from 3.2%) — citing "best risk-adjusted returns globally"', icon: '🦊' },
   { category: 'Bulk/Block Deals', insight: 'Goldman Sachs picked up 2.1% of ICICIBANK via block deal. Blackrock added RELIANCE. Vanguard increased HDFCBANK', icon: '📊' },
   { category: 'Options Flow', insight: 'Heavy NIFTY 25,500 CE buying (Aug expiry) — smart money positioning for breakout above 25K. Put-Call ratio at 1.4 (bullish)', icon: '🎯' },

@@ -2,13 +2,13 @@
 
 const SYMBOLS = [
   'RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK',
-  'HINDUNILVR', 'SBIN', 'TATAMOTORS', 'BAJFINANCE', 'MARUTI', 'WIPRO',
+  'HINDUNILVR', 'SBIN', 'TMCV', 'TMPV', 'BAJFINANCE', 'MARUTI', 'WIPRO',
 ];
 
 const SECTORS: Record<string, string> = {
   RELIANCE: 'Energy', TCS: 'IT', HDFCBANK: 'Banking', INFY: 'IT',
   ICICIBANK: 'Banking', HINDUNILVR: 'FMCG', SBIN: 'Banking',
-  TATAMOTORS: 'Auto', BAJFINANCE: 'NBFC', MARUTI: 'Auto', WIPRO: 'IT',
+  TMCV: 'Auto - CV', TMPV: 'Auto - PV', BAJFINANCE: 'NBFC', MARUTI: 'Auto', WIPRO: 'IT',
 };
 
 export interface LiveStock {
