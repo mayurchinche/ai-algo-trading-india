@@ -146,11 +146,12 @@ export async function fetchLiveIPOs(): Promise<IPOData[]> {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const payload = await res.json();
+    console.log('[IPO] API response keys:', Object.keys(payload), 'rows:', payload?.reportTableData?.length);
 
     const rows: any[] = payload?.reportTableData || [];
     if (!Array.isArray(rows) || rows.length === 0) throw new Error('No data in reportTableData');
 
-    return rows.map(row => {
+    const result = rows.map(row => {
       const nameHtml = String(row['Name'] || '');
       const name = String(row['~ipo_name'] || stripHtml(nameHtml));
       const category = String(row['~IPO_Category'] || '');
@@ -192,8 +193,11 @@ export async function fetchLiveIPOs(): Promise<IPOData[]> {
         allotment_tips: ALLOTMENT_TIPS[board] || ALLOTMENT_TIPS.mainboard,
       } as IPOData;
     }).filter(ipo => ipo.name && ipo.name.length > 2);
+
+    console.log('[IPO] Parsed', result.length, 'IPOs');
+    return result;
   } catch (e) {
-    console.warn('IPO fetch failed, using fallback:', e);
-    return []; // ponytail: empty on failure, UI shows "no data" message
+    console.warn('IPO fetch failed:', e);
+    return [];
   }
 }
