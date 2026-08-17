@@ -1,4 +1,4 @@
-import { watchlist } from '../data/mockData';
+import type { LiveStock } from '../services/liveData';
 
 interface Signal {
   symbol: string;
@@ -22,7 +22,7 @@ const signals: Signal[] = [
   { symbol: 'TCS', direction: 'HOLD', confidence: 0.48, strategy: 'Ensemble', reason: 'Below confidence threshold. IT sector weak but TCS near support. Wait for reversal confirmation or breakdown below 3860.', timestamp: '10:50:00', indicators: { rsi: 44.2, smaSignal: 'Price < SMA20, near SMA50', volumeRatio: 1.0, lstmProb: 0.46 } },
 ];
 
-export function SignalsPage() {
+export function SignalsPage({ stocks }: { stocks: LiveStock[] }) {
   const buySignals = signals.filter(s => s.direction === 'BUY');
   const sellSignals = signals.filter(s => s.direction === 'SELL');
   const holdSignals = signals.filter(s => s.direction === 'HOLD');
@@ -48,7 +48,7 @@ export function SignalsPage() {
       {/* Signal cards grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {signals.sort((a, b) => b.confidence - a.confidence).map((sig) => {
-          const stock = watchlist.find(w => w.symbol === sig.symbol);
+          const stock = stocks.find(w => w.symbol === sig.symbol);
           return (
             <div key={sig.symbol} className={`card border-l-4 ${sig.direction === 'BUY' ? 'border-l-[var(--green)]' : sig.direction === 'SELL' ? 'border-l-[var(--red)]' : 'border-l-amber-400'}`}>
               {/* Header */}

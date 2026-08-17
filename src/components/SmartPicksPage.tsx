@@ -111,7 +111,7 @@ function PickCard({ pick, type }: { pick: Pick; type: 'short' | 'long' }) {
   );
 }
 
-export function SmartPicksPage() {
+export function SmartPicksPage({ stocks: _stocks }: { stocks: import('../services/liveData').LiveStock[] }) {
   const [view, setView] = useState<'short' | 'long' | 'smartmoney'>('short');
 
   return (

@@ -11,7 +11,7 @@ function KPI({ label, value, sub, color }: { label: string; value: string; sub?:
   );
 }
 
-export function OverviewPage() {
+export function OverviewPage({ nifty: _nifty }: { nifty: import('../services/liveData').LiveStock | null }) {
   return (
     <div className="space-y-4">
       {/* KPI Row */}

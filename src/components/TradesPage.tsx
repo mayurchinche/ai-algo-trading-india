@@ -10,7 +10,7 @@ const statusConfig: Record<string, { label: string; class: string }> = {
   MANUAL_EXIT: { label: '↗ MANUAL', class: 'badge-amber' },
 };
 
-export function TradesPage() {
+export function TradesPage({ stocks: _stocks }: { stocks: import('../services/liveData').LiveStock[] }) {
   const [filter, setFilter] = useState<FilterStatus>('ALL');
 
   const filtered = filter === 'ALL' ? allTrades : allTrades.filter(t => t.status === filter);

@@ -1,10 +1,22 @@
-import { portfolio } from '../data/mockData';
+import type { LiveStock } from '../services/liveData';
 
-export function Header({ activeTab, onTabChange }: { activeTab: string; onTabChange: (t: string) => void }) {
+interface HeaderProps {
+  activeTab: string;
+  onTabChange: (t: string) => void;
+  stocks: LiveStock[];
+  nifty: LiveStock | null;
+  lastUpdated: Date | null;
+}
+
+export function Header({ activeTab, onTabChange, stocks, nifty }: HeaderProps) {
   const now = new Date();
   const h = now.getHours();
   const marketOpen = h >= 9 && (h < 15 || (h === 15 && now.getMinutes() <= 30));
   const tabs = ['Smart Picks', 'Overview', 'Trades', 'Stock Analysis', 'Signals', 'Metals'];
+
+  // Compute portfolio-level numbers from live stocks
+  const gainers = stocks.filter(s => s.changePct > 0).length;
+  const losers = stocks.filter(s => s.changePct < 0).length;
 
   return (
     <header className="bg-white border-b border-[var(--border)]">
@@ -18,27 +30,32 @@ export function Header({ activeTab, onTabChange }: { activeTab: string; onTabCha
           </div>
         </div>
 
-        {/* Quick metrics */}
+        {/* Live market summary */}
         <div className="hidden lg:flex items-center gap-8">
+          {nifty && (
+            <div>
+              <div className="text-xs text-[var(--text-muted)] font-medium">NIFTY 50</div>
+              <div className="flex items-center gap-2">
+                <span className="text-base font-bold text-[var(--text)]" style={{ fontFamily: 'Poppins' }}>
+                  {nifty.ltp.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                </span>
+                <span className={`text-sm font-bold ${nifty.changePct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
+                  {nifty.changePct >= 0 ? '+' : ''}{nifty.changePct.toFixed(2)}%
+                </span>
+              </div>
+            </div>
+          )}
           <div>
-            <div className="text-xs text-[var(--text-muted)] font-medium">Portfolio</div>
-            <div className="text-base font-bold text-[var(--text)]" style={{ fontFamily: 'Poppins' }}>₹{(portfolio.currentValue / 100000).toFixed(2)}L</div>
-          </div>
-          <div>
-            <div className="text-xs text-[var(--text-muted)] font-medium">Today</div>
-            <div className={`text-base font-bold ${portfolio.todayPnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`} style={{ fontFamily: 'Poppins' }}>
-              {portfolio.todayPnl >= 0 ? '+' : ''}₹{portfolio.todayPnl.toLocaleString()}
+            <div className="text-xs text-[var(--text-muted)] font-medium">Market</div>
+            <div className="text-sm">
+              <span className="text-[var(--green)] font-bold">{gainers}↑</span>
+              <span className="text-[var(--text-muted)] mx-1">•</span>
+              <span className="text-[var(--red)] font-bold">{losers}↓</span>
             </div>
           </div>
           <div>
-            <div className="text-xs text-[var(--text-muted)] font-medium">Total P&L</div>
-            <div className={`text-base font-bold ${portfolio.totalPnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`} style={{ fontFamily: 'Poppins' }}>
-              +₹{portfolio.totalPnl.toLocaleString()}
-            </div>
-          </div>
-          <div>
-            <div className="text-xs text-[var(--text-muted)] font-medium">Win Rate</div>
-            <div className="text-base font-bold text-[var(--blue)]" style={{ fontFamily: 'Poppins' }}>{portfolio.winRate}%</div>
+            <div className="text-xs text-[var(--text-muted)] font-medium">Stocks Tracked</div>
+            <div className="text-sm font-bold text-[var(--text)]" style={{ fontFamily: 'Poppins' }}>{stocks.length}</div>
           </div>
         </div>
 
@@ -55,7 +72,7 @@ export function Header({ activeTab, onTabChange }: { activeTab: string; onTabCha
         </div>
       </div>
 
-      {/* Tabs — pill style */}
+      {/* Tabs */}
       <div className="px-6 pb-3 max-w-[1400px] mx-auto">
         <div className="tab-bar">
           {tabs.map((t) => (

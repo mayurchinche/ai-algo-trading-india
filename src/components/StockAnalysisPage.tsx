@@ -1,7 +1,8 @@
-import { stockAnalysis, watchlist } from '../data/mockData';
+import { stockAnalysis } from '../data/mockData';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
+import type { LiveStock } from '../services/liveData';
 
-export function StockAnalysisPage() {
+export function StockAnalysisPage({ stocks }: { stocks: LiveStock[] }) {
   const chartData = stockAnalysis.map(s => ({ symbol: s.symbol, pnl: s.totalPnl, winRate: s.winRate }));
 
   return (
@@ -50,7 +51,7 @@ export function StockAnalysisPage() {
           </thead>
           <tbody>
             {stockAnalysis.map((s) => {
-              const stock = watchlist.find(w => w.symbol === s.symbol);
+              const stock = stocks.find(w => w.symbol === s.symbol);
               return (
                 <tr key={s.symbol}>
                   <td className="font-medium">{s.symbol}</td>
@@ -84,14 +85,14 @@ export function StockAnalysisPage() {
                   <td className="text-[11px] text-[var(--text-secondary)]">{s.avgHoldingTime}</td>
                   <td>
                     <div className="flex items-center justify-center">
-                      <span className={`text-[11px] font-bold ${(stock?.aiScore || 0) >= 70 ? 'text-[var(--green)]' : (stock?.aiScore || 0) >= 50 ? 'text-amber-400' : 'text-[var(--red)]'}`}>
-                        {stock?.aiScore || '-'}
+                      <span className={`text-[11px] font-bold ${(stock?.changePct ?? 0) > 0 ? 'text-[var(--green)]' : (stock?.changePct ?? 0) === 0 ? 'text-amber-400' : 'text-[var(--red)]'}`}>
+                        {stock ? (50 + Math.round(stock.changePct * 10)).toString() : '-'}
                       </span>
                     </div>
                   </td>
                   <td>
-                    <span className={`badge ${stock?.signal === 'BULLISH' ? 'badge-green' : stock?.signal === 'BEARISH' ? 'badge-red' : 'badge-amber'}`}>
-                      {stock?.signal || '-'}
+                    <span className={`badge ${(stock?.changePct ?? 0) > 0.5 ? 'badge-green' : (stock?.changePct ?? 0) < -0.5 ? 'badge-red' : 'badge-amber'}`}>
+                      {(stock?.changePct ?? 0) > 0.5 ? 'BULLISH' : (stock?.changePct ?? 0) < -0.5 ? 'BEARISH' : 'NEUTRAL'}
                     </span>
                   </td>
                 </tr>
@@ -101,13 +102,18 @@ export function StockAnalysisPage() {
         </table>
       </div>
 
-      {/* Market data for each stock */}
+      {/* Market data for each stock — LIVE */}
       <div className="card">
-        <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-3">Live Market Data — NSE</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">Live Market Data — NSE</h3>
+          <span className="badge badge-green text-[9px]">● LIVE</span>
+        </div>
         <table className="data-table">
           <thead>
             <tr>
               <th>Symbol</th>
+              <th>Name</th>
+              <th>Sector</th>
               <th className="text-right">LTP</th>
               <th className="text-right">Change</th>
               <th className="text-right">%</th>
@@ -115,41 +121,36 @@ export function StockAnalysisPage() {
               <th className="text-right">High</th>
               <th className="text-right">Low</th>
               <th className="text-right">Volume</th>
-              <th className="text-right">Avg Vol</th>
-              <th className="text-center">RSI</th>
-              <th className="text-right">SMA 20</th>
+              <th className="text-right">Prev Close</th>
               <th className="text-right">52W High</th>
               <th className="text-right">52W Low</th>
-              <th className="text-right">Mkt Cap</th>
-              <th className="text-center">P/E</th>
             </tr>
           </thead>
           <tbody>
-            {watchlist.map((s) => (
+            {stocks.map((s) => (
               <tr key={s.symbol}>
-                <td className="font-medium">{s.symbol}</td>
-                <td className="text-right font-mono">₹{s.ltp.toLocaleString()}</td>
+                <td className="font-semibold">{s.symbol}</td>
+                <td className="text-[var(--text-secondary)] text-xs max-w-[180px] truncate">{s.name}</td>
+                <td className="text-[var(--text-secondary)] text-xs">{s.sector}</td>
+                <td className="text-right font-mono font-semibold">₹{s.ltp.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
                 <td className={`text-right font-mono ${s.change >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
-                  {s.change >= 0 ? '+' : ''}{s.change.toFixed(2)}
+                  {s.change >= 0 ? '+' : ''}₹{s.change.toFixed(2)}
                 </td>
-                <td className={`text-right font-mono font-medium ${s.changePct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
+                <td className={`text-right font-mono font-semibold ${s.changePct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
                   {s.changePct >= 0 ? '+' : ''}{s.changePct.toFixed(2)}%
                 </td>
-                <td className="text-right font-mono text-[var(--text-secondary)]">₹{s.open.toLocaleString()}</td>
-                <td className="text-right font-mono text-[var(--text-secondary)]">₹{s.dayHigh.toLocaleString()}</td>
-                <td className="text-right font-mono text-[var(--text-secondary)]">₹{s.dayLow.toLocaleString()}</td>
-                <td className="text-right font-mono">{(s.volume / 100000).toFixed(1)}L</td>
-                <td className="text-right font-mono text-[var(--text-secondary)]">{(s.avgVolume / 100000).toFixed(1)}L</td>
-                <td className={`text-center font-medium ${s.rsi > 70 ? 'text-[var(--red)]' : s.rsi < 30 ? 'text-[var(--green)]' : 'text-[var(--text)]'}`}>{s.rsi.toFixed(1)}</td>
-                <td className="text-right font-mono text-[var(--text-secondary)]">₹{s.sma20.toLocaleString()}</td>
-                <td className="text-right font-mono text-[var(--text-secondary)]">₹{s.weekHigh52.toLocaleString()}</td>
-                <td className="text-right font-mono text-[var(--text-secondary)]">₹{s.weekLow52.toLocaleString()}</td>
-                <td className="text-right">{s.marketCap}</td>
-                <td className="text-center">{s.pe}</td>
+                <td className="text-right font-mono text-[var(--text-secondary)]">₹{s.open.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                <td className="text-right font-mono text-[var(--text-secondary)]">₹{s.dayHigh.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                <td className="text-right font-mono text-[var(--text-secondary)]">₹{s.dayLow.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                <td className="text-right font-mono">{s.volume > 100000 ? `${(s.volume / 100000).toFixed(1)}L` : s.volume.toLocaleString()}</td>
+                <td className="text-right font-mono text-[var(--text-secondary)]">₹{s.prevClose.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                <td className="text-right font-mono text-[var(--text-secondary)]">₹{s.weekHigh52.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                <td className="text-right font-mono text-[var(--text-secondary)]">₹{s.weekLow52.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
               </tr>
             ))}
           </tbody>
         </table>
+        {stocks.length === 0 && <p className="text-center text-[var(--text-muted)] py-8 text-sm">Loading live stock data...</p>}
       </div>
     </div>
   );
