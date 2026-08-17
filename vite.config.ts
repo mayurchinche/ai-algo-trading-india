@@ -14,6 +14,16 @@ export default defineConfig({
           'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
         },
       },
+      '/api/ipo': {
+        target: 'https://webnodejs.investorgain.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/ipo/, ''),
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+          'Origin': 'https://www.investorgain.com',
+          'Referer': 'https://www.investorgain.com/',
+        },
+      },
     },
   },
 })
