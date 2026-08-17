@@ -14,45 +14,42 @@ export function Header({ activeTab, onTabChange, nifty }: HeaderProps) {
   const tabs = ['AI Discovery', 'Smart Picks', 'Overview', 'Trades', 'Stock Analysis', 'Signals', 'Backtest', 'IPO Tracker', 'Metals'];
 
   return (
-    <header className="bg-white border-b border-[var(--border)]">
-      <div className="flex items-center justify-between px-8 xl:px-12 py-5 max-w-[1600px] mx-auto">
+    <header className="sticky top-0 z-50 glass border-b border-[rgba(0,0,0,0.06)]">
+      <div className="flex items-center justify-between px-8 xl:px-12 py-4 max-w-[1600px] mx-auto">
         <div className="flex items-center gap-4">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-200">AT</div>
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-blue-500/20">AT</div>
           <div>
-            <h1 className="text-lg font-bold text-[var(--text)]" style={{ fontFamily: 'Poppins' }}>AlgoTrader AI</h1>
-            <p className="text-[11px] text-[var(--text-muted)] tracking-wide">Indian Stock Market • NSE • Live Discovery</p>
+            <h1 className="text-[15px] font-semibold text-[var(--text)]" style={{ fontFamily: 'Poppins', letterSpacing: '-0.01em' }}>AlgoTrader AI</h1>
+            <p className="text-[11px] text-[var(--text-muted)]">NSE • Live Discovery • Paper Mode</p>
           </div>
         </div>
 
-        <div className="hidden lg:flex items-center gap-8">
+        <div className="hidden lg:flex items-center gap-6">
           {nifty && (
-            <div>
-              <div className="text-[10px] text-[var(--text-muted)] font-medium uppercase tracking-wider">NIFTY 50</div>
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-bold text-[var(--text)]" style={{ fontFamily: 'Poppins' }}>
-                  {nifty.ltp.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                </span>
-                <span className={`text-sm font-bold ${nifty.changePct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
-                  {nifty.changePct >= 0 ? '+' : ''}{nifty.changePct.toFixed(2)}%
-                </span>
-              </div>
+            <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-[rgba(0,0,0,0.02)]">
+              <span className="text-[11px] text-[var(--text-muted)] font-medium">NIFTY 50</span>
+              <span className="text-[15px] font-bold text-[var(--text)]" style={{ fontFamily: 'Poppins', letterSpacing: '-0.02em' }}>
+                {nifty.ltp.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+              </span>
+              <span className={`text-xs font-semibold ${nifty.changePct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
+                {nifty.changePct >= 0 ? '↑' : '↓'} {Math.abs(nifty.changePct).toFixed(2)}%
+              </span>
             </div>
           )}
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-xs text-[var(--text-muted)] font-medium">
+          <span className="text-[11px] text-[var(--text-muted)]">
             {now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
           </span>
-          <span className={`badge ${marketOpen ? 'badge-green' : 'badge-red'}`}>
-            <span className={`w-2 h-2 rounded-full ${marketOpen ? 'bg-[var(--green)] pulse' : 'bg-[var(--red)]'}`}></span>
-            {marketOpen ? 'MARKET OPEN' : 'MARKET CLOSED'}
-          </span>
-          <span className="badge badge-purple">📄 PAPER MODE</span>
+          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium ${marketOpen ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${marketOpen ? 'bg-green-500 pulse' : 'bg-red-400'}`}></span>
+            {marketOpen ? 'Live' : 'Closed'}
+          </div>
         </div>
       </div>
 
-      <div className="px-8 xl:px-12 pb-4 max-w-[1600px] mx-auto">
+      <div className="px-8 xl:px-12 max-w-[1600px] mx-auto">
         <div className="tab-bar overflow-x-auto">
           {tabs.map((t) => (
             <div key={t} className={`tab whitespace-nowrap ${activeTab === t ? 'active' : ''}`} onClick={() => onTabChange(t)}>{t}</div>
