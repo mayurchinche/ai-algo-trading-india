@@ -13,6 +13,12 @@ export interface IPOData {
   gmp: number | null;
   gmp_pct: number | null;
   subscription_total: number | null;
+  subscription_qib: number | null;
+  subscription_nii: number | null;
+  subscription_rii: number | null;
+  subscription_shni: number | null;
+  subscription_bhni: number | null;
+  subscription_updated: string | null;
   listing_gain_pct: number | null;
   rating: number | null;
   pe_ratio: number | null;
@@ -21,6 +27,7 @@ export interface IPOData {
   reasons: string[];
   allotment_tips: string[];
   url: string | null;
+  id: string | null;
 }
 
 function financialYear(): string {
@@ -137,16 +144,63 @@ const ALLOTMENT_TIPS: Record<string, string[]> = {
   ],
 };
 
+interface SubData {
+  total: number | null;
+  qib: number | null;
+  nii: number | null;
+  rii: number | null;
+  shni: number | null;
+  bhni: number | null;
+  updated: string | null;
+}
+
+// Fetch live subscription data from InvestorGain report 333
+async function fetchSubscriptionData(): Promise<Map<string, SubData>> {
+  const map = new Map<string, SubData>();
+  try {
+    const now = new Date();
+    const fy = financialYear();
+    const url = `/api/ipo/cloud/v2/report/data-read/333/1/1/${now.getFullYear()}/${fy}/0/all`;
+    const res = await fetch(url);
+    if (!res.ok) return map;
+    const payload = await res.json();
+    const rows = payload?.reportTableData || [];
+    for (const row of rows) {
+      const id = String(row['~id'] || '');
+      if (!id) continue;
+      const totalHtml = String(row['Total'] || '');
+      const totalMatch = stripHtml(totalHtml).match(/([\d.]+)/);
+      const updatedMatch = totalHtml.match(/(\d+\w+ \w+ [\d:]+)/);
+      map.set(id, {
+        total: totalMatch ? parseFloat(totalMatch[1]) : null,
+        qib: toFloat(row['QIB']),
+        nii: toFloat(row['NII']),
+        rii: toFloat(row['RII']),
+        shni: toFloat(row['SHNI']),
+        bhni: toFloat(row['BHNI']),
+        updated: updatedMatch ? updatedMatch[1] : null,
+      });
+    }
+  } catch (e) {
+    console.warn('[IPO] Subscription fetch failed:', e);
+  }
+  return map;
+}
+
 export async function fetchLiveIPOs(): Promise<IPOData[]> {
   const now = new Date();
   const fy = financialYear();
   const url = `/api/ipo/cloud/v2/report/data-read/331/1/1/${now.getFullYear()}/${fy}/0/all`;
 
   try {
-    const res = await fetch(url);
+    // Fetch IPO list and subscription data in parallel
+    const [res, subMap] = await Promise.all([
+      fetch(url),
+      fetchSubscriptionData(),
+    ]);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const payload = await res.json();
-    console.log('[IPO] API response keys:', Object.keys(payload), 'rows:', payload?.reportTableData?.length);
+    console.log('[IPO] API response keys:', Object.keys(payload), 'rows:', payload?.reportTableData?.length, 'subs:', subMap.size);
 
     const rows: any[] = payload?.reportTableData || [];
     if (!Array.isArray(rows) || rows.length === 0) throw new Error('No data in reportTableData');
@@ -155,6 +209,7 @@ export async function fetchLiveIPOs(): Promise<IPOData[]> {
       const nameHtml = String(row['Name'] || '');
       const name = String(row['~ipo_name'] || stripHtml(nameHtml));
       const category = String(row['~IPO_Category'] || '');
+      const id = String(row['~id'] || '');
       const status = parseStatus(nameHtml);
       const board = parseBoard(nameHtml, category);
       const price = toFloat(row['Price (₹)']);
@@ -174,11 +229,24 @@ export async function fetchLiveIPOs(): Promise<IPOData[]> {
       const listingDate = row['~Str_Listing'] || null;
       const urlPath = row['~urlrewrite_folder_name'];
 
+      // Merge live subscription data from report 333
+      const subData = subMap.get(id);
+      const subTotal = subData?.total ?? sub;
+      const subQib = subData?.qib ?? null;
+      const subNii = subData?.nii ?? null;
+      const subRii = subData?.rii ?? null;
+      const subShni = subData?.shni ?? null;
+      const subBhni = subData?.bhni ?? null;
+      const subUpdated = subData?.updated ?? null;
+
       const partial: Partial<IPOData> = {
         name, price, lot_size: lot ? Math.round(lot) : null,
         issue_size_cr: issueSize, open_date: openDate, close_date: closeDate,
-        listing_date: listingDate, status, board,
-        gmp: gmpValue, gmp_pct: gmpPct, subscription_total: sub,
+        listing_date: listingDate, status, board, id,
+        gmp: gmpValue, gmp_pct: gmpPct,
+        subscription_total: subTotal,
+        subscription_qib: subQib, subscription_nii: subNii, subscription_rii: subRii,
+        subscription_shni: subShni, subscription_bhni: subBhni, subscription_updated: subUpdated,
         listing_gain_pct: listingGain, rating, pe_ratio: pe,
         url: urlPath ? `https://www.investorgain.com${urlPath}` : null,
       };

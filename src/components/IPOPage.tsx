@@ -189,8 +189,16 @@ export function IPOPage() {
               )}
               {ipo.subscription_total != null && (
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] text-[var(--text-muted)]">Subscription:</span>
-                  <span className="text-xs font-bold text-purple-600">{ipo.subscription_total.toFixed(1)}x</span>
+                  <span className="text-[10px] text-[var(--text-muted)]">Sub:</span>
+                  <span className="text-xs font-bold text-purple-600">{ipo.subscription_total.toFixed(2)}x</span>
+                  {ipo.subscription_qib != null && (
+                    <span className="text-[10px] text-[var(--text-muted)]">
+                      QIB {ipo.subscription_qib.toFixed(1)}x • NII {ipo.subscription_nii?.toFixed(1)}x • RII {ipo.subscription_rii?.toFixed(1)}x
+                    </span>
+                  )}
+                  {ipo.subscription_updated && (
+                    <span className="text-[9px] text-[var(--text-muted)] opacity-60">({ipo.subscription_updated})</span>
+                  )}
                 </div>
               )}
               {ipo.rating != null && (
@@ -216,6 +224,50 @@ export function IPOPage() {
                 animate={{ height: 'auto', opacity: 1 }}
                 className="mt-4 pt-4 border-t border-[var(--border)] space-y-5"
               >
+                {/* Live Subscription Breakdown */}
+                {ipo.subscription_qib != null && (
+                  <div>
+                    <h4 className="text-[10px] font-bold text-[var(--text-muted)] uppercase mb-2">📊 Live Subscription Status</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                      <div className="text-center p-3 rounded-xl bg-[rgba(0,0,0,0.02)]">
+                        <div className={`text-base font-bold ${(ipo.subscription_total || 0) > 1 ? 'text-[var(--green)]' : 'text-[var(--text)]'}`}>
+                          {ipo.subscription_total?.toFixed(2)}x
+                        </div>
+                        <div className="text-[9px] text-[var(--text-muted)] uppercase mt-1">Total</div>
+                      </div>
+                      <div className="text-center p-3 rounded-xl bg-[rgba(0,0,0,0.02)]">
+                        <div className={`text-base font-bold ${(ipo.subscription_qib || 0) > 1 ? 'text-[var(--green)]' : 'text-[var(--text)]'}`}>
+                          {ipo.subscription_qib?.toFixed(2)}x
+                        </div>
+                        <div className="text-[9px] text-[var(--text-muted)] uppercase mt-1">QIB</div>
+                      </div>
+                      <div className="text-center p-3 rounded-xl bg-[rgba(0,0,0,0.02)]">
+                        <div className={`text-base font-bold ${(ipo.subscription_nii || 0) > 1 ? 'text-[var(--green)]' : 'text-[var(--text)]'}`}>
+                          {ipo.subscription_nii?.toFixed(2)}x
+                        </div>
+                        <div className="text-[9px] text-[var(--text-muted)] uppercase mt-1">NII</div>
+                      </div>
+                      <div className="text-center p-3 rounded-xl bg-[rgba(0,0,0,0.02)]">
+                        <div className={`text-base font-bold ${(ipo.subscription_rii || 0) > 1 ? 'text-[var(--green)]' : 'text-[var(--text)]'}`}>
+                          {ipo.subscription_rii?.toFixed(2)}x
+                        </div>
+                        <div className="text-[9px] text-[var(--text-muted)] uppercase mt-1">Retail</div>
+                      </div>
+                      {ipo.subscription_shni != null && (
+                        <div className="text-center p-3 rounded-xl bg-[rgba(0,0,0,0.02)]">
+                          <div className="text-base font-bold text-[var(--text)]">
+                            {ipo.subscription_shni?.toFixed(2)}x / {ipo.subscription_bhni?.toFixed(2)}x
+                          </div>
+                          <div className="text-[9px] text-[var(--text-muted)] uppercase mt-1">sHNI / bHNI</div>
+                        </div>
+                      )}
+                    </div>
+                    {ipo.subscription_updated && (
+                      <p className="text-[9px] text-[var(--text-muted)] mt-2">Last updated: {ipo.subscription_updated}</p>
+                    )}
+                  </div>
+                )}
+
                 <div>
                   <h4 className="text-[10px] font-bold text-[var(--text-muted)] uppercase mb-1.5">AI Analysis</h4>
                   <ul className="space-y-1">
