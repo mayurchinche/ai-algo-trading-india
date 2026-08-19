@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { discoverStocks, type DiscoveredStock } from '../services/stockDiscovery';
+import { recordSignals, updateOutcomes } from '../services/signalHistory';
 
 export function useStockDiscovery() {
   const [stocks, setStocks] = useState<DiscoveredStock[]>([]);
@@ -14,6 +15,11 @@ export function useStockDiscovery() {
       const discovered = await discoverStocks();
       setStocks(discovered);
       setLastScan(new Date());
+
+      // Record signals + check outcomes against current prices
+      recordSignals(discovered);
+      const priceMap = new Map(discovered.map(s => [s.symbol, s.ltp]));
+      updateOutcomes(priceMap);
     } catch (e: any) {
       setError(e?.message || 'Discovery failed');
     } finally {

@@ -74,11 +74,11 @@ function generatePaperTrades(stocks: DiscoveredStock[]): PaperTrade[] {
     const entryPrice = s.prevClose;
     const currentPrice = s.ltp;
 
-    // ponytail: F&O uses lot size (~₹5-7L notional), equity uses ₹1L per position
-    const lotSize = type === 'F&O' ? Math.max(1, Math.floor(500000 / entryPrice)) : undefined;
+    // ponytail: ₹20K capital, max ₹7K per equity trade, ₹10K for F&O
+    const lotSize = type === 'F&O' ? Math.max(1, Math.floor(10000 / entryPrice)) : undefined;
     const quantity = type === 'F&O'
       ? lotSize!
-      : Math.max(1, Math.floor(100000 / entryPrice));
+      : Math.max(1, Math.floor(7000 / entryPrice));
 
     const turnover = entryPrice * quantity * 2; // entry + exit
     const brokerage = calcBrokerage(type, turnover);
@@ -173,7 +173,7 @@ export function TradesPage() {
         </div>
         <div className="card text-center">
           <div className="text-[10px] text-[var(--text-muted)] uppercase">Capital Deployed</div>
-          <div className="text-xl font-bold" style={{ fontFamily: 'Poppins' }}>₹{(totalInvested / 100000).toFixed(1)}L</div>
+          <div className="text-xl font-bold" style={{ fontFamily: 'Poppins' }}>₹{totalInvested.toLocaleString('en-IN')}</div>
         </div>
         <div className="card text-center">
           <div className="text-[10px] text-[var(--text-muted)] uppercase">Gross vs Net</div>

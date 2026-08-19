@@ -17,7 +17,7 @@ function KPI({ label, value, sub, color }: { label: string; value: string; sub?:
 
 // Compute portfolio from live discovered stocks (paper trading simulation)
 function computePortfolio(stocks: DiscoveredStock[]) {
-  const totalCapital = 1000000; // ₹10L paper trading capital
+  const totalCapital = 20000; // ₹20K paper trading capital
   const trades = stocks.filter(s => Math.abs(s.overallScore) >= 25);
   let totalPnl = 0, wins = 0, losses = 0;
   let largestWin = 0, largestLoss = 0;
@@ -25,7 +25,7 @@ function computePortfolio(stocks: DiscoveredStock[]) {
 
   trades.forEach(s => {
     const side = s.overallScore > 0 ? 1 : -1;
-    const qty = Math.max(1, Math.floor(50000 / s.prevClose));
+    const qty = Math.max(1, Math.floor(7000 / s.prevClose));
     const pnl = side * (s.ltp - s.prevClose) * qty;
     totalPnl += pnl;
     investedValue += s.prevClose * qty;
@@ -71,7 +71,7 @@ function computeStrategyStats(stocks: DiscoveredStock[]) {
     const strat = s.strategies[0] || 'Multi-Strategy';
     if (!stratMap[strat]) stratMap[strat] = { pnl: 0, trades: 0, wins: 0 };
     const side = s.overallScore > 0 ? 1 : -1;
-    const qty = Math.max(1, Math.floor(50000 / s.prevClose));
+    const qty = Math.max(1, Math.floor(7000 / s.prevClose));
     const pnl = side * (s.ltp - s.prevClose) * qty;
     stratMap[strat].trades++;
     stratMap[strat].pnl += pnl;
@@ -123,7 +123,7 @@ export function OverviewPage() {
     <div className="space-y-6">
       {/* KPI Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
-        <div className="kpi-card gold"><KPI label="Portfolio Value" value={`₹${(portfolio.currentValue / 100000).toFixed(2)}L`} sub={`of ₹${(portfolio.totalCapital / 100000).toFixed(0)}L capital`} /></div>
+        <div className="kpi-card gold"><KPI label="Portfolio Value" value={`₹${portfolio.currentValue.toLocaleString()}`} sub={`of ₹20,000 capital`} /></div>
         <div className="kpi-card green"><KPI label="Today's P&L" value={`${portfolio.totalPnl >= 0 ? '+' : ''}₹${(portfolio.totalPnl / 1000).toFixed(1)}K`} sub={`${portfolio.totalPnlPct >= 0 ? '+' : ''}${portfolio.totalPnlPct}%`} color={portfolio.totalPnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'} /></div>
         <div className="kpi-card blue"><KPI label="Win Rate" value={`${portfolio.winRate}%`} sub={`${portfolio.totalTrades} trades`} color="text-blue-400" /></div>
         <div className="kpi-card gold"><KPI label="Sharpe Ratio" value={portfolio.sharpeRatio.toFixed(2)} sub="session" color="text-amber-400" /></div>
@@ -149,7 +149,7 @@ export function OverviewPage() {
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={stocks.filter(s => Math.abs(s.overallScore) >= 25).map(s => {
                 const side = s.overallScore > 0 ? 1 : -1;
-                const qty = Math.max(1, Math.floor(50000 / s.prevClose));
+                const qty = Math.max(1, Math.floor(7000 / s.prevClose));
                 const pnl = Math.round(side * (s.ltp - s.prevClose) * qty);
                 return { symbol: s.symbol, pnl };
               }).sort((a, b) => b.pnl - a.pnl)}>
@@ -266,7 +266,7 @@ export function OverviewPage() {
         <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-3">Paper Trading Summary (Live)</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 text-xs">
           <div><span className="text-[var(--text-secondary)]">Capital Deployed</span><div className="font-medium">₹{(portfolio.investedValue / 1000).toFixed(0)}K</div></div>
-          <div><span className="text-[var(--text-secondary)]">Available Margin</span><div className="font-medium">₹{((portfolio.totalCapital - portfolio.investedValue) / 100000).toFixed(2)}L</div></div>
+          <div><span className="text-[var(--text-secondary)]">Available Margin</span><div className="font-medium">₹{(portfolio.totalCapital - portfolio.investedValue).toLocaleString()}</div></div>
           <div><span className="text-[var(--text-secondary)]">P&L</span><div className={`font-medium ${portfolio.totalPnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>{portfolio.totalPnl >= 0 ? '+' : ''}₹{portfolio.totalPnl.toLocaleString()}</div></div>
           <div><span className="text-[var(--text-secondary)]">Open Positions</span><div className="font-medium">{portfolio.openPositions}</div></div>
           <div><span className="text-[var(--text-secondary)]">Largest Win</span><div className="font-medium text-[var(--green)]">+₹{portfolio.largestWin.toLocaleString()}</div></div>
