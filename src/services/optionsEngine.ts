@@ -1,28 +1,69 @@
 // ponytail: Options trading engine — mimics how top 1% traders pick options
 // Computes IV proxy, strike selection, strategy selection, P&L scenarios
+// ONLY recommends stocks that are actually available in NSE F&O segment
 
 import type { DiscoveredStock } from './stockDiscovery';
+
+// NSE F&O stocks list (as of 2026) — only these have options available for trading
+// Source: https://www.nseindia.com/products-services/equity-derivatives-list-underlyings-information
+const NSE_FO_SYMBOLS = new Set([
+  // Indices
+  'NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY',
+  // Large-cap F&O stocks (updated Aug 2026)
+  'RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK', 'HINDUNILVR', 'SBIN',
+  'BHARTIARTL', 'ITC', 'KOTAKBANK', 'LT', 'AXISBANK', 'MARUTI', 'TITAN',
+  'SUNPHARMA', 'BAJFINANCE', 'BAJFINSV', 'HCLTECH', 'WIPRO', 'ASIANPAINT',
+  'NTPC', 'POWERGRID', 'ONGC', 'TATAMOTORS', 'COALINDIA', 'JSWSTEEL',
+  'TATASTEEL', 'ADANIENT', 'ADANIPORTS', 'ULTRACEMCO', 'TECHM', 'INDUSINDBK',
+  'HINDALCO', 'GRASIM', 'CIPLA', 'DRREDDY', 'APOLLOHOSP', 'EICHERMOT',
+  'BPCL', 'DIVISLAB', 'BRITANNIA', 'HEROMOTOCO', 'TATACONSUM', 'NESTLEIND',
+  'SBILIFE', 'HDFCLIFE', 'DABUR', 'PIDILITIND', 'BERGEPAINT', 'HAVELLS',
+  'SIEMENS', 'GODREJCP', 'INDIGO', 'M&M', 'BAJAJ-AUTO', 'SHRIRAMFIN',
+  'BANKBARODA', 'PNB', 'CANBK', 'IDFCFIRSTB', 'FEDERALBNK', 'AUBANK',
+  'RECLTD', 'PFC', 'TATAPOWER', 'NHPC', 'IRCTC', 'HAL', 'BEL', 'BHEL',
+  'DLF', 'GODREJPROP', 'OBEROIRLTY', 'ZOMATO', 'PAYTM', 'NYKAA',
+  'DELHIVERY', 'POLYCAB', 'ABB', 'CHOLAFIN', 'MFSL', 'MANAPPURAM',
+  'MUTHOOTFIN', 'LICHSGFIN', 'VOLTAS', 'PAGEIND', 'TRENT', 'IDEA',
+  'LUPIN', 'BIOCON', 'AUROPHARMA', 'ALKEM', 'LAURUSLABS', 'COFORGE',
+  'PERSISTENT', 'LTIM', 'MPHASIS', 'MINDTREE', 'MRF', 'BALKRISIND',
+  'ATUL', 'NAVINFLUOR', 'DEEPAKNTR', 'PIIND', 'UPL', 'GNFC',
+  'TATACHEM', 'SAIL', 'NATIONALUM', 'VEDL', 'NMDC', 'GAIL',
+  'IOC', 'HINDPETRO', 'PETRONET', 'IGL', 'MGL', 'CONCOR',
+  'CUMMINSIND', 'CROMPTON', 'DIXON', 'LALPATHLAB', 'METROPOLIS',
+  'ASTRAL', 'SYNGENE', 'CANFINHOME', 'IDFC', 'RBLBANK',
+  'AMBUJACEM', 'ACC', 'RAMCOCEM', 'SHREECEM', 'DALBHARAT',
+  'COROMANDEL', 'CHAMBLFERT', 'GNFC', 'MCX', 'IEX', 'CDSL',
+  'ABCAPITAL', 'ABFRL', 'BATAINDIA', 'COLPAL', 'MARICO',
+  'PVRINOX', 'EXIDEIND', 'AMARAJABAT', 'MOTHERSON', 'ESCORTS',
+  'ASHOKLEY', 'TVSMOTORS', 'BOSCHLTD', 'BHARAT FORGE',
+  'SUNTV', 'ZEEL', 'NAUKRI', 'INDIAMART',
+]);
+
+export function isAvailableInFnO(symbol: string): boolean {
+  // Strip .NS suffix if present
+  const clean = symbol.replace('.NS', '').toUpperCase();
+  return NSE_FO_SYMBOLS.has(clean);
+}
 
 export interface OptionsPick {
   stock: DiscoveredStock;
   strategy: OptionsStrategy;
-  ivPercentile: number;  // Historical vol percentile (proxy)
-  expectedMoveWeekly: number;  // 1-week expected move %
-  expectedMoveMonthly: number; // 1-month expected move %
-  // Legs
+  ivPercentile: number;
+  expectedMoveWeekly: number;
+  expectedMoveMonthly: number;
   legs: OptionLeg[];
-  // P&L
   maxProfit: number;
   maxLoss: number;
   breakeven: number[];
-  probabilityOfProfit: number;  // estimated from expected move
+  probabilityOfProfit: number;
   riskReward: number;
-  // Execution
   suggestedExpiry: string;
   tradeRationale: string[];
   riskWarnings: string[];
-  // Edge — why this trade has an edge
   edgeFactors: string[];
+  // Beginner-friendly: exactly what to do, in plain language
+  plainEnglishInstruction: string;
+  stepByStep: string[];
 }
 
 export interface OptionLeg {
@@ -242,7 +283,7 @@ function selectStrategy(stock: DiscoveredStock, ivPct: number): {
 
 export function generateOptionsPicks(stocks: DiscoveredStock[]): OptionsPick[] {
   return stocks
-    .filter(s => s.ltp > 50 && Math.abs(s.overallScore) > 15) // Only trade stocks > ₹50 with some conviction
+    .filter(s => s.ltp > 50 && Math.abs(s.overallScore) > 15 && isAvailableInFnO(s.symbol))
     .map(stock => {
       const atrPct = stock.foAnalysis.expectedMove;
       const annualVol = computeHistoricalVolatility(atrPct);
@@ -387,6 +428,11 @@ export function generateOptionsPicks(stocks: DiscoveredStock[]): OptionsPick[] {
       if (ivPct > 80) riskWarnings.push('⚠️ Very high IV — premiums expensive, potential IV crush after event');
       if (stock.volumeRatio < 0.5) riskWarnings.push('⚠️ Low volume — may face liquidity issues in options');
 
+      // Generate beginner-friendly plain English instruction
+      const sym = stock.symbol.replace('.NS', '');
+      const plainEnglishInstruction = generatePlainInstruction(sym, strategy, legs, suggestedExpiry);
+      const stepByStep = generateStepByStep(sym, strategy, legs, suggestedExpiry, maxLoss);
+
       return {
         stock,
         strategy,
@@ -403,12 +449,46 @@ export function generateOptionsPicks(stocks: DiscoveredStock[]): OptionsPick[] {
         tradeRationale: rationale,
         riskWarnings,
         edgeFactors: edge,
+        plainEnglishInstruction,
+        stepByStep,
       };
     })
     .sort((a, b) => {
-      // Sort: high PoP + good R:R first
       const scoreA = a.probabilityOfProfit * 50 + Math.min(a.riskReward, 5) * 10;
       const scoreB = b.probabilityOfProfit * 50 + Math.min(b.riskReward, 5) * 10;
       return scoreB - scoreA;
     });
+}
+
+function generatePlainInstruction(symbol: string, _strategy: OptionsStrategy, legs: OptionLeg[], _expiry: string): string {
+  if (legs.length === 0) return `Trade ${symbol} options using ${_strategy}`;
+  
+  const parts = legs.map(leg => {
+    const action = leg.action === 'BUY' ? 'BUY' : 'SELL';
+    const type = leg.type === 'CE' ? 'CE (Call)' : 'PE (Put)';
+    return `${action} ${symbol} ₹${leg.strike} ${type} @ ₹${leg.premium.toFixed(1)}`;
+  });
+  
+  return parts.join(' + ');
+}
+
+function generateStepByStep(symbol: string, _strategy: OptionsStrategy, legs: OptionLeg[], expiry: string, maxLoss: number): string[] {
+  const steps: string[] = [];
+  
+  steps.push(`📱 Open your trading app (Zerodha/Groww/Angel One) → Go to F&O section`);
+  steps.push(`🔍 Search for "${symbol}" in the derivatives/F&O section`);
+  steps.push(`📅 Select expiry: ${expiry}`);
+  
+  for (const leg of legs) {
+    const action = leg.action === 'BUY' ? '🟢 BUY' : '🔴 SELL';
+    const type = leg.type === 'CE' ? 'CE (Call Option)' : 'PE (Put Option)';
+    const price = `₹${leg.premium.toFixed(1)}`;
+    steps.push(`${action} 1 lot of ${symbol} ${leg.strike} ${type} at around ${price}`);
+  }
+  
+  steps.push(`💰 Your maximum risk: ₹${maxLoss === -1 ? 'Unlimited ⚠️' : maxLoss.toLocaleString('en-IN')} per lot`);
+  steps.push(`⏰ Set a stop-loss at 50% of premium paid (or ₹${Math.round(maxLoss * 0.5)} loss)`);
+  steps.push(`✅ Exit when target hit or 2 days before expiry (whichever comes first)`);
+  
+  return steps;
 }

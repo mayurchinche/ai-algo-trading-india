@@ -385,6 +385,17 @@ function OptionsCard({ pick }: { pick: OptionsPick }) {
         </div>
       </div>
 
+      {/* Plain English — What to do (always visible) */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 mb-3 border border-blue-100">
+        <h5 className="text-[10px] font-bold text-blue-800 uppercase mb-2">📋 What To Do (Simple Steps)</h5>
+        <p className="text-[12px] font-semibold text-blue-900 mb-2">{pick.plainEnglishInstruction}</p>
+        <ol className="space-y-1">
+          {pick.stepByStep.map((step, i) => (
+            <li key={i} className="text-[11px] text-blue-800">{step}</li>
+          ))}
+        </ol>
+      </div>
+
       {/* Expanded section */}
       {expanded && (
         <div className="space-y-5 pt-3 border-t border-[var(--border)]">
