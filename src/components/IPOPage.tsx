@@ -35,7 +35,7 @@ function StatusPill({ status }: { status: string }) {
 export function IPOPage() {
   const [ipos, setIpos] = useState<IPOData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'open' | 'upcoming' | 'listed' | 'mainboard' | 'sme'>('all');
+  const [filter, setFilter] = useState<'all' | 'open' | 'upcoming' | 'closed' | 'listed' | 'mainboard' | 'sme'>('all');
   const [expanded, setExpanded] = useState<string | null>(null);
   const [lastFetch, setLastFetch] = useState<Date | null>(null);
 
@@ -57,6 +57,7 @@ export function IPOPage() {
     if (filter === 'all') return true;
     if (filter === 'open') return ipo.status === 'open';
     if (filter === 'upcoming') return ipo.status === 'upcoming';
+    if (filter === 'closed') return ipo.status === 'closed';
     if (filter === 'listed') return ipo.status === 'listed';
     if (filter === 'mainboard') return ipo.board === 'mainboard';
     if (filter === 'sme') return ipo.board === 'sme';
@@ -67,6 +68,7 @@ export function IPOPage() {
     { id: 'all', label: 'All IPOs', count: ipos.length },
     { id: 'open', label: '🟢 Open', count: ipos.filter(i => i.status === 'open').length },
     { id: 'upcoming', label: '🔵 Upcoming', count: ipos.filter(i => i.status === 'upcoming').length },
+    { id: 'closed', label: '🟠 Closed', count: ipos.filter(i => i.status === 'closed').length },
     { id: 'listed', label: '🟣 Listed', count: ipos.filter(i => i.status === 'listed').length },
     { id: 'mainboard', label: 'Mainboard', count: ipos.filter(i => i.board === 'mainboard').length },
     { id: 'sme', label: 'SME', count: ipos.filter(i => i.board === 'sme').length },
