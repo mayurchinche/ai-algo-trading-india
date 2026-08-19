@@ -24,6 +24,14 @@ export default defineConfig({
           'Referer': 'https://www.investorgain.com/',
         },
       },
+      '/api/goodreturns': {
+        target: 'https://www.goodreturns.in',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/goodreturns/, ''),
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+        },
+      },
     },
   },
 })

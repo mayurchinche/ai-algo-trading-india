@@ -1,5 +1,6 @@
-// ponytail: live metals prices from Yahoo Finance futures + USDINR conversion
-// Replaces hardcoded metalsData.ts
+// ponytail: live metals prices — Indian retail from GoodReturns + COMEX technicals from Yahoo Finance
+// Gold/Silver: Indian retail prices (matching Gullak/PhonePe/CRED)
+// Platinum/Palladium/Copper: COMEX converted (no Indian retail source)
 
 export interface LiveMetal {
   name: string;
@@ -8,6 +9,7 @@ export interface LiveMetal {
   icon: string;
   pricePerGram: number;
   pricePerOz: number;
+  priceSource: 'Indian Retail (GoodReturns)' | 'COMEX Futures (converted)';
   priceUSD: number;
   change24h: number;
   change24hPct: number;
@@ -129,6 +131,44 @@ function generateThesis(name: string, signal: string, rsi: number, _change7d: nu
   return `${name} in consolidation. No clear directional bias. Wait for breakout above resistance or breakdown below support for next trade.`;
 }
 
+// ponytail: fetch Indian retail gold/silver prices from GoodReturns (same source as Gullak/PhonePe/CRED)
+interface IndianRetailPrices {
+  gold24k: number | null;  // per gram
+  gold22k: number | null;
+  silver: number | null;    // per gram
+}
+
+async function fetchIndianRetailPrices(): Promise<IndianRetailPrices> {
+  const result: IndianRetailPrices = { gold24k: null, gold22k: null, silver: null };
+  try {
+    const [goldHtml, silverHtml] = await Promise.all([
+      fetch('/api/goodreturns/gold-rates/').then(r => r.text()).catch(() => ''),
+      fetch('/api/goodreturns/silver-rates/').then(r => r.text()).catch(() => ''),
+    ]);
+
+    // Gold: parse currentMetalPrices JS variable
+    const goldMatch = goldHtml.match(/currentMetalPrices\s*=\s*\{[^}]*'24'\s*:\s*(\d+)[^}]*'22'\s*:\s*(\d+)/);
+    if (goldMatch) {
+      result.gold24k = parseInt(goldMatch[1]);
+      result.gold22k = parseInt(goldMatch[2]);
+    } else {
+      // Fallback: parse from text "₹15,497 per gram for 24 karat"
+      const textMatch = goldHtml.match(/&#8377;([\d,]+)\s*per gram\s*for\s*24/);
+      if (textMatch) result.gold24k = parseInt(textMatch[1].replace(/,/g, ''));
+    }
+
+    // Silver: parse from text
+    const silverMatch = silverHtml.match(/&#8377;([\d,]+)\s*per gram/i)
+      || silverHtml.match(/₹\s*([\d,]+)\s*per gram/i);
+    if (silverMatch) result.silver = parseInt(silverMatch[1].replace(/,/g, ''));
+
+    console.log('[Metals] Indian retail prices — Gold 24K:', result.gold24k, 'Silver:', result.silver);
+  } catch (e) {
+    console.warn('[Metals] GoodReturns fetch failed:', e);
+  }
+  return result;
+}
+
 async function fetchChart(ticker: string): Promise<{ closes: number[]; highs: number[]; lows: number[]; timestamps: number[]; meta: any } | null> {
   try {
     const url = `/api/yahoo/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=3mo`;
@@ -149,9 +189,17 @@ async function fetchChart(ticker: string): Promise<{ closes: number[]; highs: nu
 }
 
 export async function fetchLiveMetals(): Promise<LiveMetal[]> {
-  // Fetch USDINR rate
-  const usdChart = await fetchChart('USDINR=X');
+  // Fetch Indian retail prices + USDINR rate in parallel
+  const [indianPrices, usdChart] = await Promise.all([
+    fetchIndianRetailPrices(),
+    fetchChart('USDINR=X'),
+  ]);
   const usdInr = usdChart?.meta?.regularMarketPrice || 85;
+
+  // Map Indian retail prices by metal name
+  const indianPriceMap: Record<string, number> = {};
+  if (indianPrices.gold24k) indianPriceMap['Gold'] = indianPrices.gold24k;
+  if (indianPrices.silver) indianPriceMap['Silver'] = indianPrices.silver;
 
   // Fetch all metals in parallel
   const results = await Promise.allSettled(
@@ -163,33 +211,38 @@ export async function fetchLiveMetals(): Promise<LiveMetal[]> {
       const priceUSD = meta.regularMarketPrice || closes[closes.length - 1];
       const prevCloseUSD = meta.chartPreviousClose || meta.previousClose || closes[closes.length - 2] || priceUSD;
 
-      // Convert to INR per gram
-      let pricePerGram: number;
+      // Convert to INR per gram (COMEX base)
+      let comexPricePerGram: number;
       let pricePerOz: number;
       if (cfg.ticker === 'HG=F') {
-        // Copper: quoted in USD/lb
-        pricePerGram = (priceUSD * usdInr) / GRAMS_PER_LB;
-        pricePerOz = priceUSD * usdInr; // just show per-lb price as "per oz" equivalent
+        comexPricePerGram = (priceUSD * usdInr) / GRAMS_PER_LB;
+        pricePerOz = priceUSD * usdInr;
       } else {
         pricePerOz = priceUSD * usdInr;
-        pricePerGram = pricePerOz / GRAMS_PER_TROY_OZ;
+        comexPricePerGram = pricePerOz / GRAMS_PER_TROY_OZ;
       }
 
-      // Convert all closes to INR/gram for consistent analysis
+      // Use Indian retail price for Gold/Silver if available
+      const hasIndianPrice = cfg.name in indianPriceMap;
+      const pricePerGram = indianPriceMap[cfg.name] ?? comexPricePerGram;
+      // ponytail: compute India premium multiplier to scale COMEX historical to Indian levels
+      const indiaPremium = hasIndianPrice ? pricePerGram / comexPricePerGram : 1;
+
+      // Convert all closes to INR/gram with India premium applied
       const closesInr = closes.map(c => {
-        if (cfg.ticker === 'HG=F') return (c * usdInr) / GRAMS_PER_LB;
-        return (c * usdInr) / GRAMS_PER_TROY_OZ;
+        const base = cfg.ticker === 'HG=F' ? (c * usdInr) / GRAMS_PER_LB : (c * usdInr) / GRAMS_PER_TROY_OZ;
+        return base * indiaPremium;
       });
 
-      // Compute technicals
+      // Compute technicals (on India-adjusted prices for Gold/Silver)
       const rsi = computeRSI(closesInr);
       const sma20 = computeSMA(closesInr, 20);
       const sma50 = computeSMA(closesInr, 50);
       const { support, resistance } = findSupportResistance(closesInr);
 
       // Changes
-      const change24h = ((priceUSD - prevCloseUSD) / prevCloseUSD) * pricePerGram;
       const change24hPct = ((priceUSD - prevCloseUSD) / prevCloseUSD) * 100;
+      const change24h = (change24hPct / 100) * pricePerGram;
       const price7dAgo = closesInr[closesInr.length - 6] || closesInr[0];
       const price30dAgo = closesInr[closesInr.length - 23] || closesInr[0];
       const change7dPct = ((pricePerGram - price7dAgo) / price7dAgo) * 100;
@@ -218,6 +271,7 @@ export async function fetchLiveMetals(): Promise<LiveMetal[]> {
         icon: cfg.icon,
         pricePerGram: Math.round(pricePerGram * 100) / 100,
         pricePerOz: Math.round(pricePerOz),
+        priceSource: hasIndianPrice ? 'Indian Retail (GoodReturns)' as const : 'COMEX Futures (converted)' as const,
         priceUSD: Math.round(priceUSD * 100) / 100,
         change24h: Math.round(change24h * 100) / 100,
         change24hPct: Math.round(change24hPct * 100) / 100,

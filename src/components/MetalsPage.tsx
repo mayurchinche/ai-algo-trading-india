@@ -68,7 +68,7 @@ export function MetalsPage() {
           ))}
         </div>
         <div className="text-xs text-[var(--text-muted)]">
-          Live prices • Yahoo Finance Futures • USD→INR converted
+          Live prices • Gold/Silver: Indian retail (GoodReturns) • Others: COMEX converted
           {lastUpdated && <span className="ml-2">Updated: {lastUpdated.toLocaleTimeString('en-IN')}</span>}
         </div>
         <button onClick={loadMetals} disabled={loading} className="text-xs font-semibold text-blue-600 hover:underline disabled:opacity-50">
@@ -189,8 +189,11 @@ export function MetalsPage() {
             <div className="text-3xl font-bold mb-1" style={{ fontFamily: 'Poppins' }}>
               ₹{activeMetal.pricePerGram.toLocaleString()}<span className="text-sm text-[var(--text-muted)] font-normal">/gram</span>
             </div>
-            <div className="text-sm text-[var(--text-secondary)] mb-4">
-              ₹{activeMetal.pricePerOz.toLocaleString()}/troy oz
+            <div className="text-sm text-[var(--text-secondary)] mb-1">
+              ₹{activeMetal.pricePerOz.toLocaleString()}/troy oz • ${activeMetal.priceUSD}/oz
+            </div>
+            <div className="text-[10px] text-[var(--text-muted)] mb-4">
+              Source: {activeMetal.priceSource}
             </div>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between py-2 border-b border-[var(--border-light)]">
