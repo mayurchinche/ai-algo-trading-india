@@ -1,16 +1,22 @@
 // ponytail: trades generated from live discovery — no hardcoded trade data
+// Limited to 2-3 equity + 1-2 F&O trades per day to minimize brokerage impact
 import { useStockDiscovery } from '../hooks/useStockDiscovery';
 import type { DiscoveredStock } from '../services/stockDiscovery';
+import { isAvailableInFnO } from '../services/optionsEngine';
 
 interface PaperTrade {
   stock: DiscoveredStock;
+  type: 'EQUITY' | 'F&O';
   side: 'BUY' | 'SELL';
   quantity: number;
+  lotSize?: number;
   entryPrice: number;
   currentPrice: number;
   stopLoss: number;
   target: number;
-  pnl: number;
+  grossPnl: number;
+  brokerage: number;
+  netPnl: number;
   pnlPct: number;
   strategy: string;
   riskReward: number;
@@ -20,84 +26,141 @@ interface PaperTrade {
   duration: string;
 }
 
+// ponytail: brokerage calc — Zerodha-like flat fee model
+// Equity intraday: ₹20/order or 0.03% whichever lower, both sides
+// F&O: ₹20/lot per leg
+// + STT + Exchange charges + GST ≈ 0.05% turnover for equity, 0.02% for F&O
+function calcBrokerage(type: 'EQUITY' | 'F&O', turnover: number): number {
+  if (type === 'EQUITY') {
+    const brokerFee = Math.min(20 * 2, turnover * 0.0003 * 2); // both legs
+    const sttExchange = turnover * 0.0005; // STT + exchange + GST
+    return Math.round(brokerFee + sttExchange);
+  }
+  // F&O: ₹20 per leg (2 legs) + STT/exchange 0.02%
+  return Math.round(40 + turnover * 0.0002);
+}
+
 function generatePaperTrades(stocks: DiscoveredStock[]): PaperTrade[] {
   const today = new Date();
   const marketOpen = new Date(today); marketOpen.setHours(9, 15, 0, 0);
   const now = new Date();
 
-  return stocks
-    .filter(s => Math.abs(s.overallScore) >= 25)
-    .map(s => {
-      const side: 'BUY' | 'SELL' = s.overallScore > 0 ? 'BUY' : 'SELL';
-      const entryPrice = s.prevClose;
-      const currentPrice = s.ltp;
-      const quantity = Math.max(1, Math.floor(50000 / entryPrice));
-      const pnl = side === 'BUY'
-        ? (currentPrice - entryPrice) * quantity
-        : (entryPrice - currentPrice) * quantity;
-      const pnlPct = side === 'BUY'
-        ? ((currentPrice - entryPrice) / entryPrice) * 100
-        : ((entryPrice - currentPrice) / entryPrice) * 100;
+  // ponytail: only take TOP 3 equity trades by conviction (score ≥ 40, not 25)
+  // + TOP 2 F&O trades from F&O-eligible stocks
+  const highConviction = stocks
+    .filter(s => Math.abs(s.overallScore) >= 40)
+    .sort((a, b) => Math.abs(b.overallScore) - Math.abs(a.overallScore));
 
-      // ponytail: entry at market open, exit when SL/target hit or still open
-      const entryTime = marketOpen.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-      let status: PaperTrade['status'] = 'OPEN';
-      let exitTime: string | null = null;
+  const equityCandidates = highConviction.slice(0, 3); // Max 3 equity trades/day
+  const foCandidates = highConviction
+    .filter(s => isAvailableInFnO(s.symbol))
+    .slice(0, 2); // Max 2 F&O trades/day
 
-      if (side === 'BUY') {
-        if (currentPrice >= s.foAnalysis.suggestedTarget) { status = 'TARGET HIT'; }
-        else if (currentPrice <= s.foAnalysis.suggestedStopLoss) { status = 'SL HIT'; }
-      } else {
-        if (currentPrice <= s.foAnalysis.suggestedTarget) { status = 'TARGET HIT'; }
-        else if (currentPrice >= s.foAnalysis.suggestedStopLoss) { status = 'SL HIT'; }
-      }
+  const allCandidates: { stock: DiscoveredStock; type: 'EQUITY' | 'F&O' }[] = [
+    ...equityCandidates.map(s => ({ stock: s, type: 'EQUITY' as const })),
+    ...foCandidates.map(s => ({ stock: s, type: 'F&O' as const })),
+  ];
 
-      if (status !== 'OPEN') {
-        // Simulate exit happened some time between open and now
-        const elapsed = now.getTime() - marketOpen.getTime();
-        const exitAt = new Date(marketOpen.getTime() + Math.random() * Math.min(elapsed, 4 * 3600000));
-        exitTime = exitAt.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-      }
+  // Deduplicate (if a stock appears in both equity and F&O, keep only F&O)
+  const seen = new Set<string>();
+  const unique = allCandidates.filter(c => {
+    if (seen.has(c.stock.symbol)) return false;
+    seen.add(c.stock.symbol);
+    return true;
+  });
 
-      const durationMs = status !== 'OPEN' && exitTime
-        ? (new Date(`2000-01-01 ${exitTime}`).getTime() - new Date(`2000-01-01 ${entryTime}`).getTime())
-        : (now.getTime() - marketOpen.getTime());
-      const durationMin = Math.max(1, Math.round(durationMs / 60000));
-      const duration = durationMin >= 60 ? `${Math.floor(durationMin / 60)}h ${durationMin % 60}m` : `${durationMin}m`;
+  return unique.map(({ stock: s, type }) => {
+    const side: 'BUY' | 'SELL' = s.overallScore > 0 ? 'BUY' : 'SELL';
+    const entryPrice = s.prevClose;
+    const currentPrice = s.ltp;
 
-      return {
-        stock: s, side, quantity, entryPrice, currentPrice,
-        stopLoss: s.foAnalysis.suggestedStopLoss,
-        target: s.foAnalysis.suggestedTarget,
-        pnl: Math.round(pnl), pnlPct: Math.round(pnlPct * 100) / 100,
-        strategy: s.strategies[0] || 'Multi-Strategy',
-        riskReward: s.foAnalysis.riskReward,
-        entryTime, exitTime, status, duration,
-      };
-    });
+    // ponytail: F&O uses lot size (~₹5-7L notional), equity uses ₹1L per position
+    const lotSize = type === 'F&O' ? Math.max(1, Math.floor(500000 / entryPrice)) : undefined;
+    const quantity = type === 'F&O'
+      ? lotSize!
+      : Math.max(1, Math.floor(100000 / entryPrice));
+
+    const turnover = entryPrice * quantity * 2; // entry + exit
+    const brokerage = calcBrokerage(type, turnover);
+
+    const grossPnl = side === 'BUY'
+      ? (currentPrice - entryPrice) * quantity
+      : (entryPrice - currentPrice) * quantity;
+    const netPnl = grossPnl - brokerage;
+    const pnlPct = side === 'BUY'
+      ? ((currentPrice - entryPrice) / entryPrice) * 100
+      : ((entryPrice - currentPrice) / entryPrice) * 100;
+
+    const entryTime = marketOpen.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    let status: PaperTrade['status'] = 'OPEN';
+    let exitTime: string | null = null;
+
+    if (side === 'BUY') {
+      if (currentPrice >= s.foAnalysis.suggestedTarget) { status = 'TARGET HIT'; }
+      else if (currentPrice <= s.foAnalysis.suggestedStopLoss) { status = 'SL HIT'; }
+    } else {
+      if (currentPrice <= s.foAnalysis.suggestedTarget) { status = 'TARGET HIT'; }
+      else if (currentPrice >= s.foAnalysis.suggestedStopLoss) { status = 'SL HIT'; }
+    }
+
+    if (status !== 'OPEN') {
+      const elapsed = now.getTime() - marketOpen.getTime();
+      const exitAt = new Date(marketOpen.getTime() + Math.random() * Math.min(elapsed, 4 * 3600000));
+      exitTime = exitAt.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    const durationMs = status !== 'OPEN' && exitTime
+      ? (new Date(`2000-01-01 ${exitTime}`).getTime() - new Date(`2000-01-01 ${entryTime}`).getTime())
+      : (now.getTime() - marketOpen.getTime());
+    const durationMin = Math.max(1, Math.round(durationMs / 60000));
+    const duration = durationMin >= 60 ? `${Math.floor(durationMin / 60)}h ${durationMin % 60}m` : `${durationMin}m`;
+
+    return {
+      stock: s, type, side, quantity, lotSize, entryPrice, currentPrice,
+      stopLoss: s.foAnalysis.suggestedStopLoss,
+      target: s.foAnalysis.suggestedTarget,
+      grossPnl: Math.round(grossPnl),
+      brokerage,
+      netPnl: Math.round(netPnl),
+      pnlPct: Math.round(pnlPct * 100) / 100,
+      strategy: s.strategies[0] || 'Multi-Strategy',
+      riskReward: s.foAnalysis.riskReward,
+      entryTime, exitTime, status, duration,
+    };
+  });
 }
 
 export function TradesPage() {
   const { stocks, loading, lastScan, rescan } = useStockDiscovery();
   const trades = generatePaperTrades(stocks);
 
-  const totalPnl = trades.reduce((a, t) => a + t.pnl, 0);
-  const wins = trades.filter(t => t.pnl > 0).length;
-  const losses = trades.filter(t => t.pnl < 0).length;
+  const totalGross = trades.reduce((a, t) => a + t.grossPnl, 0);
+  const totalBrokerage = trades.reduce((a, t) => a + t.brokerage, 0);
+  const totalNet = trades.reduce((a, t) => a + t.netPnl, 0);
+  const wins = trades.filter(t => t.netPnl > 0).length;
+  const losses = trades.filter(t => t.netPnl <= 0).length;
   const totalInvested = trades.reduce((a, t) => a + t.entryPrice * t.quantity, 0);
+  const equityTrades = trades.filter(t => t.type === 'EQUITY').length;
+  const foTrades = trades.filter(t => t.type === 'F&O').length;
 
   return (
     <div className="space-y-6">
       {/* Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
         <div className="card text-center">
-          <div className="text-[10px] text-[var(--text-muted)] uppercase">Active Trades</div>
-          <div className="text-xl font-bold" style={{ fontFamily: 'Poppins' }}>{trades.length}</div>
+          <div className="text-[10px] text-[var(--text-muted)] uppercase">Trades</div>
+          <div className="text-xl font-bold" style={{ fontFamily: 'Poppins' }}>{equityTrades}E + {foTrades}F</div>
         </div>
         <div className="card text-center">
-          <div className="text-[10px] text-[var(--text-muted)] uppercase">Today's P&L</div>
-          <div className={`text-xl font-bold ${totalPnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`} style={{ fontFamily: 'Poppins' }}>
-            {totalPnl >= 0 ? '+' : ''}₹{totalPnl.toLocaleString('en-IN')}
+          <div className="text-[10px] text-[var(--text-muted)] uppercase">Net P&L</div>
+          <div className={`text-xl font-bold ${totalNet >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`} style={{ fontFamily: 'Poppins' }}>
+            {totalNet >= 0 ? '+' : ''}₹{totalNet.toLocaleString('en-IN')}
+          </div>
+        </div>
+        <div className="card text-center">
+          <div className="text-[10px] text-[var(--text-muted)] uppercase">Brokerage</div>
+          <div className="text-xl font-bold text-[var(--red)]" style={{ fontFamily: 'Poppins' }}>
+            -₹{totalBrokerage.toLocaleString('en-IN')}
           </div>
         </div>
         <div className="card text-center">
@@ -113,9 +176,11 @@ export function TradesPage() {
           <div className="text-xl font-bold" style={{ fontFamily: 'Poppins' }}>₹{(totalInvested / 100000).toFixed(1)}L</div>
         </div>
         <div className="card text-center">
-          <div className="text-[10px] text-[var(--text-muted)] uppercase">Win Rate</div>
-          <div className="text-xl font-bold" style={{ fontFamily: 'Poppins' }}>
-            {trades.length > 0 ? ((wins / trades.length) * 100).toFixed(0) : 0}%
+          <div className="text-[10px] text-[var(--text-muted)] uppercase">Gross vs Net</div>
+          <div className="text-sm font-bold" style={{ fontFamily: 'Poppins' }}>
+            <span className={totalGross >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}>₹{totalGross.toLocaleString('en-IN')}</span>
+            <span className="text-[var(--text-muted)]"> → </span>
+            <span className={totalNet >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}>₹{totalNet.toLocaleString('en-IN')}</span>
           </div>
         </div>
       </div>
@@ -123,7 +188,7 @@ export function TradesPage() {
       {/* Info bar */}
       <div className="card bg-blue-50 flex items-center justify-between">
         <div className="text-xs text-blue-700">
-          <b>Paper Trading Mode</b> — AI discovers stocks from live NSE data, simulates entry at previous close, tracks against live LTP.
+          <b>Paper Trading Mode</b> — Max 3 equity + 2 F&O trades/day. Score ≥ 40 required. Brokerage (Zerodha model: ₹20/order + STT/GST) deducted from P&L.
           {lastScan && <span className="ml-2 text-blue-500">Last scan: {lastScan.toLocaleTimeString('en-IN')}</span>}
         </div>
         <button onClick={rescan} disabled={loading} className="text-xs font-semibold text-blue-700 hover:underline disabled:opacity-50">
@@ -142,6 +207,7 @@ export function TradesPage() {
             <thead>
               <tr>
                 <th>Symbol</th>
+                <th>Type</th>
                 <th>Side</th>
                 <th className="text-center">Status</th>
                 <th className="text-right">Entry ⏱</th>
@@ -149,20 +215,24 @@ export function TradesPage() {
                 <th className="text-right">Duration</th>
                 <th className="text-right">Qty</th>
                 <th className="text-right">Entry ₹</th>
-                <th className="text-right">LTP (Live)</th>
-                <th className="text-right">P&L</th>
-                <th className="text-right">%</th>
-                <th className="text-right">Stop Loss</th>
+                <th className="text-right">LTP</th>
+                <th className="text-right">Gross</th>
+                <th className="text-right">Charges</th>
+                <th className="text-right">Net P&L</th>
+                <th className="text-right">SL</th>
                 <th className="text-right">Target</th>
                 <th>Strategy</th>
               </tr>
             </thead>
             <tbody>
-              {trades.sort((a, b) => b.pnl - a.pnl).map(t => (
-                <tr key={t.stock.symbol}>
+              {trades.sort((a, b) => b.netPnl - a.netPnl).map(t => (
+                <tr key={t.stock.symbol + t.type}>
                   <td>
                     <div className="font-semibold">{t.stock.symbol}</div>
                     <div className="text-[10px] text-[var(--text-muted)] max-w-[120px] truncate">{t.stock.name}</div>
+                  </td>
+                  <td>
+                    <span className={`badge text-[9px] ${t.type === 'F&O' ? 'badge-purple' : 'badge-blue'}`}>{t.type}</span>
                   </td>
                   <td>
                     <span className={`badge ${t.side === 'BUY' ? 'badge-green' : 'badge-red'}`}>{t.side}</span>
@@ -175,17 +245,18 @@ export function TradesPage() {
                   <td className="text-right font-mono text-xs">{t.entryTime}</td>
                   <td className="text-right font-mono text-xs">{t.exitTime || <span className="text-amber-500">Live</span>}</td>
                   <td className="text-right font-mono text-xs text-[var(--text-secondary)]">{t.duration}</td>
-                  <td className="text-right font-mono">{t.quantity}</td>
+                  <td className="text-right font-mono">{t.quantity}{t.lotSize ? <span className="text-[9px] text-[var(--text-muted)]"> (1 lot)</span> : ''}</td>
                   <td className="text-right font-mono">₹{t.entryPrice.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
                   <td className="text-right font-mono font-semibold">₹{t.currentPrice.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
-                  <td className={`text-right font-mono font-bold ${t.pnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
-                    {t.pnl >= 0 ? '+' : ''}₹{t.pnl.toLocaleString('en-IN')}
+                  <td className={`text-right font-mono ${t.grossPnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
+                    {t.grossPnl >= 0 ? '+' : ''}₹{t.grossPnl.toLocaleString('en-IN')}
                   </td>
-                  <td className={`text-right font-mono font-bold ${t.pnlPct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
-                    {t.pnlPct >= 0 ? '+' : ''}{t.pnlPct.toFixed(2)}%
+                  <td className="text-right font-mono text-[var(--red)] text-xs">-₹{t.brokerage}</td>
+                  <td className={`text-right font-mono font-bold ${t.netPnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
+                    {t.netPnl >= 0 ? '+' : ''}₹{t.netPnl.toLocaleString('en-IN')}
                   </td>
-                  <td className="text-right font-mono text-[var(--red)]">₹{t.stopLoss.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
-                  <td className="text-right font-mono text-[var(--green)]">₹{t.target.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                  <td className="text-right font-mono text-[var(--red)] text-xs">₹{t.stopLoss.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
+                  <td className="text-right font-mono text-[var(--green)] text-xs">₹{t.target.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
                   <td className="text-xs">{t.strategy}</td>
                 </tr>
               ))}
