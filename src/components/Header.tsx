@@ -14,10 +14,10 @@ export function Header({ activeTab, onTabChange, nifty }: HeaderProps) {
   const tabs = ['AI Discovery', 'Smart Picks', 'Overview', 'Trades', 'Stock Analysis', 'Signals', 'Backtest', 'IPO Tracker', 'Metals'];
 
   return (
-    <header className="sticky top-0 z-50 glass border-b border-[var(--border)]">
+    <header className="sticky top-0 z-50 glass border-b border-[rgba(0,0,0,0.06)]">
       <div className="flex items-center justify-between px-8 xl:px-12 py-4 max-w-[1600px] mx-auto">
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-blue-500/30">AT</div>
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-blue-500/20">AT</div>
           <div>
             <h1 className="text-[15px] font-semibold text-[var(--text)]" style={{ fontFamily: 'Poppins', letterSpacing: '-0.01em' }}>AlgoTrader AI</h1>
             <p className="text-[11px] text-[var(--text-muted)]">NSE • Live Discovery • Paper Mode</p>
@@ -26,7 +26,7 @@ export function Header({ activeTab, onTabChange, nifty }: HeaderProps) {
 
         <div className="hidden lg:flex items-center gap-6">
           {nifty && (
-            <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-[rgba(255,255,255,0.03)] border border-[var(--border)]">
+            <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-[rgba(0,0,0,0.02)] border border-[var(--border)]">
               <span className="text-[11px] text-[var(--text-muted)] font-medium">NIFTY 50</span>
               <span className="text-[15px] font-bold text-[var(--text)]" style={{ fontFamily: 'Poppins', letterSpacing: '-0.02em' }}>
                 {nifty.ltp.toLocaleString('en-IN', { maximumFractionDigits: 2 })}

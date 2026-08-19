@@ -153,7 +153,7 @@ export function OverviewPage() {
                 const pnl = Math.round(side * (s.ltp - s.prevClose) * qty);
                 return { symbol: s.symbol, pnl };
               }).sort((a, b) => b.pnl - a.pnl)}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
                 <XAxis dataKey="symbol" tick={{ fontSize: 9, fill: '#64748B' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 9, fill: '#64748B' }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v/1000).toFixed(0)}K`} />
                 <Tooltip contentStyle={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 8, fontSize: 11 }} formatter={(v) => [`₹${Number(v).toLocaleString()}`, 'P&L']} />
@@ -177,7 +177,7 @@ export function OverviewPage() {
           </div>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={stocks.slice(0, 20).map(s => ({ symbol: s.symbol, score: s.overallScore })).sort((a, b) => b.score - a.score)}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
               <XAxis dataKey="symbol" tick={{ fontSize: 8, fill: '#64748B' }} axisLine={false} tickLine={false} angle={-45} textAnchor="end" height={50} />
               <YAxis tick={{ fontSize: 9, fill: '#64748B' }} axisLine={false} tickLine={false} />
               <Tooltip contentStyle={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 8, fontSize: 11 }} />

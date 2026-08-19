@@ -42,7 +42,7 @@ export default function App() {
           </motion.div>
         </AnimatePresence>
       </main>
-      <footer className="text-center text-[11px] text-[var(--text-muted)] py-8 mt-4 border-t border-[var(--border)]">
+      <footer className="text-center text-[11px] text-[var(--text-muted)] py-8 mt-4 border-t border-[rgba(0,0,0,0.04)]">
         <div className="max-w-[1600px] mx-auto px-8 space-y-1">
           <p className="font-medium text-[var(--text-secondary)]" style={{ fontFamily: 'Poppins' }}>AlgoTrader AI</p>
           <p>Paper Trading Mode • NSE • Not Financial Advice • Powered by Yahoo Finance</p>

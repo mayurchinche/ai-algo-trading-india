@@ -158,7 +158,7 @@ export function BacktestPage() {
                     <stop offset="95%" stopColor={result.totalReturn >= 0 ? '#22C55E' : '#EF4444'} stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
                 <XAxis dataKey="date" tick={{ fontSize: 9 }} tickFormatter={v => v.slice(5)} interval="preserveStartEnd" />
                 <YAxis tick={{ fontSize: 9 }} tickFormatter={v => `${(v/100000).toFixed(1)}L`} />
                 <Tooltip contentStyle={{ fontSize: 11, borderRadius: 12 }} formatter={(v: any) => [`₹${Number(v).toLocaleString('en-IN')}`, 'Equity']} />
@@ -233,7 +233,7 @@ export function BacktestPage() {
             <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-3">P&L by Strategy</h3>
             <ResponsiveContainer width="100%" height={180}>
               <BarChart data={result.strategies.filter(s => s.totalTrades > 0)}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
                 <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                 <YAxis tick={{ fontSize: 9 }} tickFormatter={v => `${(v/1000).toFixed(0)}K`} />
                 <Tooltip contentStyle={{ fontSize: 11, borderRadius: 12 }} formatter={(v: any) => [`₹${Number(v).toLocaleString('en-IN')}`, 'P&L']} />
