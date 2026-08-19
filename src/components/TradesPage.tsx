@@ -74,11 +74,11 @@ function generatePaperTrades(stocks: DiscoveredStock[]): PaperTrade[] {
     const entryPrice = s.prevClose;
     const currentPrice = s.ltp;
 
-    // ponytail: ₹20K capital, max ₹7K per equity trade, ₹10K for F&O
-    const lotSize = type === 'F&O' ? Math.max(1, Math.floor(10000 / entryPrice)) : undefined;
+    // ponytail: ₹20K capital — max ₹5K per equity, ₹7K per F&O (total ≤ ₹15K+₹14K risk)
+    const lotSize = type === 'F&O' ? Math.max(1, Math.floor(7000 / entryPrice)) : undefined;
     const quantity = type === 'F&O'
       ? lotSize!
-      : Math.max(1, Math.floor(7000 / entryPrice));
+      : Math.max(1, Math.floor(5000 / entryPrice));
 
     const turnover = entryPrice * quantity * 2; // entry + exit
     const brokerage = calcBrokerage(type, turnover);
