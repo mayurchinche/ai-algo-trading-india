@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { metals, metalsPriceHistory, sectorAllocation } from '../data/metalsData';
+import { useState, useEffect } from 'react';
+import { fetchLiveMetals, type LiveMetal } from '../services/metalsService';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
 const signalStyles: Record<string, string> = {
@@ -10,9 +10,38 @@ const signalStyles: Record<string, string> = {
   'STRONG SELL': 'badge-red',
 };
 
+const ALLOCATION: Record<string, { allocation: string; risk: string; horizon: string; bestFor: string }> = {
+  Gold: { allocation: '10-15%', risk: 'Low', horizon: '1-5 years', bestFor: 'Inflation hedge, portfolio insurance' },
+  Silver: { allocation: '5-8%', risk: 'Medium', horizon: '1-3 years', bestFor: 'Higher beta gold proxy + industrial growth' },
+  Platinum: { allocation: '2-4%', risk: 'Medium-High', horizon: '2-5 years', bestFor: 'Hydrogen economy bet, contrarian value' },
+  Copper: { allocation: '3-5%', risk: 'Medium', horizon: '1-3 years', bestFor: 'Energy transition, India infra play' },
+  Palladium: { allocation: '0-2%', risk: 'High', horizon: 'N/A', bestFor: 'Speculative only — structural decline' },
+};
+
 export function MetalsPage() {
+  const [metals, setMetals] = useState<LiveMetal[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState('Gold');
-  const activeMetal = metals.find(m => m.name === selected)!;
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  const loadMetals = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchLiveMetals();
+      setMetals(data);
+      setLastUpdated(new Date());
+      if (data.length > 0 && !data.find(m => m.name === selected)) setSelected(data[0].name);
+    } catch (e) { console.error('Failed to load metals:', e); }
+    setLoading(false);
+  };
+
+  useEffect(() => { loadMetals(); }, []);
+
+  const activeMetal = metals.find(m => m.name === selected);
+
+  if (loading && metals.length === 0) {
+    return <div className="card text-center py-16"><p className="text-sm text-[var(--text-secondary)]">Loading live metal prices from Yahoo Finance...</p></div>;
+  }
 
   return (
     <div className="space-y-5">
@@ -38,7 +67,13 @@ export function MetalsPage() {
             </button>
           ))}
         </div>
-        <div className="text-xs text-[var(--text-muted)]">Prices in INR • MCX + International • Updated 10:50 IST</div>
+        <div className="text-xs text-[var(--text-muted)]">
+          Live prices • Yahoo Finance Futures • USD→INR converted
+          {lastUpdated && <span className="ml-2">Updated: {lastUpdated.toLocaleTimeString('en-IN')}</span>}
+        </div>
+        <button onClick={loadMetals} disabled={loading} className="text-xs font-semibold text-blue-600 hover:underline disabled:opacity-50">
+          {loading ? 'Loading...' : '↻ Refresh'}
+        </button>
       </div>
 
       {/* Overview cards */}
@@ -63,7 +98,7 @@ export function MetalsPage() {
       </div>
 
       {/* Detail section for selected metal */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      {activeMetal ? (<div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Left: Chart + Price details */}
         <div className="lg:col-span-2 space-y-5">
           {/* Price chart */}
@@ -78,7 +113,7 @@ export function MetalsPage() {
               </div>
             </div>
             <ResponsiveContainer width="100%" height={240}>
-              <AreaChart data={selected === 'Gold' ? metalsPriceHistory.gold : metalsPriceHistory.silver}>
+              <AreaChart data={activeMetal?.priceHistory || []}>
                 <defs>
                   <linearGradient id="gMetal" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#2563EB" stopOpacity={0.15} />
@@ -107,20 +142,20 @@ export function MetalsPage() {
               </div>
               <div className="p-3 rounded-xl bg-[var(--bg)]">
                 <div className="text-xs text-[var(--text-muted)] mb-1">7 Days</div>
-                <div className={`text-base font-bold ${activeMetal.change7d >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`} style={{ fontFamily: 'Poppins' }}>
-                  {activeMetal.change7d >= 0 ? '+' : ''}{activeMetal.change7d}%
+                <div className={`text-base font-bold ${activeMetal.change7dPct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`} style={{ fontFamily: 'Poppins' }}>
+                  {activeMetal.change7dPct >= 0 ? '+' : ''}{activeMetal.change7dPct}%
                 </div>
               </div>
               <div className="p-3 rounded-xl bg-[var(--bg)]">
                 <div className="text-xs text-[var(--text-muted)] mb-1">30 Days</div>
-                <div className={`text-base font-bold ${activeMetal.change30d >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`} style={{ fontFamily: 'Poppins' }}>
-                  {activeMetal.change30d >= 0 ? '+' : ''}{activeMetal.change30d}%
+                <div className={`text-base font-bold ${activeMetal.change30dPct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`} style={{ fontFamily: 'Poppins' }}>
+                  {activeMetal.change30dPct >= 0 ? '+' : ''}{activeMetal.change30dPct}%
                 </div>
               </div>
               <div className="p-3 rounded-xl bg-[var(--bg)]">
-                <div className="text-xs text-[var(--text-muted)] mb-1">1 Year</div>
-                <div className={`text-base font-bold ${activeMetal.change1y >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`} style={{ fontFamily: 'Poppins' }}>
-                  {activeMetal.change1y >= 0 ? '+' : ''}{activeMetal.change1y}%
+                <div className="text-xs text-[var(--text-muted)] mb-1">SMA 20</div>
+                <div className="text-base font-bold" style={{ fontFamily: 'Poppins' }}>
+                  ₹{activeMetal.sma20.toLocaleString()}/g
                 </div>
               </div>
             </div>
@@ -200,10 +235,10 @@ export function MetalsPage() {
           {/* AI Outlook */}
           <div className="card">
             <h3 className="text-sm font-bold mb-2" style={{ fontFamily: 'Poppins' }}>🤖 AI Outlook</h3>
-            <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{activeMetal.outlook}</p>
+            <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{activeMetal.investmentThesis}</p>
           </div>
         </div>
-      </div>
+      </div>) : null}
 
       {/* Portfolio allocation recommendation */}
       <div className="card">
@@ -220,20 +255,20 @@ export function MetalsPage() {
             </tr>
           </thead>
           <tbody>
-            {sectorAllocation.map((a) => {
-              const m = metals.find(mt => mt.name === a.metal);
+            {metals.map((m) => {
+              const alloc = ALLOCATION[m.name] || { allocation: '0%', risk: 'High', horizon: 'N/A', bestFor: '' };
               return (
-                <tr key={a.metal}>
-                  <td className="font-semibold">{m?.icon} {a.metal}</td>
-                  <td><span className="font-bold text-[var(--blue)]">{a.allocation}</span></td>
+                <tr key={m.name}>
+                  <td className="font-semibold">{m.icon} {m.name}</td>
+                  <td><span className="font-bold text-[var(--blue)]">{alloc.allocation}</span></td>
                   <td>
-                    <span className={`badge ${a.risk === 'Low' ? 'badge-green' : a.risk === 'Medium' ? 'badge-amber' : 'badge-red'}`}>
-                      {a.risk}
+                    <span className={`badge ${alloc.risk === 'Low' ? 'badge-green' : alloc.risk === 'Medium' ? 'badge-amber' : 'badge-red'}`}>
+                      {alloc.risk}
                     </span>
                   </td>
-                  <td className="text-[var(--text-secondary)]">{a.horizon}</td>
-                  <td className="text-[var(--text-secondary)] text-xs">{a.bestFor}</td>
-                  <td>{m && <span className={`badge ${signalStyles[m.signal]}`}>{m.signal}</span>}</td>
+                  <td className="text-[var(--text-secondary)]">{alloc.horizon}</td>
+                  <td className="text-[var(--text-secondary)] text-xs">{alloc.bestFor}</td>
+                  <td><span className={`badge ${signalStyles[m.signal]}`}>{m.signal}</span></td>
                 </tr>
               );
             })}
