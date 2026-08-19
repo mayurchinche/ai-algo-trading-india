@@ -307,8 +307,24 @@ export async function discoverStocks(): Promise<DiscoveredStock[]> {
     if (!seen.has(sym)) seen.set(sym, q);
   });
 
-  // Step 2: For top 20 candidates, fetch historical data and compute technicals
-  const candidates = Array.from(seen.values()).slice(0, 20);
+  // Step 1b: Also fetch top F&O stocks to ensure options tab has data
+  const topFnOSymbols = [
+    'RELIANCE.NS', 'TCS.NS', 'HDFCBANK.NS', 'INFY.NS', 'ICICIBANK.NS',
+    'SBIN.NS', 'BHARTIARTL.NS', 'ITC.NS', 'BAJFINANCE.NS', 'MARUTI.NS',
+    'TATASTEEL.NS', 'TATAMOTORS.NS', 'AXISBANK.NS', 'LT.NS', 'SUNPHARMA.NS',
+    'HINDUNILVR.NS', 'ADANIENT.NS', 'WIPRO.NS', 'HCLTECH.NS', 'NTPC.NS',
+    'POWERGRID.NS', 'KOTAKBANK.NS', 'JSWSTEEL.NS', 'TITAN.NS', 'DLF.NS',
+  ];
+  // Add any F&O symbols not already discovered
+  for (const sym of topFnOSymbols) {
+    if (!seen.has(sym)) {
+      seen.set(sym, { symbol: sym, _needsFetch: true });
+    }
+  }
+
+  // Step 2: Analyze candidates. Prioritize F&O stocks + top screener results
+  // Take all unique candidates (screener + F&O stocks)
+  const candidates = Array.from(seen.values()).slice(0, 40);
   const results: DiscoveredStock[] = [];
 
   const analyses = await Promise.allSettled(
@@ -319,6 +335,9 @@ export async function discoverStocks(): Promise<DiscoveredStock[]> {
 
       const { closes, highs, lows } = hist;
       const ltp = q.regularMarketPrice || closes[closes.length - 1];
+      const prevClose = q.regularMarketPreviousClose || (closes.length > 1 ? closes[closes.length - 2] : ltp);
+      const change = q.regularMarketChange ?? (ltp - prevClose);
+      const changePct = q.regularMarketChangePercent ?? ((ltp - prevClose) / prevClose * 100);
       const rsi = computeRSI(closes);
       const macd = computeMACD(closes);
       const sma20 = computeSMA(closes, 20);
@@ -326,7 +345,9 @@ export async function discoverStocks(): Promise<DiscoveredStock[]> {
       const sma200 = computeSMA(closes, 200);
       const atr = computeATR(highs, lows, closes);
       const bollingerPos = computeBollingerPosition(closes);
-      const volumeRatio = (q.regularMarketVolume || 0) / (q.averageDailyVolume3Month || 1);
+      const vol = q.regularMarketVolume || 0;
+      const avgVol = q.averageDailyVolume3Month || 1;
+      const volumeRatio = vol / avgVol || 1;
 
       const scores = scoreStrategies(
         ltp, rsi, macd, sma20, sma50, sma200,
@@ -342,18 +363,18 @@ export async function discoverStocks(): Promise<DiscoveredStock[]> {
 
       return {
         symbol: symbol.replace('.NS', ''),
-        name: q.longName || q.shortName || symbol,
+        name: q.longName || q.shortName || symbol.replace('.NS', ''),
         exchange: 'NSE',
         ltp,
-        change: q.regularMarketChange || 0,
-        changePct: q.regularMarketChangePercent || 0,
-        volume: q.regularMarketVolume || 0,
-        avgVolume: q.averageDailyVolume3Month || 0,
+        change,
+        changePct,
+        volume: vol,
+        avgVolume: avgVol,
         volumeRatio: Math.round(volumeRatio * 10) / 10,
         dayHigh: q.regularMarketDayHigh || ltp,
         dayLow: q.regularMarketDayLow || ltp,
         open: q.regularMarketOpen || ltp,
-        prevClose: q.regularMarketPreviousClose || ltp,
+        prevClose,
         weekHigh52: q.fiftyTwoWeekHigh || ltp,
         weekLow52: q.fiftyTwoWeekLow || ltp,
         sma50: Math.round(sma50 * 100) / 100,

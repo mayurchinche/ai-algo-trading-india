@@ -36,11 +36,14 @@ function StockCard({ stock, variant }: { stock: DiscoveredStock; variant: 'short
           </div>
           <div className="text-[11px] text-[var(--text-secondary)] mt-0.5">{stock.name} • {stock.exchange}</div>
         </div>
-        <div className="score-circle" style={{
-          borderColor: stock.overallScore >= 70 ? 'var(--green)' : stock.overallScore >= 50 ? 'var(--gold, #eab308)' : 'var(--blue)',
-          color: stock.overallScore >= 70 ? 'var(--green)' : stock.overallScore >= 50 ? 'var(--gold, #eab308)' : 'var(--blue)'
-        }}>
-          {Math.round(stock.overallScore)}
+        <div className="text-center">
+          <div className="score-circle" style={{
+            borderColor: stock.overallScore >= 70 ? 'var(--green)' : stock.overallScore >= 50 ? 'var(--gold, #eab308)' : 'var(--blue)',
+            color: stock.overallScore >= 70 ? 'var(--green)' : stock.overallScore >= 50 ? 'var(--gold, #eab308)' : 'var(--blue)'
+          }}>
+            {Math.round(stock.overallScore)}
+          </div>
+          <div className="text-[8px] text-[var(--text-muted)] mt-1 uppercase">Score</div>
         </div>
       </div>
 
