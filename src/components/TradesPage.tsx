@@ -14,35 +14,65 @@ interface PaperTrade {
   pnlPct: number;
   strategy: string;
   riskReward: number;
+  entryTime: string;
+  exitTime: string | null; // null = still open
+  status: 'OPEN' | 'TARGET HIT' | 'SL HIT';
+  duration: string;
 }
 
 function generatePaperTrades(stocks: DiscoveredStock[]): PaperTrade[] {
+  const today = new Date();
+  const marketOpen = new Date(today); marketOpen.setHours(9, 15, 0, 0);
+  const now = new Date();
+
   return stocks
-    .filter(s => Math.abs(s.overallScore) >= 25) // Only trade on conviction
+    .filter(s => Math.abs(s.overallScore) >= 25)
     .map(s => {
       const side: 'BUY' | 'SELL' = s.overallScore > 0 ? 'BUY' : 'SELL';
-      // ponytail: simulate entry at previous close, current at LTP
       const entryPrice = s.prevClose;
       const currentPrice = s.ltp;
-      const quantity = Math.max(1, Math.floor(50000 / entryPrice)); // ~₹50K per position
+      const quantity = Math.max(1, Math.floor(50000 / entryPrice));
       const pnl = side === 'BUY'
         ? (currentPrice - entryPrice) * quantity
         : (entryPrice - currentPrice) * quantity;
       const pnlPct = side === 'BUY'
         ? ((currentPrice - entryPrice) / entryPrice) * 100
         : ((entryPrice - currentPrice) / entryPrice) * 100;
+
+      // ponytail: entry at market open, exit when SL/target hit or still open
+      const entryTime = marketOpen.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+      let status: PaperTrade['status'] = 'OPEN';
+      let exitTime: string | null = null;
+
+      if (side === 'BUY') {
+        if (currentPrice >= s.foAnalysis.suggestedTarget) { status = 'TARGET HIT'; }
+        else if (currentPrice <= s.foAnalysis.suggestedStopLoss) { status = 'SL HIT'; }
+      } else {
+        if (currentPrice <= s.foAnalysis.suggestedTarget) { status = 'TARGET HIT'; }
+        else if (currentPrice >= s.foAnalysis.suggestedStopLoss) { status = 'SL HIT'; }
+      }
+
+      if (status !== 'OPEN') {
+        // Simulate exit happened some time between open and now
+        const elapsed = now.getTime() - marketOpen.getTime();
+        const exitAt = new Date(marketOpen.getTime() + Math.random() * Math.min(elapsed, 4 * 3600000));
+        exitTime = exitAt.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+      }
+
+      const durationMs = status !== 'OPEN' && exitTime
+        ? (new Date(`2000-01-01 ${exitTime}`).getTime() - new Date(`2000-01-01 ${entryTime}`).getTime())
+        : (now.getTime() - marketOpen.getTime());
+      const durationMin = Math.max(1, Math.round(durationMs / 60000));
+      const duration = durationMin >= 60 ? `${Math.floor(durationMin / 60)}h ${durationMin % 60}m` : `${durationMin}m`;
+
       return {
-        stock: s,
-        side,
-        quantity,
-        entryPrice,
-        currentPrice,
+        stock: s, side, quantity, entryPrice, currentPrice,
         stopLoss: s.foAnalysis.suggestedStopLoss,
         target: s.foAnalysis.suggestedTarget,
-        pnl: Math.round(pnl),
-        pnlPct: Math.round(pnlPct * 100) / 100,
+        pnl: Math.round(pnl), pnlPct: Math.round(pnlPct * 100) / 100,
         strategy: s.strategies[0] || 'Multi-Strategy',
         riskReward: s.foAnalysis.riskReward,
+        entryTime, exitTime, status, duration,
       };
     });
 }
@@ -113,16 +143,18 @@ export function TradesPage() {
               <tr>
                 <th>Symbol</th>
                 <th>Side</th>
+                <th className="text-center">Status</th>
+                <th className="text-right">Entry ⏱</th>
+                <th className="text-right">Exit ⏱</th>
+                <th className="text-right">Duration</th>
                 <th className="text-right">Qty</th>
-                <th className="text-right">Entry</th>
+                <th className="text-right">Entry ₹</th>
                 <th className="text-right">LTP (Live)</th>
                 <th className="text-right">P&L</th>
                 <th className="text-right">%</th>
                 <th className="text-right">Stop Loss</th>
                 <th className="text-right">Target</th>
-                <th className="text-center">R:R</th>
                 <th>Strategy</th>
-                <th className="text-center">Signal</th>
               </tr>
             </thead>
             <tbody>
@@ -135,6 +167,14 @@ export function TradesPage() {
                   <td>
                     <span className={`badge ${t.side === 'BUY' ? 'badge-green' : 'badge-red'}`}>{t.side}</span>
                   </td>
+                  <td className="text-center">
+                    <span className={`badge text-[9px] ${t.status === 'TARGET HIT' ? 'badge-green' : t.status === 'SL HIT' ? 'badge-red' : 'badge-amber'}`}>
+                      {t.status}
+                    </span>
+                  </td>
+                  <td className="text-right font-mono text-xs">{t.entryTime}</td>
+                  <td className="text-right font-mono text-xs">{t.exitTime || <span className="text-amber-500">Live</span>}</td>
+                  <td className="text-right font-mono text-xs text-[var(--text-secondary)]">{t.duration}</td>
                   <td className="text-right font-mono">{t.quantity}</td>
                   <td className="text-right font-mono">₹{t.entryPrice.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
                   <td className="text-right font-mono font-semibold">₹{t.currentPrice.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
@@ -146,13 +186,7 @@ export function TradesPage() {
                   </td>
                   <td className="text-right font-mono text-[var(--red)]">₹{t.stopLoss.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
                   <td className="text-right font-mono text-[var(--green)]">₹{t.target.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
-                  <td className="text-center text-xs font-bold">1:{t.riskReward}</td>
                   <td className="text-xs">{t.strategy}</td>
-                  <td className="text-center">
-                    <span className={`badge text-[9px] ${t.stock.signal.includes('BUY') ? 'badge-green' : t.stock.signal.includes('SELL') ? 'badge-red' : 'badge-amber'}`}>
-                      {t.stock.signal.replace('_', ' ')}
-                    </span>
-                  </td>
                 </tr>
               ))}
             </tbody>
