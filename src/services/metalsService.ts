@@ -157,9 +157,9 @@ async function fetchIndianRetailPrices(): Promise<IndianRetailPrices> {
       if (textMatch) result.gold24k = parseInt(textMatch[1].replace(/,/g, ''));
     }
 
-    // Silver: parse from text
-    const silverMatch = silverHtml.match(/&#8377;([\d,]+)\s*per gram/i)
-      || silverHtml.match(/₹\s*([\d,]+)\s*per gram/i);
+    // Silver: price is wrapped in <strong>&#8377;245</strong> per gram
+    const silverSection = silverHtml.replace(/<[^>]*>/g, ' '); // strip all HTML tags
+    const silverMatch = silverSection.match(/(?:&#8377;|₹)\s*([\d,]+)\s*per\s*gram/i);
     if (silverMatch) result.silver = parseInt(silverMatch[1].replace(/,/g, ''));
 
     console.log('[Metals] Indian retail prices — Gold 24K:', result.gold24k, 'Silver:', result.silver);
