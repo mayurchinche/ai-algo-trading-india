@@ -341,23 +341,23 @@ function OptionsCard({ pick }: { pick: OptionsPick }) {
 
       {/* Key metrics */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mb-3">
-        <div className="bg-gray-50 rounded-lg px-2 py-1.5 text-center">
+        <div className="bg-[var(--bg-alt)] rounded-lg px-2 py-1.5 text-center">
           <div className="text-[9px] text-[var(--text-muted)]">IV Percentile</div>
           <div className={`text-sm font-bold ${pick.ivPercentile > 60 ? 'text-[var(--red)]' : pick.ivPercentile < 30 ? 'text-[var(--green)]' : 'text-amber-500'}`}>
             {pick.ivPercentile}th
           </div>
         </div>
-        <div className="bg-gray-50 rounded-lg px-2 py-1.5 text-center">
+        <div className="bg-[var(--bg-alt)] rounded-lg px-2 py-1.5 text-center">
           <div className="text-[9px] text-[var(--text-muted)]">Weekly Move</div>
           <div className="text-sm font-bold text-[var(--text)]">±{pick.expectedMoveWeekly}%</div>
         </div>
-        <div className="bg-green-50 rounded-lg px-2 py-1.5 text-center">
+        <div className="bg-[var(--green-bg)] rounded-lg px-2 py-1.5 text-center">
           <div className="text-[9px] text-[var(--text-muted)]">Max Profit</div>
           <div className="text-sm font-bold text-[var(--green)]">
             {pick.maxProfit === -1 ? '∞' : `₹${pick.maxProfit.toLocaleString('en-IN')}`}
           </div>
         </div>
-        <div className="bg-red-50 rounded-lg px-2 py-1.5 text-center">
+        <div className="bg-[var(--red-bg)] rounded-lg px-2 py-1.5 text-center">
           <div className="text-[9px] text-[var(--text-muted)]">Max Loss</div>
           <div className="text-sm font-bold text-[var(--red)]">
             {pick.maxLoss === -1 ? '∞ ⚠️' : `₹${pick.maxLoss.toLocaleString('en-IN')}`}
@@ -374,7 +374,7 @@ function OptionsCard({ pick }: { pick: OptionsPick }) {
         <h5 className="text-[10px] font-semibold text-[var(--text-secondary)] uppercase mb-1">Trade Legs</h5>
         <div className="flex flex-wrap gap-2">
           {pick.legs.map((leg, i) => (
-            <div key={i} className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[11px] font-medium ${leg.action === 'BUY' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+            <div key={i} className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[11px] font-medium ${leg.action === 'BUY' ? 'bg-[var(--green-bg)] text-[var(--green)]' : 'bg-[var(--red-bg)] text-[var(--red)]'}`}>
               <span>{leg.action}</span>
               <span className="font-bold">₹{leg.strike}</span>
               <span>{leg.type}</span>
@@ -414,7 +414,7 @@ function OptionsCard({ pick }: { pick: OptionsPick }) {
 
           {/* Edge Factors */}
           <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-3">
-            <h5 className="text-[10px] font-semibold text-green-700 uppercase mb-1">Statistical Edge</h5>
+            <h5 className="text-[10px] font-semibold text-[var(--green)] uppercase mb-1">Statistical Edge</h5>
             {pick.edgeFactors.map((e, i) => (
               <p key={i} className="text-[11px] text-green-800 flex items-start gap-1.5 mb-0.5">
                 <span className="text-green-500">✦</span> {e}
@@ -424,10 +424,10 @@ function OptionsCard({ pick }: { pick: OptionsPick }) {
 
           {/* Risk Warnings */}
           {pick.riskWarnings.length > 0 && (
-            <div className="bg-red-50 rounded-lg p-3">
-              <h5 className="text-[10px] font-semibold text-red-700 uppercase mb-1">Risk Warnings</h5>
+            <div className="bg-[var(--red-bg)] rounded-lg p-3">
+              <h5 className="text-[10px] font-semibold text-[var(--red)] uppercase mb-1">Risk Warnings</h5>
               {pick.riskWarnings.map((w, i) => (
-                <p key={i} className="text-[11px] text-red-700">{w}</p>
+                <p key={i} className="text-[11px] text-[var(--red)]">{w}</p>
               ))}
             </div>
           )}

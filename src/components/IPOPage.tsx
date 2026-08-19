@@ -231,32 +231,32 @@ export function IPOPage() {
                   <div>
                     <h4 className="text-[10px] font-bold text-[var(--text-muted)] uppercase mb-2">📊 Live Subscription Status</h4>
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                      <div className="text-center p-3 rounded-xl bg-[rgba(0,0,0,0.02)]">
+                      <div className="text-center p-3 rounded-xl bg-[var(--bg-alt)]">
                         <div className={`text-base font-bold ${(ipo.subscription_total || 0) > 1 ? 'text-[var(--green)]' : 'text-[var(--text)]'}`}>
                           {ipo.subscription_total?.toFixed(2)}x
                         </div>
                         <div className="text-[9px] text-[var(--text-muted)] uppercase mt-1">Total</div>
                       </div>
-                      <div className="text-center p-3 rounded-xl bg-[rgba(0,0,0,0.02)]">
+                      <div className="text-center p-3 rounded-xl bg-[var(--bg-alt)]">
                         <div className={`text-base font-bold ${(ipo.subscription_qib || 0) > 1 ? 'text-[var(--green)]' : 'text-[var(--text)]'}`}>
                           {ipo.subscription_qib?.toFixed(2)}x
                         </div>
                         <div className="text-[9px] text-[var(--text-muted)] uppercase mt-1">QIB</div>
                       </div>
-                      <div className="text-center p-3 rounded-xl bg-[rgba(0,0,0,0.02)]">
+                      <div className="text-center p-3 rounded-xl bg-[var(--bg-alt)]">
                         <div className={`text-base font-bold ${(ipo.subscription_nii || 0) > 1 ? 'text-[var(--green)]' : 'text-[var(--text)]'}`}>
                           {ipo.subscription_nii?.toFixed(2)}x
                         </div>
                         <div className="text-[9px] text-[var(--text-muted)] uppercase mt-1">NII</div>
                       </div>
-                      <div className="text-center p-3 rounded-xl bg-[rgba(0,0,0,0.02)]">
+                      <div className="text-center p-3 rounded-xl bg-[var(--bg-alt)]">
                         <div className={`text-base font-bold ${(ipo.subscription_rii || 0) > 1 ? 'text-[var(--green)]' : 'text-[var(--text)]'}`}>
                           {ipo.subscription_rii?.toFixed(2)}x
                         </div>
                         <div className="text-[9px] text-[var(--text-muted)] uppercase mt-1">Retail</div>
                       </div>
                       {ipo.subscription_shni != null && (
-                        <div className="text-center p-3 rounded-xl bg-[rgba(0,0,0,0.02)]">
+                        <div className="text-center p-3 rounded-xl bg-[var(--bg-alt)]">
                           <div className="text-base font-bold text-[var(--text)]">
                             {ipo.subscription_shni?.toFixed(2)}x / {ipo.subscription_bhni?.toFixed(2)}x
                           </div>

@@ -132,7 +132,7 @@ function StockCard({ stock, expanded, onToggle }: { stock: DiscoveredStock; expa
               { label: '52W Low', value: `₹${stock.weekLow52.toLocaleString('en-IN')}` },
               { label: 'MACD', value: stock.macd.histogram > 0 ? '↑ Bullish' : '↓ Bearish' },
             ].map(item => (
-              <div key={item.label} className="bg-gray-50 rounded-lg px-2 py-1.5">
+              <div key={item.label} className="bg-[var(--bg-alt)] rounded-lg px-2 py-1.5">
                 <div className="text-[9px] text-[var(--text-muted)]">{item.label}</div>
                 <div className="text-[11px] font-bold text-[var(--text)]">{item.value}</div>
               </div>

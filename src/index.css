@@ -2,36 +2,37 @@
 @import "tailwindcss";
 
 :root {
-  /* Premium light fintech — INDmoney / CRED inspired */
+  /* Premium dark fintech — SaaS/CRED dark inspired */
   --white: #FFFFFF;
-  --bg: #FAFBFD;
-  --bg-alt: #F3F5F8;
-  --card: #FFFFFF;
-  --text: #0F172A;
-  --text-secondary: #475569;
-  --text-muted: #94A3B8;
-  --border: rgba(0,0,0,0.06);
-  --border-light: rgba(0,0,0,0.03);
+  --bg: #050507;
+  --bg-alt: #0F1117;
+  --card: #111318;
+  --card-hover: #161922;
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: rgba(255,255,255,0.06);
+  --border-light: rgba(255,255,255,0.03);
 
-  /* Refined accents — slightly muted for elegance */
-  --green: #059669;
-  --green-bg: #ECFDF5;
-  --green-border: #A7F3D0;
-  --red: #DC2626;
-  --red-bg: #FEF2F2;
-  --red-border: #FECACA;
+  /* Refined accents — vibrant on dark */
+  --green: #10B981;
+  --green-bg: rgba(16, 185, 129, 0.1);
+  --green-border: rgba(16, 185, 129, 0.2);
+  --red: #EF4444;
+  --red-bg: rgba(239, 68, 68, 0.1);
+  --red-border: rgba(239, 68, 68, 0.2);
   --blue: #3B82F6;
-  --blue-bg: #EFF6FF;
-  --blue-border: #BFDBFE;
-  --purple: #7C3AED;
-  --purple-bg: #F5F3FF;
-  --purple-border: #DDD6FE;
-  --amber: #D97706;
-  --amber-bg: #FFFBEB;
-  --amber-border: #FDE68A;
-  --cyan: #0891B2;
-  --cyan-bg: #ECFEFF;
-  --pink: #DB2777;
+  --blue-bg: rgba(59, 130, 246, 0.1);
+  --blue-border: rgba(59, 130, 246, 0.2);
+  --purple: #8B5CF6;
+  --purple-bg: rgba(139, 92, 246, 0.1);
+  --purple-border: rgba(139, 92, 246, 0.2);
+  --amber: #F59E0B;
+  --amber-bg: rgba(245, 158, 11, 0.1);
+  --amber-border: rgba(245, 158, 11, 0.2);
+  --cyan: #06B6D4;
+  --cyan-bg: rgba(6, 182, 212, 0.1);
+  --pink: #EC4899;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -51,83 +52,88 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.01em;
 }
 
-/* Scrollbar — hidden until hover (CRED pattern) */
+/* Scrollbar — subtle on dark */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: transparent; border-radius: 10px; }
-*:hover::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); }
+*:hover::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
 
-/* Card — borderless, elevation-only (INDmoney/CRED pattern) */
+/* Card — glassmorphic dark */
 .card {
   background: var(--card);
-  border: none;
+  border: 1px solid var(--border);
   border-radius: 20px;
   padding: 28px;
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.03), 0 2px 8px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.02);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.02), 0 4px 24px rgba(0,0,0,0.4);
+  transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+  backdrop-filter: blur(12px);
 }
 .card:hover {
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06), 0 12px 40px rgba(0,0,0,0.04);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 8px 40px rgba(0,0,0,0.5);
+  border-color: rgba(255,255,255,0.1);
 }
 
-/* KPI card — borderless with soft glow */
+/* KPI card — dark glassmorphic */
 .kpi-card {
   background: var(--card);
-  border: none;
+  border: 1px solid var(--border);
   border-radius: 20px;
   padding: 28px 24px;
   text-align: center;
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.03), 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.3);
 }
 .kpi-value { font-family: 'Poppins', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
 .kpi-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; font-weight: 600; }
 .kpi-sub { font-size: 12px; margin-top: 4px; color: var(--text-secondary); }
 
-/* Pick cards — borderless with accent glow */
+/* Pick cards — accent glow on dark */
 .pick-card-short {
   background: var(--card);
-  border: none;
+  border: 1px solid rgba(16, 185, 129, 0.15);
   border-radius: 20px;
   padding: 28px;
-  box-shadow: 0 0 0 1px rgba(5, 150, 105, 0.08), 0 2px 12px rgba(5, 150, 105, 0.06);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.05);
   transition: all 0.3s ease;
 }
 .pick-card-short:hover {
-  box-shadow: 0 0 0 1px rgba(5, 150, 105, 0.12), 0 8px 32px rgba(5, 150, 105, 0.12);
+  box-shadow: 0 0 40px rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.3);
   transform: translateY(-3px);
 }
 
 .pick-card-long {
   background: var(--card);
-  border: none;
+  border: 1px solid rgba(139, 92, 246, 0.15);
   border-radius: 20px;
   padding: 28px;
-  box-shadow: 0 0 0 1px rgba(124, 58, 237, 0.08), 0 2px 12px rgba(124, 58, 237, 0.06);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.05);
   transition: all 0.3s ease;
 }
 .pick-card-long:hover {
-  box-shadow: 0 0 0 1px rgba(124, 58, 237, 0.12), 0 8px 32px rgba(124, 58, 237, 0.12);
+  box-shadow: 0 0 40px rgba(139, 92, 246, 0.15);
+  border-color: rgba(139, 92, 246, 0.3);
   transform: translateY(-3px);
 }
 
 .smart-money-card {
   background: var(--card);
-  border: none;
+  border: 1px solid rgba(245, 158, 11, 0.15);
   border-radius: 20px;
   padding: 28px;
-  box-shadow: 0 0 0 1px rgba(217, 119, 6, 0.08), 0 2px 12px rgba(217, 119, 6, 0.06);
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.05);
   transition: all 0.3s ease;
 }
 .smart-money-card:hover {
-  box-shadow: 0 0 0 1px rgba(217, 119, 6, 0.12), 0 8px 32px rgba(217, 119, 6, 0.1);
+  box-shadow: 0 0 40px rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.3);
   transform: translateY(-3px);
 }
 
-/* Data table — minimal, INDmoney-style */
+/* Data table — dark minimal */
 .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.data-table th { padding: 14px 16px; text-align: left; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid rgba(0,0,0,0.06); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; background: transparent; }
-.data-table td { padding: 16px; border-bottom: 1px solid rgba(0,0,0,0.03); }
-.data-table tr:hover { background: rgba(0,0,0,0.015); }
+.data-table th { padding: 14px 16px; text-align: left; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; background: transparent; }
+.data-table td { padding: 16px; border-bottom: 1px solid var(--border-light); }
+.data-table tr:hover { background: rgba(255,255,255,0.02); }
 .data-table tr { transition: background 0.2s; }
 .data-table tbody tr:last-child td { border-bottom: none; }
 
@@ -141,8 +147,8 @@ h1, h2, h3, h4, h5, h6 {
 .badge-cyan { background: var(--cyan-bg); color: var(--cyan); }
 .badge-pink { background: rgba(219, 39, 119, 0.06); color: var(--pink); }
 
-/* Tabs — INDmoney underline style */
-.tab-bar { display: flex; gap: 0; padding: 0; background: transparent; border-radius: 0; margin: 0; border-bottom: 1px solid rgba(0,0,0,0.06); overflow-x: auto; }
+/* Tabs — dark underline style */
+.tab-bar { display: flex; gap: 0; padding: 0; background: transparent; border-radius: 0; margin: 0; border-bottom: 1px solid var(--border); overflow-x: auto; }
 .tab {
   padding: 12px 20px; font-size: 13px; font-weight: 500; color: var(--text-muted);
   cursor: pointer; border-radius: 0; transition: all 0.25s;
@@ -202,15 +208,15 @@ h1, h2, h3, h4, h5, h6 {
 .btn-filter-active-purple { background: var(--purple); color: white; box-shadow: 0 2px 12px rgba(124, 58, 237, 0.25); }
 .btn-filter-active-amber { background: var(--amber); color: white; box-shadow: 0 2px 12px rgba(217, 119, 6, 0.25); }
 .btn-filter-active-blue { background: var(--blue); color: white; box-shadow: 0 2px 12px rgba(59, 130, 246, 0.25); }
-.btn-filter-inactive { background: rgba(0,0,0,0.03); color: var(--text-secondary); border: none; }
-.btn-filter-inactive:hover { background: rgba(0,0,0,0.06); color: var(--text); }
+.btn-filter-inactive { background: rgba(255,255,255,0.04); color: var(--text-secondary); border: none; }
+.btn-filter-inactive:hover { background: rgba(255,255,255,0.08); color: var(--text); }
 
-/* Glassmorphism utility */
-.glass { background: rgba(255,255,255,0.85); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); }
+/* Glassmorphism utility — dark */
+.glass { background: rgba(17, 19, 24, 0.85); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); }
 
-/* Subtle gradient backgrounds for hero sections */
-.gradient-hero-blue { background: linear-gradient(135deg, #EFF6FF 0%, #F5F3FF 50%, #ECFDF5 100%); }
-.gradient-hero-green { background: linear-gradient(135deg, #ECFDF5 0%, #F0FDF4 50%, #FFFBEB 100%); }
+/* Subtle gradient backgrounds for sections */
+.gradient-hero-blue { background: linear-gradient(135deg, rgba(59,130,246,0.05) 0%, rgba(139,92,246,0.05) 50%, rgba(16,185,129,0.05) 100%); }
+.gradient-hero-green { background: linear-gradient(135deg, rgba(16,185,129,0.05) 0%, rgba(6,182,212,0.05) 50%, rgba(245,158,11,0.05) 100%); }
 
 /* Number display — large financial typography */
 .number-xl { font-family: 'Poppins', sans-serif; font-size: 32px; font-weight: 700; line-height: 1.1; letter-spacing: -0.03em; }

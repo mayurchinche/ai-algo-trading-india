@@ -52,7 +52,7 @@ export function BacktestPage() {
                 onChange={e => setSymbol(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleRun()}
                 placeholder="e.g. RELIANCE, TCS, SBIN, INFY..."
-                className="flex-1 px-4 py-2.5 rounded-xl border border-[var(--border)] bg-white text-sm font-medium focus:outline-none focus:border-[var(--blue)] focus:ring-2 focus:ring-blue-100"
+                className="flex-1 px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--card)] text-sm font-medium focus:outline-none focus:border-[var(--blue)] focus:ring-2 focus:ring-blue-500/20"
               />
               <button
                 onClick={handleRun}
@@ -105,27 +105,27 @@ export function BacktestPage() {
               </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-5">
-              <div className="bg-white rounded-xl p-3 text-center shadow-sm">
+              <div className="bg-[var(--card)] rounded-xl p-3 text-center shadow-sm">
                 <div className="text-[9px] text-[var(--text-muted)] uppercase">Total P&L</div>
                 <div className={`text-base font-bold ${result.totalReturn >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
                   {result.totalReturn >= 0 ? '+' : ''}₹{result.totalReturn.toLocaleString('en-IN')}
                 </div>
               </div>
-              <div className="bg-white rounded-xl p-3 text-center shadow-sm">
+              <div className="bg-[var(--card)] rounded-xl p-3 text-center shadow-sm">
                 <div className="text-[9px] text-[var(--text-muted)] uppercase">Win Rate</div>
                 <div className="text-base font-bold text-[var(--blue)]">{result.combined.winRate}%</div>
               </div>
-              <div className="bg-white rounded-xl p-3 text-center shadow-sm">
+              <div className="bg-[var(--card)] rounded-xl p-3 text-center shadow-sm">
                 <div className="text-[9px] text-[var(--text-muted)] uppercase">Profit Factor</div>
                 <div className="text-base font-bold text-purple-600">{result.combined.profitFactor}</div>
               </div>
-              <div className="bg-white rounded-xl p-3 text-center shadow-sm">
+              <div className="bg-[var(--card)] rounded-xl p-3 text-center shadow-sm">
                 <div className="text-[9px] text-[var(--text-muted)] uppercase">vs Buy & Hold</div>
                 <div className={`text-base font-bold ${result.alphaVsBuyHold >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
                   {result.alphaVsBuyHold >= 0 ? '+' : ''}{result.alphaVsBuyHold}%
                 </div>
               </div>
-              <div className="bg-white rounded-xl p-3 text-center shadow-sm">
+              <div className="bg-[var(--card)] rounded-xl p-3 text-center shadow-sm">
                 <div className="text-[9px] text-[var(--text-muted)] uppercase">Total Trades</div>
                 <div className="text-base font-bold text-[var(--text)]">{result.combined.totalTrades}</div>
               </div>
@@ -158,7 +158,7 @@ export function BacktestPage() {
                     <stop offset="95%" stopColor={result.totalReturn >= 0 ? '#22C55E' : '#EF4444'} stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
                 <XAxis dataKey="date" tick={{ fontSize: 9 }} tickFormatter={v => v.slice(5)} interval="preserveStartEnd" />
                 <YAxis tick={{ fontSize: 9 }} tickFormatter={v => `${(v/100000).toFixed(1)}L`} />
                 <Tooltip contentStyle={{ fontSize: 11, borderRadius: 12 }} formatter={(v: any) => [`₹${Number(v).toLocaleString('en-IN')}`, 'Equity']} />
@@ -233,7 +233,7 @@ export function BacktestPage() {
             <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-3">P&L by Strategy</h3>
             <ResponsiveContainer width="100%" height={180}>
               <BarChart data={result.strategies.filter(s => s.totalTrades > 0)}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
                 <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                 <YAxis tick={{ fontSize: 9 }} tickFormatter={v => `${(v/1000).toFixed(0)}K`} />
                 <Tooltip contentStyle={{ fontSize: 11, borderRadius: 12 }} formatter={(v: any) => [`₹${Number(v).toLocaleString('en-IN')}`, 'P&L']} />
@@ -253,7 +253,7 @@ export function BacktestPage() {
             </h3>
             <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
               <table className="data-table">
-                <thead className="sticky top-0 bg-white">
+                <thead className="sticky top-0 bg-[var(--card)]">
                   <tr>
                     <th>Entry</th>
                     <th>Exit</th>
