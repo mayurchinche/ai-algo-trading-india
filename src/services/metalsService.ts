@@ -209,7 +209,8 @@ export async function fetchLiveMetals(): Promise<LiveMetal[]> {
 
       const { closes, timestamps, meta } = chart;
       const priceUSD = meta.regularMarketPrice || closes[closes.length - 1];
-      const prevCloseUSD = meta.chartPreviousClose || meta.previousClose || closes[closes.length - 2] || priceUSD;
+      // ponytail: chartPreviousClose is start-of-range (3mo ago), NOT yesterday. Use actual yesterday close.
+      const prevCloseUSD = closes[closes.length - 2] || meta.regularMarketPrice || priceUSD;
 
       // Convert to INR per gram (COMEX base)
       let comexPricePerGram: number;
