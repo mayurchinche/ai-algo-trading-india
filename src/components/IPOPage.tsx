@@ -135,7 +135,7 @@ export function IPOPage() {
 
         {!showSettings && settings.enabled && settings.broker && (
           <p className="text-xs text-[var(--text-secondary)]">
-            Auto-applying for IPOs with AI score ≥ {settings.minScore} via <b>{settings.broker.broker === 'angel_one' ? 'Angel One' : settings.broker.broker}</b>.
+            Auto-applying for IPOs with AI score ≥ {settings.minScore} via <b>{settings.broker.broker === 'dhan' ? 'Dhan' : settings.broker.broker === 'angel_one' ? 'Angel One' : settings.broker.broker}</b>.
             UPI mandate → <b>{settings.broker.upiId}</b>. Approve on your phone within 30 mins.
           </p>
         )}
@@ -160,9 +160,9 @@ export function IPOPage() {
                   className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm"
                 >
                   <option value="">Select Broker</option>
+                  <option value="dhan">Dhan (Recommended — Free API)</option>
                   <option value="angel_one">Angel One (SmartAPI)</option>
                   <option value="5paisa">5paisa</option>
-                  <option value="dhan">Dhan</option>
                 </select>
               </div>
               <div>
@@ -176,17 +176,21 @@ export function IPOPage() {
                 />
               </div>
               <div>
-                <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">API Key</label>
+                <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">
+                  {settings.broker?.broker === 'dhan' ? 'Access Token' : 'API Key'}
+                </label>
                 <input
                   type="password"
-                  placeholder="From broker developer portal"
+                  placeholder={settings.broker?.broker === 'dhan' ? 'From Dhan developer portal' : 'From broker developer portal'}
                   value={settings.broker?.apiKey || ''}
                   onChange={e => setSettings({...settings, broker: settings.broker ? {...settings.broker, apiKey: e.target.value} : null})}
                   className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm"
                 />
               </div>
               <div>
-                <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">Client ID</label>
+                <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">
+                  {settings.broker?.broker === 'dhan' ? 'Dhan Client ID' : 'Client ID'}
+                </label>
                 <input
                   type="text"
                   placeholder="Your demat client ID"

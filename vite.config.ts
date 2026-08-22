@@ -51,6 +51,11 @@ export default defineConfig({
           'User-Agent': 'Mozilla/5.0',
         },
       },
+      '/api/broker/dhan': {
+        target: 'https://api.dhan.co',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/broker\/dhan/, ''),
+      },
     },
   },
 })

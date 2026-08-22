@@ -1,13 +1,14 @@
-// ponytail: IPO auto-apply via broker API (Angel One SmartAPI / 5paisa)
+// ponytail: IPO auto-apply via broker API (Dhan primary, Angel One secondary)
 // Flow: detect open IPO → submit bid at cut-off → UPI mandate sent → user approves on phone
+// Dhan API docs: https://dhanhq.co/docs/v2/
 
 export interface BrokerConfig {
-  broker: 'angel_one' | '5paisa' | 'dhan';
-  apiKey: string;
-  clientId: string;
-  password?: string; // encrypted
-  totpSecret?: string; // for Angel One 2FA
-  upiId: string; // e.g. "user@upi" — mandate sent here
+  broker: 'dhan' | 'angel_one' | '5paisa';
+  apiKey: string; // Dhan: access token from developer portal
+  clientId: string; // Dhan: dhan_client_id
+  password?: string;
+  totpSecret?: string;
+  upiId: string; // e.g. "user@okicici" — mandate sent here
 }
 
 export interface IPOApplication {
@@ -69,6 +70,79 @@ export function getIPOApplications(): IPOApplication[] {
 
 function saveApplications(apps: IPOApplication[]): void {
   localStorage.setItem(APPLICATIONS_KEY, JSON.stringify(apps.slice(-50)));
+}
+
+// --- Dhan IPO Application ---
+// Dhan API: POST /v2/ipo/apply
+// Auth: access-token header (no login flow — token from developer portal, valid 24h)
+// Dhan auto-refreshes token if you use OAuth flow, but for IPO the static token works
+
+async function dhanApplyIPO(config: BrokerConfig, params: {
+  ipoName: string;
+  symbol: string;
+  bidPrice: number;
+  quantity: number;
+}): Promise<{ success: boolean; mandateRef?: string; error?: string }> {
+  try {
+    // Dhan IPO application endpoint
+    const res = await fetch('/api/broker/dhan/v2/ipo/apply', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'access-token': config.apiKey,
+        'client-id': config.clientId,
+      },
+      body: JSON.stringify({
+        upiId: config.upiId,
+        quantity: params.quantity,
+        price: params.bidPrice,
+        atCutoff: true, // Apply at cut-off price (recommended for retail)
+        category: 'IND', // Individual (retail)
+        applicationNumber: '', // New application
+      }),
+    });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      return { success: false, error: errData.remarks || errData.message || `HTTP ${res.status}` };
+    }
+
+    const data = await res.json();
+    if (data.status === 'success' || data.orderId || data.applicationNumber) {
+      return {
+        success: true,
+        mandateRef: data.applicationNumber || data.orderId || data.transactionId,
+      };
+    }
+    return { success: false, error: data.remarks || data.message || 'Unknown error' };
+  } catch (e: any) {
+    return { success: false, error: e.message };
+  }
+}
+
+// Dhan: fetch available IPOs (to get exact IPO IDs)
+export async function dhanFetchIPOList(config: BrokerConfig): Promise<{ name: string; ipoId: string; price: number; lotSize: number; status: string }[]> {
+  try {
+    const res = await fetch('/api/broker/dhan/v2/ipo/list', {
+      headers: {
+        'Accept': 'application/json',
+        'access-token': config.apiKey,
+        'client-id': config.clientId,
+      },
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.data || data || []).map((ipo: any) => ({
+      name: ipo.companyName || ipo.name,
+      ipoId: ipo.ipoId || ipo.id,
+      price: ipo.priceMax || ipo.cutoffPrice || 0,
+      lotSize: ipo.lotSize || ipo.minBidQuantity || 1,
+      status: ipo.status || 'open',
+    }));
+  } catch {
+    return [];
+  }
 }
 
 // --- Angel One SmartAPI IPO Application ---
@@ -176,7 +250,14 @@ export async function autoApplyForIPO(ipo: {
 
   let result: { success: boolean; mandateRef?: string; error?: string };
 
-  if (settings.broker.broker === 'angel_one') {
+  if (settings.broker.broker === 'dhan') {
+    result = await dhanApplyIPO(settings.broker, {
+      ipoName: ipo.name,
+      symbol: ipo.symbol,
+      bidPrice,
+      quantity,
+    });
+  } else if (settings.broker.broker === 'angel_one') {
     result = await angelOneApplyIPO(settings.broker, {
       ipoName: ipo.name,
       symbol: ipo.symbol,
@@ -184,7 +265,6 @@ export async function autoApplyForIPO(ipo: {
       quantity,
     });
   } else {
-    // ponytail: other brokers can be added here
     result = { success: false, error: `Broker ${settings.broker.broker} not yet supported for IPO` };
   }
 
