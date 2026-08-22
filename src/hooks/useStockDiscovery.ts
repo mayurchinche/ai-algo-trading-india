@@ -3,6 +3,7 @@ import { discoverStocks, type DiscoveredStock } from '../services/stockDiscovery
 import { recordSignals, updateOutcomes } from '../services/signalHistory';
 import { openPaperTrades, updatePaperTrades } from '../services/paperTrading';
 import { isAvailableInFnO } from '../services/optionsEngine';
+import { fetchMarketStatus } from '../services/marketStatus';
 
 export function useStockDiscovery() {
   const [stocks, setStocks] = useState<DiscoveredStock[]>([]);
@@ -14,6 +15,9 @@ export function useStockDiscovery() {
     setLoading(true);
     setError(null);
     try {
+      // Refresh market status cache before trading logic
+      await fetchMarketStatus();
+
       const discovered = await discoverStocks();
       setStocks(discovered);
       setLastScan(new Date());

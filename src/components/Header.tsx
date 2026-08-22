@@ -1,4 +1,6 @@
+import { useState, useEffect } from 'react';
 import type { LiveStock } from '../services/liveData';
+import { fetchMarketStatus } from '../services/marketStatus';
 
 interface HeaderProps {
   activeTab: string;
@@ -8,11 +10,18 @@ interface HeaderProps {
 }
 
 export function Header({ activeTab, onTabChange, nifty }: HeaderProps) {
+  const [marketOpen, setMarketOpen] = useState(false);
+  const [marketLabel, setMarketLabel] = useState('...');
+
+  useEffect(() => {
+    fetchMarketStatus().then(s => { setMarketOpen(s.isOpen); setMarketLabel(s.status); });
+    const interval = setInterval(() => {
+      fetchMarketStatus().then(s => { setMarketOpen(s.isOpen); setMarketLabel(s.status); });
+    }, 60_000);
+    return () => clearInterval(interval);
+  }, []);
+
   const now = new Date();
-  const h = now.getHours();
-  const day = now.getDay(); // 0=Sun, 6=Sat
-  const isWeekday = day >= 1 && day <= 5;
-  const marketOpen = isWeekday && h >= 9 && (h < 15 || (h === 15 && now.getMinutes() <= 30));
   const tabs = ['AI Discovery', 'Smart Picks', 'Overview', 'Trades', 'Stock Analysis', 'Signals', 'Backtest', 'IPO Tracker', 'Metals'];
 
   return (
@@ -46,7 +55,7 @@ export function Header({ activeTab, onTabChange, nifty }: HeaderProps) {
           </span>
           <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium ${marketOpen ? 'bg-[var(--green-bg)] text-[var(--green)]' : 'bg-[var(--red-bg)] text-[var(--red)]'}`}>
             <span className={`w-1.5 h-1.5 rounded-full ${marketOpen ? 'bg-[var(--green)] pulse' : 'bg-[var(--red)]'}`}></span>
-            {marketOpen ? 'Live' : 'Closed'}
+            {marketLabel}
           </div>
         </div>
       </div>

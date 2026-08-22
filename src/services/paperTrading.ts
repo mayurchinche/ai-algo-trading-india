@@ -2,6 +2,8 @@
 // Entries happen ONLY when a signal fires during market hours
 // Exits happen when SL/target hit on subsequent price checks, or EOD
 
+import { isMarketOpenCached } from './marketStatus';
+
 export interface PaperTradeRecord {
   id: string;
   symbol: string;
@@ -44,6 +46,9 @@ function saveTrades(trades: PaperTradeRecord[]): void {
 }
 
 function isMarketOpen(): boolean {
+  // ponytail: use live NSE status (cached), fallback to time-based
+  const live = isMarketOpenCached();
+  if (live !== undefined) return live;
   const now = new Date();
   const day = now.getDay();
   if (day === 0 || day === 6) return false;
