@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { fetchLiveIPOs, type IPOData } from '../services/ipoService';
+import { getAutoApplySettings, saveAutoApplySettings, getIPOApplications, autoApplyForIPO, type AutoApplySettings, type BrokerConfig } from '../services/ipoAutoApply';
 
 function ScoreBadge({ score, recommendation }: { score: number; recommendation: string }) {
   const color = score >= 70 ? 'from-green-500 to-emerald-600' : score >= 50 ? 'from-blue-500 to-indigo-600' : score >= 35 ? 'from-amber-500 to-orange-600' : 'from-red-500 to-rose-600';
@@ -38,6 +39,10 @@ export function IPOPage() {
   const [filter, setFilter] = useState<'all' | 'open' | 'upcoming' | 'closed' | 'listed' | 'mainboard' | 'sme'>('all');
   const [expanded, setExpanded] = useState<string | null>(null);
   const [lastFetch, setLastFetch] = useState<Date | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const [settings, setSettings] = useState<AutoApplySettings>(getAutoApplySettings());
+  const [applications] = useState(getIPOApplications());
+  const [applyStatus, setApplyStatus] = useState<Record<string, string>>({});
 
   const load = async () => {
     setLoading(true);
@@ -113,6 +118,205 @@ export function IPOPage() {
           <li>• Monitor <b>Day 2 subscription data</b> — QIB &gt;10x is strongest bullish signal</li>
         </ul>
       </div>
+
+      {/* Auto-Apply IPO Section */}
+      <div className="card">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <h3 className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">🤖 Auto-Apply IPO</h3>
+            <span className={`badge text-[9px] ${settings.enabled && settings.broker ? 'badge-green' : 'badge-amber'}`}>
+              {settings.enabled && settings.broker ? '✓ Active' : 'Not Configured'}
+            </span>
+          </div>
+          <button onClick={() => setShowSettings(!showSettings)} className="text-xs text-[var(--blue)] font-semibold hover:underline">
+            {showSettings ? 'Hide Settings' : '⚙ Configure'}
+          </button>
+        </div>
+
+        {!showSettings && settings.enabled && settings.broker && (
+          <p className="text-xs text-[var(--text-secondary)]">
+            Auto-applying for IPOs with AI score ≥ {settings.minScore} via <b>{settings.broker.broker === 'angel_one' ? 'Angel One' : settings.broker.broker}</b>.
+            UPI mandate → <b>{settings.broker.upiId}</b>. Approve on your phone within 30 mins.
+          </p>
+        )}
+
+        {!showSettings && !settings.broker && (
+          <p className="text-xs text-[var(--text-muted)]">
+            Configure your broker credentials below to auto-apply for recommended IPOs. You'll receive a UPI mandate request — just approve it on your phone.
+          </p>
+        )}
+
+        {showSettings && (
+          <div className="space-y-4 mt-4 p-4 rounded-xl bg-[var(--bg-alt)] border border-[var(--border)]">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">Broker</label>
+                <select
+                  value={settings.broker?.broker || ''}
+                  onChange={e => {
+                    const b = e.target.value as BrokerConfig['broker'];
+                    setSettings({...settings, broker: settings.broker ? {...settings.broker, broker: b} : { broker: b, apiKey: '', clientId: '', upiId: '', password: '' }});
+                  }}
+                  className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm"
+                >
+                  <option value="">Select Broker</option>
+                  <option value="angel_one">Angel One (SmartAPI)</option>
+                  <option value="5paisa">5paisa</option>
+                  <option value="dhan">Dhan</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">UPI ID (for mandate)</label>
+                <input
+                  type="text"
+                  placeholder="yourname@upi"
+                  value={settings.broker?.upiId || ''}
+                  onChange={e => setSettings({...settings, broker: settings.broker ? {...settings.broker, upiId: e.target.value} : null})}
+                  className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">API Key</label>
+                <input
+                  type="password"
+                  placeholder="From broker developer portal"
+                  value={settings.broker?.apiKey || ''}
+                  onChange={e => setSettings({...settings, broker: settings.broker ? {...settings.broker, apiKey: e.target.value} : null})}
+                  className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">Client ID</label>
+                <input
+                  type="text"
+                  placeholder="Your demat client ID"
+                  value={settings.broker?.clientId || ''}
+                  onChange={e => setSettings({...settings, broker: settings.broker ? {...settings.broker, clientId: e.target.value} : null})}
+                  className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">Min AI Score</label>
+                <input
+                  type="number"
+                  min={0} max={100}
+                  value={settings.minScore}
+                  onChange={e => setSettings({...settings, minScore: +e.target.value})}
+                  className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">Max Lots</label>
+                <input
+                  type="number"
+                  min={1} max={15}
+                  value={settings.maxLots}
+                  onChange={e => setSettings({...settings, maxLots: +e.target.value})}
+                  className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm"
+                />
+              </div>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={settings.autoApplyMainboard} onChange={e => setSettings({...settings, autoApplyMainboard: e.target.checked})} className="rounded" />
+                <span className="text-xs">Mainboard</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={settings.autoApplySME} onChange={e => setSettings({...settings, autoApplySME: e.target.checked})} className="rounded" />
+                <span className="text-xs">SME</span>
+              </label>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                onClick={() => {
+                  const updated = {...settings, enabled: true};
+                  setSettings(updated);
+                  saveAutoApplySettings(updated);
+                  setShowSettings(false);
+                }}
+                disabled={!settings.broker?.upiId || !settings.broker?.apiKey || !settings.broker?.clientId}
+                className="px-4 py-2 rounded-lg bg-[var(--green)] text-white text-xs font-semibold disabled:opacity-40"
+              >
+                ✓ Enable Auto-Apply
+              </button>
+              {settings.enabled && (
+                <button
+                  onClick={() => {
+                    const updated = {...settings, enabled: false};
+                    setSettings(updated);
+                    saveAutoApplySettings(updated);
+                  }}
+                  className="px-4 py-2 rounded-lg bg-[var(--red-bg)] text-[var(--red)] text-xs font-semibold"
+                >
+                  Disable
+                </button>
+              )}
+              <span className="text-[10px] text-[var(--text-muted)]">Credentials stored locally only</span>
+            </div>
+          </div>
+        )}
+
+        {/* Application History */}
+        {applications.length > 0 && (
+          <div className="mt-4 pt-4 border-t border-[var(--border)]">
+            <h4 className="text-[10px] text-[var(--text-muted)] uppercase font-semibold mb-2">Recent Applications</h4>
+            <div className="space-y-2">
+              {applications.slice(-5).reverse().map(app => (
+                <div key={app.id} className="flex items-center justify-between p-2 rounded-lg bg-[var(--bg)]">
+                  <div>
+                    <span className="text-xs font-semibold">{app.ipoName}</span>
+                    <span className="text-[10px] text-[var(--text-muted)] ml-2">{app.lots} lot @ ₹{app.bidPrice}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`badge text-[9px] ${app.status === 'PENDING_MANDATE' ? 'badge-amber' : app.status === 'APPLIED' || app.status === 'ALLOTTED' ? 'badge-green' : app.status === 'FAILED' ? 'badge-red' : 'badge-blue'}`}>
+                      {app.status === 'PENDING_MANDATE' ? '⏳ Approve UPI' : app.status === 'APPLIED' ? '✓ Applied' : app.status === 'ALLOTTED' ? '🎉 Allotted' : app.status === 'FAILED' ? '✗ Failed' : app.status}
+                    </span>
+                    <span className="text-[9px] text-[var(--text-muted)]">{new Date(app.appliedAt).toLocaleDateString('en-IN')}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Manual Apply Button for Open IPOs */}
+      {ipos.filter(i => i.status === 'open').length > 0 && settings.enabled && settings.broker && (
+        <div className="card bg-[var(--green-bg)] border border-[var(--green-border)]">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="text-xs font-bold text-[var(--green)]">Open IPOs Ready to Apply</h4>
+              <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">Click to manually trigger application for any open IPO below</p>
+            </div>
+          </div>
+          <div className="flex gap-2 flex-wrap mt-3">
+            {ipos.filter(i => i.status === 'open' && i.score >= settings.minScore).map(ipo => (
+              <button
+                key={ipo.name}
+                disabled={applyStatus[ipo.name] === 'applying' || applications.some(a => a.symbol === ipo.name && a.status !== 'FAILED')}
+                onClick={async () => {
+                  setApplyStatus(s => ({...s, [ipo.name]: 'applying'}));
+                  await autoApplyForIPO({
+                    name: ipo.name,
+                    symbol: ipo.name,
+                    price: ipo.price || 0,
+                    lotSize: ipo.lot_size || 1,
+                    score: ipo.score,
+                    type: ipo.board as 'mainboard' | 'sme',
+                  });
+                  setApplyStatus(s => ({...s, [ipo.name]: 'done'}));
+                }}
+                className="px-3 py-2 rounded-lg bg-[var(--card)] border border-[var(--green-border)] text-xs font-semibold hover:shadow-md transition-all disabled:opacity-40"
+              >
+                {applyStatus[ipo.name] === 'applying' ? '⏳' : applyStatus[ipo.name] === 'done' ? '✓' : '🚀'} {ipo.name}
+                <span className="text-[9px] text-[var(--text-muted)] ml-1">(Score: {ipo.score})</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex gap-2 flex-wrap items-center">

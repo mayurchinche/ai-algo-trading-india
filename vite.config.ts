@@ -43,6 +43,14 @@ export default defineConfig({
           'Referer': 'https://www.nseindia.com/',
         },
       },
+      '/api/broker/angel': {
+        target: 'https://apiconnect.angelbroking.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/broker\/angel/, ''),
+        headers: {
+          'User-Agent': 'Mozilla/5.0',
+        },
+      },
     },
   },
 })
