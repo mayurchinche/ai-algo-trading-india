@@ -10,7 +10,9 @@ interface HeaderProps {
 export function Header({ activeTab, onTabChange, nifty }: HeaderProps) {
   const now = new Date();
   const h = now.getHours();
-  const marketOpen = h >= 9 && (h < 15 || (h === 15 && now.getMinutes() <= 30));
+  const day = now.getDay(); // 0=Sun, 6=Sat
+  const isWeekday = day >= 1 && day <= 5;
+  const marketOpen = isWeekday && h >= 9 && (h < 15 || (h === 15 && now.getMinutes() <= 30));
   const tabs = ['AI Discovery', 'Smart Picks', 'Overview', 'Trades', 'Stock Analysis', 'Signals', 'Backtest', 'IPO Tracker', 'Metals'];
 
   return (

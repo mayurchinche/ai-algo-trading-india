@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { discoverStocks, type DiscoveredStock } from '../services/stockDiscovery';
 import { recordSignals, updateOutcomes } from '../services/signalHistory';
+import { openPaperTrades, updatePaperTrades } from '../services/paperTrading';
+import { isAvailableInFnO } from '../services/optionsEngine';
 
 export function useStockDiscovery() {
   const [stocks, setStocks] = useState<DiscoveredStock[]>([]);
@@ -20,6 +22,13 @@ export function useStockDiscovery() {
       recordSignals(discovered);
       const priceMap = new Map(discovered.map(s => [s.symbol, s.ltp]));
       updateOutcomes(priceMap);
+
+      // Paper trading: open new trades from signals + check SL/target
+      openPaperTrades(discovered.map(s => ({
+        ...s,
+        isFnO: isAvailableInFnO(s.symbol),
+      })));
+      updatePaperTrades(priceMap);
     } catch (e: any) {
       setError(e?.message || 'Discovery failed');
     } finally {
@@ -29,7 +38,6 @@ export function useStockDiscovery() {
 
   useEffect(() => {
     scan();
-    // Re-scan every 5 minutes during market hours
     const interval = setInterval(scan, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [scan]);
