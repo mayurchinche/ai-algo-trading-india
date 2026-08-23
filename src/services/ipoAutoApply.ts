@@ -402,6 +402,11 @@ export async function autoApplyForIPO(ipo: {
 
   if (result.success) {
     console.log(`[IPO Auto-Apply] ✓ ${ipo.name} — UPI mandate sent to ${settings.broker.upiId}. Approve on your phone.`);
+    // WhatsApp notification
+    import('./notifications').then(n => {
+      n.notifyIPOApplied(ipo.name, lots, amount);
+      n.notifyIPOMandatePending(ipo.name, settings.broker!.upiId);
+    });
   } else {
     console.error(`[IPO Auto-Apply] ✗ ${ipo.name} failed:`, result.error);
   }

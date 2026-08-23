@@ -128,6 +128,8 @@ export function openPaperTrades(signals: { symbol: string; name: string; overall
     };
 
     trades.push(trade);
+    // WhatsApp notification for new trade
+    import('./notifications').then(n => n.notifyTradeOpened(trade.symbol, trade.side, trade.quantity, trade.entryPrice, trade.strategy));
     if (isFO) foAdded++; else equityAdded++;
   }
 
@@ -169,6 +171,7 @@ export function updatePaperTrades(currentPrices: Map<string, number>): PaperTrad
       t.grossPnl = Math.round(t.grossPnl);
       t.pnlPct = Math.round(((t.side === 'BUY' ? price - t.entryPrice : t.entryPrice - price) / t.entryPrice) * 10000) / 100;
       changed = true;
+      import('./notifications').then(n => n.notifyTradeClosed(t.symbol, t.side, t.netPnl!, t.pnlPct!, hit!));
     }
   }
 
@@ -191,6 +194,7 @@ export function updatePaperTrades(currentPrices: Map<string, number>): PaperTrad
       t.grossPnl = Math.round(t.grossPnl);
       t.pnlPct = Math.round(((t.side === 'BUY' ? price - t.entryPrice : t.entryPrice - price) / t.entryPrice) * 10000) / 100;
       changed = true;
+      import('./notifications').then(n => n.notifyTradeClosed(t.symbol, t.side, t.netPnl!, t.pnlPct!, 'EOD_EXIT'));
     }
   }
 

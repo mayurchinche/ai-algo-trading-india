@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { LiveStock } from '../services/liveData';
 import { fetchMarketStatus } from '../services/marketStatus';
+import { getNotificationSettings, saveNotificationSettings, sendTestNotification, type NotificationSettings } from '../services/notifications';
 
 interface HeaderProps {
   activeTab: string;
@@ -12,6 +13,9 @@ interface HeaderProps {
 export function Header({ activeTab, onTabChange, nifty }: HeaderProps) {
   const [marketOpen, setMarketOpen] = useState(false);
   const [marketLabel, setMarketLabel] = useState('...');
+  const [showNotifPanel, setShowNotifPanel] = useState(false);
+  const [notifSettings, setNotifSettings] = useState<NotificationSettings>(getNotificationSettings());
+  const [testStatus, setTestStatus] = useState<'idle' | 'sending' | 'sent' | 'failed'>('idle');
 
   useEffect(() => {
     fetchMarketStatus().then(s => { setMarketOpen(s.isOpen); setMarketLabel(s.status); });
@@ -50,6 +54,15 @@ export function Header({ activeTab, onTabChange, nifty }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-3">
+          {/* WhatsApp notification bell */}
+          <button
+            onClick={() => setShowNotifPanel(!showNotifPanel)}
+            className={`relative p-2 rounded-lg transition-all hover:bg-[var(--bg-alt)] ${notifSettings.enabled ? 'text-[var(--green)]' : 'text-[var(--text-muted)]'}`}
+            title="WhatsApp Notifications"
+          >
+            🔔
+            {notifSettings.enabled && <span className="absolute top-1 right-1 w-2 h-2 bg-[var(--green)] rounded-full"></span>}
+          </button>
           <span className="text-[11px] text-[var(--text-muted)]">
             {now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
           </span>
@@ -67,6 +80,104 @@ export function Header({ activeTab, onTabChange, nifty }: HeaderProps) {
           ))}
         </div>
       </div>
+
+      {/* WhatsApp Notification Settings Panel */}
+      {showNotifPanel && (
+        <div className="absolute right-8 top-16 w-96 card z-50 shadow-2xl border border-[var(--border)]" style={{ animation: 'fadeIn 0.2s ease-out' }}>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold" style={{ fontFamily: 'Poppins' }}>📱 WhatsApp Notifications</h3>
+            <button onClick={() => setShowNotifPanel(false)} className="text-[var(--text-muted)] hover:text-[var(--text)]">✕</button>
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">Phone Number (with country code)</label>
+              <input
+                type="text"
+                placeholder="919657491288"
+                value={notifSettings.phone}
+                onChange={e => setNotifSettings({...notifSettings, phone: e.target.value})}
+                className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-sm"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">CallMeBot API Key</label>
+              <input
+                type="text"
+                placeholder="Get from CallMeBot (see below)"
+                value={notifSettings.apiKey}
+                onChange={e => setNotifSettings({...notifSettings, apiKey: e.target.value})}
+                className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-sm"
+              />
+            </div>
+
+            <div className="p-2 rounded-lg bg-[var(--blue-bg)] text-[10px] text-[var(--blue)]">
+              <b>Setup (1 min):</b> Send <i>"I allow callmebot to send me messages"</i> to <b>+34 644 71 99 23</b> on WhatsApp. You'll get your API key in reply.
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                ['ipoApplied', '📋 IPO Applied'],
+                ['ipoMandatePending', '⚠️ UPI Mandate'],
+                ['ipoAllotment', '🎉 IPO Allotment'],
+                ['tradeOpened', '📈 Trade Opened'],
+                ['tradeClosed', '💰 Trade Closed'],
+                ['signalAlert', '🔔 Signal Alert'],
+                ['dailySummary', '📊 Daily Summary'],
+              ].map(([key, label]) => (
+                <label key={key} className="flex items-center gap-2 text-xs cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={(notifSettings as any)[key]}
+                    onChange={e => setNotifSettings({...notifSettings, [key]: e.target.checked})}
+                    className="rounded"
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2 pt-2">
+              <button
+                onClick={() => {
+                  const updated = {...notifSettings, enabled: true};
+                  setNotifSettings(updated);
+                  saveNotificationSettings(updated);
+                }}
+                disabled={!notifSettings.phone || !notifSettings.apiKey}
+                className="px-4 py-2 rounded-lg bg-[var(--green)] text-white text-xs font-semibold disabled:opacity-40"
+              >
+                ✓ Enable
+              </button>
+              {notifSettings.enabled && (
+                <button
+                  onClick={() => {
+                    const updated = {...notifSettings, enabled: false};
+                    setNotifSettings(updated);
+                    saveNotificationSettings(updated);
+                  }}
+                  className="px-4 py-2 rounded-lg bg-[var(--red-bg)] text-[var(--red)] text-xs font-semibold"
+                >
+                  Disable
+                </button>
+              )}
+              <button
+                onClick={async () => {
+                  setTestStatus('sending');
+                  saveNotificationSettings(notifSettings);
+                  const ok = await sendTestNotification();
+                  setTestStatus(ok ? 'sent' : 'failed');
+                  setTimeout(() => setTestStatus('idle'), 3000);
+                }}
+                disabled={!notifSettings.phone || !notifSettings.apiKey || testStatus === 'sending'}
+                className="px-4 py-2 rounded-lg bg-[var(--blue-bg)] text-[var(--blue)] text-xs font-semibold disabled:opacity-40"
+              >
+                {testStatus === 'sending' ? '⏳ Sending...' : testStatus === 'sent' ? '✓ Sent!' : testStatus === 'failed' ? '✗ Failed' : '📤 Test'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

@@ -4,6 +4,7 @@ import { recordSignals, updateOutcomes } from '../services/signalHistory';
 import { openPaperTrades, updatePaperTrades } from '../services/paperTrading';
 import { isAvailableInFnO } from '../services/optionsEngine';
 import { fetchMarketStatus } from '../services/marketStatus';
+import { notifySignalAlert } from '../services/notifications';
 
 export function useStockDiscovery() {
   const [stocks, setStocks] = useState<DiscoveredStock[]>([]);
@@ -33,6 +34,12 @@ export function useStockDiscovery() {
         isFnO: isAvailableInFnO(s.symbol),
       })));
       updatePaperTrades(priceMap);
+
+      // WhatsApp: alert for high-conviction signals (score ≥ 70)
+      const highConviction = discovered.filter(s => Math.abs(s.overallScore) >= 70);
+      for (const s of highConviction.slice(0, 2)) { // max 2 alerts per scan
+        notifySignalAlert(s.symbol, s.signal, Math.abs(s.overallScore), s.ltp, s.foAnalysis.suggestedTarget, s.foAnalysis.suggestedStopLoss);
+      }
     } catch (e: any) {
       setError(e?.message || 'Discovery failed');
     } finally {
