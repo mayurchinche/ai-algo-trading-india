@@ -85,35 +85,91 @@ export function Header({ activeTab, onTabChange, nifty }: HeaderProps) {
       {showNotifPanel && (
         <div className="absolute right-8 top-16 w-96 card z-50 shadow-2xl border border-[var(--border)]" style={{ animation: 'fadeIn 0.2s ease-out' }}>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold" style={{ fontFamily: 'Poppins' }}>📱 WhatsApp Notifications</h3>
+            <h3 className="text-sm font-semibold" style={{ fontFamily: 'Poppins' }}>🔔 Notifications</h3>
             <button onClick={() => setShowNotifPanel(false)} className="text-[var(--text-muted)] hover:text-[var(--text)]">✕</button>
           </div>
 
           <div className="space-y-3">
-            <div>
-              <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">Phone Number (with country code)</label>
-              <input
-                type="text"
-                placeholder="919657491288"
-                value={notifSettings.phone}
-                onChange={e => setNotifSettings({...notifSettings, phone: e.target.value})}
-                className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-sm"
-              />
-            </div>
-            <div>
-              <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">CallMeBot API Key</label>
-              <input
-                type="text"
-                placeholder="Get from CallMeBot (see below)"
-                value={notifSettings.apiKey}
-                onChange={e => setNotifSettings({...notifSettings, apiKey: e.target.value})}
-                className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-sm"
-              />
+            {/* Channel selector */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setNotifSettings({...notifSettings, channel: 'telegram'})}
+                className={`flex-1 px-3 py-2 rounded-lg text-xs font-semibold border transition-all ${notifSettings.channel === 'telegram' ? 'bg-[var(--blue-bg)] border-[var(--blue-border)] text-[var(--blue)]' : 'border-[var(--border)] text-[var(--text-muted)]'}`}
+              >
+                ✈️ Telegram (Recommended)
+              </button>
+              <button
+                onClick={() => setNotifSettings({...notifSettings, channel: 'whatsapp'})}
+                className={`flex-1 px-3 py-2 rounded-lg text-xs font-semibold border transition-all ${notifSettings.channel === 'whatsapp' ? 'bg-[var(--green-bg)] border-[var(--green-border)] text-[var(--green)]' : 'border-[var(--border)] text-[var(--text-muted)]'}`}
+              >
+                📱 WhatsApp
+              </button>
             </div>
 
-            <div className="p-2 rounded-lg bg-[var(--blue-bg)] text-[10px] text-[var(--blue)]">
-              <b>Setup (1 min):</b> Send <i>"I allow callmebot to send me messages"</i> to <b>+34 644 71 99 23</b> on WhatsApp. You'll get your API key in reply.
-            </div>
+            {/* Telegram settings */}
+            {notifSettings.channel === 'telegram' && (
+              <>
+                <div>
+                  <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">Bot Token</label>
+                  <input
+                    type="password"
+                    placeholder="From @BotFather"
+                    value={notifSettings.telegramBotToken}
+                    onChange={e => setNotifSettings({...notifSettings, telegramBotToken: e.target.value})}
+                    className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">Chat ID</label>
+                  <input
+                    type="text"
+                    placeholder="Your chat ID (see below)"
+                    value={notifSettings.telegramChatId}
+                    onChange={e => setNotifSettings({...notifSettings, telegramChatId: e.target.value})}
+                    className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-sm"
+                  />
+                </div>
+                <div className="p-2 rounded-lg bg-[var(--blue-bg)] text-[10px] text-[var(--blue)]">
+                  <b>Setup (30 sec):</b><br/>
+                  1. Open Telegram → search <b>@BotFather</b> → send <code>/newbot</code> → get token<br/>
+                  2. Open your bot → send any message<br/>
+                  3. Get your chat ID: open <code>api.telegram.org/bot[TOKEN]/getUpdates</code><br/>
+                  <b>✅ Safe:</b> No phone number shared. Bot is yours. Official Telegram API.
+                </div>
+              </>
+            )}
+
+            {/* WhatsApp settings */}
+            {notifSettings.channel === 'whatsapp' && (
+              <>
+                <div className="p-2 rounded-lg bg-[var(--amber-bg)] text-[10px] text-[var(--amber)]">
+                  ⚠️ <b>Use a secondary number only.</b> CallMeBot is a third-party service — don't use your primary bank-linked number.
+                </div>
+                <div>
+                  <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">Phone (secondary number)</label>
+                  <input
+                    type="text"
+                    placeholder="91XXXXXXXXXX"
+                    value={notifSettings.phone}
+                    onChange={e => setNotifSettings({...notifSettings, phone: e.target.value})}
+                    className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">CallMeBot API Key</label>
+                  <input
+                    type="text"
+                    placeholder="Get from CallMeBot"
+                    value={notifSettings.apiKey}
+                    onChange={e => setNotifSettings({...notifSettings, apiKey: e.target.value})}
+                    className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-sm"
+                  />
+                </div>
+                <div className="p-2 rounded-lg bg-[var(--blue-bg)] text-[10px] text-[var(--blue)]">
+                  <b>Setup:</b> Send <i>"I allow callmebot to send me messages"</i> to <b>+34 644 71 99 23</b> on WhatsApp from your secondary number.
+                </div>
+              </>
+            )}
 
             <div className="grid grid-cols-2 gap-2">
               {[

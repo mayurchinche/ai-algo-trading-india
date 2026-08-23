@@ -1,25 +1,29 @@
-// ponytail: WhatsApp notifications via CallMeBot (free, no server needed)
-// Setup: user sends "I allow callmebot to send me messages" to +34 644 71 99 23 on WhatsApp
-// Then gets an apikey — that's it. No business account, no Meta approval.
+// ponytail: notifications via Telegram Bot (primary, safe) or WhatsApp CallMeBot (optional)
+// Telegram: no phone number exposed, official API, free, unlimited
+// WhatsApp: uses CallMeBot third-party — only use with a secondary number
 
 export interface NotificationSettings {
   enabled: boolean;
-  phone: string;       // e.g. "919657491288" (with country code, no +)
-  apiKey: string;       // CallMeBot API key
+  channel: 'telegram' | 'whatsapp';
+  // Telegram settings
+  telegramBotToken: string;  // from @BotFather
+  telegramChatId: string;    // your chat ID
+  // WhatsApp settings (optional, secondary number only)
+  phone: string;
+  apiKey: string;  // CallMeBot API key
   // What to notify
   ipoApplied: boolean;
   ipoMandatePending: boolean;
   ipoAllotment: boolean;
   tradeOpened: boolean;
   tradeClosed: boolean;
-  signalAlert: boolean; // High-conviction signal (score ≥ 70)
+  signalAlert: boolean;
   dailySummary: boolean;
 }
 
-const SETTINGS_KEY = 'whatsapp_notification_settings';
+const SETTINGS_KEY = 'notification_settings_v2';
 const LAST_SENT_KEY = 'notification_last_sent';
-// ponytail: CallMeBot rate limit ~1 msg per 2 seconds
-const MIN_INTERVAL_MS = 3000;
+const MIN_INTERVAL_MS = 1000; // Telegram allows ~30 msg/sec, CallMeBot ~1 per 3s
 
 export function getNotificationSettings(): NotificationSettings {
   try {
@@ -28,6 +32,9 @@ export function getNotificationSettings(): NotificationSettings {
   } catch {}
   return {
     enabled: false,
+    channel: 'telegram',
+    telegramBotToken: '',
+    telegramChatId: '',
     phone: '',
     apiKey: '',
     ipoApplied: true,
@@ -44,7 +51,34 @@ export function saveNotificationSettings(settings: NotificationSettings): void {
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 }
 
-// Send a WhatsApp message via CallMeBot
+// Send via Telegram Bot API (official, free, safe)
+async function sendViaTelegram(botToken: string, chatId: string, message: string): Promise<boolean> {
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message,
+        parse_mode: 'Markdown',
+        disable_web_page_preview: true,
+      }),
+    });
+
+    if (res.ok) {
+      console.log('[Telegram] Message sent');
+      return true;
+    }
+    const err = await res.json().catch(() => ({}));
+    console.warn('[Telegram] Send failed:', err.description || res.status);
+    return false;
+  } catch (e) {
+    console.warn('[Telegram] Error:', e);
+    return false;
+  }
+}
+
+// Send a WhatsApp message via CallMeBot (use with secondary number only)
 async function sendViaCallMeBot(phone: string, apiKey: string, message: string): Promise<boolean> {
   try {
     // Rate limit
@@ -74,12 +108,18 @@ async function sendViaCallMeBot(phone: string, apiKey: string, message: string):
 
 // --- Public API: send typed notifications ---
 
-export async function notify(type: keyof Omit<NotificationSettings, 'enabled' | 'phone' | 'apiKey'>, message: string): Promise<boolean> {
+export async function notify(type: keyof Omit<NotificationSettings, 'enabled' | 'phone' | 'apiKey' | 'channel' | 'telegramBotToken' | 'telegramChatId'>, message: string): Promise<boolean> {
   const settings = getNotificationSettings();
-  if (!settings.enabled || !settings.phone || !settings.apiKey) return false;
+  if (!settings.enabled) return false;
   if (!settings[type]) return false;
 
-  return sendViaCallMeBot(settings.phone, settings.apiKey, message);
+  if (settings.channel === 'telegram') {
+    if (!settings.telegramBotToken || !settings.telegramChatId) return false;
+    return sendViaTelegram(settings.telegramBotToken, settings.telegramChatId, message);
+  } else {
+    if (!settings.phone || !settings.apiKey) return false;
+    return sendViaCallMeBot(settings.phone, settings.apiKey, message);
+  }
 }
 
 // Convenience methods for each notification type
@@ -158,10 +198,13 @@ export async function notifyDailySummary(stats: {
 // Test notification
 export async function sendTestNotification(): Promise<boolean> {
   const settings = getNotificationSettings();
-  if (!settings.phone || !settings.apiKey) return false;
-  return sendViaCallMeBot(settings.phone, settings.apiKey,
-    `✅ *AlgoTrader AI Connected*\n` +
-    `WhatsApp notifications are working!\n` +
-    `You'll receive alerts for IPO applications, trades, and signals.`
-  );
+  const msg = `✅ *AlgoTrader AI Connected*\nNotifications are working!\nYou'll receive alerts for IPO applications, trades, and signals.`;
+
+  if (settings.channel === 'telegram') {
+    if (!settings.telegramBotToken || !settings.telegramChatId) return false;
+    return sendViaTelegram(settings.telegramBotToken, settings.telegramChatId, msg);
+  } else {
+    if (!settings.phone || !settings.apiKey) return false;
+    return sendViaCallMeBot(settings.phone, settings.apiKey, msg);
+  }
 }
