@@ -56,6 +56,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/broker\/dhan/, ''),
       },
+      '/api/broker/dhan-auth': {
+        target: 'https://auth.dhan.co',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/broker\/dhan-auth/, ''),
+      },
     },
   },
 })

@@ -201,6 +201,48 @@ export function IPOPage() {
               </div>
             </div>
 
+            {/* Dhan auto-refresh fields (optional) */}
+            {settings.broker?.broker === 'dhan' && (
+              <div className="p-3 rounded-lg bg-[var(--bg)] border border-[var(--border)]">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[10px] text-[var(--text-muted)] uppercase font-semibold">🔄 Auto Token Refresh (Optional)</span>
+                  {settings.broker.tokenExpiry && (
+                    <span className={`badge text-[9px] ${new Date(settings.broker.tokenExpiry).getTime() > Date.now() ? 'badge-green' : 'badge-red'}`}>
+                      {new Date(settings.broker.tokenExpiry).getTime() > Date.now()
+                        ? `Valid until ${new Date(settings.broker.tokenExpiry).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}`
+                        : 'Expired — needs refresh'}
+                    </span>
+                  )}
+                </div>
+                <p className="text-[10px] text-[var(--text-muted)] mb-3">
+                  Provide your Dhan PIN + TOTP secret to auto-regenerate tokens. Without these, you'll need to paste a new token from Dhan portal every 24h.
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">Dhan PIN (4-digit)</label>
+                    <input
+                      type="password"
+                      placeholder="••••"
+                      maxLength={4}
+                      value={settings.broker?.password || ''}
+                      onChange={e => setSettings({...settings, broker: settings.broker ? {...settings.broker, password: e.target.value} : null})}
+                      className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">TOTP Secret</label>
+                    <input
+                      type="password"
+                      placeholder="From authenticator app setup"
+                      value={settings.broker?.totpSecret || ''}
+                      onChange={e => setSettings({...settings, broker: settings.broker ? {...settings.broker, totpSecret: e.target.value} : null})}
+                      className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
                 <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">Min AI Score</label>

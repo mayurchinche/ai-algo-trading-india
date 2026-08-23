@@ -6,9 +6,10 @@ export interface BrokerConfig {
   broker: 'dhan' | 'angel_one' | '5paisa';
   apiKey: string; // Dhan: access token from developer portal
   clientId: string; // Dhan: dhan_client_id
-  password?: string;
-  totpSecret?: string;
+  password?: string; // Dhan: PIN (4-digit, for auto-regenerate)
+  totpSecret?: string; // Dhan: TOTP secret (for auto-regenerate) / Angel One: TOTP
   upiId: string; // e.g. "user@okicici" — mandate sent here
+  tokenExpiry?: string; // ISO timestamp when current token expires
 }
 
 export interface IPOApplication {
@@ -70,6 +71,109 @@ export function getIPOApplications(): IPOApplication[] {
 
 function saveApplications(apps: IPOApplication[]): void {
   localStorage.setItem(APPLICATIONS_KEY, JSON.stringify(apps.slice(-50)));
+}
+
+// --- Dhan Token Auto-Refresh ---
+// Method 1: GET /v2/RenewToken — renews existing token before it fully expires
+// Method 2: POST auth.dhan.co/app/generateAccessToken — generates fresh token with PIN + TOTP (fully headless)
+
+async function dhanRenewToken(config: BrokerConfig): Promise<string | null> {
+  try {
+    // Try renew first (simpler, no PIN/TOTP needed)
+    const res = await fetch('/api/broker/dhan/v2/RenewToken', {
+      method: 'GET',
+      headers: {
+        'access-token': config.apiKey,
+        'dhanClientId': config.clientId,
+      },
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      const newToken = data.accessToken || data.access_token || data.token;
+      if (newToken) {
+        console.log('[Dhan] Token renewed successfully');
+        return newToken;
+      }
+    }
+
+    console.warn('[Dhan] Renew failed, status:', res.status);
+    return null;
+  } catch (e) {
+    console.warn('[Dhan] Token renew error:', e);
+    return null;
+  }
+}
+
+async function dhanGenerateToken(config: BrokerConfig): Promise<string | null> {
+  // Requires PIN + TOTP — only works if user has provided these
+  if (!config.password || !config.totpSecret) {
+    console.warn('[Dhan] Cannot auto-generate token: PIN or TOTP secret not configured');
+    return null;
+  }
+
+  try {
+    const res = await fetch(`/api/broker/dhan-auth/app/generateAccessToken?dhanClientId=${config.clientId}&pin=${config.password}&totp=${config.totpSecret}`, {
+      method: 'POST',
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      const newToken = data.accessToken || data.access_token || data.token;
+      if (newToken) {
+        console.log('[Dhan] New token generated via PIN+TOTP');
+        return newToken;
+      }
+    }
+
+    console.warn('[Dhan] Token generation failed:', res.status);
+    return null;
+  } catch (e) {
+    console.warn('[Dhan] Token generation error:', e);
+    return null;
+  }
+}
+
+// ponytail: auto-refresh Dhan token — called before any API call
+// Try renew first, fall back to PIN+TOTP regeneration
+export async function ensureDhanToken(): Promise<boolean> {
+  const settings = getAutoApplySettings();
+  if (!settings.broker || settings.broker.broker !== 'dhan') return false;
+
+  // Check if token is expiring soon (within 2 hours)
+  const expiry = settings.broker.tokenExpiry ? new Date(settings.broker.tokenExpiry).getTime() : 0;
+  const now = Date.now();
+  const twoHours = 2 * 60 * 60 * 1000;
+
+  if (expiry > 0 && expiry - now > twoHours) {
+    return true; // Token still valid
+  }
+
+  console.log('[Dhan] Token expired or expiring soon, attempting refresh...');
+
+  // Try renew
+  let newToken = await dhanRenewToken(settings.broker);
+
+  // If renew fails, try PIN+TOTP generation
+  if (!newToken) {
+    newToken = await dhanGenerateToken(settings.broker);
+  }
+
+  if (newToken) {
+    const updated: AutoApplySettings = {
+      ...settings,
+      broker: {
+        ...settings.broker,
+        apiKey: newToken,
+        tokenExpiry: new Date(now + 24 * 60 * 60 * 1000).toISOString(), // 24h from now
+      },
+    };
+    saveAutoApplySettings(updated);
+    return true;
+  }
+
+  console.error('[Dhan] Token refresh failed — manual re-authentication needed');
+  return false;
 }
 
 // --- Dhan IPO Application ---
@@ -247,6 +351,17 @@ export async function autoApplyForIPO(ipo: {
   const amount = bidPrice * quantity;
 
   console.log(`[IPO Auto-Apply] Applying for ${ipo.name}: ${quantity} shares @ ₹${bidPrice} = ₹${amount}`);
+
+  // Auto-refresh Dhan token before applying
+  if (settings.broker.broker === 'dhan') {
+    const tokenValid = await ensureDhanToken();
+    if (!tokenValid) {
+      console.warn('[IPO Auto-Apply] Dhan token expired and refresh failed');
+    }
+    // Re-read settings in case token was refreshed
+    const refreshedSettings = getAutoApplySettings();
+    if (refreshedSettings.broker) settings.broker = refreshedSettings.broker;
+  }
 
   let result: { success: boolean; mandateRef?: string; error?: string };
 
