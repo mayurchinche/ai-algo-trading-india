@@ -33,8 +33,8 @@ export function getNotificationSettings(): NotificationSettings {
   return {
     enabled: false,
     channel: 'telegram',
-    telegramBotToken: '',
-    telegramChatId: '',
+    telegramBotToken: '8865085323:AAHmk1YTOLxBDFf6k6p9meDZlaiDJ9nkTGg',
+    telegramChatId: '6334441816',
     phone: '',
     apiKey: '',
     ipoApplied: true,
