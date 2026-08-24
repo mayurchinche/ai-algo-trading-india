@@ -319,6 +319,7 @@ export function IPOPage() {
                     <span className={`badge text-[9px] ${app.status === 'PENDING_MANDATE' ? 'badge-amber' : app.status === 'APPLIED' || app.status === 'ALLOTTED' ? 'badge-green' : app.status === 'FAILED' ? 'badge-red' : 'badge-blue'}`}>
                       {app.status === 'PENDING_MANDATE' ? '⏳ Approve UPI' : app.status === 'APPLIED' ? '✓ Applied' : app.status === 'ALLOTTED' ? '🎉 Allotted' : app.status === 'FAILED' ? '✗ Failed' : app.status}
                     </span>
+                    {app.error && <span className="text-[9px] text-[var(--red)] max-w-[200px] truncate" title={app.error}>({app.error})</span>}
                     <span className="text-[9px] text-[var(--text-muted)]">{new Date(app.appliedAt).toLocaleDateString('en-IN')}</span>
                   </div>
                 </div>

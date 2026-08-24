@@ -208,8 +208,11 @@ async function dhanApplyIPO(config: BrokerConfig, params: {
     });
 
     if (!res.ok) {
-      const errData = await res.json().catch(() => ({}));
-      return { success: false, error: errData.remarks || errData.message || `HTTP ${res.status}` };
+      const errText = await res.text();
+      let errMsg = `HTTP ${res.status}`;
+      try { const errData = JSON.parse(errText); errMsg = errData.remarks || errData.message || errData.errorMessage || errMsg; } catch { errMsg = errText.slice(0, 200) || errMsg; }
+      console.error('[Dhan IPO Apply] Error:', res.status, errText);
+      return { success: false, error: errMsg };
     }
 
     const data = await res.json();
