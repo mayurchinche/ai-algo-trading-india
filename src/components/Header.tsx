@@ -200,7 +200,7 @@ export function Header({ activeTab, onTabChange, nifty }: HeaderProps) {
                   setNotifSettings(updated);
                   saveNotificationSettings(updated);
                 }}
-                disabled={!notifSettings.phone || !notifSettings.apiKey}
+                disabled={notifSettings.channel === 'telegram' ? (!notifSettings.telegramBotToken || !notifSettings.telegramChatId) : (!notifSettings.phone || !notifSettings.apiKey)}
                 className="px-4 py-2 rounded-lg bg-[var(--green)] text-white text-xs font-semibold disabled:opacity-40"
               >
                 ✓ Enable
@@ -225,7 +225,7 @@ export function Header({ activeTab, onTabChange, nifty }: HeaderProps) {
                   setTestStatus(ok ? 'sent' : 'failed');
                   setTimeout(() => setTestStatus('idle'), 3000);
                 }}
-                disabled={!notifSettings.phone || !notifSettings.apiKey || testStatus === 'sending'}
+                disabled={(notifSettings.channel === 'telegram' ? (!notifSettings.telegramBotToken || !notifSettings.telegramChatId) : (!notifSettings.phone || !notifSettings.apiKey)) || testStatus === 'sending'}
                 className="px-4 py-2 rounded-lg bg-[var(--blue-bg)] text-[var(--blue)] text-xs font-semibold disabled:opacity-40"
               >
                 {testStatus === 'sending' ? '⏳ Sending...' : testStatus === 'sent' ? '✓ Sent!' : testStatus === 'failed' ? '✗ Failed' : '📤 Test'}
