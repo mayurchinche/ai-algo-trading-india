@@ -51,15 +51,17 @@ export default defineConfig({
           'User-Agent': 'Mozilla/5.0',
         },
       },
-      '/api/broker/dhan': {
-        target: 'https://api.dhan.co',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/broker\/dhan/, ''),
-      },
       '/api/broker/dhan-auth': {
         target: 'https://auth.dhan.co',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/broker\/dhan-auth/, ''),
+        headers: { 'Origin': 'https://auth.dhan.co' },
+      },
+      '/api/broker/dhan': {
+        target: 'https://api.dhan.co',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/broker\/dhan/, ''),
+        headers: { 'Origin': 'https://api.dhan.co' },
       },
       '/api/telegram': {
         target: 'https://api.telegram.org',
