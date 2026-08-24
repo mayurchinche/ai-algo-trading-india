@@ -61,6 +61,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/broker\/dhan-auth/, ''),
       },
+      '/api/telegram': {
+        target: 'https://api.telegram.org',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/telegram/, ''),
+      },
     },
   },
 })

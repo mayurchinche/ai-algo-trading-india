@@ -54,7 +54,7 @@ export function saveNotificationSettings(settings: NotificationSettings): void {
 // Send via Telegram Bot API (official, free, safe)
 async function sendViaTelegram(botToken: string, chatId: string, message: string): Promise<boolean> {
   try {
-    const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+    const res = await fetch(`/api/telegram/bot${botToken}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
