@@ -151,7 +151,7 @@ export async function ensureDhanToken(): Promise<boolean> {
 
   console.log('[Dhan] Token expired or expiring soon, attempting refresh...');
 
-  // Try renew
+  // Try renew (only works if token hasn't fully expired yet)
   let newToken = await dhanRenewToken(settings.broker);
 
   // If renew fails, try PIN+TOTP generation
@@ -165,14 +165,14 @@ export async function ensureDhanToken(): Promise<boolean> {
       broker: {
         ...settings.broker,
         apiKey: newToken,
-        tokenExpiry: new Date(now + 24 * 60 * 60 * 1000).toISOString(), // 24h from now
+        tokenExpiry: new Date(now + 24 * 60 * 60 * 1000).toISOString(),
       },
     };
     saveAutoApplySettings(updated);
     return true;
   }
 
-  console.error('[Dhan] Token refresh failed — manual re-authentication needed');
+  console.error('[Dhan] Token refresh failed — generate a new token at https://api.dhan.co');
   return false;
 }
 

@@ -304,6 +304,17 @@ export function IPOPage() {
           </div>
         )}
 
+        {/* Token Expired Warning */}
+        {settings.enabled && settings.broker?.broker === 'dhan' && applications.some(a => a.error?.includes('403')) && (
+          <div className="mt-3 p-3 rounded-lg bg-red-50 border border-red-200">
+            <p className="text-xs text-red-700 font-semibold">⚠️ Dhan token expired (HTTP 403)</p>
+            <p className="text-[10px] text-red-600 mt-1">
+              Generate a new token → <a href="https://api.dhan.co" target="_blank" rel="noopener" className="underline font-semibold">api.dhan.co</a> → paste it in Access Token above.
+              {!settings.broker.password && <span className="block mt-1">💡 Tip: Add your PIN + TOTP secret above to enable auto-refresh.</span>}
+            </p>
+          </div>
+        )}
+
         {/* Application History */}
         {applications.length > 0 && (
           <div className="mt-4 pt-4 border-t border-[var(--border)]">
