@@ -1,5 +1,6 @@
 // ponytail: live NSE market status — handles holidays, special sessions, weekends
 // NSE API returns actual market state (Open/Close/Pre-open etc.)
+import { apiUrl } from '../utils/apiUrl';
 
 export interface MarketStatus {
   isOpen: boolean;
@@ -16,7 +17,7 @@ export async function fetchMarketStatus(): Promise<MarketStatus> {
   if (cachedStatus && now - lastFetch < CACHE_MS) return cachedStatus;
 
   try {
-    const res = await fetch('/api/nse/api/marketStatus');
+    const res = await fetch(apiUrl('/api/nse/api/marketStatus'));
     if (!res.ok) throw new Error(`NSE API ${res.status}`);
     const data = await res.json();
 

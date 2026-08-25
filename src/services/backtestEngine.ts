@@ -1,5 +1,6 @@
 // ponytail: backtesting engine — runs all strategies on historical data, computes accuracy %
 // This is how top 1% validate before going live: backtest everything, trust nothing untested
+import { apiUrl } from '../utils/apiUrl';
 
 export interface BacktestConfig {
   symbol: string;
@@ -319,7 +320,7 @@ export async function runBacktest(config: BacktestConfig): Promise<BacktestResul
   const range = '1y';
   
   try {
-    const res = await fetch(`/api/yahoo/v8/finance/chart/${yahooSymbol}?interval=1d&range=${range}`);
+    const res = await fetch(apiUrl(`/api/yahoo/v8/finance/chart/${yahooSymbol}?interval=1d&range=${range}`));
     if (!res.ok) return null;
     const data = await res.json();
     const result = data?.chart?.result?.[0];

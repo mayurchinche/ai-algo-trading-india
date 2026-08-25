@@ -1,6 +1,7 @@
 // ponytail: overview derived from live paper trades + live Nifty intraday
 import { useState, useEffect } from 'react';
 import { XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, CartesianGrid, ComposedChart, Area } from 'recharts';
+import { apiUrl } from '../utils/apiUrl';
 import { useLiveStocks } from '../hooks/useLiveStocks';
 import { useStockDiscovery } from '../hooks/useStockDiscovery';
 import type { DiscoveredStock } from '../services/stockDiscovery';
@@ -92,7 +93,7 @@ function computeStrategyStats(stocks: DiscoveredStock[]) {
 // Fetch Nifty 50 intraday 5-min data from Yahoo Finance
 async function fetchNiftyIntraday(): Promise<{ time: string; price: number; volume: number }[]> {
   try {
-    const res = await fetch('/api/yahoo/v8/finance/chart/%5ENSEI?interval=5m&range=1d');
+    const res = await fetch(apiUrl('/api/yahoo/v8/finance/chart/%5ENSEI?interval=5m&range=1d'));
     if (!res.ok) return [];
     const data = await res.json();
     const result = data.chart?.result?.[0];

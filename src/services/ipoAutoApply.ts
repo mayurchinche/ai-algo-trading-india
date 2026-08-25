@@ -1,6 +1,7 @@
 // ponytail: IPO auto-apply via broker API (Dhan primary, Angel One secondary)
 // Flow: detect open IPO → submit bid at cut-off → UPI mandate sent → user approves on phone
 // Dhan API docs: https://dhanhq.co/docs/v2/
+import { apiUrl } from '../utils/apiUrl';
 
 export interface BrokerConfig {
   broker: 'dhan' | 'angel_one' | '5paisa';
@@ -80,7 +81,7 @@ function saveApplications(apps: IPOApplication[]): void {
 async function dhanRenewToken(config: BrokerConfig): Promise<string | null> {
   try {
     // Try renew first (simpler, no PIN/TOTP needed)
-    const res = await fetch('/api/broker/dhan/v2/RenewToken', {
+    const res = await fetch(apiUrl('/api/broker/dhan/v2/RenewToken'), {
       method: 'GET',
       headers: {
         'access-token': config.apiKey,
@@ -113,7 +114,7 @@ async function dhanGenerateToken(config: BrokerConfig): Promise<string | null> {
   }
 
   try {
-    const res = await fetch(`/api/broker/dhan-auth/app/generateAccessToken?dhanClientId=${config.clientId}&pin=${config.password}&totp=${config.totpSecret}`, {
+    const res = await fetch(apiUrl(`/api/broker/dhan-auth/app/generateAccessToken?dhanClientId=${config.clientId}&pin=${config.password}&totp=${config.totpSecret}`), {
       method: 'POST',
     });
 
@@ -189,7 +190,7 @@ async function dhanApplyIPO(config: BrokerConfig, params: {
 }): Promise<{ success: boolean; mandateRef?: string; error?: string }> {
   try {
     // Dhan IPO application endpoint
-    const res = await fetch('/api/broker/dhan/v2/ipo/apply', {
+    const res = await fetch(apiUrl('/api/broker/dhan/v2/ipo/apply'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -231,7 +232,7 @@ async function dhanApplyIPO(config: BrokerConfig, params: {
 // Dhan: fetch available IPOs (to get exact IPO IDs)
 export async function dhanFetchIPOList(config: BrokerConfig): Promise<{ name: string; ipoId: string; price: number; lotSize: number; status: string }[]> {
   try {
-    const res = await fetch('/api/broker/dhan/v2/ipo/list', {
+    const res = await fetch(apiUrl('/api/broker/dhan/v2/ipo/list'), {
       headers: {
         'Accept': 'application/json',
         'access-token': config.apiKey,
@@ -257,7 +258,7 @@ export async function dhanFetchIPOList(config: BrokerConfig): Promise<{ name: st
 
 async function angelOneLogin(config: BrokerConfig): Promise<string> {
   // ponytail: Angel One requires TOTP-based login to get JWT token
-  const res = await fetch('/api/broker/angel/rest/auth/angelbroking/user/v1/loginByPassword', {
+  const res = await fetch(apiUrl('/api/broker/angel/rest/auth/angelbroking/user/v1/loginByPassword'), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -291,7 +292,7 @@ async function angelOneApplyIPO(config: BrokerConfig, params: {
   try {
     const token = await angelOneLogin(config);
 
-    const res = await fetch('/api/broker/angel/rest/secure/angelbroking/ipo/v1/applyIPO', {
+    const res = await fetch(apiUrl('/api/broker/angel/rest/secure/angelbroking/ipo/v1/applyIPO'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

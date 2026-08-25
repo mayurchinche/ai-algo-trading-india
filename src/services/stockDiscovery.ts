@@ -1,5 +1,6 @@
 // ponytail: dynamic stock discovery engine — scans live market, applies multi-strategy analysis, picks top opportunities
 // No hardcoded stocks. Discovers from Yahoo Finance screeners + computes technicals from historical data.
+import { apiUrl } from '../utils/apiUrl';
 
 export interface DiscoveredStock {
   symbol: string;
@@ -264,7 +265,7 @@ function determineTrend(sma20: number, sma50: number, sma200: number, ltp: numbe
 
 async function fetchScreener(scrId: string, count = 25): Promise<any[]> {
   try {
-    const res = await fetch(`/api/yahoo/v1/finance/screener/predefined/saved?formatted=false&lang=en-IN&region=IN&scrIds=${scrId}&count=${count}`);
+    const res = await fetch(apiUrl(`/api/yahoo/v1/finance/screener/predefined/saved?formatted=false&lang=en-IN&region=IN&scrIds=${scrId}&count=${count}`));
     if (!res.ok) return [];
     const d = await res.json();
     return d?.finance?.result?.[0]?.quotes || [];
@@ -273,7 +274,7 @@ async function fetchScreener(scrId: string, count = 25): Promise<any[]> {
 
 async function fetchHistorical(symbol: string): Promise<{ closes: number[]; highs: number[]; lows: number[] } | null> {
   try {
-    const res = await fetch(`/api/yahoo/v8/finance/chart/${symbol}?interval=1d&range=3mo`);
+    const res = await fetch(apiUrl(`/api/yahoo/v8/finance/chart/${symbol}?interval=1d&range=3mo`));
     if (!res.ok) return null;
     const d = await res.json();
     const q = d?.chart?.result?.[0]?.indicators?.quote?.[0];

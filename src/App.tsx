@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from './components/Header';
 import { OverviewPage } from './components/OverviewPage';
@@ -11,8 +11,15 @@ import { DiscoveryPage } from './components/DiscoveryPage';
 import { BacktestPage } from './components/BacktestPage';
 import { IPOPage } from './components/IPOPage';
 import { useLiveStocks } from './hooks/useLiveStocks';
+import { fullSync } from './services/supabaseClient';
 
 export default function App() {
+  // ponytail: sync localStorage to Supabase on load + every 5 min
+  useEffect(() => {
+    fullSync();
+    const interval = setInterval(fullSync, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
   const [activeTab, setActiveTab] = useState('AI Discovery');
   const { nifty, lastUpdated } = useLiveStocks();
 

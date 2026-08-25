@@ -1,21 +1,6 @@
 {
   "rewrites": [
-    { "source": "/api/yahoo/:path*", "destination": "https://query1.finance.yahoo.com/:path*" },
-    { "source": "/api/ipo/:path*", "destination": "https://www.investorgain.com/:path*" },
-    { "source": "/api/goodreturns/:path*", "destination": "https://www.goodreturns.in/:path*" },
-    { "source": "/api/nse/:path*", "destination": "https://www.nseindia.com/:path*" },
-    { "source": "/api/broker/dhan-auth/:path*", "destination": "https://auth.dhan.co/:path*" },
-    { "source": "/api/broker/dhan/:path*", "destination": "https://api.dhan.co/:path*" },
-    { "source": "/api/broker/angel/:path*", "destination": "https://apiconnect.angelbroking.com/:path*" },
-    { "source": "/api/telegram/:path*", "destination": "https://api.telegram.org/:path*" }
-  ],
-  "headers": [
-    {
-      "source": "/api/nse/(.*)",
-      "headers": [
-        { "key": "User-Agent", "value": "Mozilla/5.0" },
-        { "key": "Referer", "value": "https://www.nseindia.com" }
-      ]
-    }
+    { "source": "/api/proxy", "destination": "/api/proxy" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

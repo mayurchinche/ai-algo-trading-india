@@ -1,4 +1,5 @@
 // ponytail: live IPO data from InvestorGain API via proxy. Same source as ipo-tracker Python backend.
+import { apiUrl } from '../utils/apiUrl';
 
 export interface IPOData {
   name: string;
@@ -161,7 +162,7 @@ async function fetchSubscriptionData(): Promise<Map<string, SubData>> {
     const now = new Date();
     const fy = financialYear();
     const url = `/api/ipo/cloud/v2/report/data-read/333/1/1/${now.getFullYear()}/${fy}/0/all`;
-    const res = await fetch(url);
+    const res = await fetch(apiUrl(url));
     if (!res.ok) return map;
     const payload = await res.json();
     const rows = payload?.reportTableData || [];
@@ -195,7 +196,7 @@ export async function fetchLiveIPOs(): Promise<IPOData[]> {
   try {
     // Fetch IPO list and subscription data in parallel
     const [res, subMap] = await Promise.all([
-      fetch(url),
+      fetch(apiUrl(url)),
       fetchSubscriptionData(),
     ]);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);

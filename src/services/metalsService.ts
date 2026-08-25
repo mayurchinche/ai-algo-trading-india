@@ -2,6 +2,8 @@
 // Gold/Silver: Indian retail prices (matching Gullak/PhonePe/CRED)
 // Platinum/Palladium/Copper: COMEX converted (no Indian retail source)
 
+import { apiUrl } from '../utils/apiUrl';
+
 export interface LiveMetal {
   name: string;
   symbol: string;
@@ -142,8 +144,8 @@ async function fetchIndianRetailPrices(): Promise<IndianRetailPrices> {
   const result: IndianRetailPrices = { gold24k: null, gold22k: null, silver: null };
   try {
     const [goldHtml, silverHtml] = await Promise.all([
-      fetch('/api/goodreturns/gold-rates/').then(r => r.text()).catch(() => ''),
-      fetch('/api/goodreturns/silver-rates/').then(r => r.text()).catch(() => ''),
+      fetch(apiUrl('/api/goodreturns/gold-rates/')).then(r => r.text()).catch(() => ''),
+      fetch(apiUrl('/api/goodreturns/silver-rates/')).then(r => r.text()).catch(() => ''),
     ]);
 
     // Gold: parse currentMetalPrices JS variable
@@ -171,7 +173,7 @@ async function fetchIndianRetailPrices(): Promise<IndianRetailPrices> {
 
 async function fetchChart(ticker: string): Promise<{ closes: number[]; highs: number[]; lows: number[]; timestamps: number[]; meta: any } | null> {
   try {
-    const url = `/api/yahoo/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=3mo`;
+    const url = apiUrl(`/api/yahoo/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=3mo`);
     const res = await fetch(url);
     if (!res.ok) return null;
     const data = await res.json();

@@ -1,6 +1,7 @@
 // ponytail: notifications via Telegram Bot (primary, safe) or WhatsApp CallMeBot (optional)
 // Telegram: no phone number exposed, official API, free, unlimited
 // WhatsApp: uses CallMeBot third-party — only use with a secondary number
+import { apiUrl } from '../utils/apiUrl';
 
 export interface NotificationSettings {
   enabled: boolean;
@@ -54,7 +55,7 @@ export function saveNotificationSettings(settings: NotificationSettings): void {
 // Send via Telegram Bot API (official, free, safe)
 async function sendViaTelegram(botToken: string, chatId: string, message: string): Promise<boolean> {
   try {
-    const res = await fetch(`/api/telegram/bot${botToken}/sendMessage`, {
+    const res = await fetch(apiUrl(`/api/telegram/bot${botToken}/sendMessage`), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
