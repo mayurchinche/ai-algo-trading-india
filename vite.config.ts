@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
-  base: '/ai-algo-trading-india/',
+  base: process.env.GITHUB_ACTIONS ? '/ai-algo-trading-india/' : '/',
   plugins: [react(), tailwindcss()],
   server: {
     proxy: {
