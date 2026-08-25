@@ -26,9 +26,10 @@ export async function fetchMarketStatus(): Promise<MarketStatus> {
     );
 
     const status = capitalMarket?.marketStatus || 'Close';
-    const isOpen = status.toLowerCase().includes('open') || status.toLowerCase().includes('pre-open');
+    const isOpen = status.toLowerCase().includes('open') && !status.toLowerCase().includes('pre-open');
+    const isPreOpen = status.toLowerCase().includes('pre-open');
 
-    cachedStatus = { isOpen, status, lastUpdated: new Date() };
+    cachedStatus = { isOpen, status: isPreOpen ? 'Pre-open' : status, lastUpdated: new Date() };
     lastFetch = now;
     console.log('[MarketStatus] NSE:', status, '→', isOpen ? 'OPEN' : 'CLOSED');
     return cachedStatus;

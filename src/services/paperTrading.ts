@@ -46,16 +46,17 @@ function saveTrades(trades: PaperTradeRecord[]): void {
 }
 
 function isMarketOpen(): boolean {
-  // ponytail: use live NSE status (cached), fallback to time-based
-  const live = isMarketOpenCached();
-  if (live !== undefined) return live;
+  // Hard floor: Indian market trading starts at 9:15 IST, ends 15:30
   const now = new Date();
   const day = now.getDay();
   if (day === 0 || day === 6) return false;
-  const h = now.getHours();
-  const m = now.getMinutes();
-  const mins = h * 60 + m;
-  return mins >= 9 * 60 + 15 && mins <= 15 * 60 + 30;
+  const mins = now.getHours() * 60 + now.getMinutes();
+  if (mins < 9 * 60 + 15 || mins > 15 * 60 + 30) return false; // ponytail: hard guard, no trades outside 9:15-15:30
+
+  // NSE live status (handles holidays, special closures)
+  const live = isMarketOpenCached();
+  if (live !== undefined) return live;
+  return true; // Within 9:15-15:30 on weekday, assume open
 }
 
 function todayStr(): string {
