@@ -188,6 +188,53 @@ async function fetchSubscriptionData(): Promise<Map<string, SubData>> {
   return map;
 }
 
+function parseIPORows(rows: any[], subMap: Map<string, SubData>): IPOData[] {
+  return rows.map(row => {
+    const nameHtml = String(row['Name'] || '');
+    const name = String(row['~ipo_name'] || stripHtml(nameHtml));
+    const category = String(row['~IPO_Category'] || '');
+    const id = String(row['~id'] || '');
+    const status = parseStatus(nameHtml);
+    const board = parseBoard(nameHtml, category);
+    const price = toFloat(row['Price (₹)']);
+    const gmpHtml = String(row['GMP'] || '');
+    const gmpMatch = stripHtml(gmpHtml).match(/([-\d,.]+)/);
+    const gmpValue = gmpMatch ? toFloat(gmpMatch[1]) : null;
+    const gmpPct = toFloat(row['~gmp_percent_calc']);
+    const subStr = String(row['Sub'] || '-');
+    const sub = subStr === '-' ? null : toFloat(subStr);
+    const lot = toFloat(row['Lot']);
+    const issueSize = toFloat(stripHtml(String(row['IPO Size'] || '')));
+    const pe = toFloat(row['~P/E']);
+    const rating = parseRating(String(row['Rating'] || ''));
+    const listingGain = parseListingGain(nameHtml);
+    const openDate = row['~Srt_Open'] || null;
+    const closeDate = row['~Srt_Close'] || null;
+    const listingDate = row['~Str_Listing'] || null;
+    const urlPath = row['~urlrewrite_folder_name'];
+
+    const subData = subMap.get(id);
+    const subTotal = subData?.total ?? sub;
+
+    const partial: Partial<IPOData> = {
+      name, price, lot_size: lot ? Math.round(lot) : null,
+      issue_size_cr: issueSize, open_date: openDate, close_date: closeDate,
+      listing_date: listingDate, status, board, id,
+      gmp: gmpValue, gmp_pct: gmpPct,
+      subscription_total: subTotal,
+      subscription_qib: subData?.qib ?? null, subscription_nii: subData?.nii ?? null,
+      subscription_rii: subData?.rii ?? null, subscription_shni: subData?.shni ?? null,
+      subscription_bhni: subData?.bhni ?? null, subscription_updated: subData?.updated ?? null,
+      listing_gain_pct: listingGain, rating, pe_ratio: pe,
+      url: urlPath ? `https://www.investorgain.com${urlPath}` : null,
+    };
+
+    const { score, recommendation, reasons } = scoreIPO(partial);
+    return { ...partial, score, recommendation: recommendation as any, reasons,
+      allotment_tips: ALLOTMENT_TIPS[board] || ALLOTMENT_TIPS.mainboard } as IPOData;
+  }).filter(ipo => ipo.name && ipo.name.length > 2);
+}
+
 export async function fetchLiveIPOs(): Promise<IPOData[]> {
   const now = new Date();
   const fy = financialYear();
@@ -206,67 +253,49 @@ export async function fetchLiveIPOs(): Promise<IPOData[]> {
     const rows: any[] = payload?.reportTableData || [];
     if (!Array.isArray(rows) || rows.length === 0) throw new Error('No data in reportTableData');
 
-    const result = rows.map(row => {
-      const nameHtml = String(row['Name'] || '');
-      const name = String(row['~ipo_name'] || stripHtml(nameHtml));
-      const category = String(row['~IPO_Category'] || '');
-      const id = String(row['~id'] || '');
-      const status = parseStatus(nameHtml);
-      const board = parseBoard(nameHtml, category);
-      const price = toFloat(row['Price (₹)']);
-      const gmpHtml = String(row['GMP'] || '');
-      const gmpMatch = stripHtml(gmpHtml).match(/([-\d,.]+)/);
-      const gmpValue = gmpMatch ? toFloat(gmpMatch[1]) : null;
-      const gmpPct = toFloat(row['~gmp_percent_calc']);
-      const subStr = String(row['Sub'] || '-');
-      const sub = subStr === '-' ? null : toFloat(subStr);
-      const lot = toFloat(row['Lot']);
-      const issueSize = toFloat(stripHtml(String(row['IPO Size'] || '')));
-      const pe = toFloat(row['~P/E']);
-      const rating = parseRating(String(row['Rating'] || ''));
-      const listingGain = parseListingGain(nameHtml);
-      const openDate = row['~Srt_Open'] || null;
-      const closeDate = row['~Srt_Close'] || null;
-      const listingDate = row['~Str_Listing'] || null;
-      const urlPath = row['~urlrewrite_folder_name'];
-
-      // Merge live subscription data from report 333
-      const subData = subMap.get(id);
-      const subTotal = subData?.total ?? sub;
-      const subQib = subData?.qib ?? null;
-      const subNii = subData?.nii ?? null;
-      const subRii = subData?.rii ?? null;
-      const subShni = subData?.shni ?? null;
-      const subBhni = subData?.bhni ?? null;
-      const subUpdated = subData?.updated ?? null;
-
-      const partial: Partial<IPOData> = {
-        name, price, lot_size: lot ? Math.round(lot) : null,
-        issue_size_cr: issueSize, open_date: openDate, close_date: closeDate,
-        listing_date: listingDate, status, board, id,
-        gmp: gmpValue, gmp_pct: gmpPct,
-        subscription_total: subTotal,
-        subscription_qib: subQib, subscription_nii: subNii, subscription_rii: subRii,
-        subscription_shni: subShni, subscription_bhni: subBhni, subscription_updated: subUpdated,
-        listing_gain_pct: listingGain, rating, pe_ratio: pe,
-        url: urlPath ? `https://www.investorgain.com${urlPath}` : null,
-      };
-
-      const { score, recommendation, reasons } = scoreIPO(partial);
-
-      return {
-        ...partial,
-        score,
-        recommendation: recommendation as any,
-        reasons,
-        allotment_tips: ALLOTMENT_TIPS[board] || ALLOTMENT_TIPS.mainboard,
-      } as IPOData;
-    }).filter(ipo => ipo.name && ipo.name.length > 2);
+    const result = parseIPORows(rows, subMap);
 
     console.log('[IPO] Parsed', result.length, 'IPOs');
     return result;
   } catch (e) {
-    console.warn('IPO fetch failed:', e);
+    console.warn('IPO direct fetch failed, trying Supabase cache:', e);
+
+    // Fallback: read from Supabase (populated by Vercel cron job)
+    try {
+      const { getSupabase } = await import('./supabaseClient');
+      const sb = getSupabase();
+      if (sb) {
+        const { data } = await sb.from('app_data').select('data').eq('id', 'ipo_live_data').single();
+        if (data?.data) {
+          const cached = JSON.parse(data.data);
+          const rows = cached.ipoRows || [];
+          const subRows = cached.subRows || [];
+          if (rows.length > 0) {
+            console.log(`[IPO] Using Supabase cache (${rows.length} IPOs, fetched: ${cached.fetchedAt})`);
+            // Build sub map from cached sub rows
+            const subMap = new Map<string, SubData>();
+            for (const row of subRows) {
+              const id = String(row['~id'] || '');
+              if (!id) continue;
+              const totalHtml = String(row['Total'] || '');
+              const totalMatch = stripHtml(totalHtml).match(/([\d.]+)/);
+              const updatedMatch = totalHtml.match(/(\d+\w+ \w+ [\d:]+)/);
+              subMap.set(id, {
+                total: totalMatch ? parseFloat(totalMatch[1]) : null,
+                qib: toFloat(row['QIB']), nii: toFloat(row['NII']),
+                rii: toFloat(row['RII']), shni: toFloat(row['SHNI']), bhni: toFloat(row['BHNI']),
+                updated: updatedMatch ? updatedMatch[1] : null,
+              });
+            }
+            // Re-parse using same logic (rows are raw InvestorGain format)
+            return parseIPORows(rows, subMap);
+          }
+        }
+      }
+    } catch (sbErr) {
+      console.warn('[IPO] Supabase fallback also failed:', sbErr);
+    }
+
     return [];
   }
 }

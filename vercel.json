@@ -1,6 +1,10 @@
 {
+  "crons": [
+    { "path": "/api/cron-ipo", "schedule": "0 */1 * * *" }
+  ],
   "rewrites": [
     { "source": "/api/proxy", "destination": "/api/proxy" },
+    { "source": "/api/cron-ipo", "destination": "/api/cron-ipo" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
