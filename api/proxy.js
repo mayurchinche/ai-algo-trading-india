@@ -29,6 +29,13 @@ export default async function handler(req, res) {
   if (targetUrl.hostname.includes('nseindia.com')) {
     headers['Referer'] = 'https://www.nseindia.com';
   }
+  if (targetUrl.hostname.includes('investorgain.com')) {
+    headers['Referer'] = 'https://www.investorgain.com';
+    headers['Origin'] = 'https://www.investorgain.com';
+  }
+  if (targetUrl.hostname.includes('goodreturns.in')) {
+    headers['Referer'] = 'https://www.goodreturns.in';
+  }
 
   // Forward auth headers from client (for Dhan, Angel One, Telegram)
   const forward = ['access-token', 'client-id', 'x-api-key', 'authorization', 'content-type', 'dhanclientid'];
