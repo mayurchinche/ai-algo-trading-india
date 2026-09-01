@@ -253,7 +253,14 @@ export async function fetchLiveIPOs(): Promise<IPOData[]> {
       fetchSubscriptionData(),
     ]);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const payload = await res.json();
+    const rawText = await res.text();
+    let payload: any;
+    try {
+      payload = JSON.parse(rawText);
+    } catch {
+      // Not JSON — likely a bot-block/captcha page from InvestorGain
+      throw new Error(`Non-JSON response (likely blocked): "${rawText.slice(0, 120).replace(/\s+/g, ' ')}"`);
+    }
     console.log('[IPO] API response keys:', Object.keys(payload), 'rows:', payload?.reportTableData?.length, 'subs:', subMap.size);
 
     const rows: any[] = payload?.reportTableData || [];
