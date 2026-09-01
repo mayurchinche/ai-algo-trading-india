@@ -24,7 +24,7 @@ function financialYear() {
 async function fetchFromInvestorGain() {
   const now = new Date();
   const fy = financialYear();
-  const url = `https://www.investorgain.com/cloud/v2/report/data-read/331/1/1/${now.getFullYear()}/${fy}/0/all`;
+  const url = `https://webnodejs.investorgain.com/cloud/v2/report/data-read/331/1/9/${now.getFullYear()}/${fy}/0/all?search=&v=21-49`;
 
   const res = await fetch(url, { headers: HEADERS });
   if (!res.ok) throw new Error(`InvestorGain HTTP ${res.status}`);
@@ -35,7 +35,7 @@ async function fetchFromInvestorGain() {
 async function fetchSubscriptions() {
   const now = new Date();
   const fy = financialYear();
-  const url = `https://www.investorgain.com/cloud/v2/report/data-read/333/1/1/${now.getFullYear()}/${fy}/0/all`;
+  const url = `https://webnodejs.investorgain.com/cloud/v2/report/data-read/333/1/9/${now.getFullYear()}/${fy}/0/all?search=&v=21-49`;
 
   try {
     const res = await fetch(url, { headers: HEADERS });

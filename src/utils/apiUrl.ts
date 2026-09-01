@@ -4,7 +4,7 @@ const IS_PROD = !import.meta.env.DEV;
 // Map of Vite proxy prefixes to real base URLs
 const PROXY_MAP: Record<string, string> = {
   '/api/yahoo': 'https://query1.finance.yahoo.com',
-  '/api/ipo': 'https://www.investorgain.com',
+  '/api/ipo': 'https://webnodejs.investorgain.com',
   '/api/goodreturns': 'https://www.goodreturns.in',
   '/api/nse': 'https://www.nseindia.com',
   '/api/broker/dhan-auth': 'https://auth.dhan.co',
