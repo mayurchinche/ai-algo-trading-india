@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { fetchLiveIPOs, type IPOData } from '../services/ipoService';
+import { fetchLiveIPOs, getLastIPOFetchError, type IPOData } from '../services/ipoService';
 import { getAutoApplySettings, saveAutoApplySettings, getIPOApplications, autoApplyForIPO, type AutoApplySettings, type BrokerConfig } from '../services/ipoAutoApply';
 
 function ScoreBadge({ score, recommendation }: { score: number; recommendation: string }) {
@@ -43,11 +43,13 @@ export function IPOPage() {
   const [settings, setSettings] = useState<AutoApplySettings>(getAutoApplySettings());
   const [applications] = useState(getIPOApplications());
   const [applyStatus, setApplyStatus] = useState<Record<string, string>>({});
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
     const data = await fetchLiveIPOs();
     setIpos(data);
+    setFetchError(getLastIPOFetchError());
     setLastFetch(new Date());
     setLoading(false);
   };
@@ -408,7 +410,7 @@ export function IPOPage() {
         <div className="card text-center py-12">
           <div className="text-3xl mb-3">⚠️</div>
           <p className="text-sm font-semibold">Could not fetch live IPO data</p>
-          <p className="text-xs text-[var(--text-muted)] mt-1">InvestorGain API may be temporarily unavailable. Data refreshes every 60s.</p>
+          <p className="text-xs text-[var(--text-muted)] mt-1">{fetchError || 'InvestorGain API may be temporarily unavailable. Data refreshes every 60s.'}</p>
         </div>
       )}
 
