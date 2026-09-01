@@ -31,6 +31,13 @@ export interface IPOData {
   id: string | null;
 }
 
+// ponytail: InvestorGain migrated their public API from www.investorgain.com/api/ipo/cloud/v2/report/data-read/...
+// (now permanently 404) to alphanodejs.investorgain.com/cloud/v2/ipo/list-read. Verified directly (curl, no
+// proxy involved) that the NEW endpoint also rejects all non-browser requests with {"msg":-1,"error":"Invalid
+// request!"} regardless of Referer/Origin/UA/cookies/method — this is server-side bot/fingerprint protection,
+// not a header bug. So neither our Vercel proxy nor the daily cron job can fetch this data; both run from
+// datacenter IPs with no real browser fingerprint. Kept the corrected URL for correctness; the Supabase-cache
+// fallback and UI error message make the "unavailable" state honest instead of silently showing stale/fake data.
 function financialYear(): string {
   const now = new Date();
   const start = now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1;
@@ -155,37 +162,12 @@ interface SubData {
   updated: string | null;
 }
 
-// Fetch live subscription data from InvestorGain report 333
+// Fetch live subscription data (QIB/NII/RII split) — InvestorGain's old report-333 endpoint that provided
+// this breakdown is gone; the new alphanodejs API only exposes a flat ipoList with no subscription split
+// (and blocks non-browser requests anyway, see comment above financialYear()). No safe replacement found;
+// short-circuit to keep the app in a clean "no subscription data" state instead of guessing at field names.
 async function fetchSubscriptionData(): Promise<Map<string, SubData>> {
-  const map = new Map<string, SubData>();
-  try {
-    const now = new Date();
-    const fy = financialYear();
-    const url = `/api/ipo/cloud/v2/report/data-read/333/1/1/${now.getFullYear()}/${fy}/0/all`;
-    const res = await fetch(apiUrl(url));
-    if (!res.ok) return map;
-    const payload = await res.json();
-    const rows = payload?.reportTableData || [];
-    for (const row of rows) {
-      const id = String(row['~id'] || '');
-      if (!id) continue;
-      const totalHtml = String(row['Total'] || '');
-      const totalMatch = stripHtml(totalHtml).match(/([\d.]+)/);
-      const updatedMatch = totalHtml.match(/(\d+\w+ \w+ [\d:]+)/);
-      map.set(id, {
-        total: totalMatch ? parseFloat(totalMatch[1]) : null,
-        qib: toFloat(row['QIB']),
-        nii: toFloat(row['NII']),
-        rii: toFloat(row['RII']),
-        shni: toFloat(row['SHNI']),
-        bhni: toFloat(row['BHNI']),
-        updated: updatedMatch ? updatedMatch[1] : null,
-      });
-    }
-  } catch (e) {
-    console.warn('[IPO] Subscription fetch failed:', e);
-  }
-  return map;
+  return new Map();
 }
 
 function parseIPORows(rows: any[], subMap: Map<string, SubData>): IPOData[] {
