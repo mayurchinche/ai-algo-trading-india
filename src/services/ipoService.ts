@@ -235,7 +235,13 @@ function parseIPORows(rows: any[], subMap: Map<string, SubData>): IPOData[] {
   }).filter(ipo => ipo.name && ipo.name.length > 2);
 }
 
+let lastFetchError: string | null = null;
+export function getLastIPOFetchError(): string | null {
+  return lastFetchError;
+}
+
 export async function fetchLiveIPOs(): Promise<IPOData[]> {
+  lastFetchError = null;
   const now = new Date();
   const fy = financialYear();
   const url = `/api/ipo/cloud/v2/report/data-read/331/1/1/${now.getFullYear()}/${fy}/0/all`;
@@ -257,7 +263,8 @@ export async function fetchLiveIPOs(): Promise<IPOData[]> {
 
     console.log('[IPO] Parsed', result.length, 'IPOs');
     return result;
-  } catch (e) {
+  } catch (e: any) {
+    const directError = e?.message || String(e);
     console.warn('IPO direct fetch failed, trying Supabase cache:', e);
 
     // Fallback: read from Supabase (populated by Vercel cron job)
@@ -288,11 +295,18 @@ export async function fetchLiveIPOs(): Promise<IPOData[]> {
               });
             }
             // Re-parse using same logic (rows are raw InvestorGain format)
+            lastFetchError = `Live fetch failed (${directError}) — showing cached data from ${cached.fetchedAt}`;
             return parseIPORows(rows, subMap);
           }
+          lastFetchError = `Live fetch failed (${directError}); cache exists but is empty`;
+        } else {
+          lastFetchError = `Live fetch failed (${directError}); no cache yet — visit /api/cron-ipo once to populate`;
         }
+      } else {
+        lastFetchError = `Live fetch failed (${directError}); Supabase not configured for fallback`;
       }
-    } catch (sbErr) {
+    } catch (sbErr: any) {
+      lastFetchError = `Live fetch failed (${directError}); Supabase fallback error: ${sbErr?.message || sbErr}`;
       console.warn('[IPO] Supabase fallback also failed:', sbErr);
     }
 
