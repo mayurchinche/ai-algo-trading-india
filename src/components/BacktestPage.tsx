@@ -39,7 +39,7 @@ export function BacktestPage() {
   };
 
   return (
-    <div className="space-y-6"><div className="notice">Historical long-only cash-equity study. Signals use the previous completed bar; entries use the next open. Includes estimated costs, adverse slippage and stop-first ambiguous candles. These individual rules differ from the live composite score and do not validate it. Corporate-action quality and out-of-sample performance remain unverified.</div>
+    <div className="space-y-6"><div className="notice">Historical long-only cash-equity study. Signals use the previous completed bar; entries use the next open. Includes estimated costs, adverse slippage and stop-first ambiguous candles. These individual rules differ from the live composite score and do not validate it. Corporate-action quality and out-of-sample performance remain unverified. Strategy rows are selected-trade attribution with unannualized trade-return ratios; the combined row uses an annualized daily-equity ratio with zero risk-free rate.</div>
       {/* Input section */}
       <div className="card">
         <div className="flex items-center gap-4">
@@ -117,7 +117,7 @@ export function BacktestPage() {
               </div>
               <div className="bg-[var(--card)] rounded-xl p-3 text-center shadow-sm">
                 <div className="text-[9px] text-[var(--text-muted)] uppercase">Profit Factor</div>
-                <div className="text-base font-bold text-purple-600">{result.combined.profitFactor}</div>
+                <div className="text-base font-bold text-purple-600">{result.combined.profitFactor ?? 'No loss sample'}</div>
               </div>
               <div className="bg-[var(--card)] rounded-xl p-3 text-center shadow-sm">
                 <div className="text-[9px] text-[var(--text-muted)] uppercase">vs Buy & Hold</div>
@@ -134,16 +134,16 @@ export function BacktestPage() {
 
           {/* Accuracy Meters */}
           <div className="card">
-            <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-4">Strategy Accuracy (% Win Rate)</h3>
+            <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-4">Historical selected-trade win rates (not predictive accuracy)</h3>
             <div className="flex items-center justify-around flex-wrap gap-4">
               <AccuracyMeter label="Overall" value={result.accuracy.overallSignalAccuracy} />
               <AccuracyMeter label="Buy Signals" value={result.accuracy.buySignalAccuracy} />
-              <AccuracyMeter label="Sell Signals" value={result.accuracy.sellSignalAccuracy} />
+              <p>Sell-side results unavailable: this study is long-only.</p>
               <AccuracyMeter label="Momentum" value={result.accuracy.momentumAccuracy} />
               <AccuracyMeter label="Breakout" value={result.accuracy.breakoutAccuracy} />
               <AccuracyMeter label="Trend" value={result.accuracy.trendAccuracy} />
               <AccuracyMeter label="Mean Rev." value={result.accuracy.meanReversionAccuracy} />
-              <AccuracyMeter label="Smart Money" value={result.accuracy.smartMoneyAccuracy} />
+              <AccuracyMeter label="Volume Pattern" value={result.accuracy.smartMoneyAccuracy} />
             </div>
           </div>
 
@@ -169,7 +169,7 @@ export function BacktestPage() {
 
           {/* Strategy comparison */}
           <div className="card">
-            <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-3">Strategy Comparison</h3>
+            <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-3">Attribution within combined strategy (not independent tests)</h3>
             <div className="overflow-x-auto">
               <table className="data-table">
                 <thead>
@@ -181,7 +181,7 @@ export function BacktestPage() {
                     <th className="text-right">Avg Win</th>
                     <th className="text-right">Avg Loss</th>
                     <th className="text-center">Profit Factor</th>
-                    <th className="text-center">Sharpe</th>
+                    <th className="text-center">Return ratio*</th>
                     <th className="text-center">Max DD</th>
                     <th className="text-right">Expectancy</th>
                   </tr>
@@ -201,7 +201,7 @@ export function BacktestPage() {
                       </td>
                       <td className="text-right font-mono text-[var(--green)]">+₹{s.avgWin.toLocaleString('en-IN')}</td>
                       <td className="text-right font-mono text-[var(--red)]">-₹{s.avgLoss.toLocaleString('en-IN')}</td>
-                      <td className="text-center font-bold">{s.profitFactor}</td>
+                      <td className="text-center font-bold">{s.profitFactor ?? 'No loss sample'}</td>
                       <td className="text-center">{s.sharpeRatio}</td>
                       <td className="text-center text-[var(--red)]">{s.maxDrawdownPct}%</td>
                       <td className={`text-right font-mono ${s.expectancy >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
@@ -218,7 +218,7 @@ export function BacktestPage() {
                     </td>
                     <td className="text-right font-mono">+₹{result.combined.avgWin.toLocaleString('en-IN')}</td>
                     <td className="text-right font-mono">-₹{result.combined.avgLoss.toLocaleString('en-IN')}</td>
-                    <td className="text-center">{result.combined.profitFactor}</td>
+                    <td className="text-center">{result.combined.profitFactor ?? 'No loss sample'}</td>
                     <td className="text-center">{result.combined.sharpeRatio}</td>
                     <td className="text-center">{result.combined.maxDrawdownPct}%</td>
                     <td className="text-right font-mono">₹{result.combined.expectancy.toLocaleString('en-IN')}</td>

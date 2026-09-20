@@ -50,10 +50,11 @@ export function SignalsPage() {
         </div>
       </div>
 
+      <p className="notice">These are observed price-threshold outcomes, not executed trade profits. Current-policy, gap-free resolved signals contribute to the target-hit rate. Review the paper ledger for simulated returns after costs.</p>
       {/* Signal Accuracy Tracker */}
       <div className="card">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">📊 Signal Accuracy Tracker</h3>
+          <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">📊 Observed target/stop outcomes</h3>
           <div className="flex items-center gap-3">
             <button onClick={() => setShowHistory(!showHistory)} className="text-xs text-[var(--blue)] font-semibold hover:underline">
               {showHistory ? 'Hide History' : 'Show History'}
@@ -69,8 +70,8 @@ export function SignalsPage() {
           <div className="space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
               <div className="p-3 rounded-xl bg-[var(--bg)] text-center">
-                <div className="text-lg font-bold" style={{ fontFamily: 'Poppins' }}>{accuracy.winRate}%</div>
-                <div className="text-[10px] text-[var(--text-muted)]">Win Rate</div>
+                <div className="text-lg font-bold" style={{ fontFamily: 'Poppins' }}>{accuracy.resolved ? `${accuracy.winRate}%` : 'No evaluated sample'}</div>
+                <div className="text-[10px] text-[var(--text-muted)]">Target-hit rate (before costs)</div>
               </div>
               <div className="p-3 rounded-xl bg-[var(--bg)] text-center">
                 <div className="text-lg font-bold text-[var(--green)]" style={{ fontFamily: 'Poppins' }}>{accuracy.targetHit}</div>

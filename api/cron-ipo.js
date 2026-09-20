@@ -1,11 +1,11 @@
 // Vercel Cron: fetches IPO data from multiple sources, stores in Supabase
-// Runs hourly on Vercel's infrastructure — no local machine needed
+// Runs daily at 03:00 UTC on Vercel's infrastructure — no local machine needed
 // vercel.json cron schedule triggers this endpoint
 
 import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
-const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_KEY || '';
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 const HEADERS = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -18,7 +18,7 @@ function financialYear() {
   const now = new Date();
   const m = now.getMonth();
   const y = now.getFullYear();
-  return m >= 3 ? `${y}-${y + 1}` : `${y - 1}-${y}`;
+  return m >= 3 ? `${y}-${String(y + 1).slice(-2)}` : `${y - 1}-${String(y).slice(-2)}`;
 }
 
 async function fetchFromInvestorGain() {
@@ -26,10 +26,11 @@ async function fetchFromInvestorGain() {
   const fy = financialYear();
   const url = `https://webnodejs.investorgain.com/cloud/v2/report/data-read/331/1/9/${now.getFullYear()}/${fy}/0/all?search=&v=21-49`;
 
-  const res = await fetch(url, { headers: HEADERS });
+  const res = await fetch(url, { headers: HEADERS, signal: AbortSignal.timeout(15000) });
   if (!res.ok) throw new Error(`InvestorGain HTTP ${res.status}`);
   const data = await res.json();
-  return data?.reportTableData || [];
+  if (!Array.isArray(data?.reportTableData) || !data.reportTableData.length) throw new Error('Provider returned no valid rows');
+  return data.reportTableData;
 }
 
 async function fetchSubscriptions() {
@@ -38,12 +39,13 @@ async function fetchSubscriptions() {
   const url = `https://webnodejs.investorgain.com/cloud/v2/report/data-read/333/1/9/${now.getFullYear()}/${fy}/0/all?search=&v=21-49`;
 
   try {
-    const res = await fetch(url, { headers: HEADERS });
-    if (!res.ok) return [];
+    const res = await fetch(url, { headers: HEADERS, signal: AbortSignal.timeout(15000) });
+    if (!res.ok) throw new Error(`Subscription HTTP ${res.status}`);
     const data = await res.json();
-    return data?.reportTableData || [];
+    if (!Array.isArray(data?.reportTableData) || !data.reportTableData.length) throw new Error('Provider returned no valid rows');
+  return data.reportTableData;
   } catch {
-    return [];
+    throw new Error('Subscription feed unavailable; previous cache preserved');
   }
 }
 
@@ -63,13 +65,14 @@ export default async function handler(req, res) {
     ]);
 
     // Store in Supabase
-    await supabase.from('app_data').upsert({
+    const { error } = await supabase.from('app_data').upsert({
       id: 'ipo_live_data',
       device_id: 'cron',
       data: JSON.stringify({ ipoRows, subRows, fetchedAt: new Date().toISOString() }),
       updated_at: new Date().toISOString(),
     }, { onConflict: 'id' });
 
+    if (error) throw new Error('IPO cache write failed');
     console.log(`[IPO Cron] Stored ${ipoRows.length} IPOs, ${subRows.length} subs`);
     res.status(200).json({ ok: true, ipos: ipoRows.length, subs: subRows.length });
   } catch (e) {

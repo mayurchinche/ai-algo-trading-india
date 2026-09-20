@@ -1,5 +1,5 @@
 // ponytail: backtesting engine — runs all strategies on historical data, computes accuracy %
-// This is how top 1% validate before going live: backtest everything, trust nothing untested
+// Exploratory simulation; does not validate the live composite scanner.
 import { apiUrl } from '../utils/apiUrl';
 import { estimatedCosts } from './paperTrading';
 import { validLevels } from './tradingTime';
@@ -9,7 +9,7 @@ export interface BacktestConfig {
   startDate?: string;  // defaults to 1 year ago
   endDate?: string;    // defaults to today
   initialCapital?: number;  // defaults to ₹5,00,000
-  riskPerTrade?: number;    // defaults to 2% (top 1% rule)
+  riskPerTrade?: number;    // defaults to 0.5%, configurable up to 2%
   slippageBps?: number;
   strategies?: string[];     // defaults to all
 }
@@ -38,7 +38,7 @@ export interface StrategyResult {
   avgPnl: number;
   avgWin: number;
   avgLoss: number;
-  profitFactor: number;
+  profitFactor: number | null;
   sharpeRatio: number;
   maxDrawdown: number;
   maxDrawdownPct: number;
@@ -283,7 +283,7 @@ function meanReversionSignal(closes: number[], highs: number[], lows: number[], 
 }
 
 function smartMoneySignal(closes: number[], highs: number[], lows: number[], volumes: number[], idx: number): Signal {
-  if (idx < 20) return { direction: 'NONE', strategy: 'Smart Money', reason: '', stopLoss: 0, target: 0 };
+  if (idx < 20) return { direction: 'NONE', strategy: 'Volume Pattern', reason: '', stopLoss: 0, target: 0 };
 
   const avgVol = volumes.slice(Math.max(0, idx - 20), idx).reduce((a, b) => a + b, 0) / 20;
   const volRatio = volumes[idx] / (avgVol || 1);
@@ -294,8 +294,8 @@ function smartMoneySignal(closes: number[], highs: number[], lows: number[], vol
   if (volRatio >= 2 && closes[idx] > sma50 && closes[idx] > closes[idx - 1]) {
     return {
       direction: 'BUY',
-      strategy: 'Smart Money',
-      reason: `Volume spike ${volRatio.toFixed(1)}x + bullish candle above SMA50 (institutional accumulation)`,
+      strategy: 'Volume Pattern',
+      reason: `Volume spike ${volRatio.toFixed(1)}x + bullish candle above SMA50 (unusual volume; participants unverified)`,
       stopLoss: closes[idx] - atr * 2,
       target: closes[idx] + atr * 3,
     };
@@ -304,13 +304,13 @@ function smartMoneySignal(closes: number[], highs: number[], lows: number[], vol
   if (volRatio >= 2 && closes[idx] < sma50 && closes[idx] < closes[idx - 1]) {
     return {
       direction: 'SELL',
-      strategy: 'Smart Money',
-      reason: `Volume spike ${volRatio.toFixed(1)}x + bearish candle below SMA50 (institutional distribution)`,
+      strategy: 'Volume Pattern',
+      reason: `Volume spike ${volRatio.toFixed(1)}x + bearish candle below SMA50 (unusual volume; participants unverified)`,
       stopLoss: closes[idx] + atr * 2,
       target: closes[idx] - atr * 3,
     };
   }
-  return { direction: 'NONE', strategy: 'Smart Money', reason: '', stopLoss: 0, target: 0 };
+  return { direction: 'NONE', strategy: 'Volume Pattern', reason: '', stopLoss: 0, target: 0 };
 }
 
 // --- Main Backtest Engine ---
@@ -387,7 +387,7 @@ export function simulateBacktest(bars: HistoricalBar[], config: BacktestConfig, 
     peak = Math.max(peak, equity);
     equityCurve.push({ date: bars[i].date, equity, drawdown: (peak - equity) / peak * 100 });
   }
-  const names = ['Momentum', 'Breakout', 'Trend Following', 'Mean Reversion', 'Smart Money'];
+  const names = ['Momentum', 'Breakout', 'Trend Following', 'Mean Reversion', 'Volume Pattern'];
   const strategies = names.map(name => computeStrategyResult(name, trades.filter(t => t.strategy === name), initialCapital));
   const combined = computeStrategyResult('Combined', trades, initialCapital);
   combined.maxDrawdownPct = Math.max(...equityCurve.map(p => p.drawdown));
@@ -421,7 +421,7 @@ function computeStrategyResult(name: string, trades: BacktestTrade[], initialCap
   const avgLoss = losses.length > 0 ? Math.abs(losses.reduce((a, t) => a + t.pnl, 0) / losses.length) : 0;
   const grossProfit = wins.reduce((a, t) => a + t.pnl, 0);
   const grossLoss = Math.abs(losses.reduce((a, t) => a + t.pnl, 0));
-  const profitFactor = grossLoss > 0 ? grossProfit / grossLoss : grossProfit > 0 ? 99 : 0;
+  const profitFactor = grossLoss > 0 ? grossProfit / grossLoss : grossProfit > 0 ? null : 0;
 
   // Sharpe (simplified: mean return / std of returns)
   const returns = trades.map(t => t.pnlPct);
@@ -456,7 +456,7 @@ function computeStrategyResult(name: string, trades: BacktestTrade[], initialCap
     avgPnl: Math.round(totalPnl / trades.length),
     avgWin: Math.round(avgWin),
     avgLoss: Math.round(avgLoss),
-    profitFactor: Math.round(profitFactor * 100) / 100,
+    profitFactor: profitFactor === null ? null : Math.round(profitFactor * 100) / 100,
     sharpeRatio: Math.round(sharpeRatio * 100) / 100,
     maxDrawdown: Math.round(maxDD),
     maxDrawdownPct: Math.round((maxDD / initialCapital) * 100 * 100) / 100, // vs initial capital

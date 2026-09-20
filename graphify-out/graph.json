@@ -1057,6 +1057,87 @@
       "norm_label": "db"
     },
     {
+      "label": "production-data.test.ts",
+      "file_type": "code",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L1",
+      "id": "tests_production_data_test_ts",
+      "community": 1,
+      "norm_label": "production-data.test.ts"
+    },
+    {
+      "label": "now",
+      "file_type": "code",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L10",
+      "id": "tests_production_data_test_now",
+      "community": 1,
+      "norm_label": "now"
+    },
+    {
+      "label": "config",
+      "file_type": "code",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L11",
+      "id": "tests_production_data_test_config",
+      "community": 1,
+      "norm_label": "config"
+    },
+    {
+      "label": "chart()",
+      "file_type": "code",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L12",
+      "id": "tests_production_data_test_chart",
+      "community": 1,
+      "norm_label": "chart()"
+    },
+    {
+      "label": "data",
+      "file_type": "code",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L14",
+      "id": "tests_production_data_test_data",
+      "community": 1,
+      "norm_label": "data"
+    },
+    {
+      "label": "result",
+      "file_type": "code",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L19",
+      "id": "tests_production_data_test_result",
+      "community": 1,
+      "norm_label": "result"
+    },
+    {
+      "label": "requests",
+      "file_type": "code",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L40",
+      "id": "tests_production_data_test_requests",
+      "community": 1,
+      "norm_label": "requests"
+    },
+    {
+      "label": "response()",
+      "file_type": "code",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L43",
+      "id": "tests_production_data_test_response",
+      "community": 1,
+      "norm_label": "response()"
+    },
+    {
+      "label": "res",
+      "file_type": "code",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L46",
+      "id": "tests_production_data_test_res",
+      "community": 1,
+      "norm_label": "res"
+    },
+    {
       "label": "mobile-database.mjs",
       "file_type": "code",
       "source_file": "tests/mobile-database.mjs",
@@ -1159,7 +1240,7 @@
       "label": "storage",
       "file_type": "code",
       "source_file": "tests/trading.test.ts",
-      "source_location": "L11",
+      "source_location": "L13",
       "id": "tests_trading_test_storage",
       "community": 0,
       "norm_label": "storage"
@@ -1168,7 +1249,7 @@
       "label": "now",
       "file_type": "code",
       "source_file": "tests/trading.test.ts",
-      "source_location": "L13",
+      "source_location": "L15",
       "id": "tests_trading_test_now",
       "community": 0,
       "norm_label": "now"
@@ -1177,7 +1258,7 @@
       "label": "iso()",
       "file_type": "code",
       "source_file": "tests/trading.test.ts",
-      "source_location": "L14",
+      "source_location": "L16",
       "id": "tests_trading_test_iso",
       "community": 0,
       "norm_label": "iso()"
@@ -1186,7 +1267,7 @@
       "label": "quote()",
       "file_type": "code",
       "source_file": "tests/trading.test.ts",
-      "source_location": "L15",
+      "source_location": "L17",
       "id": "tests_trading_test_quote",
       "community": 0,
       "norm_label": "quote()"
@@ -1195,7 +1276,7 @@
       "label": "signal()",
       "file_type": "code",
       "source_file": "tests/trading.test.ts",
-      "source_location": "L16",
+      "source_location": "L18",
       "id": "tests_trading_test_signal",
       "community": 0,
       "norm_label": "signal()"
@@ -1204,7 +1285,7 @@
       "label": "trades",
       "file_type": "code",
       "source_file": "tests/trading.test.ts",
-      "source_location": "L20",
+      "source_location": "L22",
       "id": "tests_trading_test_trades",
       "community": 0,
       "norm_label": "trades"
@@ -1213,7 +1294,7 @@
       "label": "original",
       "file_type": "code",
       "source_file": "tests/trading.test.ts",
-      "source_location": "L26",
+      "source_location": "L28",
       "id": "tests_trading_test_original",
       "community": 0,
       "norm_label": "original"
@@ -1222,7 +1303,7 @@
       "label": "s",
       "file_type": "code",
       "source_file": "tests/trading.test.ts",
-      "source_location": "L28",
+      "source_location": "L30",
       "id": "tests_trading_test_s",
       "community": 0,
       "norm_label": "s"
@@ -1231,7 +1312,7 @@
       "label": "later",
       "file_type": "code",
       "source_file": "tests/trading.test.ts",
-      "source_location": "L28",
+      "source_location": "L30",
       "id": "tests_trading_test_later",
       "community": 0,
       "norm_label": "later"
@@ -1240,7 +1321,7 @@
       "label": "bar",
       "file_type": "code",
       "source_file": "tests/trading.test.ts",
-      "source_location": "L31",
+      "source_location": "L33",
       "id": "tests_trading_test_bar",
       "community": 0,
       "norm_label": "bar"
@@ -1249,7 +1330,7 @@
       "label": "bars",
       "file_type": "code",
       "source_file": "tests/trading.test.ts",
-      "source_location": "L32",
+      "source_location": "L34",
       "id": "tests_trading_test_bars",
       "community": 0,
       "norm_label": "bars"
@@ -1258,7 +1339,7 @@
       "label": "response()",
       "file_type": "code",
       "source_file": "tests/trading.test.ts",
-      "source_location": "L33",
+      "source_location": "L35",
       "id": "tests_trading_test_response",
       "community": 0,
       "norm_label": "response()"
@@ -1267,10 +1348,109 @@
       "label": "res",
       "file_type": "code",
       "source_file": "tests/trading.test.ts",
-      "source_location": "L34",
+      "source_location": "L36",
       "id": "tests_trading_test_res",
       "community": 0,
       "norm_label": "res"
+    },
+    {
+      "label": "candidate",
+      "file_type": "code",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L41",
+      "id": "tests_trading_test_candidate",
+      "community": 0,
+      "norm_label": "candidate"
+    },
+    {
+      "label": "weak",
+      "file_type": "code",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L48",
+      "id": "tests_trading_test_weak",
+      "community": 0,
+      "norm_label": "weak"
+    },
+    {
+      "label": "strong",
+      "file_type": "code",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L52",
+      "id": "tests_trading_test_strong",
+      "community": 0,
+      "norm_label": "strong"
+    },
+    {
+      "label": "old",
+      "file_type": "code",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L64",
+      "id": "tests_trading_test_old",
+      "community": 0,
+      "norm_label": "old"
+    },
+    {
+      "label": "cutoff",
+      "file_type": "code",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L67",
+      "id": "tests_trading_test_cutoff",
+      "community": 0,
+      "norm_label": "cutoff"
+    },
+    {
+      "label": "late",
+      "file_type": "code",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L68",
+      "id": "tests_trading_test_late",
+      "community": 0,
+      "norm_label": "late"
+    },
+    {
+      "label": "candidates",
+      "file_type": "code",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L74",
+      "id": "tests_trading_test_candidates",
+      "community": 0,
+      "norm_label": "candidates"
+    },
+    {
+      "label": "decisions",
+      "file_type": "code",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L76",
+      "id": "tests_trading_test_decisions",
+      "community": 0,
+      "norm_label": "decisions"
+    },
+    {
+      "label": "ledger",
+      "file_type": "code",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L90",
+      "id": "tests_trading_test_ledger",
+      "community": 0,
+      "norm_label": "ledger"
+    },
+    {
+      "label": "summary",
+      "file_type": "code",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L93",
+      "id": "tests_trading_test_summary",
+      "community": 0,
+      "norm_label": "summary"
+    },
+    {
+      "label": "raw",
+      "file_type": "code",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L98",
+      "id": "tests_trading_test_raw",
+      "community": 0,
+      "norm_label": "raw"
     },
     {
       "label": "backend.test.ts",
@@ -1930,10 +2110,19 @@
       "norm_label": "check-deployment.mjs"
     },
     {
-      "label": "json()",
+      "label": "requireProductionData",
       "file_type": "code",
       "source_file": "scripts/check-deployment.mjs",
       "source_location": "L5",
+      "id": "scripts_check_deployment_requireproductiondata",
+      "community": 49,
+      "norm_label": "requireproductiondata"
+    },
+    {
+      "label": "json()",
+      "file_type": "code",
+      "source_file": "scripts/check-deployment.mjs",
+      "source_location": "L6",
       "id": "scripts_check_deployment_json",
       "community": 49,
       "norm_label": "json()"
@@ -1942,7 +2131,7 @@
       "label": "check()",
       "file_type": "code",
       "source_file": "scripts/check-deployment.mjs",
-      "source_location": "L11",
+      "source_location": "L12",
       "id": "scripts_check_deployment_check",
       "community": 49,
       "norm_label": "check()"
@@ -1951,10 +2140,19 @@
       "label": "market()",
       "file_type": "code",
       "source_file": "scripts/check-deployment.mjs",
-      "source_location": "L12",
+      "source_location": "L13",
       "id": "scripts_check_deployment_market",
       "community": 49,
       "norm_label": "market()"
+    },
+    {
+      "label": "now",
+      "file_type": "code",
+      "source_file": "scripts/check-deployment.mjs",
+      "source_location": "L37",
+      "id": "scripts_check_deployment_now",
+      "community": 49,
+      "norm_label": "now"
     },
     {
       "label": "signal-worker.mjs",
@@ -2122,7 +2320,7 @@
       "label": "fetchSubscriptions()",
       "file_type": "code",
       "source_file": "api/cron-ipo.js",
-      "source_location": "L35",
+      "source_location": "L36",
       "id": "api_cron_ipo_fetchsubscriptions",
       "community": 12,
       "norm_label": "fetchsubscriptions()"
@@ -2131,7 +2329,7 @@
       "label": "handler()",
       "file_type": "code",
       "source_file": "api/cron-ipo.js",
-      "source_location": "L50",
+      "source_location": "L52",
       "id": "api_cron_ipo_handler",
       "community": 12,
       "norm_label": "handler()"
@@ -2160,7 +2358,7 @@
       "source_file": "src/main.tsx",
       "source_location": "L1",
       "id": "src_main_tsx",
-      "community": 25,
+      "community": 10,
       "norm_label": "main.tsx"
     },
     {
@@ -2169,7 +2367,7 @@
       "source_file": "src/utils/fetchMarketJSON.ts",
       "source_location": "L1",
       "id": "src_utils_fetchmarketjson_ts",
-      "community": 1,
+      "community": 6,
       "norm_label": "fetchmarketjson.ts"
     },
     {
@@ -2178,7 +2376,7 @@
       "source_file": "src/utils/fetchMarketJSON.ts",
       "source_location": "L3",
       "id": "utils_fetchmarketjson_fetchmarketjson",
-      "community": 1,
+      "community": 6,
       "norm_label": "fetchmarketjson()"
     },
     {
@@ -2187,7 +2385,7 @@
       "source_file": "src/utils/apiUrl.ts",
       "source_location": "L1",
       "id": "src_utils_apiurl_ts",
-      "community": 1,
+      "community": 6,
       "norm_label": "apiurl.ts"
     },
     {
@@ -2196,14 +2394,14 @@
       "source_file": "src/utils/apiUrl.ts",
       "source_location": "L5",
       "id": "utils_apiurl_proxy_map",
-      "community": 1,
+      "community": 6,
       "norm_label": "proxy_map"
     },
     {
       "label": "apiUrl()",
       "file_type": "code",
       "source_file": "src/utils/apiUrl.ts",
-      "source_location": "L21",
+      "source_location": "L17",
       "id": "utils_apiurl_apiurl",
       "community": 1,
       "norm_label": "apiurl()"
@@ -2221,9 +2419,9 @@
       "label": "AlertsPage()",
       "file_type": "code",
       "source_file": "src/components/AlertsPage.tsx",
-      "source_location": "L3",
+      "source_location": "L5",
       "id": "components_alertspage_alertspage",
-      "community": 2,
+      "community": 0,
       "norm_label": "alertspage()"
     },
     {
@@ -2290,28 +2488,10 @@
       "norm_label": "metalspage.tsx"
     },
     {
-      "label": "signalStyles",
-      "file_type": "code",
-      "source_file": "src/components/MetalsPage.tsx",
-      "source_location": "L5",
-      "id": "components_metalspage_signalstyles",
-      "community": 3,
-      "norm_label": "signalstyles"
-    },
-    {
-      "label": "ALLOCATION",
-      "file_type": "code",
-      "source_file": "src/components/MetalsPage.tsx",
-      "source_location": "L13",
-      "id": "components_metalspage_allocation",
-      "community": 3,
-      "norm_label": "allocation"
-    },
-    {
       "label": "MetalsPage()",
       "file_type": "code",
       "source_file": "src/components/MetalsPage.tsx",
-      "source_location": "L21",
+      "source_location": "L6",
       "id": "components_metalspage_metalspage",
       "community": 3,
       "norm_label": "metalspage()"
@@ -2322,7 +2502,7 @@
       "source_file": "src/components/OverviewPage.tsx",
       "source_location": "L1",
       "id": "src_components_overviewpage_tsx",
-      "community": 0,
+      "community": 2,
       "norm_label": "overviewpage.tsx"
     },
     {
@@ -2331,7 +2511,7 @@
       "source_file": "src/components/OverviewPage.tsx",
       "source_location": "L3",
       "id": "components_overviewpage_money",
-      "community": 0,
+      "community": 2,
       "norm_label": "money()"
     },
     {
@@ -2340,7 +2520,7 @@
       "source_file": "src/components/OverviewPage.tsx",
       "source_location": "L4",
       "id": "components_overviewpage_overviewpage",
-      "community": 0,
+      "community": 2,
       "norm_label": "overviewpage()"
     },
     {
@@ -2349,7 +2529,7 @@
       "source_file": "src/components/JournalErrorBoundary.tsx",
       "source_location": "L1",
       "id": "src_components_journalerrorboundary_tsx",
-      "community": 25,
+      "community": 10,
       "norm_label": "journalerrorboundary.tsx"
     },
     {
@@ -2358,7 +2538,7 @@
       "source_file": "src/components/JournalErrorBoundary.tsx",
       "source_location": "L3",
       "id": "components_journalerrorboundary_journalerrorboundary",
-      "community": 25,
+      "community": 10,
       "norm_label": "journalerrorboundary"
     },
     {
@@ -2367,7 +2547,7 @@
       "source_file": "src/components/JournalErrorBoundary.tsx",
       "source_location": "L5",
       "id": "components_journalerrorboundary_journalerrorboundary_getderivedstatefromerror",
-      "community": 25,
+      "community": 10,
       "norm_label": ".getderivedstatefromerror()"
     },
     {
@@ -2376,7 +2556,7 @@
       "source_file": "src/components/JournalErrorBoundary.tsx",
       "source_location": "L6",
       "id": "components_journalerrorboundary_journalerrorboundary_render",
-      "community": 25,
+      "community": 10,
       "norm_label": ".render()"
     },
     {
@@ -2425,21 +2605,12 @@
       "norm_label": "smartpickspage()"
     },
     {
-      "label": "OptionsCard()",
-      "file_type": "code",
-      "source_file": "src/components/SmartPicksPage.tsx",
-      "source_location": "L318",
-      "id": "components_smartpickspage_optionscard",
-      "community": 2,
-      "norm_label": "optionscard()"
-    },
-    {
       "label": "SignalsPage.tsx",
       "file_type": "code",
       "source_file": "src/components/SignalsPage.tsx",
       "source_location": "L1",
       "id": "src_components_signalspage_tsx",
-      "community": 0,
+      "community": 2,
       "norm_label": "signalspage.tsx"
     },
     {
@@ -2448,7 +2619,7 @@
       "source_file": "src/components/SignalsPage.tsx",
       "source_location": "L9",
       "id": "components_signalspage_directionfromsignal",
-      "community": 0,
+      "community": 2,
       "norm_label": "directionfromsignal()"
     },
     {
@@ -2457,7 +2628,7 @@
       "source_file": "src/components/SignalsPage.tsx",
       "source_location": "L15",
       "id": "components_signalspage_signalspage",
-      "community": 0,
+      "community": 2,
       "norm_label": "signalspage()"
     },
     {
@@ -2491,7 +2662,7 @@
       "label": "HeaderProps",
       "file_type": "code",
       "source_file": "src/components/Header.tsx",
-      "source_location": "L5",
+      "source_location": "L6",
       "id": "components_header_headerprops",
       "community": 6,
       "norm_label": "headerprops"
@@ -2500,9 +2671,9 @@
       "label": "Header()",
       "file_type": "code",
       "source_file": "src/components/Header.tsx",
-      "source_location": "L12",
+      "source_location": "L13",
       "id": "components_header_header",
-      "community": 6,
+      "community": 2,
       "norm_label": "header()"
     },
     {
@@ -2572,7 +2743,7 @@
       "label": "StockAnalysisPage()",
       "file_type": "code",
       "source_file": "src/components/StockAnalysisPage.tsx",
-      "source_location": "L5",
+      "source_location": "L6",
       "id": "components_stockanalysispage_stockanalysispage",
       "community": 2,
       "norm_label": "stockanalysispage()"
@@ -2599,7 +2770,7 @@
       "label": "StatusPill()",
       "file_type": "code",
       "source_file": "src/components/IPOPage.tsx",
-      "source_location": "L20",
+      "source_location": "L21",
       "id": "components_ipopage_statuspill",
       "community": 1,
       "norm_label": "statuspill()"
@@ -2608,7 +2779,7 @@
       "label": "IPOPage()",
       "file_type": "code",
       "source_file": "src/components/IPOPage.tsx",
-      "source_location": "L36",
+      "source_location": "L37",
       "id": "components_ipopage_ipopage",
       "community": 1,
       "norm_label": "ipopage()"
@@ -2734,7 +2905,7 @@
       "label": "scan()",
       "file_type": "code",
       "source_file": "src/hooks/useStockDiscovery.ts",
-      "source_location": "L30",
+      "source_location": "L35",
       "id": "hooks_usestockdiscovery_scan",
       "community": 0,
       "norm_label": "scan()"
@@ -2743,16 +2914,16 @@
       "label": "useStockDiscovery()",
       "file_type": "code",
       "source_file": "src/hooks/useStockDiscovery.ts",
-      "source_location": "L35",
+      "source_location": "L40",
       "id": "hooks_usestockdiscovery_usestockdiscovery",
-      "community": 0,
+      "community": 2,
       "norm_label": "usestockdiscovery()"
     },
     {
       "label": "useTradingRuntime()",
       "file_type": "code",
       "source_file": "src/hooks/useStockDiscovery.ts",
-      "source_location": "L40",
+      "source_location": "L45",
       "id": "hooks_usestockdiscovery_usetradingruntime",
       "community": 2,
       "norm_label": "usetradingruntime()"
@@ -2763,7 +2934,7 @@
       "source_file": "src/hooks/useLiveStocks.ts",
       "source_location": "L1",
       "id": "src_hooks_uselivestocks_ts",
-      "community": 2,
+      "community": 6,
       "norm_label": "uselivestocks.ts"
     },
     {
@@ -2785,121 +2956,13 @@
       "norm_label": "optionsengine.ts"
     },
     {
-      "label": "NSE_FO_SYMBOLS",
-      "file_type": "code",
-      "source_file": "src/services/optionsEngine.ts",
-      "source_location": "L9",
-      "id": "services_optionsengine_nse_fo_symbols",
-      "community": 2,
-      "norm_label": "nse_fo_symbols"
-    },
-    {
-      "label": "isAvailableInFnO()",
-      "file_type": "code",
-      "source_file": "src/services/optionsEngine.ts",
-      "source_location": "L42",
-      "id": "services_optionsengine_isavailableinfno",
-      "community": 2,
-      "norm_label": "isavailableinfno()"
-    },
-    {
-      "label": "OptionsPick",
-      "file_type": "code",
-      "source_file": "src/services/optionsEngine.ts",
-      "source_location": "L48",
-      "id": "services_optionsengine_optionspick",
-      "community": 2,
-      "norm_label": "optionspick"
-    },
-    {
-      "label": "OptionLeg",
-      "file_type": "code",
-      "source_file": "src/services/optionsEngine.ts",
-      "source_location": "L69",
-      "id": "services_optionsengine_optionleg",
-      "community": 2,
-      "norm_label": "optionleg"
-    },
-    {
-      "label": "OptionsStrategy",
-      "file_type": "code",
-      "source_file": "src/services/optionsEngine.ts",
-      "source_location": "L77",
-      "id": "services_optionsengine_optionsstrategy",
-      "community": 2,
-      "norm_label": "optionsstrategy"
-    },
-    {
-      "label": "computeHistoricalVolatility()",
-      "file_type": "code",
-      "source_file": "src/services/optionsEngine.ts",
-      "source_location": "L99",
-      "id": "services_optionsengine_computehistoricalvolatility",
-      "community": 2,
-      "norm_label": "computehistoricalvolatility()"
-    },
-    {
-      "label": "ivPercentile()",
-      "file_type": "code",
-      "source_file": "src/services/optionsEngine.ts",
-      "source_location": "L105",
-      "id": "services_optionsengine_ivpercentile",
-      "community": 2,
-      "norm_label": "ivpercentile()"
-    },
-    {
-      "label": "roundToStrike()",
-      "file_type": "code",
-      "source_file": "src/services/optionsEngine.ts",
-      "source_location": "L116",
-      "id": "services_optionsengine_roundtostrike",
-      "community": 2,
-      "norm_label": "roundtostrike()"
-    },
-    {
-      "label": "estimatePremium()",
-      "file_type": "code",
-      "source_file": "src/services/optionsEngine.ts",
-      "source_location": "L123",
-      "id": "services_optionsengine_estimatepremium",
-      "community": 2,
-      "norm_label": "estimatepremium()"
-    },
-    {
-      "label": "selectStrategy()",
-      "file_type": "code",
-      "source_file": "src/services/optionsEngine.ts",
-      "source_location": "L130",
-      "id": "services_optionsengine_selectstrategy",
-      "community": 2,
-      "norm_label": "selectstrategy()"
-    },
-    {
       "label": "generateOptionsPicks()",
       "file_type": "code",
       "source_file": "src/services/optionsEngine.ts",
-      "source_location": "L284",
+      "source_location": "L3",
       "id": "services_optionsengine_generateoptionspicks",
       "community": 2,
       "norm_label": "generateoptionspicks()"
-    },
-    {
-      "label": "generatePlainInstruction()",
-      "file_type": "code",
-      "source_file": "src/services/optionsEngine.ts",
-      "source_location": "L463",
-      "id": "services_optionsengine_generateplaininstruction",
-      "community": 2,
-      "norm_label": "generateplaininstruction()"
-    },
-    {
-      "label": "generateStepByStep()",
-      "file_type": "code",
-      "source_file": "src/services/optionsEngine.ts",
-      "source_location": "L475",
-      "id": "services_optionsengine_generatestepbystep",
-      "community": 2,
-      "norm_label": "generatestepbystep()"
     },
     {
       "label": "supabaseClient.ts",
@@ -2914,7 +2977,7 @@
       "label": "getSupabase()",
       "file_type": "code",
       "source_file": "src/services/supabaseClient.ts",
-      "source_location": "L14",
+      "source_location": "L12",
       "id": "services_supabaseclient_getsupabase",
       "community": 10,
       "norm_label": "getsupabase()"
@@ -2923,91 +2986,10 @@
       "label": "isSupabaseConfigured()",
       "file_type": "code",
       "source_file": "src/services/supabaseClient.ts",
-      "source_location": "L22",
+      "source_location": "L20",
       "id": "services_supabaseclient_issupabaseconfigured",
       "community": 10,
       "norm_label": "issupabaseconfigured()"
-    },
-    {
-      "label": "DEVICE_ID",
-      "file_type": "code",
-      "source_file": "src/services/supabaseClient.ts",
-      "source_location": "L29",
-      "id": "services_supabaseclient_device_id",
-      "community": 10,
-      "norm_label": "device_id"
-    },
-    {
-      "label": "getOrCreateDeviceId()",
-      "file_type": "code",
-      "source_file": "src/services/supabaseClient.ts",
-      "source_location": "L31",
-      "id": "services_supabaseclient_getorcreatedeviceid",
-      "community": 10,
-      "norm_label": "getorcreatedeviceid()"
-    },
-    {
-      "label": "syncToCloud()",
-      "file_type": "code",
-      "source_file": "src/services/supabaseClient.ts",
-      "source_location": "L41",
-      "id": "services_supabaseclient_synctocloud",
-      "community": 10,
-      "norm_label": "synctocloud()"
-    },
-    {
-      "label": "syncFromCloud()",
-      "file_type": "code",
-      "source_file": "src/services/supabaseClient.ts",
-      "source_location": "L58",
-      "id": "services_supabaseclient_syncfromcloud",
-      "community": 10,
-      "norm_label": "syncfromcloud()"
-    },
-    {
-      "label": "syncPaperTrades()",
-      "file_type": "code",
-      "source_file": "src/services/supabaseClient.ts",
-      "source_location": "L73",
-      "id": "services_supabaseclient_syncpapertrades",
-      "community": 10,
-      "norm_label": "syncpapertrades()"
-    },
-    {
-      "label": "loadPaperTradesFromCloud()",
-      "file_type": "code",
-      "source_file": "src/services/supabaseClient.ts",
-      "source_location": "L78",
-      "id": "services_supabaseclient_loadpapertradesfromcloud",
-      "community": 10,
-      "norm_label": "loadpapertradesfromcloud()"
-    },
-    {
-      "label": "syncIPOApplications()",
-      "file_type": "code",
-      "source_file": "src/services/supabaseClient.ts",
-      "source_location": "L83",
-      "id": "services_supabaseclient_syncipoapplications",
-      "community": 10,
-      "norm_label": "syncipoapplications()"
-    },
-    {
-      "label": "syncSettings()",
-      "file_type": "code",
-      "source_file": "src/services/supabaseClient.ts",
-      "source_location": "L89",
-      "id": "services_supabaseclient_syncsettings",
-      "community": 10,
-      "norm_label": "syncsettings()"
-    },
-    {
-      "label": "fullSync()",
-      "file_type": "code",
-      "source_file": "src/services/supabaseClient.ts",
-      "source_location": "L98",
-      "id": "services_supabaseclient_fullsync",
-      "community": 10,
-      "norm_label": "fullsync()"
     },
     {
       "label": "ipoService.ts",
@@ -3031,7 +3013,7 @@
       "label": "financialYear()",
       "file_type": "code",
       "source_file": "src/services/ipoService.ts",
-      "source_location": "L38",
+      "source_location": "L39",
       "id": "services_iposervice_financialyear",
       "community": 1,
       "norm_label": "financialyear()"
@@ -3040,7 +3022,7 @@
       "label": "stripHtml()",
       "file_type": "code",
       "source_file": "src/services/ipoService.ts",
-      "source_location": "L44",
+      "source_location": "L45",
       "id": "services_iposervice_striphtml",
       "community": 1,
       "norm_label": "striphtml()"
@@ -3049,7 +3031,7 @@
       "label": "toFloat()",
       "file_type": "code",
       "source_file": "src/services/ipoService.ts",
-      "source_location": "L48",
+      "source_location": "L49",
       "id": "services_iposervice_tofloat",
       "community": 1,
       "norm_label": "tofloat()"
@@ -3058,7 +3040,7 @@
       "label": "parseStatus()",
       "file_type": "code",
       "source_file": "src/services/ipoService.ts",
-      "source_location": "L55",
+      "source_location": "L56",
       "id": "services_iposervice_parsestatus",
       "community": 1,
       "norm_label": "parsestatus()"
@@ -3067,7 +3049,7 @@
       "label": "parseBoard()",
       "file_type": "code",
       "source_file": "src/services/ipoService.ts",
-      "source_location": "L65",
+      "source_location": "L66",
       "id": "services_iposervice_parseboard",
       "community": 1,
       "norm_label": "parseboard()"
@@ -3076,7 +3058,7 @@
       "label": "parseRating()",
       "file_type": "code",
       "source_file": "src/services/ipoService.ts",
-      "source_location": "L70",
+      "source_location": "L71",
       "id": "services_iposervice_parserating",
       "community": 1,
       "norm_label": "parserating()"
@@ -3085,7 +3067,7 @@
       "label": "parseListingGain()",
       "file_type": "code",
       "source_file": "src/services/ipoService.ts",
-      "source_location": "L75",
+      "source_location": "L76",
       "id": "services_iposervice_parselistinggain",
       "community": 1,
       "norm_label": "parselistinggain()"
@@ -3094,7 +3076,7 @@
       "label": "scoreIPO()",
       "file_type": "code",
       "source_file": "src/services/ipoService.ts",
-      "source_location": "L81",
+      "source_location": "L82",
       "id": "services_iposervice_scoreipo",
       "community": 1,
       "norm_label": "scoreipo()"
@@ -3103,7 +3085,7 @@
       "label": "ALLOTMENT_TIPS",
       "file_type": "code",
       "source_file": "src/services/ipoService.ts",
-      "source_location": "L137",
+      "source_location": "L139",
       "id": "services_iposervice_allotment_tips",
       "community": 1,
       "norm_label": "allotment_tips"
@@ -3112,7 +3094,7 @@
       "label": "SubData",
       "file_type": "code",
       "source_file": "src/services/ipoService.ts",
-      "source_location": "L152",
+      "source_location": "L144",
       "id": "services_iposervice_subdata",
       "community": 1,
       "norm_label": "subdata"
@@ -3121,7 +3103,7 @@
       "label": "fetchSubscriptionData()",
       "file_type": "code",
       "source_file": "src/services/ipoService.ts",
-      "source_location": "L163",
+      "source_location": "L155",
       "id": "services_iposervice_fetchsubscriptiondata",
       "community": 1,
       "norm_label": "fetchsubscriptiondata()"
@@ -3130,7 +3112,7 @@
       "label": "parseIPORows()",
       "file_type": "code",
       "source_file": "src/services/ipoService.ts",
-      "source_location": "L195",
+      "source_location": "L188",
       "id": "services_iposervice_parseiporows",
       "community": 1,
       "norm_label": "parseiporows()"
@@ -3139,7 +3121,7 @@
       "label": "getLastIPOFetchError()",
       "file_type": "code",
       "source_file": "src/services/ipoService.ts",
-      "source_location": "L243",
+      "source_location": "L237",
       "id": "services_iposervice_getlastipofetcherror",
       "community": 1,
       "norm_label": "getlastipofetcherror()"
@@ -3148,10 +3130,19 @@
       "label": "fetchLiveIPOs()",
       "file_type": "code",
       "source_file": "src/services/ipoService.ts",
-      "source_location": "L247",
+      "source_location": "L241",
       "id": "services_iposervice_fetchliveipos",
       "community": 1,
       "norm_label": "fetchliveipos()"
+    },
+    {
+      "label": "isFreshIPOCache()",
+      "file_type": "code",
+      "source_file": "src/services/ipoService.ts",
+      "source_location": "L323",
+      "id": "services_iposervice_isfreshipocache",
+      "community": 1,
+      "norm_label": "isfreshipocache()"
     },
     {
       "label": "ipoAutoApply.ts",
@@ -3163,148 +3154,13 @@
       "norm_label": "ipoautoapply.ts"
     },
     {
-      "label": "BrokerConfig",
-      "file_type": "code",
-      "source_file": "src/services/ipoAutoApply.ts",
-      "source_location": "L6",
-      "id": "services_ipoautoapply_brokerconfig",
-      "community": 1,
-      "norm_label": "brokerconfig"
-    },
-    {
-      "label": "IPOApplication",
-      "file_type": "code",
-      "source_file": "src/services/ipoAutoApply.ts",
-      "source_location": "L16",
-      "id": "services_ipoautoapply_ipoapplication",
-      "community": 1,
-      "norm_label": "ipoapplication"
-    },
-    {
-      "label": "AutoApplySettings",
-      "file_type": "code",
-      "source_file": "src/services/ipoAutoApply.ts",
-      "source_location": "L30",
-      "id": "services_ipoautoapply_autoapplysettings",
-      "community": 1,
-      "norm_label": "autoapplysettings"
-    },
-    {
-      "label": "getAutoApplySettings()",
-      "file_type": "code",
-      "source_file": "src/services/ipoAutoApply.ts",
-      "source_location": "L45",
-      "id": "services_ipoautoapply_getautoapplysettings",
-      "community": 1,
-      "norm_label": "getautoapplysettings()"
-    },
-    {
-      "label": "saveAutoApplySettings()",
-      "file_type": "code",
-      "source_file": "src/services/ipoAutoApply.ts",
-      "source_location": "L61",
-      "id": "services_ipoautoapply_saveautoapplysettings",
-      "community": 1,
-      "norm_label": "saveautoapplysettings()"
-    },
-    {
-      "label": "getIPOApplications()",
-      "file_type": "code",
-      "source_file": "src/services/ipoAutoApply.ts",
-      "source_location": "L67",
-      "id": "services_ipoautoapply_getipoapplications",
-      "community": 1,
-      "norm_label": "getipoapplications()"
-    },
-    {
-      "label": "saveApplications()",
-      "file_type": "code",
-      "source_file": "src/services/ipoAutoApply.ts",
-      "source_location": "L73",
-      "id": "services_ipoautoapply_saveapplications",
-      "community": 1,
-      "norm_label": "saveapplications()"
-    },
-    {
-      "label": "dhanRenewToken()",
-      "file_type": "code",
-      "source_file": "src/services/ipoAutoApply.ts",
-      "source_location": "L81",
-      "id": "services_ipoautoapply_dhanrenewtoken",
-      "community": 1,
-      "norm_label": "dhanrenewtoken()"
-    },
-    {
-      "label": "dhanGenerateToken()",
-      "file_type": "code",
-      "source_file": "src/services/ipoAutoApply.ts",
-      "source_location": "L109",
-      "id": "services_ipoautoapply_dhangeneratetoken",
-      "community": 1,
-      "norm_label": "dhangeneratetoken()"
-    },
-    {
-      "label": "ensureDhanToken()",
-      "file_type": "code",
-      "source_file": "src/services/ipoAutoApply.ts",
-      "source_location": "L140",
-      "id": "services_ipoautoapply_ensuredhantoken",
-      "community": 1,
-      "norm_label": "ensuredhantoken()"
-    },
-    {
-      "label": "dhanApplyIPO()",
-      "file_type": "code",
-      "source_file": "src/services/ipoAutoApply.ts",
-      "source_location": "L185",
-      "id": "services_ipoautoapply_dhanapplyipo",
-      "community": 1,
-      "norm_label": "dhanapplyipo()"
-    },
-    {
-      "label": "dhanFetchIPOList()",
-      "file_type": "code",
-      "source_file": "src/services/ipoAutoApply.ts",
-      "source_location": "L233",
-      "id": "services_ipoautoapply_dhanfetchipolist",
-      "community": 1,
-      "norm_label": "dhanfetchipolist()"
-    },
-    {
-      "label": "angelOneLogin()",
-      "file_type": "code",
-      "source_file": "src/services/ipoAutoApply.ts",
-      "source_location": "L259",
-      "id": "services_ipoautoapply_angelonelogin",
-      "community": 1,
-      "norm_label": "angelonelogin()"
-    },
-    {
-      "label": "angelOneApplyIPO()",
-      "file_type": "code",
-      "source_file": "src/services/ipoAutoApply.ts",
-      "source_location": "L286",
-      "id": "services_ipoautoapply_angeloneapplyipo",
-      "community": 1,
-      "norm_label": "angeloneapplyipo()"
-    },
-    {
       "label": "autoApplyForIPO()",
       "file_type": "code",
       "source_file": "src/services/ipoAutoApply.ts",
-      "source_location": "L333",
+      "source_location": "L2",
       "id": "services_ipoautoapply_autoapplyforipo",
       "community": 1,
       "norm_label": "autoapplyforipo()"
-    },
-    {
-      "label": "clearIPOApplications()",
-      "file_type": "code",
-      "source_file": "src/services/ipoAutoApply.ts",
-      "source_location": "L422",
-      "id": "services_ipoautoapply_clearipoapplications",
-      "community": 1,
-      "norm_label": "clearipoapplications()"
     },
     {
       "label": "journalStorage.ts",
@@ -3339,7 +3195,7 @@
       "source_file": "src/services/journalStorage.ts",
       "source_location": "L12",
       "id": "services_journalstorage_downloadjson",
-      "community": 0,
+      "community": 10,
       "norm_label": "downloadjson()"
     },
     {
@@ -3355,7 +3211,7 @@
       "label": "StoredSignal",
       "file_type": "code",
       "source_file": "src/services/signalHistory.ts",
-      "source_location": "L5",
+      "source_location": "L6",
       "id": "services_signalhistory_storedsignal",
       "community": 2,
       "norm_label": "storedsignal"
@@ -3364,7 +3220,7 @@
       "label": "loadSignals()",
       "file_type": "code",
       "source_file": "src/services/signalHistory.ts",
-      "source_location": "L12",
+      "source_location": "L13",
       "id": "services_signalhistory_loadsignals",
       "community": 0,
       "norm_label": "loadsignals()"
@@ -3373,7 +3229,7 @@
       "label": "saveSignals()",
       "file_type": "code",
       "source_file": "src/services/signalHistory.ts",
-      "source_location": "L13",
+      "source_location": "L14",
       "id": "services_signalhistory_savesignals",
       "community": 0,
       "norm_label": "savesignals()"
@@ -3382,7 +3238,7 @@
       "label": "pruneSignalHistory()",
       "file_type": "code",
       "source_file": "src/services/signalHistory.ts",
-      "source_location": "L14",
+      "source_location": "L15",
       "id": "services_signalhistory_prunesignalhistory",
       "community": 0,
       "norm_label": "prunesignalhistory()"
@@ -3391,7 +3247,7 @@
       "label": "recordSignals()",
       "file_type": "code",
       "source_file": "src/services/signalHistory.ts",
-      "source_location": "L20",
+      "source_location": "L21",
       "id": "services_signalhistory_recordsignals",
       "community": 0,
       "norm_label": "recordsignals()"
@@ -3400,7 +3256,7 @@
       "label": "updateOutcomes()",
       "file_type": "code",
       "source_file": "src/services/signalHistory.ts",
-      "source_location": "L38",
+      "source_location": "L39",
       "id": "services_signalhistory_updateoutcomes",
       "community": 0,
       "norm_label": "updateoutcomes()"
@@ -3409,7 +3265,7 @@
       "label": "SignalAccuracy",
       "file_type": "code",
       "source_file": "src/services/signalHistory.ts",
-      "source_location": "L61",
+      "source_location": "L62",
       "id": "services_signalhistory_signalaccuracy",
       "community": 0,
       "norm_label": "signalaccuracy"
@@ -3418,16 +3274,16 @@
       "label": "getSignalAccuracy()",
       "file_type": "code",
       "source_file": "src/services/signalHistory.ts",
-      "source_location": "L75",
+      "source_location": "L76",
       "id": "services_signalhistory_getsignalaccuracy",
-      "community": 0,
+      "community": 2,
       "norm_label": "getsignalaccuracy()"
     },
     {
       "label": "getSignalHistory()",
       "file_type": "code",
       "source_file": "src/services/signalHistory.ts",
-      "source_location": "L129",
+      "source_location": "L130",
       "id": "services_signalhistory_getsignalhistory",
       "community": 0,
       "norm_label": "getsignalhistory()"
@@ -3436,7 +3292,7 @@
       "label": "clearSignalHistory()",
       "file_type": "code",
       "source_file": "src/services/signalHistory.ts",
-      "source_location": "L133",
+      "source_location": "L134",
       "id": "services_signalhistory_clearsignalhistory",
       "community": 0,
       "norm_label": "clearsignalhistory()"
@@ -3451,130 +3307,49 @@
       "norm_label": "notifications.ts"
     },
     {
-      "label": "NotificationSettings",
-      "file_type": "code",
-      "source_file": "src/services/notifications.ts",
-      "source_location": "L6",
-      "id": "services_notifications_notificationsettings",
-      "community": 6,
-      "norm_label": "notificationsettings"
-    },
-    {
-      "label": "getNotificationSettings()",
-      "file_type": "code",
-      "source_file": "src/services/notifications.ts",
-      "source_location": "L29",
-      "id": "services_notifications_getnotificationsettings",
-      "community": 6,
-      "norm_label": "getnotificationsettings()"
-    },
-    {
-      "label": "saveNotificationSettings()",
-      "file_type": "code",
-      "source_file": "src/services/notifications.ts",
-      "source_location": "L51",
-      "id": "services_notifications_savenotificationsettings",
-      "community": 6,
-      "norm_label": "savenotificationsettings()"
-    },
-    {
-      "label": "sendViaTelegram()",
-      "file_type": "code",
-      "source_file": "src/services/notifications.ts",
-      "source_location": "L56",
-      "id": "services_notifications_sendviatelegram",
-      "community": 6,
-      "norm_label": "sendviatelegram()"
-    },
-    {
-      "label": "sendViaCallMeBot()",
-      "file_type": "code",
-      "source_file": "src/services/notifications.ts",
-      "source_location": "L83",
-      "id": "services_notifications_sendviacallmebot",
-      "community": 6,
-      "norm_label": "sendviacallmebot()"
-    },
-    {
       "label": "notify()",
       "file_type": "code",
       "source_file": "src/services/notifications.ts",
-      "source_location": "L112",
+      "source_location": "L2",
       "id": "services_notifications_notify",
       "community": 6,
       "norm_label": "notify()"
     },
     {
-      "label": "notifyIPOApplied()",
+      "label": "strongSignalPolicy.ts",
       "file_type": "code",
-      "source_file": "src/services/notifications.ts",
-      "source_location": "L128",
-      "id": "services_notifications_notifyipoapplied",
-      "community": 6,
-      "norm_label": "notifyipoapplied()"
+      "source_file": "src/services/strongSignalPolicy.ts",
+      "source_location": "L1",
+      "id": "src_services_strongsignalpolicy_ts",
+      "community": 0,
+      "norm_label": "strongsignalpolicy.ts"
     },
     {
-      "label": "notifyIPOMandatePending()",
+      "label": "StrongCandidate",
       "file_type": "code",
-      "source_file": "src/services/notifications.ts",
-      "source_location": "L137",
-      "id": "services_notifications_notifyipomandatepending",
-      "community": 6,
-      "norm_label": "notifyipomandatepending()"
+      "source_file": "src/services/strongSignalPolicy.ts",
+      "source_location": "L4",
+      "id": "services_strongsignalpolicy_strongcandidate",
+      "community": 0,
+      "norm_label": "strongcandidate"
     },
     {
-      "label": "notifyIPOAllotment()",
+      "label": "strongSignalId()",
       "file_type": "code",
-      "source_file": "src/services/notifications.ts",
-      "source_location": "L146",
-      "id": "services_notifications_notifyipoallotment",
-      "community": 6,
-      "norm_label": "notifyipoallotment()"
+      "source_file": "src/services/strongSignalPolicy.ts",
+      "source_location": "L9",
+      "id": "services_strongsignalpolicy_strongsignalid",
+      "community": 0,
+      "norm_label": "strongsignalid()"
     },
     {
-      "label": "notifyTradeOpened()",
+      "label": "strongSignalRejection()",
       "file_type": "code",
-      "source_file": "src/services/notifications.ts",
-      "source_location": "L154",
-      "id": "services_notifications_notifytradeopened",
-      "community": 6,
-      "norm_label": "notifytradeopened()"
-    },
-    {
-      "label": "notifyTradeClosed()",
-      "file_type": "code",
-      "source_file": "src/services/notifications.ts",
-      "source_location": "L163",
-      "id": "services_notifications_notifytradeclosed",
-      "community": 6,
-      "norm_label": "notifytradeclosed()"
-    },
-    {
-      "label": "notifySignalAlert()",
-      "file_type": "code",
-      "source_file": "src/services/notifications.ts",
-      "source_location": "L173",
-      "id": "services_notifications_notifysignalalert",
-      "community": 6,
-      "norm_label": "notifysignalalert()"
-    },
-    {
-      "label": "notifyDailySummary()",
-      "file_type": "code",
-      "source_file": "src/services/notifications.ts",
-      "source_location": "L183",
-      "id": "services_notifications_notifydailysummary",
-      "community": 6,
-      "norm_label": "notifydailysummary()"
-    },
-    {
-      "label": "sendTestNotification()",
-      "file_type": "code",
-      "source_file": "src/services/notifications.ts",
-      "source_location": "L200",
-      "id": "services_notifications_sendtestnotification",
-      "community": 6,
-      "norm_label": "sendtestnotification()"
+      "source_file": "src/services/strongSignalPolicy.ts",
+      "source_location": "L14",
+      "id": "services_strongsignalpolicy_strongsignalrejection",
+      "community": 0,
+      "norm_label": "strongsignalrejection()"
     },
     {
       "label": "foregroundAlerts.ts",
@@ -3589,7 +3364,7 @@
       "label": "ForegroundAlert",
       "file_type": "code",
       "source_file": "src/services/foregroundAlerts.ts",
-      "source_location": "L4",
+      "source_location": "L5",
       "id": "services_foregroundalerts_foregroundalert",
       "community": 2,
       "norm_label": "foregroundalert"
@@ -3598,7 +3373,7 @@
       "label": "getForegroundAlerts()",
       "file_type": "code",
       "source_file": "src/services/foregroundAlerts.ts",
-      "source_location": "L9",
+      "source_location": "L10",
       "id": "services_foregroundalerts_getforegroundalerts",
       "community": 0,
       "norm_label": "getforegroundalerts()"
@@ -3607,7 +3382,7 @@
       "label": "collectForegroundAlerts()",
       "file_type": "code",
       "source_file": "src/services/foregroundAlerts.ts",
-      "source_location": "L12",
+      "source_location": "L13",
       "id": "services_foregroundalerts_collectforegroundalerts",
       "community": 0,
       "norm_label": "collectforegroundalerts()"
@@ -3931,7 +3706,7 @@
       "label": "generateReasons()",
       "file_type": "code",
       "source_file": "src/services/stockDiscovery.ts",
-      "source_location": "L236",
+      "source_location": "L216",
       "id": "services_stockdiscovery_generatereasons",
       "community": 47,
       "norm_label": "generatereasons()"
@@ -3940,7 +3715,7 @@
       "label": "identifyStrategies()",
       "file_type": "code",
       "source_file": "src/services/stockDiscovery.ts",
-      "source_location": "L252",
+      "source_location": "L232",
       "id": "services_stockdiscovery_identifystrategies",
       "community": 47,
       "norm_label": "identifystrategies()"
@@ -3949,7 +3724,7 @@
       "label": "determineTrend()",
       "file_type": "code",
       "source_file": "src/services/stockDiscovery.ts",
-      "source_location": "L264",
+      "source_location": "L244",
       "id": "services_stockdiscovery_determinetrend",
       "community": 47,
       "norm_label": "determinetrend()"
@@ -3958,25 +3733,25 @@
       "label": "fetchScreener()",
       "file_type": "code",
       "source_file": "src/services/stockDiscovery.ts",
-      "source_location": "L274",
+      "source_location": "L254",
       "id": "services_stockdiscovery_fetchscreener",
-      "community": 1,
+      "community": 47,
       "norm_label": "fetchscreener()"
     },
     {
       "label": "fetchHistorical()",
       "file_type": "code",
       "source_file": "src/services/stockDiscovery.ts",
-      "source_location": "L281",
+      "source_location": "L261",
       "id": "services_stockdiscovery_fetchhistorical",
-      "community": 1,
+      "community": 47,
       "norm_label": "fetchhistorical()"
     },
     {
       "label": "fetchQuotes()",
       "file_type": "code",
       "source_file": "src/services/stockDiscovery.ts",
-      "source_location": "L291",
+      "source_location": "L271",
       "id": "services_stockdiscovery_fetchquotes",
       "community": 0,
       "norm_label": "fetchquotes()"
@@ -3985,9 +3760,9 @@
       "label": "discoverStocks()",
       "file_type": "code",
       "source_file": "src/services/stockDiscovery.ts",
-      "source_location": "L303",
+      "source_location": "L283",
       "id": "services_stockdiscovery_discoverstocks",
-      "community": 0,
+      "community": 47,
       "norm_label": "discoverstocks()"
     },
     {
@@ -4003,106 +3778,34 @@
       "label": "LiveMetal",
       "file_type": "code",
       "source_file": "src/services/metalsService.ts",
-      "source_location": "L7",
+      "source_location": "L3",
       "id": "services_metalsservice_livemetal",
       "community": 3,
       "norm_label": "livemetal"
     },
     {
-      "label": "MetalConfig",
-      "file_type": "code",
-      "source_file": "src/services/metalsService.ts",
-      "source_location": "L37",
-      "id": "services_metalsservice_metalconfig",
-      "community": 3,
-      "norm_label": "metalconfig"
-    },
-    {
       "label": "METALS",
       "file_type": "code",
       "source_file": "src/services/metalsService.ts",
-      "source_location": "L46",
+      "source_location": "L9",
       "id": "services_metalsservice_metals",
       "community": 3,
       "norm_label": "metals"
     },
     {
-      "label": "computeRSI()",
+      "label": "parseMetalChart()",
       "file_type": "code",
       "source_file": "src/services/metalsService.ts",
-      "source_location": "L58",
-      "id": "services_metalsservice_computersi",
+      "source_location": "L16",
+      "id": "services_metalsservice_parsemetalchart",
       "community": 3,
-      "norm_label": "computersi()"
-    },
-    {
-      "label": "computeSMA()",
-      "file_type": "code",
-      "source_file": "src/services/metalsService.ts",
-      "source_location": "L72",
-      "id": "services_metalsservice_computesma",
-      "community": 3,
-      "norm_label": "computesma()"
-    },
-    {
-      "label": "generateSignal()",
-      "file_type": "code",
-      "source_file": "src/services/metalsService.ts",
-      "source_location": "L78",
-      "id": "services_metalsservice_generatesignal",
-      "community": 3,
-      "norm_label": "generatesignal()"
-    },
-    {
-      "label": "findSupportResistance()",
-      "file_type": "code",
-      "source_file": "src/services/metalsService.ts",
-      "source_location": "L118",
-      "id": "services_metalsservice_findsupportresistance",
-      "community": 3,
-      "norm_label": "findsupportresistance()"
-    },
-    {
-      "label": "generateThesis()",
-      "file_type": "code",
-      "source_file": "src/services/metalsService.ts",
-      "source_location": "L127",
-      "id": "services_metalsservice_generatethesis",
-      "community": 3,
-      "norm_label": "generatethesis()"
-    },
-    {
-      "label": "IndianRetailPrices",
-      "file_type": "code",
-      "source_file": "src/services/metalsService.ts",
-      "source_location": "L137",
-      "id": "services_metalsservice_indianretailprices",
-      "community": 3,
-      "norm_label": "indianretailprices"
-    },
-    {
-      "label": "fetchIndianRetailPrices()",
-      "file_type": "code",
-      "source_file": "src/services/metalsService.ts",
-      "source_location": "L143",
-      "id": "services_metalsservice_fetchindianretailprices",
-      "community": 3,
-      "norm_label": "fetchindianretailprices()"
-    },
-    {
-      "label": "fetchChart()",
-      "file_type": "code",
-      "source_file": "src/services/metalsService.ts",
-      "source_location": "L174",
-      "id": "services_metalsservice_fetchchart",
-      "community": 3,
-      "norm_label": "fetchchart()"
+      "norm_label": "parsemetalchart()"
     },
     {
       "label": "fetchLiveMetals()",
       "file_type": "code",
       "source_file": "src/services/metalsService.ts",
-      "source_location": "L193",
+      "source_location": "L36",
       "id": "services_metalsservice_fetchlivemetals",
       "community": 3,
       "norm_label": "fetchlivemetals()"
@@ -4120,7 +3823,7 @@
       "label": "PaperTradeRecord",
       "file_type": "code",
       "source_file": "src/services/paperTrading.ts",
-      "source_location": "L5",
+      "source_location": "L7",
       "id": "services_papertrading_papertraderecord",
       "community": 0,
       "norm_label": "papertraderecord"
@@ -4129,7 +3832,7 @@
       "label": "Ledger",
       "file_type": "code",
       "source_file": "src/services/paperTrading.ts",
-      "source_location": "L15",
+      "source_location": "L17",
       "id": "services_papertrading_ledger",
       "community": 0,
       "norm_label": "ledger"
@@ -4138,7 +3841,7 @@
       "label": "round()",
       "file_type": "code",
       "source_file": "src/services/paperTrading.ts",
-      "source_location": "L19",
+      "source_location": "L21",
       "id": "services_papertrading_round",
       "community": 0,
       "norm_label": "round()"
@@ -4147,7 +3850,7 @@
       "label": "loadLedger()",
       "file_type": "code",
       "source_file": "src/services/paperTrading.ts",
-      "source_location": "L20",
+      "source_location": "L22",
       "id": "services_papertrading_loadledger",
       "community": 0,
       "norm_label": "loadledger()"
@@ -4156,7 +3859,7 @@
       "label": "save()",
       "file_type": "code",
       "source_file": "src/services/paperTrading.ts",
-      "source_location": "L29",
+      "source_location": "L31",
       "id": "services_papertrading_save",
       "community": 0,
       "norm_label": "save()"
@@ -4165,7 +3868,7 @@
       "label": "prunePaperTrades()",
       "file_type": "code",
       "source_file": "src/services/paperTrading.ts",
-      "source_location": "L30",
+      "source_location": "L32",
       "id": "services_papertrading_prunepapertrades",
       "community": 0,
       "norm_label": "prunepapertrades()"
@@ -4174,7 +3877,7 @@
       "label": "estimatedCosts()",
       "file_type": "code",
       "source_file": "src/services/paperTrading.ts",
-      "source_location": "L40",
+      "source_location": "L42",
       "id": "services_papertrading_estimatedcosts",
       "community": 0,
       "norm_label": "estimatedcosts()"
@@ -4183,7 +3886,7 @@
       "label": "PaperSignal",
       "file_type": "code",
       "source_file": "src/services/paperTrading.ts",
-      "source_location": "L43",
+      "source_location": "L45",
       "id": "services_papertrading_papersignal",
       "community": 0,
       "norm_label": "papersignal"
@@ -4192,7 +3895,7 @@
       "label": "openPaperTrades()",
       "file_type": "code",
       "source_file": "src/services/paperTrading.ts",
-      "source_location": "L48",
+      "source_location": "L50",
       "id": "services_papertrading_openpapertrades",
       "community": 0,
       "norm_label": "openpapertrades()"
@@ -4201,7 +3904,7 @@
       "label": "updatePaperTrades()",
       "file_type": "code",
       "source_file": "src/services/paperTrading.ts",
-      "source_location": "L82",
+      "source_location": "L94",
       "id": "services_papertrading_updatepapertrades",
       "community": 0,
       "norm_label": "updatepapertrades()"
@@ -4210,7 +3913,7 @@
       "label": "getPaperTrades()",
       "file_type": "code",
       "source_file": "src/services/paperTrading.ts",
-      "source_location": "L113",
+      "source_location": "L125",
       "id": "services_papertrading_getpapertrades",
       "community": 0,
       "norm_label": "getpapertrades()"
@@ -4219,7 +3922,7 @@
       "label": "getPaperTradeSummary()",
       "file_type": "code",
       "source_file": "src/services/paperTrading.ts",
-      "source_location": "L114",
+      "source_location": "L126",
       "id": "services_papertrading_getpapertradesummary",
       "community": 0,
       "norm_label": "getpapertradesummary()"
@@ -4302,7 +4005,7 @@
       "source_file": "src/services/marketStatus.ts",
       "source_location": "L1",
       "id": "src_services_marketstatus_ts",
-      "community": 1,
+      "community": 6,
       "norm_label": "marketstatus.ts"
     },
     {
@@ -4311,7 +4014,7 @@
       "source_file": "src/services/marketStatus.ts",
       "source_location": "L5",
       "id": "services_marketstatus_marketstatus",
-      "community": 1,
+      "community": 6,
       "norm_label": "marketstatus"
     },
     {
@@ -4320,14 +4023,14 @@
       "source_file": "src/services/marketStatus.ts",
       "source_location": "L15",
       "id": "services_marketstatus_fetchmarketstatus",
-      "community": 1,
+      "community": 6,
       "norm_label": "fetchmarketstatus()"
     },
     {
       "label": "isMarketOpenCached()",
       "file_type": "code",
       "source_file": "src/services/marketStatus.ts",
-      "source_location": "L44",
+      "source_location": "L45",
       "id": "services_marketstatus_ismarketopencached",
       "community": 0,
       "norm_label": "ismarketopencached()"
@@ -4405,48 +4108,84 @@
       "norm_label": "disabledevicepush()"
     },
     {
+      "label": "decisionJournal.ts",
+      "file_type": "code",
+      "source_file": "src/services/decisionJournal.ts",
+      "source_location": "L1",
+      "id": "src_services_decisionjournal_ts",
+      "community": 0,
+      "norm_label": "decisionjournal.ts"
+    },
+    {
+      "label": "CandidateDecision",
+      "file_type": "code",
+      "source_file": "src/services/decisionJournal.ts",
+      "source_location": "L4",
+      "id": "services_decisionjournal_candidatedecision",
+      "community": 0,
+      "norm_label": "candidatedecision"
+    },
+    {
+      "label": "DecisionRecord",
+      "file_type": "code",
+      "source_file": "src/services/decisionJournal.ts",
+      "source_location": "L9",
+      "id": "services_decisionjournal_decisionrecord",
+      "community": 0,
+      "norm_label": "decisionrecord"
+    },
+    {
+      "label": "retained()",
+      "file_type": "code",
+      "source_file": "src/services/decisionJournal.ts",
+      "source_location": "L13",
+      "id": "services_decisionjournal_retained",
+      "community": 0,
+      "norm_label": "retained()"
+    },
+    {
+      "label": "getDecisionJournal()",
+      "file_type": "code",
+      "source_file": "src/services/decisionJournal.ts",
+      "source_location": "L17",
+      "id": "services_decisionjournal_getdecisionjournal",
+      "community": 0,
+      "norm_label": "getdecisionjournal()"
+    },
+    {
+      "label": "mergeDecisions()",
+      "file_type": "code",
+      "source_file": "src/services/decisionJournal.ts",
+      "source_location": "L27",
+      "id": "services_decisionjournal_mergedecisions",
+      "community": 0,
+      "norm_label": "mergedecisions()"
+    },
+    {
       "label": "liveData.ts",
       "file_type": "code",
       "source_file": "src/services/liveData.ts",
       "source_location": "L1",
       "id": "src_services_livedata_ts",
-      "community": 1,
+      "community": 6,
       "norm_label": "livedata.ts"
     },
     {
       "label": "LiveStock",
       "file_type": "code",
       "source_file": "src/services/liveData.ts",
-      "source_location": "L4",
+      "source_location": "L2",
       "id": "services_livedata_livestock",
       "community": 6,
       "norm_label": "livestock"
     },
     {
-      "label": "YahooChartMeta",
-      "file_type": "code",
-      "source_file": "src/services/liveData.ts",
-      "source_location": "L20",
-      "id": "services_livedata_yahoochartmeta",
-      "community": 1,
-      "norm_label": "yahoochartmeta"
-    },
-    {
-      "label": "fetchSingleStock()",
-      "file_type": "code",
-      "source_file": "src/services/liveData.ts",
-      "source_location": "L33",
-      "id": "services_livedata_fetchsinglestock",
-      "community": 1,
-      "norm_label": "fetchsinglestock()"
-    },
-    {
       "label": "fetchNifty()",
       "file_type": "code",
       "source_file": "src/services/liveData.ts",
-      "source_location": "L68",
+      "source_location": "L3",
       "id": "services_livedata_fetchnifty",
-      "community": 1,
+      "community": 6,
       "norm_label": "fetchnifty()"
     },
     {
@@ -4493,6 +4232,51 @@
       "id": "trading_app_readme_codeblock_1",
       "community": 15,
       "norm_label": "code:json ({)"
+    },
+    {
+      "label": "README.md",
+      "file_type": "document",
+      "source_file": "releases/android/README.md",
+      "source_location": "L1",
+      "id": "releases_android_readme_md",
+      "community": 50,
+      "norm_label": "readme.md"
+    },
+    {
+      "label": "Android test builds",
+      "file_type": "document",
+      "source_file": "releases/android/README.md",
+      "source_location": "L1",
+      "id": "android_readme_android_test_builds",
+      "community": 50,
+      "norm_label": "android test builds"
+    },
+    {
+      "label": "Strong-signal policy update \u2014 20 September 2026",
+      "file_type": "document",
+      "source_file": "releases/android/README.md",
+      "source_location": "L3",
+      "id": "android_readme_strong_signal_policy_update_20_september_2026",
+      "community": 50,
+      "norm_label": "strong-signal policy update \u2014 20 september 2026"
+    },
+    {
+      "label": "Previous backend test build",
+      "file_type": "document",
+      "source_file": "releases/android/README.md",
+      "source_location": "L13",
+      "id": "android_readme_previous_backend_test_build",
+      "community": 50,
+      "norm_label": "previous backend test build"
+    },
+    {
+      "label": "Production-data audit build \u2014 20 September 2026",
+      "file_type": "document",
+      "source_file": "releases/android/README.md",
+      "source_location": "L27",
+      "id": "android_readme_production_data_audit_build_20_september_2026",
+      "community": 50,
+      "norm_label": "production-data audit build \u2014 20 september 2026"
     },
     {
       "label": "VERCEL_RELEASE.md",
@@ -4745,6 +4529,582 @@
       "id": "capapp_spm_readme_capapp_spm",
       "community": 38,
       "norm_label": "capapp-spm"
+    },
+    {
+      "label": "signalStyles",
+      "file_type": "code",
+      "source_file": "src/components/MetalsPage.tsx",
+      "source_location": "L5",
+      "community": 3,
+      "norm_label": "signalstyles",
+      "id": "components_metalspage_signalstyles"
+    },
+    {
+      "label": "ALLOCATION",
+      "file_type": "code",
+      "source_file": "src/components/MetalsPage.tsx",
+      "source_location": "L13",
+      "community": 3,
+      "norm_label": "allocation",
+      "id": "components_metalspage_allocation"
+    },
+    {
+      "label": "OptionsCard()",
+      "file_type": "code",
+      "source_file": "src/components/SmartPicksPage.tsx",
+      "source_location": "L318",
+      "community": 2,
+      "norm_label": "optionscard()",
+      "id": "components_smartpickspage_optionscard"
+    },
+    {
+      "label": "NSE_FO_SYMBOLS",
+      "file_type": "code",
+      "source_file": "src/services/optionsEngine.ts",
+      "source_location": "L9",
+      "community": 2,
+      "norm_label": "nse_fo_symbols",
+      "id": "services_optionsengine_nse_fo_symbols"
+    },
+    {
+      "label": "isAvailableInFnO()",
+      "file_type": "code",
+      "source_file": "src/services/optionsEngine.ts",
+      "source_location": "L42",
+      "community": 2,
+      "norm_label": "isavailableinfno()",
+      "id": "services_optionsengine_isavailableinfno"
+    },
+    {
+      "label": "OptionsPick",
+      "file_type": "code",
+      "source_file": "src/services/optionsEngine.ts",
+      "source_location": "L48",
+      "community": 2,
+      "norm_label": "optionspick",
+      "id": "services_optionsengine_optionspick"
+    },
+    {
+      "label": "OptionLeg",
+      "file_type": "code",
+      "source_file": "src/services/optionsEngine.ts",
+      "source_location": "L69",
+      "community": 2,
+      "norm_label": "optionleg",
+      "id": "services_optionsengine_optionleg"
+    },
+    {
+      "label": "OptionsStrategy",
+      "file_type": "code",
+      "source_file": "src/services/optionsEngine.ts",
+      "source_location": "L77",
+      "community": 2,
+      "norm_label": "optionsstrategy",
+      "id": "services_optionsengine_optionsstrategy"
+    },
+    {
+      "label": "computeHistoricalVolatility()",
+      "file_type": "code",
+      "source_file": "src/services/optionsEngine.ts",
+      "source_location": "L99",
+      "community": 2,
+      "norm_label": "computehistoricalvolatility()",
+      "id": "services_optionsengine_computehistoricalvolatility"
+    },
+    {
+      "label": "ivPercentile()",
+      "file_type": "code",
+      "source_file": "src/services/optionsEngine.ts",
+      "source_location": "L105",
+      "community": 2,
+      "norm_label": "ivpercentile()",
+      "id": "services_optionsengine_ivpercentile"
+    },
+    {
+      "label": "roundToStrike()",
+      "file_type": "code",
+      "source_file": "src/services/optionsEngine.ts",
+      "source_location": "L116",
+      "community": 2,
+      "norm_label": "roundtostrike()",
+      "id": "services_optionsengine_roundtostrike"
+    },
+    {
+      "label": "estimatePremium()",
+      "file_type": "code",
+      "source_file": "src/services/optionsEngine.ts",
+      "source_location": "L123",
+      "community": 2,
+      "norm_label": "estimatepremium()",
+      "id": "services_optionsengine_estimatepremium"
+    },
+    {
+      "label": "selectStrategy()",
+      "file_type": "code",
+      "source_file": "src/services/optionsEngine.ts",
+      "source_location": "L130",
+      "community": 2,
+      "norm_label": "selectstrategy()",
+      "id": "services_optionsengine_selectstrategy"
+    },
+    {
+      "label": "generatePlainInstruction()",
+      "file_type": "code",
+      "source_file": "src/services/optionsEngine.ts",
+      "source_location": "L463",
+      "community": 2,
+      "norm_label": "generateplaininstruction()",
+      "id": "services_optionsengine_generateplaininstruction"
+    },
+    {
+      "label": "generateStepByStep()",
+      "file_type": "code",
+      "source_file": "src/services/optionsEngine.ts",
+      "source_location": "L475",
+      "community": 2,
+      "norm_label": "generatestepbystep()",
+      "id": "services_optionsengine_generatestepbystep"
+    },
+    {
+      "label": "DEVICE_ID",
+      "file_type": "code",
+      "source_file": "src/services/supabaseClient.ts",
+      "source_location": "L29",
+      "community": 10,
+      "norm_label": "device_id",
+      "id": "services_supabaseclient_device_id"
+    },
+    {
+      "label": "getOrCreateDeviceId()",
+      "file_type": "code",
+      "source_file": "src/services/supabaseClient.ts",
+      "source_location": "L31",
+      "community": 10,
+      "norm_label": "getorcreatedeviceid()",
+      "id": "services_supabaseclient_getorcreatedeviceid"
+    },
+    {
+      "label": "syncToCloud()",
+      "file_type": "code",
+      "source_file": "src/services/supabaseClient.ts",
+      "source_location": "L41",
+      "community": 10,
+      "norm_label": "synctocloud()",
+      "id": "services_supabaseclient_synctocloud"
+    },
+    {
+      "label": "syncFromCloud()",
+      "file_type": "code",
+      "source_file": "src/services/supabaseClient.ts",
+      "source_location": "L58",
+      "community": 10,
+      "norm_label": "syncfromcloud()",
+      "id": "services_supabaseclient_syncfromcloud"
+    },
+    {
+      "label": "syncPaperTrades()",
+      "file_type": "code",
+      "source_file": "src/services/supabaseClient.ts",
+      "source_location": "L73",
+      "community": 10,
+      "norm_label": "syncpapertrades()",
+      "id": "services_supabaseclient_syncpapertrades"
+    },
+    {
+      "label": "loadPaperTradesFromCloud()",
+      "file_type": "code",
+      "source_file": "src/services/supabaseClient.ts",
+      "source_location": "L78",
+      "community": 10,
+      "norm_label": "loadpapertradesfromcloud()",
+      "id": "services_supabaseclient_loadpapertradesfromcloud"
+    },
+    {
+      "label": "syncIPOApplications()",
+      "file_type": "code",
+      "source_file": "src/services/supabaseClient.ts",
+      "source_location": "L83",
+      "community": 10,
+      "norm_label": "syncipoapplications()",
+      "id": "services_supabaseclient_syncipoapplications"
+    },
+    {
+      "label": "syncSettings()",
+      "file_type": "code",
+      "source_file": "src/services/supabaseClient.ts",
+      "source_location": "L89",
+      "community": 10,
+      "norm_label": "syncsettings()",
+      "id": "services_supabaseclient_syncsettings"
+    },
+    {
+      "label": "fullSync()",
+      "file_type": "code",
+      "source_file": "src/services/supabaseClient.ts",
+      "source_location": "L98",
+      "community": 10,
+      "norm_label": "fullsync()",
+      "id": "services_supabaseclient_fullsync"
+    },
+    {
+      "label": "BrokerConfig",
+      "file_type": "code",
+      "source_file": "src/services/ipoAutoApply.ts",
+      "source_location": "L6",
+      "community": 1,
+      "norm_label": "brokerconfig",
+      "id": "services_ipoautoapply_brokerconfig"
+    },
+    {
+      "label": "IPOApplication",
+      "file_type": "code",
+      "source_file": "src/services/ipoAutoApply.ts",
+      "source_location": "L16",
+      "community": 1,
+      "norm_label": "ipoapplication",
+      "id": "services_ipoautoapply_ipoapplication"
+    },
+    {
+      "label": "AutoApplySettings",
+      "file_type": "code",
+      "source_file": "src/services/ipoAutoApply.ts",
+      "source_location": "L30",
+      "community": 1,
+      "norm_label": "autoapplysettings",
+      "id": "services_ipoautoapply_autoapplysettings"
+    },
+    {
+      "label": "getAutoApplySettings()",
+      "file_type": "code",
+      "source_file": "src/services/ipoAutoApply.ts",
+      "source_location": "L45",
+      "community": 1,
+      "norm_label": "getautoapplysettings()",
+      "id": "services_ipoautoapply_getautoapplysettings"
+    },
+    {
+      "label": "saveAutoApplySettings()",
+      "file_type": "code",
+      "source_file": "src/services/ipoAutoApply.ts",
+      "source_location": "L61",
+      "community": 1,
+      "norm_label": "saveautoapplysettings()",
+      "id": "services_ipoautoapply_saveautoapplysettings"
+    },
+    {
+      "label": "getIPOApplications()",
+      "file_type": "code",
+      "source_file": "src/services/ipoAutoApply.ts",
+      "source_location": "L67",
+      "community": 1,
+      "norm_label": "getipoapplications()",
+      "id": "services_ipoautoapply_getipoapplications"
+    },
+    {
+      "label": "saveApplications()",
+      "file_type": "code",
+      "source_file": "src/services/ipoAutoApply.ts",
+      "source_location": "L73",
+      "community": 1,
+      "norm_label": "saveapplications()",
+      "id": "services_ipoautoapply_saveapplications"
+    },
+    {
+      "label": "dhanRenewToken()",
+      "file_type": "code",
+      "source_file": "src/services/ipoAutoApply.ts",
+      "source_location": "L81",
+      "community": 1,
+      "norm_label": "dhanrenewtoken()",
+      "id": "services_ipoautoapply_dhanrenewtoken"
+    },
+    {
+      "label": "dhanGenerateToken()",
+      "file_type": "code",
+      "source_file": "src/services/ipoAutoApply.ts",
+      "source_location": "L109",
+      "community": 1,
+      "norm_label": "dhangeneratetoken()",
+      "id": "services_ipoautoapply_dhangeneratetoken"
+    },
+    {
+      "label": "ensureDhanToken()",
+      "file_type": "code",
+      "source_file": "src/services/ipoAutoApply.ts",
+      "source_location": "L140",
+      "community": 1,
+      "norm_label": "ensuredhantoken()",
+      "id": "services_ipoautoapply_ensuredhantoken"
+    },
+    {
+      "label": "dhanApplyIPO()",
+      "file_type": "code",
+      "source_file": "src/services/ipoAutoApply.ts",
+      "source_location": "L185",
+      "community": 1,
+      "norm_label": "dhanapplyipo()",
+      "id": "services_ipoautoapply_dhanapplyipo"
+    },
+    {
+      "label": "dhanFetchIPOList()",
+      "file_type": "code",
+      "source_file": "src/services/ipoAutoApply.ts",
+      "source_location": "L233",
+      "community": 1,
+      "norm_label": "dhanfetchipolist()",
+      "id": "services_ipoautoapply_dhanfetchipolist"
+    },
+    {
+      "label": "angelOneLogin()",
+      "file_type": "code",
+      "source_file": "src/services/ipoAutoApply.ts",
+      "source_location": "L259",
+      "community": 1,
+      "norm_label": "angelonelogin()",
+      "id": "services_ipoautoapply_angelonelogin"
+    },
+    {
+      "label": "angelOneApplyIPO()",
+      "file_type": "code",
+      "source_file": "src/services/ipoAutoApply.ts",
+      "source_location": "L286",
+      "community": 1,
+      "norm_label": "angeloneapplyipo()",
+      "id": "services_ipoautoapply_angeloneapplyipo"
+    },
+    {
+      "label": "clearIPOApplications()",
+      "file_type": "code",
+      "source_file": "src/services/ipoAutoApply.ts",
+      "source_location": "L422",
+      "community": 1,
+      "norm_label": "clearipoapplications()",
+      "id": "services_ipoautoapply_clearipoapplications"
+    },
+    {
+      "label": "NotificationSettings",
+      "file_type": "code",
+      "source_file": "src/services/notifications.ts",
+      "source_location": "L6",
+      "community": 6,
+      "norm_label": "notificationsettings",
+      "id": "services_notifications_notificationsettings"
+    },
+    {
+      "label": "getNotificationSettings()",
+      "file_type": "code",
+      "source_file": "src/services/notifications.ts",
+      "source_location": "L29",
+      "community": 6,
+      "norm_label": "getnotificationsettings()",
+      "id": "services_notifications_getnotificationsettings"
+    },
+    {
+      "label": "saveNotificationSettings()",
+      "file_type": "code",
+      "source_file": "src/services/notifications.ts",
+      "source_location": "L51",
+      "community": 6,
+      "norm_label": "savenotificationsettings()",
+      "id": "services_notifications_savenotificationsettings"
+    },
+    {
+      "label": "sendViaTelegram()",
+      "file_type": "code",
+      "source_file": "src/services/notifications.ts",
+      "source_location": "L56",
+      "community": 6,
+      "norm_label": "sendviatelegram()",
+      "id": "services_notifications_sendviatelegram"
+    },
+    {
+      "label": "sendViaCallMeBot()",
+      "file_type": "code",
+      "source_file": "src/services/notifications.ts",
+      "source_location": "L83",
+      "community": 6,
+      "norm_label": "sendviacallmebot()",
+      "id": "services_notifications_sendviacallmebot"
+    },
+    {
+      "label": "notifyIPOApplied()",
+      "file_type": "code",
+      "source_file": "src/services/notifications.ts",
+      "source_location": "L128",
+      "community": 6,
+      "norm_label": "notifyipoapplied()",
+      "id": "services_notifications_notifyipoapplied"
+    },
+    {
+      "label": "notifyIPOMandatePending()",
+      "file_type": "code",
+      "source_file": "src/services/notifications.ts",
+      "source_location": "L137",
+      "community": 6,
+      "norm_label": "notifyipomandatepending()",
+      "id": "services_notifications_notifyipomandatepending"
+    },
+    {
+      "label": "notifyIPOAllotment()",
+      "file_type": "code",
+      "source_file": "src/services/notifications.ts",
+      "source_location": "L146",
+      "community": 6,
+      "norm_label": "notifyipoallotment()",
+      "id": "services_notifications_notifyipoallotment"
+    },
+    {
+      "label": "notifyTradeOpened()",
+      "file_type": "code",
+      "source_file": "src/services/notifications.ts",
+      "source_location": "L154",
+      "community": 6,
+      "norm_label": "notifytradeopened()",
+      "id": "services_notifications_notifytradeopened"
+    },
+    {
+      "label": "notifyTradeClosed()",
+      "file_type": "code",
+      "source_file": "src/services/notifications.ts",
+      "source_location": "L163",
+      "community": 6,
+      "norm_label": "notifytradeclosed()",
+      "id": "services_notifications_notifytradeclosed"
+    },
+    {
+      "label": "notifySignalAlert()",
+      "file_type": "code",
+      "source_file": "src/services/notifications.ts",
+      "source_location": "L173",
+      "community": 6,
+      "norm_label": "notifysignalalert()",
+      "id": "services_notifications_notifysignalalert"
+    },
+    {
+      "label": "notifyDailySummary()",
+      "file_type": "code",
+      "source_file": "src/services/notifications.ts",
+      "source_location": "L183",
+      "community": 6,
+      "norm_label": "notifydailysummary()",
+      "id": "services_notifications_notifydailysummary"
+    },
+    {
+      "label": "sendTestNotification()",
+      "file_type": "code",
+      "source_file": "src/services/notifications.ts",
+      "source_location": "L200",
+      "community": 6,
+      "norm_label": "sendtestnotification()",
+      "id": "services_notifications_sendtestnotification"
+    },
+    {
+      "label": "MetalConfig",
+      "file_type": "code",
+      "source_file": "src/services/metalsService.ts",
+      "source_location": "L37",
+      "community": 3,
+      "norm_label": "metalconfig",
+      "id": "services_metalsservice_metalconfig"
+    },
+    {
+      "label": "computeRSI()",
+      "file_type": "code",
+      "source_file": "src/services/metalsService.ts",
+      "source_location": "L58",
+      "community": 3,
+      "norm_label": "computersi()",
+      "id": "services_metalsservice_computersi"
+    },
+    {
+      "label": "computeSMA()",
+      "file_type": "code",
+      "source_file": "src/services/metalsService.ts",
+      "source_location": "L72",
+      "community": 3,
+      "norm_label": "computesma()",
+      "id": "services_metalsservice_computesma"
+    },
+    {
+      "label": "generateSignal()",
+      "file_type": "code",
+      "source_file": "src/services/metalsService.ts",
+      "source_location": "L78",
+      "community": 3,
+      "norm_label": "generatesignal()",
+      "id": "services_metalsservice_generatesignal"
+    },
+    {
+      "label": "findSupportResistance()",
+      "file_type": "code",
+      "source_file": "src/services/metalsService.ts",
+      "source_location": "L118",
+      "community": 3,
+      "norm_label": "findsupportresistance()",
+      "id": "services_metalsservice_findsupportresistance"
+    },
+    {
+      "label": "generateThesis()",
+      "file_type": "code",
+      "source_file": "src/services/metalsService.ts",
+      "source_location": "L127",
+      "community": 3,
+      "norm_label": "generatethesis()",
+      "id": "services_metalsservice_generatethesis"
+    },
+    {
+      "label": "IndianRetailPrices",
+      "file_type": "code",
+      "source_file": "src/services/metalsService.ts",
+      "source_location": "L137",
+      "community": 3,
+      "norm_label": "indianretailprices",
+      "id": "services_metalsservice_indianretailprices"
+    },
+    {
+      "label": "fetchIndianRetailPrices()",
+      "file_type": "code",
+      "source_file": "src/services/metalsService.ts",
+      "source_location": "L143",
+      "community": 3,
+      "norm_label": "fetchindianretailprices()",
+      "id": "services_metalsservice_fetchindianretailprices"
+    },
+    {
+      "label": "fetchChart()",
+      "file_type": "code",
+      "source_file": "src/services/metalsService.ts",
+      "source_location": "L174",
+      "community": 3,
+      "norm_label": "fetchchart()",
+      "id": "services_metalsservice_fetchchart"
+    },
+    {
+      "label": "YahooChartMeta",
+      "file_type": "code",
+      "source_file": "src/services/liveData.ts",
+      "source_location": "L20",
+      "community": 6,
+      "norm_label": "yahoochartmeta",
+      "id": "services_livedata_yahoochartmeta"
+    },
+    {
+      "label": "fetchSingleStock()",
+      "file_type": "code",
+      "source_file": "src/services/liveData.ts",
+      "source_location": "L33",
+      "community": 6,
+      "norm_label": "fetchsinglestock()",
+      "id": "services_livedata_fetchsinglestock"
+    },
+    {
+      "label": "Android test build",
+      "file_type": "document",
+      "source_file": "releases/android/README.md",
+      "source_location": "L1",
+      "community": 50,
+      "norm_label": "android test build",
+      "id": "android_readme_android_test_build"
     },
     {
       "label": "vercel.json",
@@ -5294,9 +5654,9 @@
       "source_file": "vercel.json",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "vercel_json",
-      "target": "ai_algo_trading_india_vercel_crons",
-      "confidence_score": 1.0
+      "target": "ai_algo_trading_india_vercel_crons"
     },
     {
       "relation": "contains",
@@ -5304,9 +5664,9 @@
       "source_file": "vercel.json",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "vercel_json",
-      "target": "ai_algo_trading_india_vercel_rewrites",
-      "confidence_score": 1.0
+      "target": "ai_algo_trading_india_vercel_rewrites"
     },
     {
       "relation": "contains",
@@ -5314,9 +5674,9 @@
       "source_file": "vercel.json",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "vercel_json",
-      "target": "ai_algo_trading_india_vercel_framework",
-      "confidence_score": 1.0
+      "target": "ai_algo_trading_india_vercel_framework"
     },
     {
       "relation": "contains",
@@ -5324,9 +5684,9 @@
       "source_file": "vercel.json",
       "source_location": "L15",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "vercel_json",
-      "target": "ai_algo_trading_india_vercel_buildcommand",
-      "confidence_score": 1.0
+      "target": "ai_algo_trading_india_vercel_buildcommand"
     },
     {
       "relation": "contains",
@@ -5334,9 +5694,9 @@
       "source_file": "vercel.json",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "vercel_json",
-      "target": "ai_algo_trading_india_vercel_outputdirectory",
-      "confidence_score": 1.0
+      "target": "ai_algo_trading_india_vercel_outputdirectory"
     },
     {
       "relation": "contains",
@@ -5344,9 +5704,9 @@
       "source_file": "vercel.json",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "vercel_json",
-      "target": "ai_algo_trading_india_vercel_installcommand",
-      "confidence_score": 1.0
+      "target": "ai_algo_trading_india_vercel_installcommand"
     },
     {
       "relation": "contains",
@@ -5354,9 +5714,9 @@
       "source_file": "vercel.json",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "vercel_json",
-      "target": "ai_algo_trading_india_vercel_functions",
-      "confidence_score": 1.0
+      "target": "ai_algo_trading_india_vercel_functions"
     },
     {
       "relation": "contains",
@@ -5384,9 +5744,9 @@
       "source_file": "vercel.json",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ai_algo_trading_india_vercel_functions",
-      "target": "ai_algo_trading_india_vercel_functions_api_js",
-      "confidence_score": 1.0
+      "target": "ai_algo_trading_india_vercel_functions_api_js"
     },
     {
       "relation": "contains",
@@ -5394,9 +5754,9 @@
       "source_file": "vercel.json",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ai_algo_trading_india_vercel_functions_api_js",
-      "target": "ai_algo_trading_india_vercel_api_js_maxduration",
-      "confidence_score": 1.0
+      "target": "ai_algo_trading_india_vercel_api_js_maxduration"
     },
     {
       "relation": "contains",
@@ -5944,9 +6304,9 @@
       "source_file": "package.json",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ai_algo_trading_india_package_scripts",
-      "target": "ai_algo_trading_india_package_scripts_check_deployment",
-      "confidence_score": 1.0
+      "target": "ai_algo_trading_india_package_scripts_check_deployment"
     },
     {
       "relation": "contains",
@@ -6256,9 +6616,9 @@
       "source_file": "vite.config.ts",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "vite_config_ts",
-      "target": "server_mobileconfig_js",
-      "confidence_score": 1.0
+      "target": "server_mobileconfig_js"
     },
     {
       "relation": "imports",
@@ -6267,9 +6627,9 @@
       "source_file": "vite.config.ts",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "vite_config_ts",
-      "target": "server_mobileconfig_validatemobileapibase",
-      "confidence_score": 1.0
+      "target": "server_mobileconfig_validatemobileapibase"
     },
     {
       "relation": "imports_from",
@@ -6278,9 +6638,9 @@
       "source_file": "vite.config.ts",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "vite_config_ts",
-      "target": "api_health_js",
-      "confidence_score": 1.0
+      "target": "api_health_js"
     },
     {
       "relation": "contains",
@@ -6288,9 +6648,9 @@
       "source_file": "vite.config.ts",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "vite_config_ts",
-      "target": "ai_algo_trading_india_vite_config_env",
-      "confidence_score": 1.0
+      "target": "ai_algo_trading_india_vite_config_env"
     },
     {
       "relation": "contains",
@@ -6555,6 +6915,240 @@
       "target": "tests_mobile_alerts_test_signal"
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_production_data_test_ts",
+      "target": "src_services_metalsservice_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_production_data_test_ts",
+      "target": "services_metalsservice_parsemetalchart"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_production_data_test_ts",
+      "target": "src_services_optionsengine_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_production_data_test_ts",
+      "target": "services_optionsengine_generateoptionspicks"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_production_data_test_ts",
+      "target": "src_services_ipoautoapply_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_production_data_test_ts",
+      "target": "services_ipoautoapply_autoapplyforipo"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_production_data_test_ts",
+      "target": "src_services_iposervice_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_production_data_test_ts",
+      "target": "services_iposervice_scoreipo"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_production_data_test_ts",
+      "target": "services_iposervice_isfreshipocache"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_production_data_test_ts",
+      "target": "src_services_livedata_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_production_data_test_ts",
+      "target": "services_livedata_fetchnifty"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_production_data_test_ts",
+      "target": "src_services_stockdiscovery_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_production_data_test_ts",
+      "target": "services_stockdiscovery_discoverstocks"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_production_data_test_ts",
+      "target": "api_proxy_js"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_production_data_test_ts",
+      "target": "tests_production_data_test_now"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_production_data_test_ts",
+      "target": "tests_production_data_test_config"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_production_data_test_ts",
+      "target": "tests_production_data_test_chart"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L18",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_production_data_test_ts",
+      "target": "tests_production_data_test_data"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L19",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_production_data_test_ts",
+      "target": "tests_production_data_test_result"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L40",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_production_data_test_ts",
+      "target": "tests_production_data_test_requests"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L43",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_production_data_test_ts",
+      "target": "tests_production_data_test_response"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/production-data.test.ts",
+      "source_location": "L47",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_production_data_test_ts",
+      "target": "tests_production_data_test_res"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/mobile-database.mjs",
@@ -6688,6 +7282,50 @@
       "confidence_score": 1.0,
       "source": "tests_foreground_alerts_test_ts",
       "target": "tests_foreground_alerts_test_alerts"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_trading_test_ts",
+      "target": "src_services_decisionjournal_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_trading_test_ts",
+      "target": "services_decisionjournal_getdecisionjournal"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_trading_test_ts",
+      "target": "src_services_foregroundalerts_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_trading_test_ts",
+      "target": "services_foregroundalerts_collectforegroundalerts"
     },
     {
       "relation": "imports_from",
@@ -7084,6 +7722,116 @@
       "target": "tests_trading_test_res"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L41",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_trading_test_ts",
+      "target": "tests_trading_test_candidate"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L48",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_trading_test_ts",
+      "target": "tests_trading_test_weak"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L52",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_trading_test_ts",
+      "target": "tests_trading_test_strong"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L64",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_trading_test_ts",
+      "target": "tests_trading_test_old"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L67",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_trading_test_ts",
+      "target": "tests_trading_test_cutoff"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L68",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_trading_test_ts",
+      "target": "tests_trading_test_late"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L74",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_trading_test_ts",
+      "target": "tests_trading_test_candidates"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L76",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_trading_test_ts",
+      "target": "tests_trading_test_decisions"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L90",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_trading_test_ts",
+      "target": "tests_trading_test_ledger"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L93",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_trading_test_ts",
+      "target": "tests_trading_test_summary"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/trading.test.ts",
+      "source_location": "L98",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_trading_test_ts",
+      "target": "tests_trading_test_raw"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -7112,9 +7860,9 @@
       "source_file": "tests/backend.test.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_backend_test_ts",
-      "target": "api_market_js",
-      "confidence_score": 1.0
+      "target": "api_market_js"
     },
     {
       "relation": "imports_from",
@@ -7123,9 +7871,9 @@
       "source_file": "tests/backend.test.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_backend_test_ts",
-      "target": "api_health_js",
-      "confidence_score": 1.0
+      "target": "api_health_js"
     },
     {
       "relation": "imports_from",
@@ -7134,9 +7882,9 @@
       "source_file": "tests/backend.test.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_backend_test_ts",
-      "target": "server_mobileconfig_js",
-      "confidence_score": 1.0
+      "target": "server_mobileconfig_js"
     },
     {
       "relation": "imports",
@@ -7145,9 +7893,9 @@
       "source_file": "tests/backend.test.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_backend_test_ts",
-      "target": "server_mobileconfig_validatemobileapibase",
-      "confidence_score": 1.0
+      "target": "server_mobileconfig_validatemobileapibase"
     },
     {
       "relation": "imports_from",
@@ -7156,9 +7904,9 @@
       "source_file": "tests/backend.test.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_backend_test_ts",
-      "target": "src_utils_fetchmarketjson_ts",
-      "confidence_score": 1.0
+      "target": "src_utils_fetchmarketjson_ts"
     },
     {
       "relation": "imports",
@@ -7167,9 +7915,9 @@
       "source_file": "tests/backend.test.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_backend_test_ts",
-      "target": "utils_fetchmarketjson_fetchmarketjson",
-      "confidence_score": 1.0
+      "target": "utils_fetchmarketjson_fetchmarketjson"
     },
     {
       "relation": "contains",
@@ -7177,9 +7925,9 @@
       "source_file": "tests/backend.test.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_backend_test_ts",
-      "target": "tests_backend_test_response",
-      "confidence_score": 1.0
+      "target": "tests_backend_test_response"
     },
     {
       "relation": "contains",
@@ -7187,9 +7935,9 @@
       "source_file": "tests/backend.test.ts",
       "source_location": "L24",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_backend_test_ts",
-      "target": "tests_backend_test_res",
-      "confidence_score": 1.0
+      "target": "tests_backend_test_res"
     },
     {
       "relation": "contains",
@@ -7197,9 +7945,9 @@
       "source_file": "tests/backend.test.ts",
       "source_location": "L15",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_backend_test_ts",
-      "target": "tests_backend_test_pre",
-      "confidence_score": 1.0
+      "target": "tests_backend_test_pre"
     },
     {
       "relation": "contains",
@@ -7207,9 +7955,9 @@
       "source_file": "tests/backend.test.ts",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_backend_test_ts",
-      "target": "tests_backend_test_req",
-      "confidence_score": 1.0
+      "target": "tests_backend_test_req"
     },
     {
       "relation": "contains",
@@ -7217,9 +7965,9 @@
       "source_file": "tests/backend.test.ts",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_backend_test_ts",
-      "target": "tests_backend_test_data",
-      "confidence_score": 1.0
+      "target": "tests_backend_test_data"
     },
     {
       "relation": "contains",
@@ -7312,9 +8060,9 @@
       "source_file": "api/health.js",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_health_js",
-      "target": "server_pushbackend_js",
-      "confidence_score": 1.0
+      "target": "server_pushbackend_js"
     },
     {
       "relation": "imports_from",
@@ -7411,9 +8159,9 @@
       "source_file": "api/health.js",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_health_js",
-      "target": "server_pushbackend_allowrequest",
-      "confidence_score": 1.0
+      "target": "server_pushbackend_allowrequest"
     },
     {
       "relation": "imports",
@@ -7564,9 +8312,9 @@
       "source_file": "server/mobileConfig.js",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_mobileconfig_js",
-      "target": "server_mobileconfig_validatemobileapibase",
-      "confidence_score": 1.0
+      "target": "server_mobileconfig_validatemobileapibase"
     },
     {
       "relation": "imports_from",
@@ -8229,9 +8977,19 @@
       "source_file": "scripts/check-deployment.mjs",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_check_deployment_mjs",
-      "target": "scripts_check_deployment_json",
-      "confidence_score": 1.0
+      "target": "scripts_check_deployment_requireproductiondata"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/check-deployment.mjs",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_check_deployment_mjs",
+      "target": "scripts_check_deployment_json"
     },
     {
       "relation": "contains",
@@ -8239,9 +8997,9 @@
       "source_file": "scripts/check-deployment.mjs",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_check_deployment_mjs",
-      "target": "scripts_check_deployment_check",
-      "confidence_score": 1.0
+      "target": "scripts_check_deployment_check"
     },
     {
       "relation": "contains",
@@ -8249,9 +9007,19 @@
       "source_file": "scripts/check-deployment.mjs",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_check_deployment_mjs",
-      "target": "scripts_check_deployment_market",
-      "confidence_score": 1.0
+      "target": "scripts_check_deployment_market"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/check-deployment.mjs",
+      "source_location": "L37",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_check_deployment_mjs",
+      "target": "scripts_check_deployment_now"
     },
     {
       "relation": "calls",
@@ -8260,9 +9028,9 @@
       "source_file": "scripts/check-deployment.mjs",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "scripts_check_deployment_market",
-      "target": "scripts_check_deployment_json",
-      "confidence_score": 1.0
+      "target": "scripts_check_deployment_json"
     },
     {
       "relation": "contains",
@@ -8341,9 +9109,9 @@
       "source_file": "api/health.js",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "api_health_js",
-      "target": "api_health_handler",
-      "confidence_score": 1.0
+      "target": "api_health_handler"
     },
     {
       "relation": "contains",
@@ -8884,9 +9652,9 @@
       "source_file": "src/utils/fetchMarketJSON.ts",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_fetchmarketjson_ts",
-      "target": "src_utils_apiurl_ts",
-      "confidence_score": 1.0
+      "target": "src_utils_apiurl_ts"
     },
     {
       "relation": "imports",
@@ -8895,9 +9663,9 @@
       "source_file": "src/utils/fetchMarketJSON.ts",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_fetchmarketjson_ts",
-      "target": "utils_apiurl_apiurl",
-      "confidence_score": 1.0
+      "target": "utils_apiurl_apiurl"
     },
     {
       "relation": "contains",
@@ -8905,9 +9673,9 @@
       "source_file": "src/utils/fetchMarketJSON.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_utils_fetchmarketjson_ts",
-      "target": "utils_fetchmarketjson_fetchmarketjson",
-      "confidence_score": 1.0
+      "target": "utils_fetchmarketjson_fetchmarketjson"
     },
     {
       "relation": "imports_from",
@@ -8916,9 +9684,20 @@
       "source_file": "src/services/stockDiscovery.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_services_stockdiscovery_ts",
-      "target": "src_utils_fetchmarketjson_ts",
-      "confidence_score": 1.0
+      "target": "src_utils_fetchmarketjson_ts"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/metalsService.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_metalsservice_ts",
+      "target": "src_utils_fetchmarketjson_ts"
     },
     {
       "relation": "imports_from",
@@ -8927,9 +9706,9 @@
       "source_file": "src/services/marketStatus.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_services_marketstatus_ts",
-      "target": "src_utils_fetchmarketjson_ts",
-      "confidence_score": 1.0
+      "target": "src_utils_fetchmarketjson_ts"
     },
     {
       "relation": "imports_from",
@@ -8938,9 +9717,9 @@
       "source_file": "src/services/liveData.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_services_livedata_ts",
-      "target": "src_utils_fetchmarketjson_ts",
-      "confidence_score": 1.0
+      "target": "src_utils_fetchmarketjson_ts"
     },
     {
       "relation": "imports",
@@ -8949,9 +9728,20 @@
       "source_file": "src/services/stockDiscovery.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_services_stockdiscovery_ts",
-      "target": "utils_fetchmarketjson_fetchmarketjson",
-      "confidence_score": 1.0
+      "target": "utils_fetchmarketjson_fetchmarketjson"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/metalsService.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_metalsservice_ts",
+      "target": "utils_fetchmarketjson_fetchmarketjson"
     },
     {
       "relation": "imports",
@@ -8960,9 +9750,9 @@
       "source_file": "src/services/marketStatus.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_services_marketstatus_ts",
-      "target": "utils_fetchmarketjson_fetchmarketjson",
-      "confidence_score": 1.0
+      "target": "utils_fetchmarketjson_fetchmarketjson"
     },
     {
       "relation": "imports",
@@ -8971,9 +9761,9 @@
       "source_file": "src/services/liveData.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_services_livedata_ts",
-      "target": "utils_fetchmarketjson_fetchmarketjson",
-      "confidence_score": 1.0
+      "target": "utils_fetchmarketjson_fetchmarketjson"
     },
     {
       "relation": "calls",
@@ -8982,20 +9772,9 @@
       "source_file": "src/services/stockDiscovery.ts",
       "source_location": "L276",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_stockdiscovery_fetchscreener",
-      "target": "utils_fetchmarketjson_fetchmarketjson",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/liveData.ts",
-      "source_location": "L35",
-      "weight": 1.0,
-      "source": "services_livedata_fetchsinglestock",
-      "target": "utils_fetchmarketjson_fetchmarketjson",
-      "confidence_score": 1.0
+      "target": "utils_fetchmarketjson_fetchmarketjson"
     },
     {
       "relation": "calls",
@@ -9028,6 +9807,28 @@
       "source_location": "L20",
       "weight": 1.0,
       "source": "services_marketstatus_fetchmarketstatus",
+      "target": "utils_fetchmarketjson_fetchmarketjson"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/services/liveData.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "services_livedata_fetchnifty",
+      "target": "utils_fetchmarketjson_fetchmarketjson"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/liveData.ts",
+      "source_location": "L35",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_livedata_fetchsinglestock",
       "target": "utils_fetchmarketjson_fetchmarketjson"
     },
     {
@@ -9065,6 +9866,17 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/services/backtestEngine.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_backtestengine_ts",
+      "target": "src_utils_apiurl_ts"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/services/ipoAutoApply.ts",
       "source_location": "L4",
       "weight": 1.0,
@@ -9081,17 +9893,6 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_services_notifications_ts",
-      "target": "src_utils_apiurl_ts"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/backtestEngine.ts",
-      "source_location": "L3",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_services_backtestengine_ts",
       "target": "src_utils_apiurl_ts"
     },
     {
@@ -9153,6 +9954,50 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/services/backtestEngine.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_backtestengine_ts",
+      "target": "utils_apiurl_apiurl"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ipoService.ts",
+      "source_location": "L169",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_iposervice_fetchsubscriptiondata",
+      "target": "utils_apiurl_apiurl"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/services/ipoService.ts",
+      "source_location": "L256",
+      "weight": 1.0,
+      "source": "services_iposervice_fetchliveipos",
+      "target": "utils_apiurl_apiurl"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/services/backtestEngine.ts",
+      "source_location": "L335",
+      "weight": 1.0,
+      "source": "services_backtestengine_runbacktest",
+      "target": "utils_apiurl_apiurl"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/services/ipoAutoApply.ts",
       "source_location": "L4",
       "weight": 1.0,
@@ -9175,33 +10020,11 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/services/backtestEngine.ts",
-      "source_location": "L3",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_services_backtestengine_ts",
-      "target": "utils_apiurl_apiurl"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
       "source_file": "src/services/metalsService.ts",
       "source_location": "L5",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_services_metalsservice_ts",
-      "target": "utils_apiurl_apiurl"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/ipoService.ts",
-      "source_location": "L169",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "services_iposervice_fetchsubscriptiondata",
       "target": "utils_apiurl_apiurl"
     },
     {
@@ -9297,32 +10120,10 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "src/services/ipoService.ts",
-      "source_location": "L256",
-      "weight": 1.0,
-      "source": "services_iposervice_fetchliveipos",
-      "target": "utils_apiurl_apiurl"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
       "source_file": "src/services/ipoAutoApply.ts",
       "source_location": "L235",
       "weight": 1.0,
       "source": "services_ipoautoapply_dhanfetchipolist",
-      "target": "utils_apiurl_apiurl"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/services/backtestEngine.ts",
-      "source_location": "L335",
-      "weight": 1.0,
-      "source": "services_backtestengine_runbacktest",
       "target": "utils_apiurl_apiurl"
     },
     {
@@ -9423,6 +10224,50 @@
       "confidence_score": 1.0,
       "source": "src_components_alertspage_tsx",
       "target": "services_foregroundalerts_getforegroundalerts"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/AlertsPage.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_alertspage_tsx",
+      "target": "src_services_decisionjournal_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/AlertsPage.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_alertspage_tsx",
+      "target": "services_decisionjournal_getdecisionjournal"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/AlertsPage.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_alertspage_tsx",
+      "target": "src_services_journalstorage_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/AlertsPage.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_alertspage_tsx",
+      "target": "services_journalstorage_downloadjson"
     },
     {
       "relation": "imports_from",
@@ -9565,6 +10410,17 @@
       "weight": 1.0,
       "source": "components_alertspage_alertspage",
       "target": "services_foregroundalerts_getforegroundalerts"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/components/AlertsPage.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "components_alertspage_alertspage",
+      "target": "services_decisionjournal_getdecisionjournal"
     },
     {
       "relation": "imports_from",
@@ -9849,6 +10705,49 @@
       "target": "services_metalsservice_livemetal"
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/MetalsPage.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_metalspage_tsx",
+      "target": "src_services_tradingtime_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/MetalsPage.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_metalspage_tsx",
+      "target": "services_tradingtime_formatist"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/MetalsPage.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_metalspage_tsx",
+      "target": "services_tradingtime_freshquote"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/MetalsPage.tsx",
+      "source_location": "L21",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_metalspage_tsx",
+      "target": "components_metalspage_metalspage"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/components/MetalsPage.tsx",
@@ -9867,16 +10766,6 @@
       "confidence_score": 1.0,
       "source": "src_components_metalspage_tsx",
       "target": "components_metalspage_allocation"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/components/MetalsPage.tsx",
-      "source_location": "L21",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_components_metalspage_tsx",
-      "target": "components_metalspage_metalspage"
     },
     {
       "relation": "imports_from",
@@ -10127,28 +11016,6 @@
       "target": "src_services_optionsengine_ts"
     },
     {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/components/SmartPicksPage.tsx",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_components_smartpickspage_tsx",
-      "target": "services_optionsengine_generateoptionspicks"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/components/SmartPicksPage.tsx",
-      "source_location": "L5",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_components_smartpickspage_tsx",
-      "target": "services_optionsengine_optionspick"
-    },
-    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/components/SmartPicksPage.tsx",
@@ -10187,6 +11054,28 @@
       "confidence_score": 1.0,
       "source": "src_components_smartpickspage_tsx",
       "target": "components_smartpickspage_smartpickspage"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/SmartPicksPage.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_smartpickspage_tsx",
+      "target": "services_optionsengine_generateoptionspicks"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/SmartPicksPage.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_smartpickspage_tsx",
+      "target": "services_optionsengine_optionspick"
     },
     {
       "relation": "contains",
@@ -10534,6 +11423,28 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_components_header_tsx",
+      "target": "src_services_tradingtime_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/Header.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_header_tsx",
+      "target": "services_tradingtime_formatist"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/Header.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_header_tsx",
       "target": "src_services_marketstatus_ts"
     },
     {
@@ -10632,6 +11543,17 @@
       "confidence_score": 1.0,
       "source": "components_header_headerprops",
       "target": "services_livedata_livestock"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/components/Header.tsx",
+      "source_location": "L42",
+      "weight": 1.0,
+      "source": "components_header_header",
+      "target": "services_tradingtime_formatist"
     },
     {
       "relation": "calls",
@@ -10791,6 +11713,28 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_components_stockanalysispage_tsx",
+      "target": "src_services_tradingtime_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/StockAnalysisPage.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_stockanalysispage_tsx",
+      "target": "services_tradingtime_formatist"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/StockAnalysisPage.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_stockanalysispage_tsx",
       "target": "src_hooks_usestockdiscovery_ts"
     },
     {
@@ -10824,6 +11768,28 @@
       "weight": 1.0,
       "source": "components_stockanalysispage_stockanalysispage",
       "target": "hooks_usestockdiscovery_usestockdiscovery"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/IPOPage.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_ipopage_tsx",
+      "target": "src_services_tradingtime_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/IPOPage.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_ipopage_tsx",
+      "target": "services_tradingtime_formatist"
     },
     {
       "relation": "imports_from",
@@ -10868,6 +11834,36 @@
       "confidence_score": 1.0,
       "source": "src_components_ipopage_tsx",
       "target": "services_iposervice_ipodata"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/IPOPage.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_ipopage_tsx",
+      "target": "components_ipopage_scorebadge"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/IPOPage.tsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_ipopage_tsx",
+      "target": "components_ipopage_statuspill"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/IPOPage.tsx",
+      "source_location": "L36",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_ipopage_tsx",
+      "target": "components_ipopage_ipopage"
     },
     {
       "relation": "imports_from",
@@ -10945,36 +11941,6 @@
       "confidence_score": 1.0,
       "source": "src_components_ipopage_tsx",
       "target": "services_ipoautoapply_brokerconfig"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/components/IPOPage.tsx",
-      "source_location": "L6",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_components_ipopage_tsx",
-      "target": "components_ipopage_scorebadge"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/components/IPOPage.tsx",
-      "source_location": "L20",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_components_ipopage_tsx",
-      "target": "components_ipopage_statuspill"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/components/IPOPage.tsx",
-      "source_location": "L36",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_components_ipopage_tsx",
-      "target": "components_ipopage_ipopage"
     },
     {
       "relation": "calls",
@@ -11268,6 +12234,17 @@
       "target": "services_marketstatus_fetchmarketstatus"
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/hooks/useStockDiscovery.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_hooks_usestockdiscovery_ts",
+      "target": "services_marketstatus_ismarketopencached"
+    },
+    {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -11463,6 +12440,17 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/hooks/useStockDiscovery.ts",
+      "source_location": "L26",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "hooks_usestockdiscovery_runscan",
+      "target": "services_marketstatus_ismarketopencached"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/hooks/useStockDiscovery.ts",
       "source_location": "L24",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -11544,6 +12532,16 @@
       "confidence_score": 1.0,
       "source": "src_services_optionsengine_ts",
       "target": "services_stockdiscovery_discoveredstock"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/optionsEngine.ts",
+      "source_location": "L284",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_optionsengine_ts",
+      "target": "services_optionsengine_generateoptionspicks"
     },
     {
       "relation": "contains",
@@ -11649,16 +12647,6 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/services/optionsEngine.ts",
-      "source_location": "L284",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_services_optionsengine_ts",
-      "target": "services_optionsengine_generateoptionspicks"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/optionsEngine.ts",
       "source_location": "L463",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -11674,17 +12662,6 @@
       "confidence_score": 1.0,
       "source": "src_services_optionsengine_ts",
       "target": "services_optionsengine_generatestepbystep"
-    },
-    {
-      "relation": "references",
-      "context": "field",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/optionsEngine.ts",
-      "source_location": "L49",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "services_optionsengine_optionspick",
-      "target": "services_stockdiscovery_discoveredstock"
     },
     {
       "relation": "contains",
@@ -11705,6 +12682,28 @@
       "confidence_score": 1.0,
       "source": "src_services_supabaseclient_ts",
       "target": "services_supabaseclient_issupabaseconfigured"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ipoService.ts",
+      "source_location": "L283",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_iposervice_fetchliveipos",
+      "target": "src_services_supabaseclient_ts"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/mobileAlerts.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_mobilealerts_ts",
+      "target": "src_services_supabaseclient_ts"
     },
     {
       "relation": "contains",
@@ -11797,50 +12796,6 @@
       "target": "services_supabaseclient_fullsync"
     },
     {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/ipoService.ts",
-      "source_location": "L283",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "services_iposervice_fetchliveipos",
-      "target": "src_services_supabaseclient_ts"
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/mobileAlerts.ts",
-      "source_location": "L3",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_services_mobilealerts_ts",
-      "target": "src_services_supabaseclient_ts"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/supabaseClient.ts",
-      "source_location": "L42",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "services_supabaseclient_synctocloud",
-      "target": "services_supabaseclient_getsupabase"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/supabaseClient.ts",
-      "source_location": "L59",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "services_supabaseclient_syncfromcloud",
-      "target": "services_supabaseclient_getsupabase"
-    },
-    {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -11878,88 +12833,33 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/services/supabaseClient.ts",
+      "source_location": "L42",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_supabaseclient_synctocloud",
+      "target": "services_supabaseclient_getsupabase"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/supabaseClient.ts",
+      "source_location": "L59",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_supabaseclient_syncfromcloud",
+      "target": "services_supabaseclient_getsupabase"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/supabaseClient.ts",
       "source_location": "L99",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "services_supabaseclient_fullsync",
       "target": "services_supabaseclient_issupabaseconfigured"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/supabaseClient.ts",
-      "source_location": "L75",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "services_supabaseclient_syncpapertrades",
-      "target": "services_supabaseclient_synctocloud"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/supabaseClient.ts",
-      "source_location": "L85",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "services_supabaseclient_syncipoapplications",
-      "target": "services_supabaseclient_synctocloud"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/supabaseClient.ts",
-      "source_location": "L93",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "services_supabaseclient_syncsettings",
-      "target": "services_supabaseclient_synctocloud"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/supabaseClient.ts",
-      "source_location": "L79",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "services_supabaseclient_loadpapertradesfromcloud",
-      "target": "services_supabaseclient_syncfromcloud"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/supabaseClient.ts",
-      "source_location": "L103",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "services_supabaseclient_fullsync",
-      "target": "services_supabaseclient_syncpapertrades"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/supabaseClient.ts",
-      "source_location": "L104",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "services_supabaseclient_fullsync",
-      "target": "services_supabaseclient_syncipoapplications"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/supabaseClient.ts",
-      "source_location": "L105",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "services_supabaseclient_fullsync",
-      "target": "services_supabaseclient_syncsettings"
     },
     {
       "relation": "contains",
@@ -12112,6 +13012,16 @@
       "target": "services_iposervice_fetchliveipos"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ipoService.ts",
+      "source_location": "L323",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_iposervice_ts",
+      "target": "services_iposervice_isfreshipocache"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -12198,6 +13108,27 @@
       "confidence_score": 1.0,
       "source": "services_iposervice_fetchliveipos",
       "target": "services_iposervice_parseiporows"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ipoService.ts",
+      "source_location": "L283",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_iposervice_fetchliveipos",
+      "target": "services_iposervice_isfreshipocache"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ipoAutoApply.ts",
+      "source_location": "L333",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_ipoautoapply_ts",
+      "target": "services_ipoautoapply_autoapplyforipo"
     },
     {
       "relation": "contains",
@@ -12343,16 +13274,6 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/services/ipoAutoApply.ts",
-      "source_location": "L333",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_services_ipoautoapply_ts",
-      "target": "services_ipoautoapply_autoapplyforipo"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/ipoAutoApply.ts",
       "source_location": "L422",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -12364,33 +13285,11 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/services/ipoAutoApply.ts",
-      "source_location": "L141",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "services_ipoautoapply_ensuredhantoken",
-      "target": "services_ipoautoapply_getautoapplysettings"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/ipoAutoApply.ts",
       "source_location": "L341",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "services_ipoautoapply_autoapplyforipo",
       "target": "services_ipoautoapply_getautoapplysettings"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/ipoAutoApply.ts",
-      "source_location": "L172",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "services_ipoautoapply_ensuredhantoken",
-      "target": "services_ipoautoapply_saveautoapplysettings"
     },
     {
       "relation": "calls",
@@ -12419,28 +13318,6 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/services/ipoAutoApply.ts",
-      "source_location": "L156",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "services_ipoautoapply_ensuredhantoken",
-      "target": "services_ipoautoapply_dhanrenewtoken"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/ipoAutoApply.ts",
-      "source_location": "L160",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "services_ipoautoapply_ensuredhantoken",
-      "target": "services_ipoautoapply_dhangeneratetoken"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/ipoAutoApply.ts",
       "source_location": "L361",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -12457,17 +13334,6 @@
       "confidence_score": 1.0,
       "source": "services_ipoautoapply_autoapplyforipo",
       "target": "services_ipoautoapply_dhanapplyipo"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/ipoAutoApply.ts",
-      "source_location": "L293",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "services_ipoautoapply_angeloneapplyipo",
-      "target": "services_ipoautoapply_angelonelogin"
     },
     {
       "relation": "calls",
@@ -12731,6 +13597,39 @@
       "target": "services_tradingtime_marketquote"
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/signalHistory.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_signalhistory_ts",
+      "target": "src_services_strongsignalpolicy_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/signalHistory.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_signalhistory_ts",
+      "target": "services_strongsignalpolicy_strongsignalid"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/signalHistory.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_signalhistory_ts",
+      "target": "services_strongsignalpolicy_strongsignalrejection"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/services/signalHistory.ts",
@@ -12938,6 +13837,28 @@
       "source_location": "L24",
       "weight": 1.0,
       "source": "services_signalhistory_recordsignals",
+      "target": "services_strongsignalpolicy_strongsignalrejection"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/services/signalHistory.ts",
+      "source_location": "L25",
+      "weight": 1.0,
+      "source": "services_signalhistory_recordsignals",
+      "target": "services_strongsignalpolicy_strongsignalid"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/services/signalHistory.ts",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "services_signalhistory_recordsignals",
       "target": "services_tradingtime_istdate"
     },
     {
@@ -12950,6 +13871,16 @@
       "weight": 1.0,
       "source": "services_signalhistory_updateoutcomes",
       "target": "services_tradingtime_freshquote"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/notifications.ts",
+      "source_location": "L112",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_notifications_ts",
+      "target": "services_notifications_notify"
     },
     {
       "relation": "contains",
@@ -13000,16 +13931,6 @@
       "confidence_score": 1.0,
       "source": "src_services_notifications_ts",
       "target": "services_notifications_sendviacallmebot"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/notifications.ts",
-      "source_location": "L112",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_services_notifications_ts",
-      "target": "services_notifications_notify"
     },
     {
       "relation": "contains",
@@ -13107,17 +14028,6 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/services/notifications.ts",
-      "source_location": "L201",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "services_notifications_sendtestnotification",
-      "target": "services_notifications_getnotificationsettings"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/notifications.ts",
       "source_location": "L119",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -13129,32 +14039,10 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/services/notifications.ts",
-      "source_location": "L206",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "services_notifications_sendtestnotification",
-      "target": "services_notifications_sendviatelegram"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/notifications.ts",
       "source_location": "L122",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "services_notifications_notify",
-      "target": "services_notifications_sendviacallmebot"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/notifications.ts",
-      "source_location": "L209",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "services_notifications_sendtestnotification",
       "target": "services_notifications_sendviacallmebot"
     },
     {
@@ -13238,6 +14126,256 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/services/strongSignalPolicy.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_strongsignalpolicy_ts",
+      "target": "src_services_tradingtime_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/strongSignalPolicy.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_strongsignalpolicy_ts",
+      "target": "services_tradingtime_freshquote"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/strongSignalPolicy.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_strongsignalpolicy_ts",
+      "target": "services_tradingtime_insession"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/strongSignalPolicy.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_strongsignalpolicy_ts",
+      "target": "services_tradingtime_istdate"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/strongSignalPolicy.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_strongsignalpolicy_ts",
+      "target": "services_tradingtime_istminutes"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/strongSignalPolicy.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_strongsignalpolicy_ts",
+      "target": "services_tradingtime_validlevels"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/strongSignalPolicy.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_strongsignalpolicy_ts",
+      "target": "services_strongsignalpolicy_strongcandidate"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/strongSignalPolicy.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_strongsignalpolicy_ts",
+      "target": "services_strongsignalpolicy_strongsignalid"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/strongSignalPolicy.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_strongsignalpolicy_ts",
+      "target": "services_strongsignalpolicy_strongsignalrejection"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/foregroundAlerts.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_foregroundalerts_ts",
+      "target": "src_services_strongsignalpolicy_ts"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/paperTrading.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_papertrading_ts",
+      "target": "src_services_strongsignalpolicy_ts"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/decisionJournal.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_decisionjournal_ts",
+      "target": "src_services_strongsignalpolicy_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/foregroundAlerts.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_foregroundalerts_ts",
+      "target": "services_strongsignalpolicy_strongsignalid"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/services/strongSignalPolicy.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "services_strongsignalpolicy_strongsignalid",
+      "target": "services_tradingtime_istdate"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/services/foregroundAlerts.ts",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "services_foregroundalerts_collectforegroundalerts",
+      "target": "services_strongsignalpolicy_strongsignalid"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/foregroundAlerts.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_foregroundalerts_ts",
+      "target": "services_strongsignalpolicy_strongsignalrejection"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/paperTrading.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_papertrading_ts",
+      "target": "services_strongsignalpolicy_strongsignalrejection"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/services/strongSignalPolicy.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "services_strongsignalpolicy_strongsignalrejection",
+      "target": "services_tradingtime_insession"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/services/strongSignalPolicy.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "services_strongsignalpolicy_strongsignalrejection",
+      "target": "services_tradingtime_istminutes"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/services/strongSignalPolicy.ts",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "services_strongsignalpolicy_strongsignalrejection",
+      "target": "services_tradingtime_freshquote"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/services/strongSignalPolicy.ts",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "services_strongsignalpolicy_strongsignalrejection",
+      "target": "services_tradingtime_validlevels"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/services/foregroundAlerts.ts",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "services_foregroundalerts_collectforegroundalerts",
+      "target": "services_strongsignalpolicy_strongsignalrejection"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/services/paperTrading.ts",
+      "source_location": "L70",
+      "weight": 1.0,
+      "source": "services_papertrading_openpapertrades",
+      "target": "services_strongsignalpolicy_strongsignalrejection"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/services/foregroundAlerts.ts",
       "source_location": "L1",
       "weight": 1.0,
@@ -13276,17 +14414,6 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_services_foregroundalerts_ts",
-      "target": "services_tradingtime_freshquote"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/foregroundAlerts.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_services_foregroundalerts_ts",
       "target": "services_tradingtime_insession"
     },
     {
@@ -13299,17 +14426,6 @@
       "confidence_score": 1.0,
       "source": "src_services_foregroundalerts_ts",
       "target": "services_tradingtime_istdate"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/foregroundAlerts.ts",
-      "source_location": "L2",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_services_foregroundalerts_ts",
-      "target": "services_tradingtime_validlevels"
     },
     {
       "relation": "contains",
@@ -13342,6 +14458,28 @@
       "target": "services_foregroundalerts_collectforegroundalerts"
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/foregroundAlerts.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_foregroundalerts_ts",
+      "target": "services_tradingtime_freshquote"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/foregroundAlerts.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_foregroundalerts_ts",
+      "target": "services_tradingtime_validlevels"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -13369,6 +14507,17 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/services/foregroundAlerts.ts",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "services_foregroundalerts_collectforegroundalerts",
+      "target": "services_tradingtime_istdate"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/services/foregroundAlerts.ts",
       "source_location": "L19",
       "weight": 1.0,
       "source": "services_foregroundalerts_collectforegroundalerts",
@@ -13384,17 +14533,6 @@
       "weight": 1.0,
       "source": "services_foregroundalerts_collectforegroundalerts",
       "target": "services_tradingtime_validlevels"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/services/foregroundAlerts.ts",
-      "source_location": "L20",
-      "weight": 1.0,
-      "source": "services_foregroundalerts_collectforegroundalerts",
-      "target": "services_tradingtime_istdate"
     },
     {
       "relation": "imports_from",
@@ -14149,6 +15287,17 @@
       "target": "services_stockdiscovery_discoverstocks"
     },
     {
+      "relation": "references",
+      "context": "field",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/optionsEngine.ts",
+      "source_location": "L49",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_optionsengine_optionspick",
+      "target": "services_stockdiscovery_discoveredstock"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -14206,21 +15355,41 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/services/metalsService.ts",
-      "source_location": "L37",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_services_metalsservice_ts",
-      "target": "services_metalsservice_metalconfig"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/metalsService.ts",
       "source_location": "L46",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_services_metalsservice_ts",
       "target": "services_metalsservice_metals"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/metalsService.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_metalsservice_ts",
+      "target": "services_metalsservice_parsemetalchart"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/metalsService.ts",
+      "source_location": "L193",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_metalsservice_ts",
+      "target": "services_metalsservice_fetchlivemetals"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/metalsService.ts",
+      "source_location": "L37",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_metalsservice_ts",
+      "target": "services_metalsservice_metalconfig"
     },
     {
       "relation": "contains",
@@ -14301,16 +15470,6 @@
       "confidence_score": 1.0,
       "source": "src_services_metalsservice_ts",
       "target": "services_metalsservice_fetchchart"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/metalsService.ts",
-      "source_location": "L193",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_services_metalsservice_ts",
-      "target": "services_metalsservice_fetchlivemetals"
     },
     {
       "relation": "calls",
@@ -14434,6 +15593,50 @@
       "target": "services_tradingtime_marketquote"
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/paperTrading.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_papertrading_ts",
+      "target": "src_services_decisionjournal_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/paperTrading.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_papertrading_ts",
+      "target": "services_decisionjournal_mergedecisions"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/paperTrading.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_papertrading_ts",
+      "target": "services_decisionjournal_candidatedecision"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/paperTrading.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_papertrading_ts",
+      "target": "services_decisionjournal_decisionrecord"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/services/paperTrading.ts",
@@ -14552,6 +15755,17 @@
       "confidence_score": 1.0,
       "source": "src_services_papertrading_ts",
       "target": "services_papertrading_getpapertradesummary"
+    },
+    {
+      "relation": "references",
+      "context": "field",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/paperTrading.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_papertrading_ledger",
+      "target": "services_decisionjournal_decisionrecord"
     },
     {
       "relation": "calls",
@@ -14702,6 +15916,50 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/services/paperTrading.ts",
+      "source_location": "L52",
+      "weight": 1.0,
+      "source": "services_papertrading_openpapertrades",
+      "target": "services_tradingtime_istdate"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/services/paperTrading.ts",
+      "source_location": "L50",
+      "weight": 1.0,
+      "source": "services_papertrading_openpapertrades",
+      "target": "services_marketstatus_ismarketopencached"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/services/paperTrading.ts",
+      "source_location": "L68",
+      "weight": 1.0,
+      "source": "services_papertrading_openpapertrades",
+      "target": "services_tradingtime_validlevels"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/services/paperTrading.ts",
+      "source_location": "L90",
+      "weight": 1.0,
+      "source": "services_papertrading_openpapertrades",
+      "target": "services_decisionjournal_mergedecisions"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/services/paperTrading.ts",
       "source_location": "L50",
       "weight": 1.0,
       "source": "services_papertrading_openpapertrades",
@@ -14724,43 +15982,10 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/services/paperTrading.ts",
-      "source_location": "L50",
-      "weight": 1.0,
-      "source": "services_papertrading_openpapertrades",
-      "target": "services_marketstatus_ismarketopencached"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/services/paperTrading.ts",
-      "source_location": "L52",
-      "weight": 1.0,
-      "source": "services_papertrading_openpapertrades",
-      "target": "services_tradingtime_istdate"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/services/paperTrading.ts",
       "source_location": "L64",
       "weight": 1.0,
       "source": "services_papertrading_openpapertrades",
       "target": "services_tradingtime_freshquote"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/services/paperTrading.ts",
-      "source_location": "L68",
-      "weight": 1.0,
-      "source": "services_papertrading_openpapertrades",
-      "target": "services_tradingtime_validlevels"
     },
     {
       "relation": "calls",
@@ -14875,6 +16100,39 @@
       "confidence_score": 1.0,
       "source": "src_services_tradingtime_ts",
       "target": "services_tradingtime_validlevels"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/decisionJournal.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_decisionjournal_ts",
+      "target": "src_services_tradingtime_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/decisionJournal.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_decisionjournal_ts",
+      "target": "services_tradingtime_istdate"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/services/decisionJournal.ts",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "services_decisionjournal_mergedecisions",
+      "target": "services_tradingtime_istdate"
     },
     {
       "relation": "calls",
@@ -15012,12 +16270,94 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "src/services/decisionJournal.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_decisionjournal_ts",
+      "target": "services_decisionjournal_candidatedecision"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/decisionJournal.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_decisionjournal_ts",
+      "target": "services_decisionjournal_decisionrecord"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/decisionJournal.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_decisionjournal_ts",
+      "target": "services_decisionjournal_retained"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/decisionJournal.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_decisionjournal_ts",
+      "target": "services_decisionjournal_getdecisionjournal"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/decisionJournal.ts",
+      "source_location": "L27",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_decisionjournal_ts",
+      "target": "services_decisionjournal_mergedecisions"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/decisionJournal.ts",
+      "source_location": "L23",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_decisionjournal_getdecisionjournal",
+      "target": "services_decisionjournal_retained"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/decisionJournal.ts",
+      "source_location": "L28",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_decisionjournal_mergedecisions",
+      "target": "services_decisionjournal_retained"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "src/services/liveData.ts",
       "source_location": "L4",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_services_livedata_ts",
       "target": "services_livedata_livestock"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/liveData.ts",
+      "source_location": "L70",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_services_livedata_ts",
+      "target": "services_livedata_fetchnifty"
     },
     {
       "relation": "contains",
@@ -15038,16 +16378,6 @@
       "confidence_score": 1.0,
       "source": "src_services_livedata_ts",
       "target": "services_livedata_fetchsinglestock"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/services/liveData.ts",
-      "source_location": "L70",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_services_livedata_ts",
-      "target": "services_livedata_fetchnifty"
     },
     {
       "relation": "calls",
@@ -15113,12 +16443,62 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "releases/android/README.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "releases_android_readme_md",
+      "target": "android_readme_android_test_builds"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "releases/android/README.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "releases_android_readme_md",
+      "target": "android_readme_android_test_build"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "releases/android/README.md",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "android_readme_android_test_builds",
+      "target": "android_readme_strong_signal_policy_update_20_september_2026"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "releases/android/README.md",
+      "source_location": "L13",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "android_readme_android_test_builds",
+      "target": "android_readme_previous_backend_test_build"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "releases/android/README.md",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "android_readme_android_test_builds",
+      "target": "android_readme_production_data_audit_build_20_september_2026",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "docs/VERCEL_RELEASE.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_vercel_release_md",
-      "target": "docs_vercel_release_vercel_release_and_android_backend_setup",
-      "confidence_score": 1.0
+      "target": "docs_vercel_release_vercel_release_and_android_backend_setup"
     },
     {
       "relation": "contains",
@@ -15126,9 +16506,9 @@
       "source_file": "docs/VERCEL_RELEASE.md",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_vercel_release_vercel_release_and_android_backend_setup",
-      "target": "docs_vercel_release_root_cause",
-      "confidence_score": 1.0
+      "target": "docs_vercel_release_root_cause"
     },
     {
       "relation": "contains",
@@ -15136,9 +16516,9 @@
       "source_file": "docs/VERCEL_RELEASE.md",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_vercel_release_vercel_release_and_android_backend_setup",
-      "target": "docs_vercel_release_release_gate",
-      "confidence_score": 1.0
+      "target": "docs_vercel_release_release_gate"
     },
     {
       "relation": "contains",
@@ -15146,9 +16526,9 @@
       "source_file": "docs/VERCEL_RELEASE.md",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_vercel_release_vercel_release_and_android_backend_setup",
-      "target": "docs_vercel_release_required_configuration",
-      "confidence_score": 1.0
+      "target": "docs_vercel_release_required_configuration"
     },
     {
       "relation": "contains",
@@ -15156,9 +16536,9 @@
       "source_file": "docs/VERCEL_RELEASE.md",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_vercel_release_vercel_release_and_android_backend_setup",
-      "target": "docs_vercel_release_verification",
-      "confidence_score": 1.0
+      "target": "docs_vercel_release_verification"
     },
     {
       "relation": "contains",
@@ -15166,9 +16546,9 @@
       "source_file": "docs/VERCEL_RELEASE.md",
       "source_location": "L24",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_vercel_release_vercel_release_and_android_backend_setup",
-      "target": "docs_vercel_release_limitations",
-      "confidence_score": 1.0
+      "target": "docs_vercel_release_limitations"
     },
     {
       "relation": "contains",
@@ -15349,6 +16729,171 @@
       "confidence_score": 1.0,
       "source": "ios_app_capapp_spm_readme_md",
       "target": "capapp_spm_readme_capapp_spm"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/supabaseClient.ts",
+      "source_location": "L75",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_supabaseclient_syncpapertrades",
+      "target": "services_supabaseclient_synctocloud"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/supabaseClient.ts",
+      "source_location": "L85",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_supabaseclient_syncipoapplications",
+      "target": "services_supabaseclient_synctocloud"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/supabaseClient.ts",
+      "source_location": "L93",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_supabaseclient_syncsettings",
+      "target": "services_supabaseclient_synctocloud"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/supabaseClient.ts",
+      "source_location": "L79",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_supabaseclient_loadpapertradesfromcloud",
+      "target": "services_supabaseclient_syncfromcloud"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/supabaseClient.ts",
+      "source_location": "L103",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_supabaseclient_fullsync",
+      "target": "services_supabaseclient_syncpapertrades"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/supabaseClient.ts",
+      "source_location": "L104",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_supabaseclient_fullsync",
+      "target": "services_supabaseclient_syncipoapplications"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/supabaseClient.ts",
+      "source_location": "L105",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_supabaseclient_fullsync",
+      "target": "services_supabaseclient_syncsettings"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ipoAutoApply.ts",
+      "source_location": "L141",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_ipoautoapply_ensuredhantoken",
+      "target": "services_ipoautoapply_getautoapplysettings"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ipoAutoApply.ts",
+      "source_location": "L172",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_ipoautoapply_ensuredhantoken",
+      "target": "services_ipoautoapply_saveautoapplysettings"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ipoAutoApply.ts",
+      "source_location": "L156",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_ipoautoapply_ensuredhantoken",
+      "target": "services_ipoautoapply_dhanrenewtoken"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ipoAutoApply.ts",
+      "source_location": "L160",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_ipoautoapply_ensuredhantoken",
+      "target": "services_ipoautoapply_dhangeneratetoken"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/ipoAutoApply.ts",
+      "source_location": "L293",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_ipoautoapply_angeloneapplyipo",
+      "target": "services_ipoautoapply_angelonelogin"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/notifications.ts",
+      "source_location": "L201",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_notifications_sendtestnotification",
+      "target": "services_notifications_getnotificationsettings"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/notifications.ts",
+      "source_location": "L206",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_notifications_sendtestnotification",
+      "target": "services_notifications_sendviatelegram"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/notifications.ts",
+      "source_location": "L209",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "services_notifications_sendtestnotification",
+      "target": "services_notifications_sendviacallmebot"
     },
     {
       "relation": "contains",
@@ -15592,5 +17137,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "47acfbe1154b63796615f96a9fa70129dddf254e"
+  "built_at_commit": "5744df5af4c55e505ab969ef06c3c5e7481ba3ef"
 }

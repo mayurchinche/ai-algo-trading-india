@@ -2,6 +2,7 @@
 import { apiUrl } from '../utils/apiUrl';
 
 export interface IPOData {
+  source: string; receivedAt: string;
   name: string;
   price: number | null;
   lot_size: number | null;
@@ -23,8 +24,8 @@ export interface IPOData {
   listing_gain_pct: number | null;
   rating: number | null;
   pe_ratio: number | null;
-  score: number;
-  recommendation: 'Strong Apply' | 'Apply' | 'Neutral' | 'Avoid';
+  score: number | null;
+  recommendation: 'High research score' | 'Moderate research score' | 'Neutral' | 'Low research score' | 'Insufficient data';
   reasons: string[];
   allotment_tips: string[];
   url: string | null;
@@ -49,7 +50,7 @@ function toFloat(val: any): number | null {
   if (val == null) return null;
   const s = String(val).replace(/[₹,\s]/g, '').replace(/<[^>]*>/g, '');
   const n = parseFloat(s);
-  return isNaN(n) ? null : n;
+  return Number.isFinite(n) ? n : null;
 }
 
 function parseStatus(nameHtml: string): 'open' | 'upcoming' | 'listed' | 'closed' | 'unknown' {
@@ -78,8 +79,9 @@ function parseListingGain(nameHtml: string): number | null {
 }
 
 // Score an IPO based on available data (simplified version of ipo-tracker scoring.py)
-function scoreIPO(ipo: Partial<IPOData>): { score: number; recommendation: string; reasons: string[] } {
-  let score = 50; // base
+export function scoreIPO(ipo: Partial<IPOData>): { score: number | null; recommendation: string; reasons: string[] } {
+  if (ipo.gmp_pct == null || ipo.subscription_total == null) return { score: null, recommendation: 'Insufficient data', reasons: ['GMP or subscription observations missing; no ranking generated'] };
+  let score = 50; // unvalidated research parameter, not a market observation
   const reasons: string[] = [];
 
   // GMP scoring (weight: 25%)
@@ -96,26 +98,26 @@ function scoreIPO(ipo: Partial<IPOData>): { score: number; recommendation: strin
     if (ipo.subscription_total > 50) { score += 15; reasons.push(`Massive subscription ${ipo.subscription_total.toFixed(1)}x — very high demand`); }
     else if (ipo.subscription_total > 10) { score += 10; reasons.push(`Strong subscription ${ipo.subscription_total.toFixed(1)}x`); }
     else if (ipo.subscription_total > 3) { score += 5; reasons.push(`Moderate subscription ${ipo.subscription_total.toFixed(1)}x`); }
-    else if (ipo.subscription_total > 1) { score += 0; reasons.push(`Low subscription ${ipo.subscription_total.toFixed(1)}x — may list flat`); }
+    else if (ipo.subscription_total > 1) { score += 0; reasons.push(`Low subscription ${ipo.subscription_total.toFixed(1)}x`); }
     else { score -= 5; reasons.push(`Under-subscribed — risky`); }
   }
 
   // Rating scoring (weight: 10%)
   if (ipo.rating != null) {
-    if (ipo.rating >= 4) { score += 8; reasons.push(`High analyst rating (${ipo.rating}/5)`); }
-    else if (ipo.rating >= 3) { score += 4; reasons.push(`Moderate analyst rating (${ipo.rating}/5)`); }
-    else { score -= 3; reasons.push(`Low analyst rating (${ipo.rating}/5)`); }
+    if (ipo.rating >= 4) { score += 8; reasons.push(`High provider rating (${ipo.rating}/5)`); }
+    else if (ipo.rating >= 3) { score += 4; reasons.push(`Moderate provider rating (${ipo.rating}/5)`); }
+    else { score -= 3; reasons.push(`Low provider rating (${ipo.rating}/5)`); }
   }
 
   // PE ratio
   if (ipo.pe_ratio != null) {
-    if (ipo.pe_ratio < 20) { score += 5; reasons.push(`Attractive P/E of ${ipo.pe_ratio.toFixed(1)}x`); }
-    else if (ipo.pe_ratio > 50) { score -= 5; reasons.push(`Expensive at P/E ${ipo.pe_ratio.toFixed(1)}x`); }
+    if (ipo.pe_ratio < 20) { score += 5; reasons.push(`P/E below model threshold: ${ipo.pe_ratio.toFixed(1)}x`); }
+    else if (ipo.pe_ratio > 50) { score -= 5; reasons.push(`P/E above model threshold: ${ipo.pe_ratio.toFixed(1)}x`); }
   }
 
   // Board bonus
   if (ipo.board === 'sme' && ipo.gmp_pct != null && ipo.gmp_pct > 30) {
-    score += 5; reasons.push('SME with strong GMP — small supply amplifies gains');
+    score += 5; reasons.push('SME/GMP scoring rule adds 5 points; unvalidated');
   }
 
   // Listing gain (if already listed)
@@ -126,27 +128,17 @@ function scoreIPO(ipo: Partial<IPOData>): { score: number; recommendation: strin
   score = Math.max(0, Math.min(100, score));
 
   let recommendation: string;
-  if (score >= 72) recommendation = 'Strong Apply';
-  else if (score >= 55) recommendation = 'Apply';
+  if (score >= 72) recommendation = 'High research score';
+  else if (score >= 55) recommendation = 'Moderate research score';
   else if (score >= 35) recommendation = 'Neutral';
-  else recommendation = 'Avoid';
+  else recommendation = 'Low research score';
 
   return { score, recommendation, reasons };
 }
 
 const ALLOTMENT_TIPS: Record<string, string[]> = {
-  mainboard: [
-    'Apply at cut-off price — never miss allotment due to price band revision',
-    'Apply in multiple demat accounts (family members) for higher lottery chance',
-    'UPI mandate must be approved within 12hrs of application',
-    'Single lot application maximizes allotment probability for retail category',
-  ],
-  sme: [
-    'Apply in exactly 1 lot — same allotment chance as multiple lots (lottery)',
-    'Multiple demat accounts increase chances linearly',
-    'Check if T2T (trade-to-trade) segment — impacts selling post-listing',
-    'SME IPOs have higher listing gains but also higher risk — apply only in strong GMP',
-  ],
+  mainboard: ['Verify current offer documents, category, lot size and mandate deadline through your broker.'],
+  sme: ['Verify current SME eligibility, minimum application and liquidity restrictions through your broker.'],
 };
 
 interface SubData {
@@ -167,7 +159,7 @@ async function fetchSubscriptionData(): Promise<Map<string, SubData>> {
     const fy = financialYear();
     const url = `/api/ipo/cloud/v2/report/data-read/333/1/9/${now.getFullYear()}/${fy}/0/all?search=&v=21-49`;
     const res = await fetch(apiUrl(url));
-    if (!res.ok) return map;
+    if (!res.ok) throw new Error(`Subscription HTTP ${res.status}`);
     const payload = await res.json();
     const rows = payload?.reportTableData || [];
     for (const row of rows) {
@@ -187,12 +179,13 @@ async function fetchSubscriptionData(): Promise<Map<string, SubData>> {
       });
     }
   } catch (e) {
+    lastFetchError = 'Subscription feed unavailable; affected observations are not ranked.';
     console.warn('[IPO] Subscription fetch failed:', e);
   }
   return map;
 }
 
-function parseIPORows(rows: any[], subMap: Map<string, SubData>): IPOData[] {
+export function parseIPORows(rows: any[], subMap: Map<string, SubData>): IPOData[] {
   return rows.map(row => {
     const nameHtml = String(row['Name'] || '');
     const name = String(row['~ipo_name'] || stripHtml(nameHtml));
@@ -221,6 +214,7 @@ function parseIPORows(rows: any[], subMap: Map<string, SubData>): IPOData[] {
     const subTotal = subData?.total ?? sub;
 
     const partial: Partial<IPOData> = {
+      source: 'InvestorGain third-party report; source publication time not verified', receivedAt: new Date().toISOString(),
       name, price, lot_size: lot ? Math.round(lot) : null,
       issue_size_cr: issueSize, open_date: openDate, close_date: closeDate,
       listing_date: listingDate, status, board, id,
@@ -286,6 +280,7 @@ export async function fetchLiveIPOs(): Promise<IPOData[]> {
         const { data } = await sb.from('app_data').select('data').eq('id', 'ipo_live_data').single();
         if (data?.data) {
           const cached = JSON.parse(data.data);
+          if (!isFreshIPOCache(cached.fetchedAt)) throw new Error('IPO cache expired or timestamp invalid');
           const rows = cached.ipoRows || [];
           const subRows = cached.subRows || [];
           if (rows.length > 0) {
@@ -307,11 +302,11 @@ export async function fetchLiveIPOs(): Promise<IPOData[]> {
             }
             // Re-parse using same logic (rows are raw InvestorGain format)
             lastFetchError = `Live fetch failed (${directError}) — showing cached data from ${cached.fetchedAt}`;
-            return parseIPORows(rows, subMap);
+            return parseIPORows(rows, subMap).map(ipo => ({...ipo, receivedAt: cached.fetchedAt, source: 'InvestorGain cached report; source publication time not verified'}));
           }
           lastFetchError = `Live fetch failed (${directError}); cache exists but is empty`;
         } else {
-          lastFetchError = `Live fetch failed (${directError}); no cache yet — visit /api/cron-ipo once to populate`;
+          lastFetchError = `Live fetch failed (${directError}); no cache yet — authenticated server refresh is required`;
         }
       } else {
         lastFetchError = `Live fetch failed (${directError}); Supabase not configured for fallback`;
@@ -323,4 +318,9 @@ export async function fetchLiveIPOs(): Promise<IPOData[]> {
 
     return [];
   }
+}
+
+export function isFreshIPOCache(fetchedAt: string, now = Date.now()): boolean {
+  const age = now - Date.parse(fetchedAt);
+  return Number.isFinite(age) && age >= -5000 && age <= 3600000;
 }

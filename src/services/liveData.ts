@@ -1,70 +1,12 @@
-// ponytail: only Nifty index fetching — stock discovery handled by stockDiscovery.ts
 import { fetchMarketJSON } from '../utils/fetchMarketJSON';
-
-export interface LiveStock {
-  symbol: string;
-  name: string;
-  sector: string;
-  ltp: number;
-  change: number;
-  changePct: number;
-  dayHigh: number;
-  dayLow: number;
-  open: number;
-  prevClose: number;
-  volume: number;
-  weekHigh52: number;
-  weekLow52: number;
-}
-
-interface YahooChartMeta {
-  symbol: string;
-  shortName?: string;
-  longName?: string;
-  regularMarketPrice: number;
-  regularMarketDayHigh: number;
-  regularMarketDayLow: number;
-  regularMarketVolume: number;
-  chartPreviousClose: number;
-  fiftyTwoWeekHigh: number;
-  fiftyTwoWeekLow: number;
-}
-
-async function fetchSingleStock(symbol: string): Promise<LiveStock | null> {
-  try {
-    const data = await fetchMarketJSON(`/api/yahoo/v8/finance/chart/${symbol}?interval=1d&range=1d`);
-    const meta: YahooChartMeta = data?.chart?.result?.[0]?.meta;
-    if (!meta) return null;
-
-    const prevClose = meta.chartPreviousClose || 0;
-    const ltp = meta.regularMarketPrice || 0;
-    const change = ltp - prevClose;
-    const changePct = prevClose > 0 ? (change / prevClose) * 100 : 0;
-    const opens = data?.chart?.result?.[0]?.indicators?.quote?.[0]?.open;
-    const openPrice = opens?.[0] ?? prevClose;
-    const sym = symbol.replace('.NS', '').replace('^', '');
-
-    return {
-      symbol: sym,
-      name: meta.longName || meta.shortName || sym,
-      sector: '',
-      ltp: Math.round(ltp * 100) / 100,
-      change: Math.round(change * 100) / 100,
-      changePct: Math.round(changePct * 100) / 100,
-      dayHigh: meta.regularMarketDayHigh || ltp,
-      dayLow: meta.regularMarketDayLow || ltp,
-      open: openPrice,
-      prevClose: Math.round(prevClose * 100) / 100,
-      volume: meta.regularMarketVolume || 0,
-      weekHigh52: meta.fiftyTwoWeekHigh || ltp,
-      weekLow52: meta.fiftyTwoWeekLow || ltp,
-    };
-  } catch {
-    return null;
-  }
-}
-
-// ponytail: only Nifty — individual stocks come from stockDiscovery.ts
+export interface LiveStock { symbol: string; ltp: number; changePct: number; quoteTime: string }
 export async function fetchNifty(): Promise<LiveStock | null> {
-  return fetchSingleStock('^NSEI');
+  try {
+    const data = await fetchMarketJSON('/api/yahoo/v8/finance/chart/%5ENSEI?interval=1d&range=1d');
+    const meta = data?.chart?.result?.[0]?.meta;
+    if (![meta?.regularMarketPrice, meta?.chartPreviousClose, meta?.regularMarketTime].every(Number.isFinite)
+        || meta.regularMarketPrice <= 0 || meta.chartPreviousClose <= 0 || meta.regularMarketTime * 1000 > Date.now()+5000) return null;
+    return {symbol:'NSEI', ltp:meta.regularMarketPrice, changePct:(meta.regularMarketPrice/meta.chartPreviousClose-1)*100,
+      quoteTime:new Date(meta.regularMarketTime*1000).toISOString()};
+  } catch { return null; }
 }

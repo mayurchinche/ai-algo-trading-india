@@ -1,16 +1,16 @@
-# Graph Report - ai-algo-trading-india  (2026-09-19)
+# Graph Report - ai-algo-trading-india  (2026-09-20)
 
 ## Corpus Check
-- 91 files · ~57,829 words
+- 96 files · ~50,303 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 567 nodes · 997 edges · 50 communities (39 shown, 11 thin omitted)
+- 607 nodes · 1108 edges · 50 communities (41 shown, 9 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 2 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `47acfbe1`
+- Built from commit: `5744df5a`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -39,7 +39,6 @@
 - [[_COMMUNITY_Community 22|Community 22]]
 - [[_COMMUNITY_Community 23|Community 23]]
 - [[_COMMUNITY_Community 24|Community 24]]
-- [[_COMMUNITY_Community 25|Community 25]]
 - [[_COMMUNITY_Community 26|Community 26]]
 - [[_COMMUNITY_Community 27|Community 27]]
 - [[_COMMUNITY_Community 28|Community 28]]
@@ -56,18 +55,19 @@
 - [[_COMMUNITY_Community 47|Community 47]]
 - [[_COMMUNITY_Community 48|Community 48]]
 - [[_COMMUNITY_Community 49|Community 49]]
+- [[_COMMUNITY_Community 50|Community 50]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `apiUrl()` - 27 edges
 2. `compilerOptions` - 19 edges
 3. `compilerOptions` - 16 edges
 4. `useStockDiscovery()` - 15 edges
-5. `simulateBacktest()` - 13 edges
-6. `openPaperTrades()` - 13 edges
-7. `DiscoveredStock` - 12 edges
-8. `updatePaperTrades()` - 12 edges
-9. `scripts` - 11 edges
-10. `runScan()` - 11 edges
+5. `openPaperTrades()` - 15 edges
+6. `istDate()` - 15 edges
+7. `formatIST()` - 15 edges
+8. `simulateBacktest()` - 13 edges
+9. `freshQuote()` - 13 edges
+10. `fetchMarketJSON()` - 12 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `scan()` --calls--> `discoverStocks()`  [INFERRED]
@@ -81,23 +81,23 @@
 - `handler()` --calls--> `dispatchAlerts()`  [EXTRACTED]
   api/dispatch-alerts.js → server/dispatchAlerts.js
 
-## Communities (50 total, 11 thin omitted)
+## Communities (50 total, 9 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.08
-Nodes (57): money(), OverviewPage(), SignalsPage(), money(), TradesPage(), listeners, publish(), runScan() (+49 more)
+Cohesion: 0.07
+Nodes (70): AlertsPage(), money(), TradesPage(), listeners, publish(), runScan(), scan(), state (+62 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.08
-Nodes (36): IPOPage(), angelOneApplyIPO(), angelOneLogin(), autoApplyForIPO(), AutoApplySettings, BrokerConfig, dhanApplyIPO(), dhanFetchIPOList() (+28 more)
+Nodes (35): IPOPage(), angelOneApplyIPO(), angelOneLogin(), autoApplyForIPO(), AutoApplySettings, BrokerConfig, dhanApplyIPO(), dhanFetchIPOList() (+27 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.07
-Nodes (20): AlertsPage(), DiscoveryPage(), StockCard(), SignalPopup(), SmartPicksPage(), StockCard(), StockAnalysisPage(), useLiveStocks() (+12 more)
+Cohesion: 0.08
+Nodes (25): DiscoveryPage(), StockCard(), Header(), money(), OverviewPage(), SignalPopup(), SignalsPage(), SmartPicksPage() (+17 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.15
-Nodes (10): ALLOCATION, MetalsPage(), signalStyles, fetchChart(), fetchIndianRetailPrices(), fetchLiveMetals(), IndianRetailPrices, LiveMetal (+2 more)
+Cohesion: 0.14
+Nodes (11): ALLOCATION, MetalsPage(), signalStyles, fetchChart(), fetchIndianRetailPrices(), fetchLiveMetals(), IndianRetailPrices, LiveMetal (+3 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.20
@@ -108,8 +108,8 @@ Cohesion: 0.16
 Nodes (22): BacktestPage(), BacktestConfig, BacktestResult, BacktestTrade, breakoutSignal(), computeATR(), computeBollingerBands(), computeDirectionAccuracy() (+14 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.22
-Nodes (17): Header(), HeaderProps, LiveStock, getNotificationSettings(), NotificationSettings, notify(), notifyDailySummary(), notifyIPOAllotment() (+9 more)
+Cohesion: 0.14
+Nodes (23): HeaderProps, fetchNifty(), fetchSingleStock(), LiveStock, YahooChartMeta, fetchMarketStatus(), MarketStatus, getNotificationSettings() (+15 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.10
@@ -124,8 +124,8 @@ Cohesion: 0.12
 Nodes (16): compilerOptions, allowImportingTsExtensions, erasableSyntaxOnly, lib, module, moduleDetection, noEmit, noFallthroughCasesInSwitch (+8 more)
 
 ### Community 10 - "Community 10"
-Cohesion: 0.20
-Nodes (17): AlertPreferences, alertRequest(), defaultAlertPreferences, disableDevicePush(), enableDevicePush(), installationId(), MobileAlert, DEVICE_ID (+9 more)
+Cohesion: 0.14
+Nodes (19): JournalErrorBoundary, downloadJSON(), AlertPreferences, alertRequest(), defaultAlertPreferences, disableDevicePush(), enableDevicePush(), installationId() (+11 more)
 
 ### Community 11 - "Community 11"
 Cohesion: 0.29
@@ -196,32 +196,40 @@ Cohesion: 0.50
 Nodes (3): info, author, version
 
 ### Community 47 - "Community 47"
-Cohesion: 0.11
-Nodes (12): computeBollingerPosition(), computeEMA(), computeFOAnalysis(), computeMACD(), computeOverallSignal(), computeSMA(), FOAnalysis, StrategyScores (+4 more)
+Cohesion: 0.10
+Nodes (15): computeBollingerPosition(), computeEMA(), computeFOAnalysis(), computeMACD(), computeOverallSignal(), computeSMA(), discoverStocks(), fetchHistorical() (+7 more)
 
 ### Community 48 - "Community 48"
 Cohesion: 0.29
 Nodes (6): Limitations, Release gate, Required configuration, Root cause, Vercel release and Android backend setup, Verification
 
+### Community 49 - "Community 49"
+Cohesion: 0.40
+Nodes (4): json(), market(), now, requireProductionData
+
+### Community 50 - "Community 50"
+Cohesion: 0.33
+Nodes (5): Android test build, Android test builds, Previous backend test build, Production-data audit build — 20 September 2026, Strong-signal policy update — 20 September 2026
+
 ## Knowledge Gaps
-- **196 isolated node(s):** `tsBuildInfoFile`, `target`, `lib`, `types`, `skipLibCheck` (+191 more)
+- **219 isolated node(s):** `tsBuildInfoFile`, `target`, `lib`, `types`, `skipLibCheck` (+214 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **11 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **9 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `apiUrl()` connect `Community 1` to `Community 3`, `Community 5`, `Community 6`, `Community 47`?**
-  _High betweenness centrality (0.064) - this node is a cross-community bridge._
-- **Why does `discoverStocks()` connect `Community 0` to `Community 8`, `Community 1`, `Community 47`?**
-  _High betweenness centrality (0.033) - this node is a cross-community bridge._
-- **Why does `scan()` connect `Community 8` to `Community 0`?**
-  _High betweenness centrality (0.031) - this node is a cross-community bridge._
+  _High betweenness centrality (0.040) - this node is a cross-community bridge._
+- **Why does `discoverStocks()` connect `Community 47` to `Community 0`, `Community 1`, `Community 8`?**
+  _High betweenness centrality (0.025) - this node is a cross-community bridge._
+- **Why does `scan()` connect `Community 8` to `Community 47`?**
+  _High betweenness centrality (0.021) - this node is a cross-community bridge._
 - **What connects `tsBuildInfoFile`, `target`, `lib` to the rest of the system?**
-  _196 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _219 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.08281573498964803 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.0689551339957844 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.08313725490196078 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08067375886524823 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
-  _Cohesion score 0.07317073170731707 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07535460992907801 - nodes in this community are weakly interconnected._

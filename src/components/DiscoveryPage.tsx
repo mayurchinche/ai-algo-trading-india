@@ -74,7 +74,7 @@ function StockCard({ stock, expanded, onToggle }: { stock: DiscoveredStock; expa
               <ScoreBar score={stock.scores.meanReversion} label="Mean Reversion" />
               <ScoreBar score={stock.scores.breakout} label="Breakout" />
               <ScoreBar score={stock.scores.trendFollowing} label="Trend Follow" />
-              <ScoreBar score={stock.scores.smartMoney} label="Smart Money" />
+              <ScoreBar score={stock.scores.smartMoney} label="Volume Pattern" />
             </div>
           </div>
 
@@ -92,10 +92,10 @@ function StockCard({ stock, expanded, onToggle }: { stock: DiscoveredStock; expa
 
           {/* F&O Analysis */}
           <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-4">
-            <h4 className="text-xs font-semibold text-purple-700 uppercase tracking-wide mb-2">F&O Strategy</h4>
+            <h4 className="text-xs font-semibold text-purple-700 uppercase tracking-wide mb-2">Calculated equity risk levels</h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
               <div>
-                <div className="text-[10px] text-purple-500">Expected Move</div>
+                <div className="text-[10px] text-purple-500">Historical ATR / price</div>
                 <div className="text-sm font-bold text-purple-800">±{stock.foAnalysis.expectedMove}%</div>
               </div>
               <div>
@@ -112,7 +112,7 @@ function StockCard({ stock, expanded, onToggle }: { stock: DiscoveredStock; expa
               </div>
             </div>
             <div className="flex items-start gap-2">
-              <span className="badge badge-purple text-[10px]">OPTION</span>
+              <span className="badge badge-purple text-[10px]">UNAVAILABLE</span>
               <div>
                 <p className="text-xs font-semibold text-purple-900">{stock.foAnalysis.optionStrategy}</p>
                 <p className="text-[11px] text-purple-700 mt-0.5">{stock.foAnalysis.optionReason}</p>
@@ -184,12 +184,12 @@ export function DiscoveryPage() {
 
       {/* How it works */}
       <div className="card bg-gradient-to-r from-blue-50 to-indigo-50">
-        <h3 className="text-xs font-bold text-blue-800 uppercase tracking-wide mb-2">How the AI Scanner Works</h3>
+        <h3 className="text-xs font-bold text-blue-800 uppercase tracking-wide mb-2">How the research scanner works</h3>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 text-[11px] text-blue-700">
-          <div className="flex items-start gap-1.5"><span className="font-bold text-blue-500">1.</span> Scans top volume leaders, gainers & losers on NSE in real-time</div>
+          <div className="flex items-start gap-1.5"><span className="font-bold text-blue-500">1.</span> Scans top volume leaders, gainers & losers from provider snapshots for NSE</div>
           <div className="flex items-start gap-1.5"><span className="font-bold text-blue-500">2.</span> Fetches up to 2 years of historical data for technical analysis</div>
           <div className="flex items-start gap-1.5"><span className="font-bold text-blue-500">3.</span> Computes RSI, MACD, SMA, Bollinger Bands, ATR for each stock</div>
-          <div className="flex items-start gap-1.5"><span className="font-bold text-blue-500">4.</span> Applies 5 strategies: Momentum, Mean Reversion, Breakout, Trend Following, Smart Money</div>
+          <div className="flex items-start gap-1.5"><span className="font-bold text-blue-500">4.</span> Applies 5 strategies: Momentum, Mean Reversion, Breakout, Trend Following, Volume Pattern</div>
           <div className="flex items-start gap-1.5"><span className="font-bold text-blue-500">5.</span> Shows research levels; options execution requires verified contract data</div>
         </div>
       </div>

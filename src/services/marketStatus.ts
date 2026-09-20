@@ -24,8 +24,9 @@ export async function fetchMarketStatus(): Promise<MarketStatus> {
       (m: any) => m.market === 'Capital Market' || m.market === 'CM'
     );
 
-    const status = capitalMarket?.marketStatus || 'Close';
-    const isOpen = status.toLowerCase().includes('open') && !status.toLowerCase().includes('pre-open');
+    if (typeof capitalMarket?.marketStatus !== 'string') throw new Error('Capital market status missing');
+    const status = capitalMarket.marketStatus;
+    const isOpen = status.trim().toLowerCase() === 'open';
     const isPreOpen = status.toLowerCase().includes('pre-open');
 
     cachedStatus = { isOpen, status: isPreOpen ? 'Pre-open' : status, lastUpdated: new Date() };

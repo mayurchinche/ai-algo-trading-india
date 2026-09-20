@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useStockDiscovery } from '../hooks/useStockDiscovery';
-import { getPaperTrades, getPaperTradeSummary, loadLedger, prunePaperTrades } from '../services/paperTrading';
+import { getPaperTrades, getPaperTradeSummary, loadLedger, prunePaperTrades, MODEL_VERSION } from '../services/paperTrading';
 import { downloadJSON } from '../services/journalStorage';
 import { formatIST, istDate } from '../services/tradingTime';
 const money = (n?: number) => n == null ? '—' : n.toLocaleString('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 });
@@ -28,7 +28,7 @@ export function TradesPage() {
     <div className="trade-list">{trades.map(t => <article className="card trade-card" key={t.id}>
       <div className="trade-heading"><div><b>{t.symbol}</b><span>{t.strategy} · {t.quantity} shares</span></div><span className={`badge ${t.side === 'BUY' ? 'badge-green' : 'badge-red'}`}>{t.side}</span><span className="badge badge-blue">{t.status.replaceAll('_', ' ')}</span><strong className={(t.netPnl || 0) < 0 ? 'negative' : 'positive'}>{t.status === 'OPEN' ? 'Open' : money(t.netPnl)}</strong></div>
       <div className="trade-details"><div><label>Entry observation</label><b>{money(t.entryPrice)}</b><time>{formatIST(t.entryTime)}</time></div><div><label>Exit observation</label><b>{money(t.exitPrice)}</b><time>{t.exitTime ? formatIST(t.exitTime) : 'Awaiting exit'}</time></div><div><label>Stop / target</label><b>{money(t.stopLoss)} / {money(t.target)}</b><span>Estimated costs: {money(t.brokerage)}</span></div></div>
-      {(!t.modelVersion || t.monitoringGap || t.status === 'EXPIRED') && <p className="quality-note">{!t.modelVersion ? 'Legacy record: execution quality was not captured.' : 'Monitoring gap: earlier threshold crossings are unknown.'} Excluded from evaluated win rate.</p>}
+      {(t.modelVersion !== MODEL_VERSION || t.monitoringGap || t.status === 'EXPIRED') && <p className="quality-note">{t.modelVersion !== MODEL_VERSION ? 'Earlier policy: retained in balance, excluded from current-policy evaluation.' : 'Monitoring gap: earlier threshold crossings are unknown.'} Excluded from evaluated win rate.</p>}
       <button className="text-button" onClick={() => setExpanded(expanded === t.id ? null : t.id)} aria-expanded={expanded === t.id}>{expanded === t.id ? 'Hide' : 'View'} audit trail</button>
       {expanded === t.id && <div className="audit-trail"><p>Signal: {formatIST(t.signalTime)} · ID: {t.signalId || 'Legacy / unavailable'}</p><p>Entry quote: {formatIST(t.entryQuoteTime)} · Exit quote: {formatIST(t.exitQuoteTime)}</p><p>Source: {t.source || 'Legacy / unknown'} · Model: {t.modelVersion || 'Legacy'}</p>{t.events?.map((event, i) => <p key={i}><b>{event.kind}</b> · {formatIST(event.at)} — {event.note}</p>)}</div>}
     </article>)}</div>

@@ -12,7 +12,7 @@ export function useLiveStocks() {
     setLoading(true);
     try {
       const n = await fetchNifty();
-      if (n) { setNifty(n); setLastUpdated(new Date()); }
+      setNifty(n); setLastUpdated(n ? new Date(n.quoteTime) : null);
     } finally { setLoading(false); }
   }, []);
 

@@ -1,4 +1,5 @@
 // ponytail: stock analysis from live discovery — no hardcoded data
+import { formatIST } from '../services/tradingTime';
 import { useStockDiscovery } from '../hooks/useStockDiscovery';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 
@@ -16,7 +17,7 @@ export function StockAnalysisPage() {
       {/* Score chart */}
       <div className="card">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">AI Conviction Score by Stock (Live)</h3>
+          <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">Calculated research score by stock</h3>
           <button onClick={rescan} disabled={loading} className="text-xs text-[var(--blue)] font-semibold hover:underline disabled:opacity-50">
             {loading ? 'Scanning...' : '↻ Rescan'}
           </button>
@@ -42,10 +43,10 @@ export function StockAnalysisPage() {
       {/* Live Market Data */}
       <div className="card">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">Live Market Data — NSE (Dynamically Discovered)</h3>
+          <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">NSE provider observations</h3>
           <div className="flex items-center gap-2">
             {lastScan && <span className="text-[10px] text-[var(--text-muted)]">Updated: {lastScan.toLocaleTimeString('en-IN')}</span>}
-            <span className="badge badge-green text-[9px]">● LIVE</span>
+            <span className="badge badge-green text-[9px]">SOURCE SNAPSHOTS</span>
           </div>
         </div>
         {loading && stocks.length === 0 ? (
@@ -74,7 +75,7 @@ export function StockAnalysisPage() {
               <tbody>
                 {stocks.map(s => (
                   <tr key={s.symbol}>
-                    <td className="font-semibold">{s.symbol}</td>
+                    <td className="font-semibold">{s.symbol}<p className="text-xs">{formatIST(s.quoteTime)}</p><p className="text-xs">{s.eligible ? 'Research only' : s.blockedReasons.join('; ')}</p></td>
                     <td className="text-[var(--text-secondary)] text-xs max-w-[160px] truncate">{s.name}</td>
                     <td className="text-right font-mono font-semibold">₹{s.ltp.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
                     <td className={`text-right font-mono ${s.change >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>

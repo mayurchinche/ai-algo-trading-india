@@ -2,7 +2,7 @@ import { useEffect, useSyncExternalStore } from 'react';
 import { discoverStocks, fetchQuotes, type DiscoveredStock } from '../services/stockDiscovery';
 import { getSignalHistory, recordSignals, updateOutcomes } from '../services/signalHistory';
 import { getPaperTrades, openPaperTrades, updatePaperTrades } from '../services/paperTrading';
-import { fetchMarketStatus } from '../services/marketStatus';
+import { fetchMarketStatus, isMarketOpenCached } from '../services/marketStatus';
 import type { MarketQuote } from '../services/tradingTime';
 
 let state = { stocks: [] as DiscoveredStock[], quotes: new Map<string, MarketQuote>(), marketOpen: false, loading: false, lastScan: null as Date | null, error: null as string | null };
@@ -21,8 +21,13 @@ async function runScan() {
     publish({ quotes });
     if (symbols.some(symbol => !quotes.has(symbol))) publish({ error: 'Some open positions or signals have no quote; their outcomes remain unknown.' });
     const stocks = await discoverStocks();
-    if (market.isOpen) { recordSignals(stocks); openPaperTrades(stocks); }
-    publish({ stocks, marketOpen: market.isOpen, lastScan: new Date() });
+    // Provider calls can finish after the app is hidden or the status cache expires.
+    if (document.visibilityState !== 'visible') { publish({ marketOpen: false }); return; }
+    const marketOpen = market.isOpen && isMarketOpenCached();
+    const observedAt = Date.now();
+    if (marketOpen) recordSignals(stocks, observedAt);
+    openPaperTrades(stocks, observedAt);
+    publish({ stocks, marketOpen, lastScan: new Date(observedAt) });
   } catch (error) {
     publish({ marketOpen: false, error: error instanceof Error ? error.message : 'Scan failed; entries paused' });
   } finally { running = false; publish({ loading: false }); }

@@ -19,15 +19,15 @@ export interface DiscoveredStock {
   volume: number;
   avgVolume: number;
   volumeRatio: number;
-  dayHigh: number;
-  dayLow: number;
-  open: number;
+  dayHigh: number | null;
+  dayLow: number | null;
+  open: number | null;
   prevClose: number;
   weekHigh52: number;
   weekLow52: number;
   sma50: number;
   sma200: number;
-  marketCap: number;
+  marketCap: number | null;
   // Computed technicals
   rsi: number;
   macd: { value: number; signal: number; histogram: number };
@@ -170,7 +170,7 @@ function scoreStrategies(
   if (atrPct > 3) trendFollowing = Math.round(trendFollowing * 1.3);
   trendFollowing = Math.max(-100, Math.min(100, trendFollowing));
 
-  // Smart Money: volume spike + price near key levels = institutional activity
+  // Volume pattern: price and volume alone do not establish institutional activity
   let smartMoney = 0;
   if (volumeRatio > 2) smartMoney += ltp > sma50 ? 40 : -40;
   if (volumeRatio > 3) smartMoney += ltp > sma50 ? 30 : -30;
@@ -191,14 +191,14 @@ function computeOverallSignal(scores: StrategyScores): { score: number; signal: 
     scores.smartMoney * 0.15
   );
   let signal: DiscoveredStock['signal'] = 'HOLD';
-  if (score >= 60) signal = 'STRONG_BUY';
+  if (score >= 70) signal = 'STRONG_BUY';
   else if (score >= 30) signal = 'BUY';
-  else if (score <= -60) signal = 'STRONG_SELL';
+  else if (score <= -70) signal = 'STRONG_SELL';
   else if (score <= -30) signal = 'SELL';
   return { score, signal };
 }
 
-function computeFOAnalysis(ltp: number, atr: number, _sma20: number, scores: StrategyScores, rsi: number): FOAnalysis {
+function computeFOAnalysis(ltp: number, atr: number, _sma20: number, scores: StrategyScores, _rsi: number): FOAnalysis {
   const expectedMove = (atr / ltp) * 100;
   const supportLevel = Math.round((ltp - atr * 1.5) * 100) / 100;
   const resistanceLevel = Math.round((ltp + atr * 1.5) * 100) / 100;
@@ -207,28 +207,8 @@ function computeFOAnalysis(ltp: number, atr: number, _sma20: number, scores: Str
   const suggestedTarget = Math.round((ltp + direction * atr * 3) * 100) / 100;
   const riskReward = Math.round(((suggestedTarget - ltp) / (ltp - suggestedStopLoss)) * 10) / 10;
 
-  let optionStrategy = '';
-  let optionReason = '';
-
-  if (scores.momentum > 50 && scores.breakout > 40) {
-    optionStrategy = 'Buy Call (ATM or slightly OTM)';
-    optionReason = 'Strong momentum + breakout setup. Directional long call for leveraged upside.';
-  } else if (scores.momentum < -50) {
-    optionStrategy = 'Buy Put or Bear Put Spread';
-    optionReason = 'Bearish momentum. Protective put or directional bear spread.';
-  } else if (rsi > 65 && scores.meanReversion < -30) {
-    optionStrategy = 'Covered Call / Short Straddle';
-    optionReason = 'Overbought. Sell premium — expect consolidation or pullback.';
-  } else if (rsi < 35 && scores.meanReversion > 30) {
-    optionStrategy = 'Bull Put Spread (Credit)';
-    optionReason = 'Oversold with support. Sell put spread below support for income.';
-  } else if (Math.abs(scores.trendFollowing) < 20) {
-    optionStrategy = 'Iron Condor / Short Strangle';
-    optionReason = 'Range-bound. Sell premium on both sides, profit from time decay.';
-  } else {
-    optionStrategy = 'Bull Call Spread';
-    optionReason = 'Moderate conviction. Defined-risk directional trade.';
-  }
+  const optionStrategy = '';
+  const optionReason = 'Options unavailable without verified contract data';
 
   return { expectedMove: Math.round(expectedMove * 100) / 100, supportLevel, resistanceLevel, riskReward, suggestedStopLoss, suggestedTarget, optionStrategy, optionReason };
 }
@@ -255,7 +235,7 @@ function identifyStrategies(scores: StrategyScores): string[] {
   if (scores.meanReversion > 40) strats.push('Mean Reversion');
   if (scores.breakout > 40) strats.push('Breakout');
   if (scores.trendFollowing > 40) strats.push('Trend Following');
-  if (scores.smartMoney > 40) strats.push('Smart Money Flow');
+  if (scores.smartMoney > 40) strats.push('Volume Pattern');
   if (scores.momentum < -40) strats.push('Bearish Momentum');
   if (scores.meanReversion < -40) strats.push('Overbought Reversal');
   return strats.length ? strats : ['Wait & Watch'];
@@ -284,8 +264,8 @@ export async function fetchHistorical(symbol: string) {
   const q = result?.indicators?.quote?.[0];
   if (!q || !result.timestamp) return null;
   const rows = result.timestamp.map((time: number, i: number) => ({ time, close: q.close[i], high: q.high[i], low: q.low[i], volume: q.volume[i] }))
-    .filter((r: any) => [r.close, r.high, r.low, r.volume].every(Number.isFinite) && r.low > 0 && r.low <= r.close && r.close <= r.high && istDate(r.time * 1000) < istDate());
-  return { closes: rows.map((r: any) => r.close) as number[], highs: rows.map((r: any) => r.high) as number[], lows: rows.map((r: any) => r.low) as number[], volumes: rows.map((r: any) => r.volume) as number[], meta: result.meta };
+    .filter((r: any) => [r.time, r.close, r.high, r.low, r.volume].every(Number.isFinite) && r.time > 0 && r.volume >= 0 && r.low > 0 && r.low <= r.close && r.close <= r.high && istDate(r.time * 1000) < istDate());
+  return { dates: rows.map((r: any) => istDate(r.time * 1000)) as string[], closes: rows.map((r: any) => r.close) as number[], highs: rows.map((r: any) => r.high) as number[], lows: rows.map((r: any) => r.low) as number[], volumes: rows.map((r: any) => r.volume) as number[], meta: result.meta };
 }
 
 export async function fetchQuotes(symbols: string[]) {
@@ -320,23 +300,7 @@ export async function discoverStocks(): Promise<DiscoveredStock[]> {
     if (!seen.has(sym)) seen.set(sym, q);
   });
 
-  // Step 1b: Also fetch top F&O stocks to ensure options tab has data
-  const topFnOSymbols = [
-    'RELIANCE.NS', 'TCS.NS', 'HDFCBANK.NS', 'INFY.NS', 'ICICIBANK.NS',
-    'SBIN.NS', 'BHARTIARTL.NS', 'ITC.NS', 'BAJFINANCE.NS', 'MARUTI.NS',
-    'TATASTEEL.NS', 'TATAMOTORS.NS', 'AXISBANK.NS', 'LT.NS', 'SUNPHARMA.NS',
-    'HINDUNILVR.NS', 'ADANIENT.NS', 'WIPRO.NS', 'HCLTECH.NS', 'NTPC.NS',
-    'POWERGRID.NS', 'KOTAKBANK.NS', 'JSWSTEEL.NS', 'TITAN.NS', 'DLF.NS',
-  ];
-  // Add any F&O symbols not already discovered
-  for (const sym of topFnOSymbols) {
-    if (!seen.has(sym)) {
-      seen.set(sym, { symbol: sym, _needsFetch: true });
-    }
-  }
-
-  // Step 2: Analyze candidates. Prioritize F&O stocks + top screener results
-  // Take all unique candidates (screener + F&O stocks)
+  // Universe comes only from provider screener observations.
   const candidates = Array.from(seen.values()).slice(0, 40);
   const results: DiscoveredStock[] = [];
 
@@ -347,11 +311,21 @@ export async function discoverStocks(): Promise<DiscoveredStock[]> {
       if (!hist || hist.closes.length < 200) return null;
 
       const { closes, highs, lows } = hist;
-      q = { ...hist.meta, ...q };
-      const ltp = q.regularMarketPrice || closes[closes.length - 1];
-      const prevClose = q.regularMarketPreviousClose || (closes.length > 1 ? closes[closes.length - 2] : ltp);
-      const change = q.regularMarketChange ?? (ltp - prevClose);
-      const changePct = q.regularMarketChangePercent ?? ((ltp - prevClose) / prevClose * 100);
+      // Price and timestamp must originate from the same chart response.
+      q = hist.meta;
+      if (!Number.isFinite(q?.regularMarketPrice) || q.regularMarketPrice <= 0 || !Number.isFinite(q.regularMarketTime) || !Number.isFinite(q.regularMarketVolume) || q.regularMarketVolume < 0) return null;
+      const ltp = q.regularMarketPrice;
+      const quoteDate = istDate(q.regularMarketTime * 1000);
+      const priorCloses = closes.filter((_, i) => hist.dates[i] < quoteDate);
+      const prevClose = priorCloses.at(-1);
+      if (!prevClose) return null;
+      const change = ltp - prevClose;
+      const changePct = change / prevClose * 100;
+      const yearStart = new Date(Date.parse(quoteDate) - 365 * 86400000).toISOString().slice(0, 10);
+      const yearRows = hist.dates.map((date, i) => ({date, high: highs[i], low: lows[i]})).filter(row => row.date >= yearStart && row.date <= quoteDate);
+      if ((!Number.isFinite(q.fiftyTwoWeekHigh) || !Number.isFinite(q.fiftyTwoWeekLow)) && (!yearRows.length || hist.dates[0] > yearStart)) return null;
+      const weekHigh52 = Number.isFinite(q.fiftyTwoWeekHigh) && q.fiftyTwoWeekHigh > 0 ? q.fiftyTwoWeekHigh : Math.max(...yearRows.map(row => row.high));
+      const weekLow52 = Number.isFinite(q.fiftyTwoWeekLow) && q.fiftyTwoWeekLow > 0 ? q.fiftyTwoWeekLow : Math.min(...yearRows.map(row => row.low));
       const rsi = computeRSI(closes);
       const macd = computeMACD(closes);
       const sma20 = computeSMA(closes, 20);
@@ -366,11 +340,11 @@ export async function discoverStocks(): Promise<DiscoveredStock[]> {
       const scores = scoreStrategies(
         ltp, rsi, macd, sma20, sma50, sma200,
         volumeRatio, bollingerPos,
-        q.fiftyTwoWeekHigh || Math.max(...highs.slice(-252)), q.fiftyTwoWeekLow || Math.min(...lows.slice(-252)), atr
+        weekHigh52, weekLow52, atr
       );
 
       const { score: overallScore, signal } = computeOverallSignal(scores);
-      const reasons = generateReasons(scores, rsi, volumeRatio, ltp, sma50, sma200, q.fiftyTwoWeekHigh || ltp);
+      const reasons = generateReasons(scores, rsi, volumeRatio, ltp, sma50, sma200, weekHigh52);
       const strategies = identifyStrategies(scores);
       const trend = determineTrend(sma20, sma50, sma200, ltp);
       const foAnalysis = computeFOAnalysis(ltp, atr, sma20, scores, rsi);
@@ -394,15 +368,15 @@ export async function discoverStocks(): Promise<DiscoveredStock[]> {
         volume: vol,
         avgVolume: avgVol,
         volumeRatio: Math.round(volumeRatio * 10) / 10,
-        dayHigh: q.regularMarketDayHigh || ltp,
-        dayLow: q.regularMarketDayLow || ltp,
-        open: q.regularMarketOpen || ltp,
+        dayHigh: Number.isFinite(q.regularMarketDayHigh) ? q.regularMarketDayHigh : null,
+        dayLow: Number.isFinite(q.regularMarketDayLow) ? q.regularMarketDayLow : null,
+        open: Number.isFinite(q.regularMarketOpen) ? q.regularMarketOpen : null,
         prevClose,
-        weekHigh52: q.fiftyTwoWeekHigh || ltp,
-        weekLow52: q.fiftyTwoWeekLow || ltp,
+        weekHigh52,
+        weekLow52,
         sma50: Math.round(sma50 * 100) / 100,
         sma200: Math.round(sma200 * 100) / 100,
-        marketCap: q.marketCap || 0,
+        marketCap: Number.isFinite(q.marketCap) ? q.marketCap : null,
         rsi: Math.round(rsi * 10) / 10,
         macd,
         sma20: Math.round(sma20 * 100) / 100,

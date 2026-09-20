@@ -1,5 +1,6 @@
 import type { DiscoveredStock } from './stockDiscovery';
 import { DAY_MS, freshQuote, istDate, type MarketQuote } from './tradingTime';
+import { SIGNAL_POLICY, strongSignalId, strongSignalRejection } from './strongSignalPolicy';
 import { readRecords, writeRecords } from './journalStorage';
 
 export interface StoredSignal {
@@ -17,17 +18,17 @@ export function pruneSignalHistory(now = Date.now()): number {
   saveSignals(kept); return signals.length - kept.length;
 }
 // Immutable first observation for each symbol/direction/session. Repeated scans reuse its ID/time.
-export function recordSignals(stocks: DiscoveredStock[]): void {
+export function recordSignals(stocks: DiscoveredStock[], now = Date.now()): void {
   const existing = loadSignals();
   for (const s of stocks) {
-    if (!s.eligible || Math.abs(s.overallScore) < 40 || s.signal === 'HOLD') continue;
-    const id = `${istDate(s.generatedAt)}:${s.symbol}:${s.overallScore > 0 ? 'BUY' : 'SELL'}:signals-v3`;
+    if (strongSignalRejection(s, now)) continue;
+    const id = strongSignalId(s, now);
     let stored = existing.find(x => x.id === id);
     if (!stored) {
       stored = { id, symbol: s.symbol, name: s.name, signal: s.signal, score: s.overallScore,
         entryPrice: s.ltp, target: s.foAnalysis.suggestedTarget, stopLoss: s.foAnalysis.suggestedStopLoss,
         strategy: s.strategies[0] || 'Composite', timestamp: s.generatedAt, quoteTime: s.quoteTime,
-        lastQuoteTime: s.quoteTime, modelVersion: 'signals-v3', outcome: 'PENDING' };
+        lastQuoteTime: s.quoteTime, modelVersion: SIGNAL_POLICY, outcome: 'PENDING' };
       existing.push(stored);
     }
     s.signalId = stored.id;
@@ -74,7 +75,7 @@ export interface SignalAccuracy {
 
 export function getSignalAccuracy(): SignalAccuracy {
   const signals = loadSignals();
-  const resolved = signals.filter(s => (s.outcome === 'TARGET_HIT' || s.outcome === 'SL_HIT') && !s.monitoringGap && s.modelVersion === 'signals-v3');
+  const resolved = signals.filter(s => (s.outcome === 'TARGET_HIT' || s.outcome === 'SL_HIT') && !s.monitoringGap && s.modelVersion === SIGNAL_POLICY);
   const targetHit = resolved.filter(s => s.outcome === 'TARGET_HIT');
   const slHit = resolved.filter(s => s.outcome === 'SL_HIT');
   const expired = signals.filter(s => s.outcome === 'EXPIRED');
@@ -85,7 +86,7 @@ export function getSignalAccuracy(): SignalAccuracy {
 
   // By strategy
   const stratMap: Record<string, { total: number; wins: number }> = {};
-  signals.filter(s => (s.outcome === 'TARGET_HIT' || s.outcome === 'SL_HIT') && !s.monitoringGap && s.modelVersion === 'signals-v3').forEach(s => {
+  resolved.forEach(s => {
     if (!stratMap[s.strategy]) stratMap[s.strategy] = { total: 0, wins: 0 };
     stratMap[s.strategy].total++;
     if (s.outcome === 'TARGET_HIT') stratMap[s.strategy].wins++;
@@ -97,8 +98,8 @@ export function getSignalAccuracy(): SignalAccuracy {
 
   // By day
   const dayMap: Record<string, { signals: number; wins: number; losses: number }> = {};
-  signals.forEach(s => {
-    const day = s.timestamp.slice(0, 10);
+  resolved.forEach(s => {
+    const day = istDate(s.timestamp);
     if (!dayMap[day]) dayMap[day] = { signals: 0, wins: 0, losses: 0 };
     dayMap[day].signals++;
     if (s.outcome === 'TARGET_HIT') dayMap[day].wins++;

@@ -7,10 +7,6 @@ const PROXY_MAP: Record<string, string> = {
   '/api/ipo': 'https://webnodejs.investorgain.com',
   '/api/goodreturns': 'https://www.goodreturns.in',
   '/api/nse': 'https://www.nseindia.com',
-  '/api/broker/dhan-auth': 'https://auth.dhan.co',
-  '/api/broker/dhan': 'https://api.dhan.co',
-  '/api/broker/angel': 'https://apiconnect.angelbroking.com',
-  '/api/telegram': 'https://api.telegram.org',
 };
 
 /**
@@ -19,6 +15,7 @@ const PROXY_MAP: Record<string, string> = {
  * Production (Vercel): routes through /api/proxy serverless function
  */
 export function apiUrl(localPath: string): string {
+  if (localPath.startsWith('/api/broker/') || localPath.startsWith('/api/telegram/')) throw new Error('Broker execution and messaging integrations are unavailable');
   const apiBase = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
   if (localPath.startsWith('/api/yahoo/') || localPath.startsWith('/api/nse/')) {
     const provider = localPath.startsWith('/api/yahoo/') ? 'yahoo' : 'nse';

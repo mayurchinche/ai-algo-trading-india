@@ -1,5 +1,6 @@
 import type { DiscoveredStock } from './stockDiscovery';
-import { DAY_MS, freshQuote, inSession, istDate, validLevels } from './tradingTime';
+import { DAY_MS, inSession, istDate } from './tradingTime';
+import { strongSignalId, strongSignalRejection } from './strongSignalPolicy';
 import { readRecords, writeRecords } from './journalStorage';
 export interface ForegroundAlert {
   id: string; symbol: string; side: 'BUY' | 'SELL'; score: number;
@@ -15,12 +16,11 @@ export function collectForegroundAlerts(stocks: DiscoveredStock[], visible: bool
   const added: ForegroundAlert[] = [];
   for (const s of stocks) {
     const side = s.overallScore > 0 ? 'BUY' : 'SELL';
-    const age = now - Date.parse(s.generatedAt);
-    if (!s.eligible || s.signal !== (side === 'BUY' ? 'STRONG_BUY' : 'STRONG_SELL') || !Number.isFinite(s.overallScore) || Math.abs(s.overallScore) < 70 || Math.abs(s.overallScore) > 100 || !Number.isFinite(age) || age < -5000 || age > 120000 || !freshQuote({ price: s.ltp, timestamp: s.quoteTime || '', source: 'research' }, now) || !validLevels(side, s.ltp, s.foAnalysis.suggestedStopLoss, s.foAnalysis.suggestedTarget)) continue;
-    const id = `${istDate(now)}:${s.symbol}:${side}`;
+    if (strongSignalRejection(s, now)) continue;
+    const id = strongSignalId(s, now);
     if (ids.has(id)) continue;
     ids.add(id);
-    added.push({ id, symbol: s.symbol, side, score: s.overallScore, entry: s.ltp, stop: s.foAnalysis.suggestedStopLoss, target: s.foAnalysis.suggestedTarget, generatedAt: s.generatedAt, quoteTime: s.quoteTime!, expiresAt: new Date(Math.min(Date.parse(s.quoteTime!) + 120000, Date.parse(istDate(now) + 'T10:00:00Z'))).toISOString() });
+    added.push({ id, symbol: s.symbol, side, score: s.overallScore, entry: s.ltp, stop: s.foAnalysis.suggestedStopLoss, target: s.foAnalysis.suggestedTarget, generatedAt: s.firstSignalAt || s.generatedAt, quoteTime: s.quoteTime!, expiresAt: new Date(Math.min(Date.parse(s.quoteTime!) + 120000, Date.parse(s.firstSignalAt || s.generatedAt) + 120000, Date.parse(istDate(now) + 'T09:45:00Z'))).toISOString() });
   }
   writeRecords(KEY, [...added, ...history]);
   return added;

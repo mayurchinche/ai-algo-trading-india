@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { LiveStock } from '../services/liveData';
+import { formatIST } from '../services/tradingTime';
 import { fetchMarketStatus } from '../services/marketStatus';
 
 interface HeaderProps {
@@ -38,7 +39,7 @@ export function Header({ activeTab, onTabChange, nifty }: HeaderProps) {
         <div className="hidden lg:flex items-center gap-6">
           {nifty && (
             <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-[rgba(0,0,0,0.02)] border border-[var(--border)]">
-              <span className="text-[11px] text-[var(--text-muted)] font-medium">NIFTY 50</span>
+              <span className="text-[11px] text-[var(--text-muted)] font-medium" title={formatIST(nifty.quoteTime)}>NIFTY 50 · {formatIST(nifty.quoteTime)}</span>
               <span className="text-[15px] font-bold text-[var(--text)]" style={{ fontFamily: 'Poppins', letterSpacing: '-0.02em' }}>
                 {nifty.ltp.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
               </span>

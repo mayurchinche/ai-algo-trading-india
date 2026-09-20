@@ -30,5 +30,17 @@ try {
  await db.exec(`update mobile_alerts set created_at=now()-interval '31 days'; select cleanup_mobile_alerts();`);
  assert.equal((await db.query('select * from mobile_alerts')).rows.length,0);
  assert.equal((await db.query('select * from mobile_push_jobs')).rows.length,0);
+ await db.exec(`create table app_data(id text primary key,device_id text,data jsonb not null default '{}',updated_at timestamptz default now()); alter table app_data enable row level security; create policy "Allow all" on app_data for all using(true) with check(true); grant all on app_data to anon,authenticated; insert into app_data(id,data) values('ipo_live_data','{}'),('paper_trades','{}'); grant usage on schema public to anon;`);
+ await db.exec(await readFile('supabase/migrations/20260920_restrict_app_data.sql','utf8'));
+ await db.exec('set role anon');
+ assert.deepEqual((await db.query('select id from app_data')).rows,[{id:'ipo_live_data'}]);
+ await assert.rejects(db.query("update app_data set data='{}'"));
+ await assert.rejects(db.query("insert into app_data(id)values('injected')"));
+ await db.exec('reset role; set role authenticated');
+ assert.deepEqual((await db.query('select id from app_data')).rows,[{id:'ipo_live_data'}]);
+ await assert.rejects(db.query("delete from app_data"));
+ await db.exec('reset role');
+ assert.equal((await db.query('select * from app_data')).rows.length,2);
+ console.log('PASS IPO cache migration: anonymous and authenticated users read only IPO cache, cannot mutate it, private rows retained and hidden');
  console.log('PASS PostgreSQL integration: migration, opt-in, deduplication, leases, row ownership, private tokens, service-only writes, expiry and 30-day cleanup');
 } finally { await db.close(); }

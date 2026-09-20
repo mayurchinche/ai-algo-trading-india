@@ -1,9 +1,10 @@
+import { formatIST } from '../services/tradingTime';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { fetchLiveIPOs, getLastIPOFetchError, type IPOData } from '../services/ipoService';
-import { getAutoApplySettings, saveAutoApplySettings, getIPOApplications, autoApplyForIPO, type AutoApplySettings, type BrokerConfig } from '../services/ipoAutoApply';
 
-function ScoreBadge({ score, recommendation }: { score: number; recommendation: string }) {
+function ScoreBadge({ score, recommendation }: { score: number | null; recommendation: string }) {
+  if (score === null) return <span className="badge badge-amber">Insufficient data</span>;
   const color = score >= 70 ? 'from-green-500 to-emerald-600' : score >= 50 ? 'from-blue-500 to-indigo-600' : score >= 35 ? 'from-amber-500 to-orange-600' : 'from-red-500 to-rose-600';
   return (
     <div className="flex items-center gap-2">
@@ -39,10 +40,6 @@ export function IPOPage() {
   const [filter, setFilter] = useState<'all' | 'open' | 'upcoming' | 'closed' | 'listed' | 'mainboard' | 'sme'>('all');
   const [expanded, setExpanded] = useState<string | null>(null);
   const [lastFetch, setLastFetch] = useState<Date | null>(null);
-  const [showSettings, setShowSettings] = useState(false);
-  const [settings, setSettings] = useState<AutoApplySettings>(getAutoApplySettings());
-  const [applications] = useState(getIPOApplications());
-  const [applyStatus, setApplyStatus] = useState<Record<string, string>>({});
   const [fetchError, setFetchError] = useState<string | null>(null);
 
   const load = async () => {
@@ -69,7 +66,7 @@ export function IPOPage() {
     if (filter === 'mainboard') return ipo.board === 'mainboard';
     if (filter === 'sme') return ipo.board === 'sme';
     return true;
-  }).sort((a, b) => b.score - a.score);
+  }).sort((a, b) => (b.score ?? -1) - (a.score ?? -1));
 
   const filters = [
     { id: 'all', label: 'All IPOs', count: ipos.length },
@@ -94,8 +91,8 @@ export function IPOPage() {
           <div className="text-[10px] text-[var(--text-muted)] uppercase">Upcoming</div>
         </div>
         <div className="card text-center">
-          <div className="text-2xl font-bold text-purple-600" style={{ fontFamily: 'Poppins' }}>{ipos.filter(i => i.score >= 70).length}</div>
-          <div className="text-[10px] text-[var(--text-muted)] uppercase">Strong Apply</div>
+          <div className="text-2xl font-bold text-purple-600" style={{ fontFamily: 'Poppins' }}>{ipos.filter(i => i.recommendation === 'High research score').length}</div>
+          <div className="text-[10px] text-[var(--text-muted)] uppercase">High research score</div>
         </div>
         <div className="card text-center">
           <div className="text-2xl font-bold text-[var(--text)]" style={{ fontFamily: 'Poppins' }}>{ipos.length}</div>
@@ -105,278 +102,11 @@ export function IPOPage() {
           <div className="text-[11px] text-[var(--text-secondary)]">
             {lastFetch ? `Updated ${lastFetch.toLocaleTimeString('en-IN')}` : '—'}
           </div>
-          <div className="text-[10px] text-[var(--text-muted)] uppercase">Live Data</div>
+          <div className="text-[10px] text-[var(--text-muted)] uppercase">Fetch attempt time</div>
         </div>
       </div>
 
-      {/* Tips */}
-      <div className="card bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-l-amber-400">
-        <h3 className="text-xs font-bold text-amber-700 mb-1">💡 Top 1% IPO Allocation Tips</h3>
-        <ul className="text-[11px] text-amber-800 space-y-0.5">
-          <li>• Apply via <b>multiple demat accounts</b> (family members) — each gets independent lottery chance</li>
-          <li>• Always apply at <b>cut-off price</b> for mainboard IPOs</li>
-          <li>• For SME IPOs, apply in <b>exactly 1 lot</b> — same allotment probability as multiple lots</li>
-          <li>• Approve UPI mandate <b>within 30 minutes</b> — delayed mandates get rejected</li>
-          <li>• Monitor <b>Day 2 subscription data</b> — QIB &gt;10x is strongest bullish signal</li>
-        </ul>
-      </div>
-
-      {/* Auto-Apply IPO Section */}
-      <div className="card">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <h3 className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">🤖 Auto-Apply IPO</h3>
-            <span className={`badge text-[9px] ${settings.enabled && settings.broker ? 'badge-green' : 'badge-amber'}`}>
-              {settings.enabled && settings.broker ? '✓ Active' : 'Not Configured'}
-            </span>
-          </div>
-          <button onClick={() => setShowSettings(!showSettings)} className="text-xs text-[var(--blue)] font-semibold hover:underline">
-            {showSettings ? 'Hide Settings' : '⚙ Configure'}
-          </button>
-        </div>
-
-        {!showSettings && settings.enabled && settings.broker && (
-          <p className="text-xs text-[var(--text-secondary)]">
-            Auto-applying for IPOs with AI score ≥ {settings.minScore} via <b>{settings.broker.broker === 'dhan' ? 'Dhan' : settings.broker.broker === 'angel_one' ? 'Angel One' : settings.broker.broker}</b>.
-            UPI mandate → <b>{settings.broker.upiId}</b>. Approve on your phone within 30 mins.
-          </p>
-        )}
-
-        {!showSettings && !settings.broker && (
-          <p className="text-xs text-[var(--text-muted)]">
-            Configure your broker credentials below to auto-apply for recommended IPOs. You'll receive a UPI mandate request — just approve it on your phone.
-          </p>
-        )}
-
-        {showSettings && (
-          <div className="space-y-4 mt-4 p-4 rounded-xl bg-[var(--bg-alt)] border border-[var(--border)]">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">Broker</label>
-                <select
-                  value={settings.broker?.broker || ''}
-                  onChange={e => {
-                    const b = e.target.value as BrokerConfig['broker'];
-                    setSettings({...settings, broker: settings.broker ? {...settings.broker, broker: b} : { broker: b, apiKey: '', clientId: '', upiId: '', password: '' }});
-                  }}
-                  className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm"
-                >
-                  <option value="">Select Broker</option>
-                  <option value="dhan">Dhan (Recommended — Free API)</option>
-                  <option value="angel_one">Angel One (SmartAPI)</option>
-                  <option value="5paisa">5paisa</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">UPI ID (for mandate)</label>
-                <input
-                  type="text"
-                  placeholder="yourname@upi"
-                  value={settings.broker?.upiId || ''}
-                  onChange={e => setSettings({...settings, broker: settings.broker ? {...settings.broker, upiId: e.target.value} : null})}
-                  className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm"
-                />
-              </div>
-              <div>
-                <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">
-                  {settings.broker?.broker === 'dhan' ? 'Access Token' : 'API Key'}
-                </label>
-                <input
-                  type="password"
-                  placeholder={settings.broker?.broker === 'dhan' ? 'From Dhan developer portal' : 'From broker developer portal'}
-                  value={settings.broker?.apiKey || ''}
-                  onChange={e => setSettings({...settings, broker: settings.broker ? {...settings.broker, apiKey: e.target.value} : null})}
-                  className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm"
-                />
-              </div>
-              <div>
-                <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">
-                  {settings.broker?.broker === 'dhan' ? 'Dhan Client ID' : 'Client ID'}
-                </label>
-                <input
-                  type="text"
-                  placeholder="Your demat client ID"
-                  value={settings.broker?.clientId || ''}
-                  onChange={e => setSettings({...settings, broker: settings.broker ? {...settings.broker, clientId: e.target.value} : null})}
-                  className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm"
-                />
-              </div>
-            </div>
-
-            {/* Dhan auto-refresh fields (optional) */}
-            {settings.broker?.broker === 'dhan' && (
-              <div className="p-3 rounded-lg bg-[var(--bg)] border border-[var(--border)]">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-[10px] text-[var(--text-muted)] uppercase font-semibold">🔄 Auto Token Refresh (Optional)</span>
-                  {settings.broker.tokenExpiry && (
-                    <span className={`badge text-[9px] ${new Date(settings.broker.tokenExpiry).getTime() > Date.now() ? 'badge-green' : 'badge-red'}`}>
-                      {new Date(settings.broker.tokenExpiry).getTime() > Date.now()
-                        ? `Valid until ${new Date(settings.broker.tokenExpiry).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}`
-                        : 'Expired — needs refresh'}
-                    </span>
-                  )}
-                </div>
-                <p className="text-[10px] text-[var(--text-muted)] mb-3">
-                  Provide your Dhan PIN + TOTP secret to auto-regenerate tokens. Without these, you'll need to paste a new token from Dhan portal every 24h.
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">Dhan PIN (4-digit)</label>
-                    <input
-                      type="password"
-                      placeholder="••••"
-                      maxLength={4}
-                      value={settings.broker?.password || ''}
-                      onChange={e => setSettings({...settings, broker: settings.broker ? {...settings.broker, password: e.target.value} : null})}
-                      className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">TOTP Secret</label>
-                    <input
-                      type="password"
-                      placeholder="From authenticator app setup"
-                      value={settings.broker?.totpSecret || ''}
-                      onChange={e => setSettings({...settings, broker: settings.broker ? {...settings.broker, totpSecret: e.target.value} : null})}
-                      className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div>
-                <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">Min AI Score</label>
-                <input
-                  type="number"
-                  min={0} max={100}
-                  value={settings.minScore}
-                  onChange={e => setSettings({...settings, minScore: +e.target.value})}
-                  className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm"
-                />
-              </div>
-              <div>
-                <label className="text-[10px] text-[var(--text-muted)] uppercase font-semibold block mb-1">Max Lots</label>
-                <input
-                  type="number"
-                  min={1} max={15}
-                  value={settings.maxLots}
-                  onChange={e => setSettings({...settings, maxLots: +e.target.value})}
-                  className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm"
-                />
-              </div>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={settings.autoApplyMainboard} onChange={e => setSettings({...settings, autoApplyMainboard: e.target.checked})} className="rounded" />
-                <span className="text-xs">Mainboard</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={settings.autoApplySME} onChange={e => setSettings({...settings, autoApplySME: e.target.checked})} className="rounded" />
-                <span className="text-xs">SME</span>
-              </label>
-            </div>
-
-            <div className="flex items-center gap-3 pt-2">
-              <button
-                onClick={() => {
-                  const updated = {...settings, enabled: true};
-                  setSettings(updated);
-                  saveAutoApplySettings(updated);
-                  setShowSettings(false);
-                }}
-                disabled={!settings.broker?.upiId || !settings.broker?.apiKey || !settings.broker?.clientId}
-                className="px-4 py-2 rounded-lg bg-[var(--green)] text-white text-xs font-semibold disabled:opacity-40"
-              >
-                ✓ Enable Auto-Apply
-              </button>
-              {settings.enabled && (
-                <button
-                  onClick={() => {
-                    const updated = {...settings, enabled: false};
-                    setSettings(updated);
-                    saveAutoApplySettings(updated);
-                  }}
-                  className="px-4 py-2 rounded-lg bg-[var(--red-bg)] text-[var(--red)] text-xs font-semibold"
-                >
-                  Disable
-                </button>
-              )}
-              <span className="text-[10px] text-[var(--text-muted)]">Credentials stored locally only</span>
-            </div>
-          </div>
-        )}
-
-        {/* Token Expired Warning */}
-        {settings.enabled && settings.broker?.broker === 'dhan' && applications.some(a => a.error?.includes('403')) && (
-          <div className="mt-3 p-3 rounded-lg bg-red-50 border border-red-200">
-            <p className="text-xs text-red-700 font-semibold">⚠️ Dhan token expired (HTTP 403)</p>
-            <p className="text-[10px] text-red-600 mt-1">
-              Generate a new token → <a href="https://api.dhan.co" target="_blank" rel="noopener" className="underline font-semibold">api.dhan.co</a> → paste it in Access Token above.
-              {!settings.broker.password && <span className="block mt-1">💡 Tip: Add your PIN + TOTP secret above to enable auto-refresh.</span>}
-            </p>
-          </div>
-        )}
-
-        {/* Application History */}
-        {applications.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-[var(--border)]">
-            <h4 className="text-[10px] text-[var(--text-muted)] uppercase font-semibold mb-2">Recent Applications</h4>
-            <div className="space-y-2">
-              {applications.slice(-5).reverse().map(app => (
-                <div key={app.id} className="flex items-center justify-between p-2 rounded-lg bg-[var(--bg)]">
-                  <div>
-                    <span className="text-xs font-semibold">{app.ipoName}</span>
-                    <span className="text-[10px] text-[var(--text-muted)] ml-2">{app.lots} lot @ ₹{app.bidPrice}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`badge text-[9px] ${app.status === 'PENDING_MANDATE' ? 'badge-amber' : app.status === 'APPLIED' || app.status === 'ALLOTTED' ? 'badge-green' : app.status === 'FAILED' ? 'badge-red' : 'badge-blue'}`}>
-                      {app.status === 'PENDING_MANDATE' ? '⏳ Approve UPI' : app.status === 'APPLIED' ? '✓ Applied' : app.status === 'ALLOTTED' ? '🎉 Allotted' : app.status === 'FAILED' ? '✗ Failed' : app.status}
-                    </span>
-                    {app.error && <span className="text-[9px] text-[var(--red)] max-w-[200px] truncate" title={app.error}>({app.error})</span>}
-                    <span className="text-[9px] text-[var(--text-muted)]">{new Date(app.appliedAt).toLocaleDateString('en-IN')}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Manual Apply Button for Open IPOs */}
-      {ipos.filter(i => i.status === 'open').length > 0 && settings.enabled && settings.broker && (
-        <div className="card bg-[var(--green-bg)] border border-[var(--green-border)]">
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="text-xs font-bold text-[var(--green)]">Open IPOs Ready to Apply</h4>
-              <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">Click to manually trigger application for any open IPO below</p>
-            </div>
-          </div>
-          <div className="flex gap-2 flex-wrap mt-3">
-            {ipos.filter(i => i.status === 'open' && i.score >= settings.minScore).map(ipo => (
-              <button
-                key={ipo.name}
-                disabled={applyStatus[ipo.name] === 'applying' || applications.some(a => a.symbol === ipo.name && a.status !== 'FAILED')}
-                onClick={async () => {
-                  setApplyStatus(s => ({...s, [ipo.name]: 'applying'}));
-                  await autoApplyForIPO({
-                    name: ipo.name,
-                    symbol: ipo.name,
-                    price: ipo.price || 0,
-                    lotSize: ipo.lot_size || 1,
-                    score: ipo.score,
-                    type: ipo.board as 'mainboard' | 'sme',
-                  });
-                  setApplyStatus(s => ({...s, [ipo.name]: 'done'}));
-                }}
-                className="px-3 py-2 rounded-lg bg-[var(--card)] border border-[var(--green-border)] text-xs font-semibold hover:shadow-md transition-all disabled:opacity-40"
-              >
-                {applyStatus[ipo.name] === 'applying' ? '⏳' : applyStatus[ipo.name] === 'done' ? '✓' : '🚀'} {ipo.name}
-                <span className="text-[9px] text-[var(--text-muted)] ml-1">(Score: {ipo.score})</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      <section className="card space-y-2"><h3>IPO research only</h3><p>GMP is an unofficial third-party observation. The score is an unvalidated ranking, not a listing-gain forecast. Verify offer documents, lot size, category and mandate deadlines with your broker.</p><p>Broker applications are unavailable: no verified execution integration is connected. This app does not collect broker PINs, tokens or TOTP secrets.</p></section>
 
       {/* Filters */}
       <div className="flex gap-2 flex-wrap items-center">
@@ -400,7 +130,7 @@ export function IPOPage() {
       {loading && ipos.length === 0 && (
         <div className="card text-center py-12">
           <div className="text-3xl mb-3">📋</div>
-          <p className="text-sm font-semibold">Fetching live IPO data from InvestorGain...</p>
+          <p className="text-sm font-semibold">Fetching IPO observations from InvestorGain...</p>
           <p className="text-xs text-[var(--text-muted)] mt-1">GMP, subscription, ratings — all real-time</p>
         </div>
       )}
@@ -409,7 +139,7 @@ export function IPOPage() {
       {!loading && ipos.length === 0 && (
         <div className="card text-center py-12">
           <div className="text-3xl mb-3">⚠️</div>
-          <p className="text-sm font-semibold">Could not fetch live IPO data</p>
+          <p className="text-sm font-semibold">IPO data unavailable</p>
           <p className="text-xs text-[var(--text-muted)] mt-1">{fetchError || 'InvestorGain API may be temporarily unavailable. Data refreshes every 60s.'}</p>
         </div>
       )}
@@ -440,6 +170,7 @@ export function IPOPage() {
                   {ipo.pe_ratio && <span>P/E: {ipo.pe_ratio.toFixed(1)}x</span>}
                 </div>
               </div>
+              <p className="text-xs">{ipo.source} · Received: {formatIST(ipo.receivedAt)}</p>
               <ScoreBadge score={ipo.score} recommendation={ipo.recommendation} />
             </div>
 
@@ -459,7 +190,7 @@ export function IPOPage() {
                   <span className="text-xs font-bold text-purple-600">{ipo.subscription_total.toFixed(2)}x</span>
                   {ipo.subscription_qib != null && (
                     <span className="text-[10px] text-[var(--text-muted)]">
-                      QIB {ipo.subscription_qib.toFixed(1)}x • NII {ipo.subscription_nii?.toFixed(1)}x • RII {ipo.subscription_rii?.toFixed(1)}x
+                      QIB {ipo.subscription_qib.toFixed(1)}x • NII {ipo.subscription_nii == null ? 'Unavailable' : ipo.subscription_nii.toFixed(1) + 'x'} • RII {ipo.subscription_rii == null ? 'Unavailable' : ipo.subscription_rii.toFixed(1) + 'x'}
                     </span>
                   )}
                   {ipo.subscription_updated && (
@@ -493,36 +224,36 @@ export function IPOPage() {
                 {/* Live Subscription Breakdown */}
                 {ipo.subscription_qib != null && (
                   <div>
-                    <h4 className="text-[10px] font-bold text-[var(--text-muted)] uppercase mb-2">📊 Live Subscription Status</h4>
+                    <h4 className="text-[10px] font-bold text-[var(--text-muted)] uppercase mb-2">📊 Reported subscription snapshot</h4>
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                       <div className="text-center p-3 rounded-xl bg-[var(--bg-alt)]">
                         <div className={`text-base font-bold ${(ipo.subscription_total || 0) > 1 ? 'text-[var(--green)]' : 'text-[var(--text)]'}`}>
-                          {ipo.subscription_total?.toFixed(2)}x
+                          {ipo.subscription_total == null ? 'Unavailable' : ipo.subscription_total.toFixed(2) + 'x'}
                         </div>
                         <div className="text-[9px] text-[var(--text-muted)] uppercase mt-1">Total</div>
                       </div>
                       <div className="text-center p-3 rounded-xl bg-[var(--bg-alt)]">
                         <div className={`text-base font-bold ${(ipo.subscription_qib || 0) > 1 ? 'text-[var(--green)]' : 'text-[var(--text)]'}`}>
-                          {ipo.subscription_qib?.toFixed(2)}x
+                          {ipo.subscription_qib == null ? 'Unavailable' : ipo.subscription_qib.toFixed(2) + 'x'}
                         </div>
                         <div className="text-[9px] text-[var(--text-muted)] uppercase mt-1">QIB</div>
                       </div>
                       <div className="text-center p-3 rounded-xl bg-[var(--bg-alt)]">
                         <div className={`text-base font-bold ${(ipo.subscription_nii || 0) > 1 ? 'text-[var(--green)]' : 'text-[var(--text)]'}`}>
-                          {ipo.subscription_nii?.toFixed(2)}x
+                          {ipo.subscription_nii == null ? 'Unavailable' : ipo.subscription_nii.toFixed(2) + 'x'}
                         </div>
                         <div className="text-[9px] text-[var(--text-muted)] uppercase mt-1">NII</div>
                       </div>
                       <div className="text-center p-3 rounded-xl bg-[var(--bg-alt)]">
                         <div className={`text-base font-bold ${(ipo.subscription_rii || 0) > 1 ? 'text-[var(--green)]' : 'text-[var(--text)]'}`}>
-                          {ipo.subscription_rii?.toFixed(2)}x
+                          {ipo.subscription_rii == null ? 'Unavailable' : ipo.subscription_rii.toFixed(2) + 'x'}
                         </div>
                         <div className="text-[9px] text-[var(--text-muted)] uppercase mt-1">Retail</div>
                       </div>
                       {ipo.subscription_shni != null && (
                         <div className="text-center p-3 rounded-xl bg-[var(--bg-alt)]">
                           <div className="text-base font-bold text-[var(--text)]">
-                            {ipo.subscription_shni?.toFixed(2)}x / {ipo.subscription_bhni?.toFixed(2)}x
+                            {ipo.subscription_shni == null ? 'Unavailable' : ipo.subscription_shni.toFixed(2) + 'x'} / {ipo.subscription_bhni == null ? 'Unavailable' : ipo.subscription_bhni.toFixed(2) + 'x'}
                           </div>
                           <div className="text-[9px] text-[var(--text-muted)] uppercase mt-1">sHNI / bHNI</div>
                         </div>
@@ -566,7 +297,7 @@ export function IPOPage() {
       </div>
 
       <div className="text-[10px] text-[var(--text-muted)] text-center mt-6">
-        Live data from InvestorGain • Refreshes every 60s • GMP is grey market premium (unregulated & indicative only) • Not investment advice
+        Third-party observations from InvestorGain • Refreshes every 60s • GMP is grey market premium (unregulated & indicative only) • Not investment advice
       </div>
     </div>
   );

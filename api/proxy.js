@@ -7,18 +7,12 @@ export default async function handler(req, res) {
   const { url } = req.query;
   if (!url) return res.status(400).json({ error: 'Missing url param' });
 
-  const allowed = [
-    'goodreturns.in', 'nseindia.com',
-    'query1.finance.yahoo.com', 'query2.finance.yahoo.com',
-    'api.dhan.co', 'auth.dhan.co',
-    'apiconnect.angelbroking.com',
-    'api.telegram.org',
-    'investorgain.com',
-  ];
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Read-only data gateway' });
+  const allowed = ['www.goodreturns.in', 'www.nseindia.com', 'query1.finance.yahoo.com', 'query2.finance.yahoo.com', 'webnodejs.investorgain.com'];
 
   let targetUrl;
   try { targetUrl = new URL(url); } catch { return res.status(400).json({ error: 'Invalid URL' }); }
-  if (targetUrl.protocol !== 'https:' || targetUrl.port || targetUrl.username || targetUrl.password || !allowed.some(d => targetUrl.hostname === d || targetUrl.hostname.endsWith('.' + d))) {
+  if (targetUrl.protocol !== 'https:' || targetUrl.port || targetUrl.username || targetUrl.password || !allowed.includes(targetUrl.hostname)) {
     return res.status(403).json({ error: 'Domain not allowed' });
   }
 
@@ -39,18 +33,7 @@ export default async function handler(req, res) {
     headers['Referer'] = 'https://www.goodreturns.in';
   }
 
-  // Forward auth headers from client (for Dhan, Angel One, Telegram)
-  const forward = ['access-token', 'client-id', 'x-api-key', 'authorization', 'content-type', 'dhanclientid'];
-  for (const h of forward) {
-    if (req.headers[h]) headers[h] = req.headers[h];
-  }
-
-  const opts = { method: req.method || 'GET', headers, redirect: 'error', signal: AbortSignal.timeout(12000) };
-
-  if (req.method === 'POST' || req.method === 'PUT') {
-    opts.body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
-    if (!headers['content-type']) headers['content-type'] = 'application/json';
-  }
+  const opts = { method: 'GET', headers, redirect: 'error', signal: AbortSignal.timeout(12000) };
 
   try {
     const upstream = await fetch(url, opts);
