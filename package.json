@@ -13,7 +13,8 @@
     "mobile:android": "cap open android",
     "mobile:ios": "cap open ios",
     "worker:signals": "node --env-file=.env.worker scripts/signal-worker.mjs",
-    "check:deployment": "node scripts/check-deployment.mjs"
+    "check:deployment": "node scripts/check-deployment.mjs",
+    "worker:paper": "node --env-file=.env.worker scripts/paper-worker.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.2",

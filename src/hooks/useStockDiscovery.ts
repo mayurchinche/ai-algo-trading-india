@@ -1,7 +1,7 @@
 import { useEffect, useSyncExternalStore } from 'react';
 import { discoverStocks, fetchQuotes, type DiscoveredStock } from '../services/stockDiscovery';
 import { getSignalHistory, recordSignals, updateOutcomes } from '../services/signalHistory';
-import { getPaperTrades, openPaperTrades, updatePaperTrades } from '../services/paperTrading';
+import { getPaperTrades, updatePaperTrades } from '../services/paperTrading';
 import { fetchMarketStatus, isMarketOpenCached } from '../services/marketStatus';
 import type { MarketQuote } from '../services/tradingTime';
 
@@ -17,7 +17,8 @@ async function runScan() {
     // Monitor existing positions independently of whether they appear in today's screener.
     const symbols = [...getPaperTrades().filter(t => t.status === 'OPEN').map(t => t.symbol), ...getSignalHistory().filter(s => s.outcome === 'PENDING').map(s => s.symbol)];
     const quotes = await fetchQuotes(symbols);
-    updatePaperTrades(quotes); updateOutcomes(quotes);
+    if(localStorage.getItem('paper_legacy_reconciled')!=='true') updatePaperTrades(quotes);
+    updateOutcomes(quotes);
     publish({ quotes });
     if (symbols.some(symbol => !quotes.has(symbol))) publish({ error: 'Some open positions or signals have no quote; their outcomes remain unknown.' });
     const stocks = await discoverStocks();
@@ -26,7 +27,7 @@ async function runScan() {
     const marketOpen = market.isOpen && isMarketOpenCached();
     const observedAt = Date.now();
     if (marketOpen) recordSignals(stocks, observedAt);
-    openPaperTrades(stocks, observedAt);
+    // New paper entries belong exclusively to the persistent backend worker.
     publish({ stocks, marketOpen, lastScan: new Date(observedAt) });
   } catch (error) {
     publish({ marketOpen: false, error: error instanceof Error ? error.message : 'Scan failed; entries paused' });

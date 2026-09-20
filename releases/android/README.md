@@ -27,3 +27,11 @@ SHA-256: `edd3f60cb314618866a81294e68e910d2bf5282905d14df9a855959f37044b81`
 ## Production-data audit build — 20 September 2026
 
 `algotrader-observed-data-2026-09-20.apk` is a debug-signed verification build containing observed-data hardening. SHA-256: `9087a59cc0f3d8d00ff9d80c9ae2601a76a66ed4caf6f3846b43e1bb1c01a1ce`. Options and IPO order execution are intentionally unavailable. It uses the existing Vercel data backend; the backend policy upgrade and database migration have NOT been deployed. It is not a signed production release and has not been tested on a connected phone.
+
+## Persistent paper account verification build
+
+`algotrader-persistent-paper-2026-09-20.apk` — SHA256 `75732d5c5361eb35fd8e8bd0afd17f931b16f42f0c21fece208d99cdf83ffe6a`. Debug-signed; requires authenticated paper API/database and an always-on worker to activate. It does not activate the production backend or a broker stream. See `docs/PERSISTENT-PAPER-TRADING.md`.
+
+## Cumulative balance and funding verification build
+
+`algotrader-paper-balance-2026-09-20.apk` — SHA256 `b1c8e36e0162f12cebdbcc784bd5d10c683576084573a76715cca16632560d6d`. Debug test APK: simulated deposits/withdrawals, cumulative account metrics and one-time local journal reconciliation. Requires the persistent paper API/database/worker activation; installing alone does not deploy the backend or import history.

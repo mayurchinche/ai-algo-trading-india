@@ -625,10 +625,19 @@
       "norm_label": "check:deployment"
     },
     {
+      "label": "worker:paper",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L17",
+      "id": "ai_algo_trading_india_package_scripts_worker_paper",
+      "community": 26,
+      "norm_label": "worker:paper"
+    },
+    {
       "label": "dependencies",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L18",
+      "source_location": "L19",
       "id": "ai_algo_trading_india_package_dependencies",
       "community": 22,
       "norm_label": "dependencies"
@@ -637,7 +646,7 @@
       "label": "@capacitor/android",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L19",
+      "source_location": "L20",
       "id": "ai_algo_trading_india_package_dependencies_capacitor_android",
       "community": 22,
       "norm_label": "@capacitor/android"
@@ -646,7 +655,7 @@
       "label": "@capacitor/core",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L20",
+      "source_location": "L21",
       "id": "ai_algo_trading_india_package_dependencies_capacitor_core",
       "community": 22,
       "norm_label": "@capacitor/core"
@@ -655,7 +664,7 @@
       "label": "@capacitor/ios",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L21",
+      "source_location": "L22",
       "id": "ai_algo_trading_india_package_dependencies_capacitor_ios",
       "community": 22,
       "norm_label": "@capacitor/ios"
@@ -664,7 +673,7 @@
       "label": "@capacitor/push-notifications",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L22",
+      "source_location": "L23",
       "id": "ai_algo_trading_india_package_dependencies_capacitor_push_notifications",
       "community": 22,
       "norm_label": "@capacitor/push-notifications"
@@ -673,7 +682,7 @@
       "label": "@supabase/supabase-js",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L23",
+      "source_location": "L24",
       "id": "ai_algo_trading_india_package_dependencies_supabase_supabase_js",
       "community": 22,
       "norm_label": "@supabase/supabase-js"
@@ -682,7 +691,7 @@
       "label": "firebase-admin",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L24",
+      "source_location": "L25",
       "id": "ai_algo_trading_india_package_dependencies_firebase_admin",
       "community": 22,
       "norm_label": "firebase-admin"
@@ -691,7 +700,7 @@
       "label": "framer-motion",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L25",
+      "source_location": "L26",
       "id": "ai_algo_trading_india_package_dependencies_framer_motion",
       "community": 22,
       "norm_label": "framer-motion"
@@ -700,7 +709,7 @@
       "label": "lucide-react",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L26",
+      "source_location": "L27",
       "id": "ai_algo_trading_india_package_dependencies_lucide_react",
       "community": 22,
       "norm_label": "lucide-react"
@@ -709,7 +718,7 @@
       "label": "react",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L27",
+      "source_location": "L28",
       "id": "ai_algo_trading_india_package_dependencies_react",
       "community": 22,
       "norm_label": "react"
@@ -718,7 +727,7 @@
       "label": "react-dom",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L28",
+      "source_location": "L29",
       "id": "ai_algo_trading_india_package_dependencies_react_dom",
       "community": 22,
       "norm_label": "react-dom"
@@ -727,7 +736,7 @@
       "label": "react-is",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L29",
+      "source_location": "L30",
       "id": "ai_algo_trading_india_package_dependencies_react_is",
       "community": 22,
       "norm_label": "react-is"
@@ -736,7 +745,7 @@
       "label": "recharts",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L30",
+      "source_location": "L31",
       "id": "ai_algo_trading_india_package_dependencies_recharts",
       "community": 22,
       "norm_label": "recharts"
@@ -745,7 +754,7 @@
       "label": "devDependencies",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L32",
+      "source_location": "L33",
       "id": "ai_algo_trading_india_package_devdependencies",
       "community": 23,
       "norm_label": "devdependencies"
@@ -754,7 +763,7 @@
       "label": "@capacitor/cli",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L33",
+      "source_location": "L34",
       "id": "ai_algo_trading_india_package_devdependencies_capacitor_cli",
       "community": 23,
       "norm_label": "@capacitor/cli"
@@ -763,7 +772,7 @@
       "label": "@electric-sql/pglite",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L34",
+      "source_location": "L35",
       "id": "ai_algo_trading_india_package_devdependencies_electric_sql_pglite",
       "community": 23,
       "norm_label": "@electric-sql/pglite"
@@ -772,7 +781,7 @@
       "label": "@tailwindcss/vite",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L35",
+      "source_location": "L36",
       "id": "ai_algo_trading_india_package_devdependencies_tailwindcss_vite",
       "community": 23,
       "norm_label": "@tailwindcss/vite"
@@ -781,7 +790,7 @@
       "label": "@types/node",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L36",
+      "source_location": "L37",
       "id": "ai_algo_trading_india_package_devdependencies_types_node",
       "community": 23,
       "norm_label": "@types/node"
@@ -790,7 +799,7 @@
       "label": "@types/react",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L37",
+      "source_location": "L38",
       "id": "ai_algo_trading_india_package_devdependencies_types_react",
       "community": 23,
       "norm_label": "@types/react"
@@ -799,7 +808,7 @@
       "label": "@types/react-dom",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L38",
+      "source_location": "L39",
       "id": "ai_algo_trading_india_package_devdependencies_types_react_dom",
       "community": 23,
       "norm_label": "@types/react-dom"
@@ -808,7 +817,7 @@
       "label": "@vitejs/plugin-react",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L39",
+      "source_location": "L40",
       "id": "ai_algo_trading_india_package_devdependencies_vitejs_plugin_react",
       "community": 23,
       "norm_label": "@vitejs/plugin-react"
@@ -817,7 +826,7 @@
       "label": "esbuild",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L40",
+      "source_location": "L41",
       "id": "ai_algo_trading_india_package_devdependencies_esbuild",
       "community": 23,
       "norm_label": "esbuild"
@@ -826,7 +835,7 @@
       "label": "oxlint",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L41",
+      "source_location": "L42",
       "id": "ai_algo_trading_india_package_devdependencies_oxlint",
       "community": 23,
       "norm_label": "oxlint"
@@ -835,7 +844,7 @@
       "label": "tailwindcss",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L42",
+      "source_location": "L43",
       "id": "ai_algo_trading_india_package_devdependencies_tailwindcss",
       "community": 23,
       "norm_label": "tailwindcss"
@@ -844,7 +853,7 @@
       "label": "typescript",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L43",
+      "source_location": "L44",
       "id": "ai_algo_trading_india_package_devdependencies_typescript",
       "community": 23,
       "norm_label": "typescript"
@@ -853,7 +862,7 @@
       "label": "vite",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L44",
+      "source_location": "L45",
       "id": "ai_algo_trading_india_package_devdependencies_vite",
       "community": 23,
       "norm_label": "vite"
@@ -862,7 +871,7 @@
       "label": "engines",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L46",
+      "source_location": "L47",
       "id": "ai_algo_trading_india_package_engines",
       "community": 24,
       "norm_label": "engines"
@@ -871,7 +880,7 @@
       "label": "node",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L47",
+      "source_location": "L48",
       "id": "ai_algo_trading_india_package_engines_node",
       "community": 24,
       "norm_label": "node"
@@ -909,25 +918,25 @@
       "source_file": "vite.config.ts",
       "source_location": "L1",
       "id": "vite_config_ts",
-      "community": 8,
+      "community": 25,
       "norm_label": "vite.config.ts"
     },
     {
       "label": "env",
       "file_type": "code",
       "source_file": "vite.config.ts",
-      "source_location": "L13",
+      "source_location": "L15",
       "id": "ai_algo_trading_india_vite_config_env",
-      "community": 8,
+      "community": 25,
       "norm_label": "env"
     },
     {
       "label": "configureServer()",
       "file_type": "code",
       "source_file": "vite.config.ts",
-      "source_location": "L19",
+      "source_location": "L21",
       "id": "ai_algo_trading_india_vite_config_configureserver",
-      "community": 8,
+      "community": 25,
       "norm_label": "configureserver()"
     },
     {
@@ -972,7 +981,7 @@
       "source_file": "tests/mobile-alerts.test.ts",
       "source_location": "L1",
       "id": "tests_mobile_alerts_test_ts",
-      "community": 8,
+      "community": 25,
       "norm_label": "mobile-alerts.test.ts"
     },
     {
@@ -981,7 +990,7 @@
       "source_file": "tests/mobile-alerts.test.ts",
       "source_location": "L7",
       "id": "tests_mobile_alerts_test_now",
-      "community": 8,
+      "community": 25,
       "norm_label": "now"
     },
     {
@@ -990,7 +999,7 @@
       "source_file": "tests/mobile-alerts.test.ts",
       "source_location": "L8",
       "id": "tests_mobile_alerts_test_signal",
-      "community": 8,
+      "community": 25,
       "norm_label": "signal()"
     },
     {
@@ -999,7 +1008,7 @@
       "source_file": "tests/mobile-alerts.test.ts",
       "source_location": "L14",
       "id": "tests_mobile_alerts_test_s",
-      "community": 8,
+      "community": 25,
       "norm_label": "s"
     },
     {
@@ -1008,7 +1017,7 @@
       "source_file": "tests/mobile-alerts.test.ts",
       "source_location": "L20",
       "id": "tests_mobile_alerts_test_stock",
-      "community": 8,
+      "community": 25,
       "norm_label": "stock"
     },
     {
@@ -1017,7 +1026,7 @@
       "source_file": "tests/mobile-alerts.test.ts",
       "source_location": "L25",
       "id": "tests_mobile_alerts_test_msg",
-      "community": 8,
+      "community": 25,
       "norm_label": "msg"
     },
     {
@@ -1026,7 +1035,7 @@
       "source_file": "tests/mobile-alerts.test.ts",
       "source_location": "L29",
       "id": "tests_mobile_alerts_test_response",
-      "community": 8,
+      "community": 25,
       "norm_label": "response()"
     },
     {
@@ -1035,7 +1044,7 @@
       "source_file": "tests/mobile-alerts.test.ts",
       "source_location": "L30",
       "id": "tests_mobile_alerts_test_r",
-      "community": 8,
+      "community": 25,
       "norm_label": "r"
     },
     {
@@ -1044,7 +1053,7 @@
       "source_file": "tests/mobile-alerts.test.ts",
       "source_location": "L35",
       "id": "tests_mobile_alerts_test_fakedatabase",
-      "community": 8,
+      "community": 25,
       "norm_label": "fakedatabase()"
     },
     {
@@ -1053,7 +1062,7 @@
       "source_file": "tests/mobile-alerts.test.ts",
       "source_location": "L41",
       "id": "tests_mobile_alerts_test_db",
-      "community": 8,
+      "community": 25,
       "norm_label": "db"
     },
     {
@@ -1062,7 +1071,7 @@
       "source_file": "tests/production-data.test.ts",
       "source_location": "L1",
       "id": "tests_production_data_test_ts",
-      "community": 1,
+      "community": 53,
       "norm_label": "production-data.test.ts"
     },
     {
@@ -1071,7 +1080,7 @@
       "source_file": "tests/production-data.test.ts",
       "source_location": "L10",
       "id": "tests_production_data_test_now",
-      "community": 1,
+      "community": 53,
       "norm_label": "now"
     },
     {
@@ -1080,7 +1089,7 @@
       "source_file": "tests/production-data.test.ts",
       "source_location": "L11",
       "id": "tests_production_data_test_config",
-      "community": 1,
+      "community": 53,
       "norm_label": "config"
     },
     {
@@ -1089,7 +1098,7 @@
       "source_file": "tests/production-data.test.ts",
       "source_location": "L12",
       "id": "tests_production_data_test_chart",
-      "community": 1,
+      "community": 53,
       "norm_label": "chart()"
     },
     {
@@ -1098,7 +1107,7 @@
       "source_file": "tests/production-data.test.ts",
       "source_location": "L14",
       "id": "tests_production_data_test_data",
-      "community": 1,
+      "community": 53,
       "norm_label": "data"
     },
     {
@@ -1107,7 +1116,7 @@
       "source_file": "tests/production-data.test.ts",
       "source_location": "L19",
       "id": "tests_production_data_test_result",
-      "community": 1,
+      "community": 53,
       "norm_label": "result"
     },
     {
@@ -1116,7 +1125,7 @@
       "source_file": "tests/production-data.test.ts",
       "source_location": "L40",
       "id": "tests_production_data_test_requests",
-      "community": 1,
+      "community": 53,
       "norm_label": "requests"
     },
     {
@@ -1125,7 +1134,7 @@
       "source_file": "tests/production-data.test.ts",
       "source_location": "L43",
       "id": "tests_production_data_test_response",
-      "community": 1,
+      "community": 53,
       "norm_label": "response()"
     },
     {
@@ -1134,7 +1143,7 @@
       "source_file": "tests/production-data.test.ts",
       "source_location": "L46",
       "id": "tests_production_data_test_res",
-      "community": 1,
+      "community": 53,
       "norm_label": "res"
     },
     {
@@ -1179,7 +1188,7 @@
       "source_file": "tests/foreground-alerts.test.ts",
       "source_location": "L1",
       "id": "tests_foreground_alerts_test_ts",
-      "community": 47,
+      "community": 2,
       "norm_label": "foreground-alerts.test.ts"
     },
     {
@@ -1188,7 +1197,7 @@
       "source_file": "tests/foreground-alerts.test.ts",
       "source_location": "L5",
       "id": "tests_foreground_alerts_test_storage",
-      "community": 47,
+      "community": 2,
       "norm_label": "storage"
     },
     {
@@ -1197,7 +1206,7 @@
       "source_file": "tests/foreground-alerts.test.ts",
       "source_location": "L7",
       "id": "tests_foreground_alerts_test_now",
-      "community": 47,
+      "community": 2,
       "norm_label": "now"
     },
     {
@@ -1206,7 +1215,7 @@
       "source_file": "tests/foreground-alerts.test.ts",
       "source_location": "L8",
       "id": "tests_foreground_alerts_test_stock",
-      "community": 47,
+      "community": 2,
       "norm_label": "stock()"
     },
     {
@@ -1215,7 +1224,7 @@
       "source_file": "tests/foreground-alerts.test.ts",
       "source_location": "L21",
       "id": "tests_foreground_alerts_test_sell",
-      "community": 47,
+      "community": 2,
       "norm_label": "sell"
     },
     {
@@ -1224,7 +1233,7 @@
       "source_file": "tests/foreground-alerts.test.ts",
       "source_location": "L22",
       "id": "tests_foreground_alerts_test_alerts",
-      "community": 47,
+      "community": 2,
       "norm_label": "alerts"
     },
     {
@@ -1458,7 +1467,7 @@
       "source_file": "tests/backend.test.ts",
       "source_location": "L1",
       "id": "tests_backend_test_ts",
-      "community": 8,
+      "community": 25,
       "norm_label": "backend.test.ts"
     },
     {
@@ -1467,7 +1476,7 @@
       "source_file": "tests/backend.test.ts",
       "source_location": "L7",
       "id": "tests_backend_test_response",
-      "community": 8,
+      "community": 25,
       "norm_label": "response()"
     },
     {
@@ -1476,7 +1485,7 @@
       "source_file": "tests/backend.test.ts",
       "source_location": "L13",
       "id": "tests_backend_test_res",
-      "community": 8,
+      "community": 25,
       "norm_label": "res"
     },
     {
@@ -1485,7 +1494,7 @@
       "source_file": "tests/backend.test.ts",
       "source_location": "L15",
       "id": "tests_backend_test_pre",
-      "community": 8,
+      "community": 25,
       "norm_label": "pre"
     },
     {
@@ -1494,7 +1503,7 @@
       "source_file": "tests/backend.test.ts",
       "source_location": "L23",
       "id": "tests_backend_test_req",
-      "community": 8,
+      "community": 25,
       "norm_label": "req"
     },
     {
@@ -1503,8 +1512,314 @@
       "source_file": "tests/backend.test.ts",
       "source_location": "L25",
       "id": "tests_backend_test_data",
-      "community": 8,
+      "community": 25,
       "norm_label": "data"
+    },
+    {
+      "label": "paper-database.mjs",
+      "file_type": "code",
+      "source_file": "tests/paper-database.mjs",
+      "source_location": "L1",
+      "id": "tests_paper_database_mjs",
+      "community": 8,
+      "norm_label": "paper-database.mjs"
+    },
+    {
+      "label": "db",
+      "file_type": "code",
+      "source_file": "tests/paper-database.mjs",
+      "source_location": "L2",
+      "id": "tests_paper_database_db",
+      "community": 8,
+      "norm_label": "db"
+    },
+    {
+      "label": "event",
+      "file_type": "code",
+      "source_file": "tests/paper-database.mjs",
+      "source_location": "L7",
+      "id": "tests_paper_database_event",
+      "community": 8,
+      "norm_label": "event"
+    },
+    {
+      "label": "commit()",
+      "file_type": "code",
+      "source_file": "tests/paper-database.mjs",
+      "source_location": "L8",
+      "id": "tests_paper_database_commit",
+      "community": 8,
+      "norm_label": "commit()"
+    },
+    {
+      "label": "paper-funds.test.ts",
+      "file_type": "code",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L1",
+      "id": "tests_paper_funds_test_ts",
+      "community": 8,
+      "norm_label": "paper-funds.test.ts"
+    },
+    {
+      "label": "now",
+      "file_type": "code",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L4",
+      "id": "tests_paper_funds_test_now",
+      "community": 8,
+      "norm_label": "now"
+    },
+    {
+      "label": "adjustment()",
+      "file_type": "code",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L5",
+      "id": "tests_paper_funds_test_adjustment",
+      "community": 8,
+      "norm_label": "adjustment()"
+    },
+    {
+      "label": "s",
+      "file_type": "code",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L7",
+      "id": "tests_paper_funds_test_s",
+      "community": 8,
+      "norm_label": "s"
+    },
+    {
+      "label": "r",
+      "file_type": "code",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L7",
+      "id": "tests_paper_funds_test_r",
+      "community": 8,
+      "norm_label": "r"
+    },
+    {
+      "label": "b",
+      "file_type": "code",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L8",
+      "id": "tests_paper_funds_test_b",
+      "community": 8,
+      "norm_label": "b"
+    },
+    {
+      "label": "tomorrow",
+      "file_type": "code",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L9",
+      "id": "tests_paper_funds_test_tomorrow",
+      "community": 8,
+      "norm_label": "tomorrow"
+    },
+    {
+      "label": "retry",
+      "file_type": "code",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L12",
+      "id": "tests_paper_funds_test_retry",
+      "community": 8,
+      "norm_label": "retry"
+    },
+    {
+      "label": "trade()",
+      "file_type": "code",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L17",
+      "id": "tests_paper_funds_test_trade",
+      "community": 8,
+      "norm_label": "trade()"
+    },
+    {
+      "label": "original",
+      "file_type": "code",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L19",
+      "id": "tests_paper_funds_test_original",
+      "community": 8,
+      "norm_label": "original"
+    },
+    {
+      "label": "next",
+      "file_type": "code",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L21",
+      "id": "tests_paper_funds_test_next",
+      "community": 8,
+      "norm_label": "next"
+    },
+    {
+      "label": "t",
+      "file_type": "code",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L24",
+      "id": "tests_paper_funds_test_t",
+      "community": 8,
+      "norm_label": "t"
+    },
+    {
+      "label": "open",
+      "file_type": "code",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L27",
+      "id": "tests_paper_funds_test_open",
+      "community": 8,
+      "norm_label": "open"
+    },
+    {
+      "label": "legacy",
+      "file_type": "code",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L32",
+      "id": "tests_paper_funds_test_legacy",
+      "community": 8,
+      "norm_label": "legacy"
+    },
+    {
+      "label": "tick()",
+      "file_type": "code",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L33",
+      "id": "tests_paper_funds_test_tick",
+      "community": 8,
+      "norm_label": "tick()"
+    },
+    {
+      "label": "paper-engine.test.ts",
+      "file_type": "code",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L1",
+      "id": "tests_paper_engine_test_ts",
+      "community": 8,
+      "norm_label": "paper-engine.test.ts"
+    },
+    {
+      "label": "start",
+      "file_type": "code",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L3",
+      "id": "tests_paper_engine_test_start",
+      "community": 8,
+      "norm_label": "start"
+    },
+    {
+      "label": "q()",
+      "file_type": "code",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L4",
+      "id": "tests_paper_engine_test_q",
+      "community": 8,
+      "norm_label": "q()"
+    },
+    {
+      "label": "signal",
+      "file_type": "code",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L5",
+      "id": "tests_paper_engine_test_signal",
+      "community": 8,
+      "norm_label": "signal"
+    },
+    {
+      "label": "step()",
+      "file_type": "code",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L6",
+      "id": "tests_paper_engine_test_step",
+      "community": 8,
+      "norm_label": "step()"
+    },
+    {
+      "label": "pending()",
+      "file_type": "code",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L7",
+      "id": "tests_paper_engine_test_pending",
+      "community": 8,
+      "norm_label": "pending()"
+    },
+    {
+      "label": "s",
+      "file_type": "code",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L9",
+      "id": "tests_paper_engine_test_s",
+      "community": 8,
+      "norm_label": "s"
+    },
+    {
+      "label": "filled",
+      "file_type": "code",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L10",
+      "id": "tests_paper_engine_test_filled",
+      "community": 8,
+      "norm_label": "filled"
+    },
+    {
+      "label": "result",
+      "file_type": "code",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L16",
+      "id": "tests_paper_engine_test_result",
+      "community": 8,
+      "norm_label": "result"
+    },
+    {
+      "label": "tick",
+      "file_type": "code",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L19",
+      "id": "tests_paper_engine_test_tick",
+      "community": 8,
+      "norm_label": "tick"
+    },
+    {
+      "label": "r",
+      "file_type": "code",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L19",
+      "id": "tests_paper_engine_test_r",
+      "community": 8,
+      "norm_label": "r"
+    },
+    {
+      "label": "sell",
+      "file_type": "code",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L40",
+      "id": "tests_paper_engine_test_sell",
+      "community": 8,
+      "norm_label": "sell"
+    },
+    {
+      "label": "response()",
+      "file_type": "code",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L47",
+      "id": "tests_paper_engine_test_response",
+      "community": 8,
+      "norm_label": "response()"
+    },
+    {
+      "label": "blocked",
+      "file_type": "code",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L49",
+      "id": "tests_paper_engine_test_blocked",
+      "community": 8,
+      "norm_label": "blocked"
+    },
+    {
+      "label": "second",
+      "file_type": "code",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L56",
+      "id": "tests_paper_engine_test_second",
+      "community": 8,
+      "norm_label": "second"
     },
     {
       "label": "pushBackend.js",
@@ -1512,7 +1827,7 @@
       "source_file": "server/pushBackend.js",
       "source_location": "L1",
       "id": "server_pushbackend_js",
-      "community": 8,
+      "community": 25,
       "norm_label": "pushbackend.js"
     },
     {
@@ -1521,7 +1836,7 @@
       "source_file": "server/pushBackend.js",
       "source_location": "L3",
       "id": "server_pushbackend_backend",
-      "community": 8,
+      "community": 25,
       "norm_label": "backend()"
     },
     {
@@ -1530,7 +1845,7 @@
       "source_file": "server/pushBackend.js",
       "source_location": "L7",
       "id": "server_pushbackend_allowrequest",
-      "community": 8,
+      "community": 25,
       "norm_label": "allowrequest()"
     },
     {
@@ -1539,7 +1854,7 @@
       "source_file": "server/pushBackend.js",
       "source_location": "L21",
       "id": "server_pushbackend_signedinuser",
-      "community": 8,
+      "community": 25,
       "norm_label": "signedinuser()"
     },
     {
@@ -1548,7 +1863,7 @@
       "source_file": "server/pushBackend.js",
       "source_location": "L27",
       "id": "server_pushbackend_check",
-      "community": 8,
+      "community": 25,
       "norm_label": "check()"
     },
     {
@@ -1557,7 +1872,7 @@
       "source_file": "server/mobileConfig.js",
       "source_location": "L1",
       "id": "server_mobileconfig_js",
-      "community": 8,
+      "community": 25,
       "norm_label": "mobileconfig.js"
     },
     {
@@ -1566,7 +1881,7 @@
       "source_file": "server/mobileConfig.js",
       "source_location": "L1",
       "id": "server_mobileconfig_validatemobileapibase",
-      "community": 8,
+      "community": 25,
       "norm_label": "validatemobileapibase()"
     },
     {
@@ -1575,7 +1890,7 @@
       "source_file": "server/dispatchAlerts.js",
       "source_location": "L1",
       "id": "server_dispatchalerts_js",
-      "community": 8,
+      "community": 25,
       "norm_label": "dispatchalerts.js"
     },
     {
@@ -1584,8 +1899,134 @@
       "source_file": "server/dispatchAlerts.js",
       "source_location": "L4",
       "id": "server_dispatchalerts_dispatchalerts",
-      "community": 8,
+      "community": 25,
       "norm_label": "dispatchalerts()"
+    },
+    {
+      "label": "paperEngine.js",
+      "file_type": "code",
+      "source_file": "server/paperEngine.js",
+      "source_location": "L1",
+      "id": "server_paperengine_js",
+      "community": 8,
+      "norm_label": "paperengine.js"
+    },
+    {
+      "label": "day()",
+      "file_type": "code",
+      "source_file": "server/paperEngine.js",
+      "source_location": "L4",
+      "id": "server_paperengine_day",
+      "community": 8,
+      "norm_label": "day()"
+    },
+    {
+      "label": "minute()",
+      "file_type": "code",
+      "source_file": "server/paperEngine.js",
+      "source_location": "L5",
+      "id": "server_paperengine_minute",
+      "community": 8,
+      "norm_label": "minute()"
+    },
+    {
+      "label": "round()",
+      "file_type": "code",
+      "source_file": "server/paperEngine.js",
+      "source_location": "L6",
+      "id": "server_paperengine_round",
+      "community": 8,
+      "norm_label": "round()"
+    },
+    {
+      "label": "cost()",
+      "file_type": "code",
+      "source_file": "server/paperEngine.js",
+      "source_location": "L7",
+      "id": "server_paperengine_cost",
+      "community": 8,
+      "norm_label": "cost()"
+    },
+    {
+      "label": "newPaperAccount()",
+      "file_type": "code",
+      "source_file": "server/paperEngine.js",
+      "source_location": "L8",
+      "id": "server_paperengine_newpaperaccount",
+      "community": 8,
+      "norm_label": "newpaperaccount()"
+    },
+    {
+      "label": "advancePaper()",
+      "file_type": "code",
+      "source_file": "server/paperEngine.js",
+      "source_location": "L9",
+      "id": "server_paperengine_advancepaper",
+      "community": 8,
+      "norm_label": "advancepaper()"
+    },
+    {
+      "label": "paperFunds.js",
+      "file_type": "code",
+      "source_file": "server/paperFunds.js",
+      "source_location": "L1",
+      "id": "server_paperfunds_js",
+      "community": 8,
+      "norm_label": "paperfunds.js"
+    },
+    {
+      "label": "round()",
+      "file_type": "code",
+      "source_file": "server/paperFunds.js",
+      "source_location": "L2",
+      "id": "server_paperfunds_round",
+      "community": 8,
+      "norm_label": "round()"
+    },
+    {
+      "label": "PaperAccountError",
+      "file_type": "code",
+      "source_file": "server/paperFunds.js",
+      "source_location": "L3",
+      "id": "server_paperfunds_paperaccounterror",
+      "community": 8,
+      "norm_label": "paperaccounterror"
+    },
+    {
+      "label": "fundedCapital()",
+      "file_type": "code",
+      "source_file": "server/paperFunds.js",
+      "source_location": "L4",
+      "id": "server_paperfunds_fundedcapital",
+      "community": 8,
+      "norm_label": "fundedcapital()"
+    },
+    {
+      "label": "paperBalance()",
+      "file_type": "code",
+      "source_file": "server/paperFunds.js",
+      "source_location": "L5",
+      "id": "server_paperfunds_paperbalance",
+      "community": 8,
+      "norm_label": "paperbalance()"
+    },
+    {
+      "label": "transferPaperFunds()",
+      "file_type": "code",
+      "source_file": "server/paperFunds.js",
+      "source_location": "L18",
+      "id": "server_paperfunds_transferpaperfunds",
+      "community": 8,
+      "norm_label": "transferpaperfunds()"
+    },
+    {
+      "label": "importLegacyPaper()",
+      "file_type": "code",
+      "source_file": "server/paperFunds.js",
+      "source_location": "L30",
+      "id": "server_paperfunds_importlegacypaper",
+      "community": 8,
+      "norm_label": "importlegacypaper()"
     },
     {
       "label": "alertPolicy.js",
@@ -1593,7 +2034,7 @@
       "source_file": "server/alertPolicy.js",
       "source_location": "L1",
       "id": "server_alertpolicy_js",
-      "community": 8,
+      "community": 25,
       "norm_label": "alertpolicy.js"
     },
     {
@@ -1602,7 +2043,7 @@
       "source_file": "server/alertPolicy.js",
       "source_location": "L4",
       "id": "server_alertpolicy_validatealert",
-      "community": 8,
+      "community": 25,
       "norm_label": "validatealert()"
     },
     {
@@ -1611,7 +2052,7 @@
       "source_file": "server/alertPolicy.js",
       "source_location": "L21",
       "id": "server_alertpolicy_equityalert",
-      "community": 8,
+      "community": 25,
       "norm_label": "equityalert()"
     },
     {
@@ -1620,7 +2061,7 @@
       "source_file": "server/alertPolicy.js",
       "source_location": "L31",
       "id": "server_alertpolicy_notificationcontent",
-      "community": 8,
+      "community": 25,
       "norm_label": "notificationcontent()"
     },
     {
@@ -1629,7 +2070,7 @@
       "source_file": "server/pushDelivery.js",
       "source_location": "L1",
       "id": "server_pushdelivery_js",
-      "community": 8,
+      "community": 25,
       "norm_label": "pushdelivery.js"
     },
     {
@@ -1638,7 +2079,7 @@
       "source_file": "server/pushDelivery.js",
       "source_location": "L5",
       "id": "server_pushdelivery_androidmessage",
-      "community": 8,
+      "community": 25,
       "norm_label": "androidmessage()"
     },
     {
@@ -1647,7 +2088,7 @@
       "source_file": "server/pushDelivery.js",
       "source_location": "L10",
       "id": "server_pushdelivery_appletoken",
-      "community": 8,
+      "community": 25,
       "norm_label": "appletoken()"
     },
     {
@@ -1656,7 +2097,7 @@
       "source_file": "server/pushDelivery.js",
       "source_location": "L20",
       "id": "server_pushdelivery_sendapple",
-      "community": 8,
+      "community": 25,
       "norm_label": "sendapple()"
     },
     {
@@ -1665,7 +2106,7 @@
       "source_file": "server/pushDelivery.js",
       "source_location": "L38",
       "id": "server_pushdelivery_sendpush",
-      "community": 8,
+      "community": 25,
       "norm_label": "sendpush()"
     },
     {
@@ -2155,12 +2596,66 @@
       "norm_label": "now"
     },
     {
+      "label": "paper-worker.mjs",
+      "file_type": "code",
+      "source_file": "scripts/paper-worker.mjs",
+      "source_location": "L1",
+      "id": "scripts_paper_worker_mjs",
+      "community": 25,
+      "norm_label": "paper-worker.mjs"
+    },
+    {
+      "label": "db",
+      "file_type": "code",
+      "source_file": "scripts/paper-worker.mjs",
+      "source_location": "L11",
+      "id": "scripts_paper_worker_db",
+      "community": 25,
+      "norm_label": "db"
+    },
+    {
+      "label": "candidates",
+      "file_type": "code",
+      "source_file": "scripts/paper-worker.mjs",
+      "source_location": "L11",
+      "id": "scripts_paper_worker_candidates",
+      "community": 25,
+      "norm_label": "candidates"
+    },
+    {
+      "label": "discover()",
+      "file_type": "code",
+      "source_file": "scripts/paper-worker.mjs",
+      "source_location": "L13",
+      "id": "scripts_paper_worker_discover",
+      "community": 25,
+      "norm_label": "discover()"
+    },
+    {
+      "label": "accounts()",
+      "file_type": "code",
+      "source_file": "scripts/paper-worker.mjs",
+      "source_location": "L19",
+      "id": "scripts_paper_worker_accounts",
+      "community": 25,
+      "norm_label": "accounts()"
+    },
+    {
+      "label": "cycle()",
+      "file_type": "code",
+      "source_file": "scripts/paper-worker.mjs",
+      "source_location": "L22",
+      "id": "scripts_paper_worker_cycle",
+      "community": 25,
+      "norm_label": "cycle()"
+    },
+    {
       "label": "signal-worker.mjs",
       "file_type": "code",
       "source_file": "scripts/signal-worker.mjs",
       "source_location": "L1",
       "id": "scripts_signal_worker_mjs",
-      "community": 8,
+      "community": 25,
       "norm_label": "signal-worker.mjs"
     },
     {
@@ -2169,7 +2664,7 @@
       "source_file": "scripts/signal-worker.mjs",
       "source_location": "L14",
       "id": "scripts_signal_worker_db",
-      "community": 8,
+      "community": 25,
       "norm_label": "db"
     },
     {
@@ -2178,7 +2673,7 @@
       "source_file": "scripts/signal-worker.mjs",
       "source_location": "L17",
       "id": "scripts_signal_worker_scan",
-      "community": 8,
+      "community": 25,
       "norm_label": "scan()"
     },
     {
@@ -2187,7 +2682,7 @@
       "source_file": "scripts/signal-worker.mjs",
       "source_location": "L28",
       "id": "scripts_signal_worker_started",
-      "community": 8,
+      "community": 25,
       "norm_label": "started"
     },
     {
@@ -2196,7 +2691,7 @@
       "source_file": "api/dispatch-alerts.js",
       "source_location": "L1",
       "id": "api_dispatch_alerts_js",
-      "community": 8,
+      "community": 25,
       "norm_label": "dispatch-alerts.js"
     },
     {
@@ -2205,7 +2700,7 @@
       "source_file": "api/dispatch-alerts.js",
       "source_location": "L3",
       "id": "api_dispatch_alerts_handler",
-      "community": 8,
+      "community": 25,
       "norm_label": "handler()"
     },
     {
@@ -2214,7 +2709,7 @@
       "source_file": "api/proxy.js",
       "source_location": "L1",
       "id": "api_proxy_js",
-      "community": 8,
+      "community": 25,
       "norm_label": "proxy.js"
     },
     {
@@ -2223,7 +2718,7 @@
       "source_file": "api/proxy.js",
       "source_location": "L5",
       "id": "api_proxy_handler",
-      "community": 8,
+      "community": 25,
       "norm_label": "handler()"
     },
     {
@@ -2232,7 +2727,7 @@
       "source_file": "api/market.js",
       "source_location": "L1",
       "id": "api_market_js",
-      "community": 8,
+      "community": 25,
       "norm_label": "market.js"
     },
     {
@@ -2241,7 +2736,7 @@
       "source_file": "api/market.js",
       "source_location": "L3",
       "id": "api_market_handler",
-      "community": 8,
+      "community": 25,
       "norm_label": "handler()"
     },
     {
@@ -2250,7 +2745,7 @@
       "source_file": "api/health.js",
       "source_location": "L1",
       "id": "api_health_js",
-      "community": 8,
+      "community": 25,
       "norm_label": "health.js"
     },
     {
@@ -2259,6 +2754,24 @@
       "source_file": "api/health.js",
       "source_location": "L2",
       "id": "api_health_handler",
+      "community": 25,
+      "norm_label": "handler()"
+    },
+    {
+      "label": "paper.js",
+      "file_type": "code",
+      "source_file": "api/paper.js",
+      "source_location": "L1",
+      "id": "api_paper_js",
+      "community": 8,
+      "norm_label": "paper.js"
+    },
+    {
+      "label": "handler()",
+      "file_type": "code",
+      "source_file": "api/paper.js",
+      "source_location": "L4",
+      "id": "api_paper_handler",
       "community": 8,
       "norm_label": "handler()"
     },
@@ -2268,7 +2781,7 @@
       "source_file": "api/mobile-alerts.js",
       "source_location": "L1",
       "id": "api_mobile_alerts_js",
-      "community": 8,
+      "community": 25,
       "norm_label": "mobile-alerts.js"
     },
     {
@@ -2277,7 +2790,7 @@
       "source_file": "api/mobile-alerts.js",
       "source_location": "L2",
       "id": "api_mobile_alerts_handler",
-      "community": 8,
+      "community": 25,
       "norm_label": "handler()"
     },
     {
@@ -2340,7 +2853,7 @@
       "source_file": "src/App.tsx",
       "source_location": "L1",
       "id": "src_app_tsx",
-      "community": 2,
+      "community": 51,
       "norm_label": "app.tsx"
     },
     {
@@ -2349,7 +2862,7 @@
       "source_file": "src/App.tsx",
       "source_location": "L18",
       "id": "src_app_app",
-      "community": 2,
+      "community": 51,
       "norm_label": "app()"
     },
     {
@@ -2358,7 +2871,7 @@
       "source_file": "src/main.tsx",
       "source_location": "L1",
       "id": "src_main_tsx",
-      "community": 10,
+      "community": 56,
       "norm_label": "main.tsx"
     },
     {
@@ -2367,7 +2880,7 @@
       "source_file": "src/utils/fetchMarketJSON.ts",
       "source_location": "L1",
       "id": "src_utils_fetchmarketjson_ts",
-      "community": 6,
+      "community": 47,
       "norm_label": "fetchmarketjson.ts"
     },
     {
@@ -2376,7 +2889,7 @@
       "source_file": "src/utils/fetchMarketJSON.ts",
       "source_location": "L3",
       "id": "utils_fetchmarketjson_fetchmarketjson",
-      "community": 6,
+      "community": 47,
       "norm_label": "fetchmarketjson()"
     },
     {
@@ -2385,7 +2898,7 @@
       "source_file": "src/utils/apiUrl.ts",
       "source_location": "L1",
       "id": "src_utils_apiurl_ts",
-      "community": 6,
+      "community": 47,
       "norm_label": "apiurl.ts"
     },
     {
@@ -2394,7 +2907,7 @@
       "source_file": "src/utils/apiUrl.ts",
       "source_location": "L5",
       "id": "utils_apiurl_proxy_map",
-      "community": 6,
+      "community": 47,
       "norm_label": "proxy_map"
     },
     {
@@ -2403,7 +2916,7 @@
       "source_file": "src/utils/apiUrl.ts",
       "source_location": "L17",
       "id": "utils_apiurl_apiurl",
-      "community": 1,
+      "community": 47,
       "norm_label": "apiurl()"
     },
     {
@@ -2430,26 +2943,35 @@
       "source_file": "src/components/TradesPage.tsx",
       "source_location": "L1",
       "id": "src_components_tradespage_tsx",
-      "community": 0,
+      "community": 51,
       "norm_label": "tradespage.tsx"
     },
     {
       "label": "money()",
       "file_type": "code",
       "source_file": "src/components/TradesPage.tsx",
-      "source_location": "L6",
+      "source_location": "L7",
       "id": "components_tradespage_money",
-      "community": 0,
+      "community": 51,
       "norm_label": "money()"
     },
     {
       "label": "TradesPage()",
       "file_type": "code",
       "source_file": "src/components/TradesPage.tsx",
-      "source_location": "L7",
+      "source_location": "L8",
       "id": "components_tradespage_tradespage",
-      "community": 0,
+      "community": 51,
       "norm_label": "tradespage()"
+    },
+    {
+      "label": "LegacyTradesPage()",
+      "file_type": "code",
+      "source_file": "src/components/TradesPage.tsx",
+      "source_location": "L9",
+      "id": "components_tradespage_legacytradespage",
+      "community": 51,
+      "norm_label": "legacytradespage()"
     },
     {
       "label": "BacktestPage.tsx",
@@ -2502,25 +3024,16 @@
       "source_file": "src/components/OverviewPage.tsx",
       "source_location": "L1",
       "id": "src_components_overviewpage_tsx",
-      "community": 2,
+      "community": 51,
       "norm_label": "overviewpage.tsx"
-    },
-    {
-      "label": "money()",
-      "file_type": "code",
-      "source_file": "src/components/OverviewPage.tsx",
-      "source_location": "L3",
-      "id": "components_overviewpage_money",
-      "community": 2,
-      "norm_label": "money()"
     },
     {
       "label": "OverviewPage()",
       "file_type": "code",
       "source_file": "src/components/OverviewPage.tsx",
-      "source_location": "L4",
+      "source_location": "L2",
       "id": "components_overviewpage_overviewpage",
-      "community": 2,
+      "community": 51,
       "norm_label": "overviewpage()"
     },
     {
@@ -2529,7 +3042,7 @@
       "source_file": "src/components/JournalErrorBoundary.tsx",
       "source_location": "L1",
       "id": "src_components_journalerrorboundary_tsx",
-      "community": 10,
+      "community": 56,
       "norm_label": "journalerrorboundary.tsx"
     },
     {
@@ -2538,7 +3051,7 @@
       "source_file": "src/components/JournalErrorBoundary.tsx",
       "source_location": "L3",
       "id": "components_journalerrorboundary_journalerrorboundary",
-      "community": 10,
+      "community": 56,
       "norm_label": "journalerrorboundary"
     },
     {
@@ -2547,7 +3060,7 @@
       "source_file": "src/components/JournalErrorBoundary.tsx",
       "source_location": "L5",
       "id": "components_journalerrorboundary_journalerrorboundary_getderivedstatefromerror",
-      "community": 10,
+      "community": 56,
       "norm_label": ".getderivedstatefromerror()"
     },
     {
@@ -2556,7 +3069,7 @@
       "source_file": "src/components/JournalErrorBoundary.tsx",
       "source_location": "L6",
       "id": "components_journalerrorboundary_journalerrorboundary_render",
-      "community": 10,
+      "community": 56,
       "norm_label": ".render()"
     },
     {
@@ -2610,7 +3123,7 @@
       "source_file": "src/components/SignalsPage.tsx",
       "source_location": "L1",
       "id": "src_components_signalspage_tsx",
-      "community": 2,
+      "community": 0,
       "norm_label": "signalspage.tsx"
     },
     {
@@ -2619,7 +3132,7 @@
       "source_file": "src/components/SignalsPage.tsx",
       "source_location": "L9",
       "id": "components_signalspage_directionfromsignal",
-      "community": 2,
+      "community": 0,
       "norm_label": "directionfromsignal()"
     },
     {
@@ -2628,8 +3141,62 @@
       "source_file": "src/components/SignalsPage.tsx",
       "source_location": "L15",
       "id": "components_signalspage_signalspage",
-      "community": 2,
+      "community": 0,
       "norm_label": "signalspage()"
+    },
+    {
+      "label": "ServerPaperPage.tsx",
+      "file_type": "code",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L1",
+      "id": "src_components_serverpaperpage_tsx",
+      "community": 51,
+      "norm_label": "serverpaperpage.tsx"
+    },
+    {
+      "label": "Order",
+      "file_type": "code",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L6",
+      "id": "components_serverpaperpage_order",
+      "community": 51,
+      "norm_label": "order"
+    },
+    {
+      "label": "Account",
+      "file_type": "code",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L7",
+      "id": "components_serverpaperpage_account",
+      "community": 51,
+      "norm_label": "account"
+    },
+    {
+      "label": "money()",
+      "file_type": "code",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L8",
+      "id": "components_serverpaperpage_money",
+      "community": 51,
+      "norm_label": "money()"
+    },
+    {
+      "label": "PaperEvent",
+      "file_type": "code",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L9",
+      "id": "components_serverpaperpage_paperevent",
+      "community": 51,
+      "norm_label": "paperevent"
+    },
+    {
+      "label": "ServerPaperPage()",
+      "file_type": "code",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L10",
+      "id": "components_serverpaperpage_serverpaperpage",
+      "community": 51,
+      "norm_label": "serverpaperpage()"
     },
     {
       "label": "SignalPopup.tsx",
@@ -2637,7 +3204,7 @@
       "source_file": "src/components/SignalPopup.tsx",
       "source_location": "L1",
       "id": "src_components_signalpopup_tsx",
-      "community": 2,
+      "community": 0,
       "norm_label": "signalpopup.tsx"
     },
     {
@@ -2646,7 +3213,7 @@
       "source_file": "src/components/SignalPopup.tsx",
       "source_location": "L5",
       "id": "components_signalpopup_signalpopup",
-      "community": 2,
+      "community": 51,
       "norm_label": "signalpopup()"
     },
     {
@@ -2673,7 +3240,7 @@
       "source_file": "src/components/Header.tsx",
       "source_location": "L13",
       "id": "components_header_header",
-      "community": 2,
+      "community": 6,
       "norm_label": "header()"
     },
     {
@@ -2682,7 +3249,7 @@
       "source_file": "src/components/DiscoveryPage.tsx",
       "source_location": "L1",
       "id": "src_components_discoverypage_tsx",
-      "community": 2,
+      "community": 51,
       "norm_label": "discoverypage.tsx"
     },
     {
@@ -2691,7 +3258,7 @@
       "source_file": "src/components/DiscoveryPage.tsx",
       "source_location": "L6",
       "id": "components_discoverypage_signalbadge",
-      "community": 2,
+      "community": 51,
       "norm_label": "signalbadge()"
     },
     {
@@ -2700,7 +3267,7 @@
       "source_file": "src/components/DiscoveryPage.tsx",
       "source_location": "L11",
       "id": "components_discoverypage_trendbadge",
-      "community": 2,
+      "community": 51,
       "norm_label": "trendbadge()"
     },
     {
@@ -2709,7 +3276,7 @@
       "source_file": "src/components/DiscoveryPage.tsx",
       "source_location": "L17",
       "id": "components_discoverypage_scorebar",
-      "community": 2,
+      "community": 51,
       "norm_label": "scorebar()"
     },
     {
@@ -2718,7 +3285,7 @@
       "source_file": "src/components/DiscoveryPage.tsx",
       "source_location": "L31",
       "id": "components_discoverypage_stockcard",
-      "community": 2,
+      "community": 51,
       "norm_label": "stockcard()"
     },
     {
@@ -2727,8 +3294,53 @@
       "source_file": "src/components/DiscoveryPage.tsx",
       "source_location": "L149",
       "id": "components_discoverypage_discoverypage",
-      "community": 2,
+      "community": 51,
       "norm_label": "discoverypage()"
+    },
+    {
+      "label": "PaperFundsPanel.tsx",
+      "file_type": "code",
+      "source_file": "src/components/PaperFundsPanel.tsx",
+      "source_location": "L1",
+      "id": "src_components_paperfundspanel_tsx",
+      "community": 51,
+      "norm_label": "paperfundspanel.tsx"
+    },
+    {
+      "label": "PaperBalance",
+      "file_type": "code",
+      "source_file": "src/components/PaperFundsPanel.tsx",
+      "source_location": "L4",
+      "id": "components_paperfundspanel_paperbalance",
+      "community": 51,
+      "norm_label": "paperbalance"
+    },
+    {
+      "label": "FundingState",
+      "file_type": "code",
+      "source_file": "src/components/PaperFundsPanel.tsx",
+      "source_location": "L5",
+      "id": "components_paperfundspanel_fundingstate",
+      "community": 51,
+      "norm_label": "fundingstate"
+    },
+    {
+      "label": "money()",
+      "file_type": "code",
+      "source_file": "src/components/PaperFundsPanel.tsx",
+      "source_location": "L6",
+      "id": "components_paperfundspanel_money",
+      "community": 51,
+      "norm_label": "money()"
+    },
+    {
+      "label": "PaperFundsPanel()",
+      "file_type": "code",
+      "source_file": "src/components/PaperFundsPanel.tsx",
+      "source_location": "L7",
+      "id": "components_paperfundspanel_paperfundspanel",
+      "community": 51,
+      "norm_label": "paperfundspanel()"
     },
     {
       "label": "StockAnalysisPage.tsx",
@@ -2736,7 +3348,7 @@
       "source_file": "src/components/StockAnalysisPage.tsx",
       "source_location": "L1",
       "id": "src_components_stockanalysispage_tsx",
-      "community": 2,
+      "community": 51,
       "norm_label": "stockanalysispage.tsx"
     },
     {
@@ -2745,7 +3357,7 @@
       "source_file": "src/components/StockAnalysisPage.tsx",
       "source_location": "L6",
       "id": "components_stockanalysispage_stockanalysispage",
-      "community": 2,
+      "community": 51,
       "norm_label": "stockanalysispage()"
     },
     {
@@ -2853,7 +3465,7 @@
       "source_file": "src/hooks/useNativeAlerts.ts",
       "source_location": "L6",
       "id": "hooks_usenativealerts_usenativealerts",
-      "community": 2,
+      "community": 51,
       "norm_label": "usenativealerts()"
     },
     {
@@ -2905,7 +3517,7 @@
       "label": "scan()",
       "file_type": "code",
       "source_file": "src/hooks/useStockDiscovery.ts",
-      "source_location": "L35",
+      "source_location": "L36",
       "id": "hooks_usestockdiscovery_scan",
       "community": 0,
       "norm_label": "scan()"
@@ -2914,18 +3526,18 @@
       "label": "useStockDiscovery()",
       "file_type": "code",
       "source_file": "src/hooks/useStockDiscovery.ts",
-      "source_location": "L40",
+      "source_location": "L41",
       "id": "hooks_usestockdiscovery_usestockdiscovery",
-      "community": 2,
+      "community": 51,
       "norm_label": "usestockdiscovery()"
     },
     {
       "label": "useTradingRuntime()",
       "file_type": "code",
       "source_file": "src/hooks/useStockDiscovery.ts",
-      "source_location": "L45",
+      "source_location": "L46",
       "id": "hooks_usestockdiscovery_usetradingruntime",
-      "community": 2,
+      "community": 51,
       "norm_label": "usetradingruntime()"
     },
     {
@@ -2934,7 +3546,7 @@
       "source_file": "src/hooks/useLiveStocks.ts",
       "source_location": "L1",
       "id": "src_hooks_uselivestocks_ts",
-      "community": 6,
+      "community": 51,
       "norm_label": "uselivestocks.ts"
     },
     {
@@ -2943,7 +3555,7 @@
       "source_file": "src/hooks/useLiveStocks.ts",
       "source_location": "L6",
       "id": "hooks_uselivestocks_uselivestocks",
-      "community": 2,
+      "community": 51,
       "norm_label": "uselivestocks()"
     },
     {
@@ -2997,7 +3609,7 @@
       "source_file": "src/services/ipoService.ts",
       "source_location": "L1",
       "id": "src_services_iposervice_ts",
-      "community": 1,
+      "community": 52,
       "norm_label": "iposervice.ts"
     },
     {
@@ -3015,7 +3627,7 @@
       "source_file": "src/services/ipoService.ts",
       "source_location": "L39",
       "id": "services_iposervice_financialyear",
-      "community": 1,
+      "community": 52,
       "norm_label": "financialyear()"
     },
     {
@@ -3024,7 +3636,7 @@
       "source_file": "src/services/ipoService.ts",
       "source_location": "L45",
       "id": "services_iposervice_striphtml",
-      "community": 1,
+      "community": 52,
       "norm_label": "striphtml()"
     },
     {
@@ -3033,7 +3645,7 @@
       "source_file": "src/services/ipoService.ts",
       "source_location": "L49",
       "id": "services_iposervice_tofloat",
-      "community": 1,
+      "community": 52,
       "norm_label": "tofloat()"
     },
     {
@@ -3042,7 +3654,7 @@
       "source_file": "src/services/ipoService.ts",
       "source_location": "L56",
       "id": "services_iposervice_parsestatus",
-      "community": 1,
+      "community": 52,
       "norm_label": "parsestatus()"
     },
     {
@@ -3051,7 +3663,7 @@
       "source_file": "src/services/ipoService.ts",
       "source_location": "L66",
       "id": "services_iposervice_parseboard",
-      "community": 1,
+      "community": 52,
       "norm_label": "parseboard()"
     },
     {
@@ -3060,7 +3672,7 @@
       "source_file": "src/services/ipoService.ts",
       "source_location": "L71",
       "id": "services_iposervice_parserating",
-      "community": 1,
+      "community": 52,
       "norm_label": "parserating()"
     },
     {
@@ -3069,7 +3681,7 @@
       "source_file": "src/services/ipoService.ts",
       "source_location": "L76",
       "id": "services_iposervice_parselistinggain",
-      "community": 1,
+      "community": 52,
       "norm_label": "parselistinggain()"
     },
     {
@@ -3078,7 +3690,7 @@
       "source_file": "src/services/ipoService.ts",
       "source_location": "L82",
       "id": "services_iposervice_scoreipo",
-      "community": 1,
+      "community": 53,
       "norm_label": "scoreipo()"
     },
     {
@@ -3087,7 +3699,7 @@
       "source_file": "src/services/ipoService.ts",
       "source_location": "L139",
       "id": "services_iposervice_allotment_tips",
-      "community": 1,
+      "community": 52,
       "norm_label": "allotment_tips"
     },
     {
@@ -3096,7 +3708,7 @@
       "source_file": "src/services/ipoService.ts",
       "source_location": "L144",
       "id": "services_iposervice_subdata",
-      "community": 1,
+      "community": 52,
       "norm_label": "subdata"
     },
     {
@@ -3105,7 +3717,7 @@
       "source_file": "src/services/ipoService.ts",
       "source_location": "L155",
       "id": "services_iposervice_fetchsubscriptiondata",
-      "community": 1,
+      "community": 52,
       "norm_label": "fetchsubscriptiondata()"
     },
     {
@@ -3114,7 +3726,7 @@
       "source_file": "src/services/ipoService.ts",
       "source_location": "L188",
       "id": "services_iposervice_parseiporows",
-      "community": 1,
+      "community": 52,
       "norm_label": "parseiporows()"
     },
     {
@@ -3132,7 +3744,7 @@
       "source_file": "src/services/ipoService.ts",
       "source_location": "L241",
       "id": "services_iposervice_fetchliveipos",
-      "community": 1,
+      "community": 52,
       "norm_label": "fetchliveipos()"
     },
     {
@@ -3141,7 +3753,7 @@
       "source_file": "src/services/ipoService.ts",
       "source_location": "L323",
       "id": "services_iposervice_isfreshipocache",
-      "community": 1,
+      "community": 52,
       "norm_label": "isfreshipocache()"
     },
     {
@@ -3195,7 +3807,7 @@
       "source_file": "src/services/journalStorage.ts",
       "source_location": "L12",
       "id": "services_journalstorage_downloadjson",
-      "community": 10,
+      "community": 0,
       "norm_label": "downloadjson()"
     },
     {
@@ -3276,7 +3888,7 @@
       "source_file": "src/services/signalHistory.ts",
       "source_location": "L76",
       "id": "services_signalhistory_getsignalaccuracy",
-      "community": 2,
+      "community": 0,
       "norm_label": "getsignalaccuracy()"
     },
     {
@@ -3366,7 +3978,7 @@
       "source_file": "src/services/foregroundAlerts.ts",
       "source_location": "L5",
       "id": "services_foregroundalerts_foregroundalert",
-      "community": 2,
+      "community": 0,
       "norm_label": "foregroundalert"
     },
     {
@@ -3591,7 +4203,7 @@
       "source_file": "src/services/stockDiscovery.ts",
       "source_location": "L1",
       "id": "src_services_stockdiscovery_ts",
-      "community": 47,
+      "community": 55,
       "norm_label": "stockdiscovery.ts"
     },
     {
@@ -3609,7 +4221,7 @@
       "source_file": "src/services/stockDiscovery.ts",
       "source_location": "L46",
       "id": "services_stockdiscovery_strategyscores",
-      "community": 47,
+      "community": 55,
       "norm_label": "strategyscores"
     },
     {
@@ -3618,7 +4230,7 @@
       "source_file": "src/services/stockDiscovery.ts",
       "source_location": "L54",
       "id": "services_stockdiscovery_foanalysis",
-      "community": 47,
+      "community": 55,
       "norm_label": "foanalysis"
     },
     {
@@ -3627,7 +4239,7 @@
       "source_file": "src/services/stockDiscovery.ts",
       "source_location": "L67",
       "id": "services_stockdiscovery_computersi",
-      "community": 47,
+      "community": 55,
       "norm_label": "computersi()"
     },
     {
@@ -3636,7 +4248,7 @@
       "source_file": "src/services/stockDiscovery.ts",
       "source_location": "L80",
       "id": "services_stockdiscovery_computeema",
-      "community": 47,
+      "community": 55,
       "norm_label": "computeema()"
     },
     {
@@ -3645,7 +4257,7 @@
       "source_file": "src/services/stockDiscovery.ts",
       "source_location": "L89",
       "id": "services_stockdiscovery_computemacd",
-      "community": 47,
+      "community": 55,
       "norm_label": "computemacd()"
     },
     {
@@ -3654,7 +4266,7 @@
       "source_file": "src/services/stockDiscovery.ts",
       "source_location": "L100",
       "id": "services_stockdiscovery_computesma",
-      "community": 47,
+      "community": 55,
       "norm_label": "computesma()"
     },
     {
@@ -3663,7 +4275,7 @@
       "source_file": "src/services/stockDiscovery.ts",
       "source_location": "L106",
       "id": "services_stockdiscovery_computeatr",
-      "community": 47,
+      "community": 55,
       "norm_label": "computeatr()"
     },
     {
@@ -3672,7 +4284,7 @@
       "source_file": "src/services/stockDiscovery.ts",
       "source_location": "L120",
       "id": "services_stockdiscovery_computebollingerposition",
-      "community": 47,
+      "community": 55,
       "norm_label": "computebollingerposition()"
     },
     {
@@ -3681,7 +4293,7 @@
       "source_file": "src/services/stockDiscovery.ts",
       "source_location": "L133",
       "id": "services_stockdiscovery_scorestrategies",
-      "community": 47,
+      "community": 55,
       "norm_label": "scorestrategies()"
     },
     {
@@ -3690,7 +4302,7 @@
       "source_file": "src/services/stockDiscovery.ts",
       "source_location": "L184",
       "id": "services_stockdiscovery_computeoverallsignal",
-      "community": 47,
+      "community": 55,
       "norm_label": "computeoverallsignal()"
     },
     {
@@ -3699,7 +4311,7 @@
       "source_file": "src/services/stockDiscovery.ts",
       "source_location": "L201",
       "id": "services_stockdiscovery_computefoanalysis",
-      "community": 47,
+      "community": 55,
       "norm_label": "computefoanalysis()"
     },
     {
@@ -3708,7 +4320,7 @@
       "source_file": "src/services/stockDiscovery.ts",
       "source_location": "L216",
       "id": "services_stockdiscovery_generatereasons",
-      "community": 47,
+      "community": 55,
       "norm_label": "generatereasons()"
     },
     {
@@ -3717,7 +4329,7 @@
       "source_file": "src/services/stockDiscovery.ts",
       "source_location": "L232",
       "id": "services_stockdiscovery_identifystrategies",
-      "community": 47,
+      "community": 55,
       "norm_label": "identifystrategies()"
     },
     {
@@ -3726,7 +4338,7 @@
       "source_file": "src/services/stockDiscovery.ts",
       "source_location": "L244",
       "id": "services_stockdiscovery_determinetrend",
-      "community": 47,
+      "community": 55,
       "norm_label": "determinetrend()"
     },
     {
@@ -3762,7 +4374,7 @@
       "source_file": "src/services/stockDiscovery.ts",
       "source_location": "L283",
       "id": "services_stockdiscovery_discoverstocks",
-      "community": 47,
+      "community": 0,
       "norm_label": "discoverstocks()"
     },
     {
@@ -3852,7 +4464,7 @@
       "source_file": "src/services/paperTrading.ts",
       "source_location": "L22",
       "id": "services_papertrading_loadledger",
-      "community": 0,
+      "community": 51,
       "norm_label": "loadledger()"
     },
     {
@@ -3870,7 +4482,7 @@
       "source_file": "src/services/paperTrading.ts",
       "source_location": "L32",
       "id": "services_papertrading_prunepapertrades",
-      "community": 0,
+      "community": 51,
       "norm_label": "prunepapertrades()"
     },
     {
@@ -3915,7 +4527,7 @@
       "source_file": "src/services/paperTrading.ts",
       "source_location": "L125",
       "id": "services_papertrading_getpapertrades",
-      "community": 0,
+      "community": 51,
       "norm_label": "getpapertrades()"
     },
     {
@@ -3924,7 +4536,7 @@
       "source_file": "src/services/paperTrading.ts",
       "source_location": "L126",
       "id": "services_papertrading_getpapertradesummary",
-      "community": 0,
+      "community": 51,
       "norm_label": "getpapertradesummary()"
     },
     {
@@ -3969,7 +4581,7 @@
       "source_file": "src/services/tradingTime.ts",
       "source_location": "L13",
       "id": "services_tradingtime_formatist",
-      "community": 2,
+      "community": 51,
       "norm_label": "formatist()"
     },
     {
@@ -4005,7 +4617,7 @@
       "source_file": "src/services/marketStatus.ts",
       "source_location": "L1",
       "id": "src_services_marketstatus_ts",
-      "community": 6,
+      "community": 0,
       "norm_label": "marketstatus.ts"
     },
     {
@@ -4014,7 +4626,7 @@
       "source_file": "src/services/marketStatus.ts",
       "source_location": "L5",
       "id": "services_marketstatus_marketstatus",
-      "community": 6,
+      "community": 0,
       "norm_label": "marketstatus"
     },
     {
@@ -4023,7 +4635,7 @@
       "source_file": "src/services/marketStatus.ts",
       "source_location": "L15",
       "id": "services_marketstatus_fetchmarketstatus",
-      "community": 6,
+      "community": 0,
       "norm_label": "fetchmarketstatus()"
     },
     {
@@ -4167,7 +4779,7 @@
       "source_file": "src/services/liveData.ts",
       "source_location": "L1",
       "id": "src_services_livedata_ts",
-      "community": 6,
+      "community": 47,
       "norm_label": "livedata.ts"
     },
     {
@@ -4185,7 +4797,7 @@
       "source_file": "src/services/liveData.ts",
       "source_location": "L3",
       "id": "services_livedata_fetchnifty",
-      "community": 6,
+      "community": 47,
       "norm_label": "fetchnifty()"
     },
     {
@@ -4277,6 +4889,15 @@
       "id": "android_readme_production_data_audit_build_20_september_2026",
       "community": 50,
       "norm_label": "production-data audit build \u2014 20 september 2026"
+    },
+    {
+      "label": "Persistent paper account verification build",
+      "file_type": "document",
+      "source_file": "releases/android/README.md",
+      "source_location": "L31",
+      "id": "android_readme_persistent_paper_account_verification_build",
+      "community": 50,
+      "norm_label": "persistent paper account verification build"
     },
     {
       "label": "VERCEL_RELEASE.md",
@@ -4513,6 +5134,60 @@
       "norm_label": "validation"
     },
     {
+      "label": "PERSISTENT-PAPER-TRADING.md",
+      "file_type": "document",
+      "source_file": "docs/PERSISTENT-PAPER-TRADING.md",
+      "source_location": "L1",
+      "id": "docs_persistent_paper_trading_md",
+      "community": 54,
+      "norm_label": "persistent-paper-trading.md"
+    },
+    {
+      "label": "Persistent paper trading",
+      "file_type": "document",
+      "source_file": "docs/PERSISTENT-PAPER-TRADING.md",
+      "source_location": "L1",
+      "id": "docs_persistent_paper_trading_persistent_paper_trading",
+      "community": 54,
+      "norm_label": "persistent paper trading"
+    },
+    {
+      "label": "Execution semantics",
+      "file_type": "document",
+      "source_file": "docs/PERSISTENT-PAPER-TRADING.md",
+      "source_location": "L7",
+      "id": "docs_persistent_paper_trading_execution_semantics",
+      "community": 54,
+      "norm_label": "execution semantics"
+    },
+    {
+      "label": "Deployment required before activation",
+      "file_type": "document",
+      "source_file": "docs/PERSISTENT-PAPER-TRADING.md",
+      "source_location": "L15",
+      "id": "docs_persistent_paper_trading_deployment_required_before_activation",
+      "community": 54,
+      "norm_label": "deployment required before activation"
+    },
+    {
+      "label": "Verification",
+      "file_type": "document",
+      "source_file": "docs/PERSISTENT-PAPER-TRADING.md",
+      "source_location": "L26",
+      "id": "docs_persistent_paper_trading_verification",
+      "community": 54,
+      "norm_label": "verification"
+    },
+    {
+      "label": "Historical balance and paper funding",
+      "file_type": "document",
+      "source_file": "docs/PERSISTENT-PAPER-TRADING.md",
+      "source_location": "L32",
+      "id": "docs_persistent_paper_trading_historical_balance_and_paper_funding",
+      "community": 54,
+      "norm_label": "historical balance and paper funding"
+    },
+    {
       "label": "README.md",
       "file_type": "document",
       "source_file": "ios/App/CapApp-SPM/README.md",
@@ -4529,6 +5204,15 @@
       "id": "capapp_spm_readme_capapp_spm",
       "community": 38,
       "norm_label": "capapp-spm"
+    },
+    {
+      "label": "money()",
+      "file_type": "code",
+      "source_file": "src/components/OverviewPage.tsx",
+      "source_location": "L3",
+      "community": 51,
+      "norm_label": "money()",
+      "id": "components_overviewpage_money"
     },
     {
       "label": "signalStyles",
@@ -5084,7 +5768,7 @@
       "file_type": "code",
       "source_file": "src/services/liveData.ts",
       "source_location": "L20",
-      "community": 6,
+      "community": 47,
       "norm_label": "yahoochartmeta",
       "id": "services_livedata_yahoochartmeta"
     },
@@ -5093,7 +5777,7 @@
       "file_type": "code",
       "source_file": "src/services/liveData.ts",
       "source_location": "L33",
-      "community": 6,
+      "community": 47,
       "norm_label": "fetchsinglestock()",
       "id": "services_livedata_fetchsinglestock"
     },
@@ -5444,7 +6128,7 @@
       "file_type": "code",
       "source_file": "vite.config.ts",
       "source_location": "L11",
-      "community": 8,
+      "community": 25,
       "norm_label": "configureserver()",
       "id": "trading_app_vite_config_configureserver"
     },
@@ -6312,6 +6996,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
+      "source_location": "L17",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_algo_trading_india_package_scripts",
+      "target": "ai_algo_trading_india_package_scripts_worker_paper"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
       "source_location": "L18",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -6641,6 +7335,17 @@
       "confidence_score": 1.0,
       "source": "vite_config_ts",
       "target": "api_health_js"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "vite.config.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "vite_config_ts",
+      "target": "api_paper_js"
     },
     {
       "relation": "contains",
@@ -7972,6 +8677,503 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "tests/paper-database.mjs",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_database_mjs",
+      "target": "tests_paper_database_db"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-database.mjs",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_database_mjs",
+      "target": "tests_paper_database_event"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-database.mjs",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_database_mjs",
+      "target": "tests_paper_database_commit"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "server/paperEngine.js",
+      "source_location": "L25",
+      "weight": 1.0,
+      "source": "server_paperengine_advancepaper",
+      "target": "tests_paper_database_event"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "tests_paper_funds_test_ts",
+      "target": "server_paperengine_js",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "tests_paper_funds_test_ts",
+      "target": "server_paperengine_newpaperaccount",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "tests_paper_funds_test_ts",
+      "target": "server_paperengine_advancepaper",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "tests_paper_funds_test_ts",
+      "target": "server_paperfunds_js",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "tests_paper_funds_test_ts",
+      "target": "server_paperfunds_paperbalance",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "tests_paper_funds_test_ts",
+      "target": "server_paperfunds_transferpaperfunds",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "tests_paper_funds_test_ts",
+      "target": "server_paperfunds_importlegacypaper",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "tests_paper_funds_test_ts",
+      "target": "tests_paper_funds_test_now",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "tests_paper_funds_test_ts",
+      "target": "tests_paper_funds_test_adjustment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "tests_paper_funds_test_ts",
+      "target": "tests_paper_funds_test_s",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "tests_paper_funds_test_ts",
+      "target": "tests_paper_funds_test_r",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "tests_paper_funds_test_ts",
+      "target": "tests_paper_funds_test_b",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "tests_paper_funds_test_ts",
+      "target": "tests_paper_funds_test_tomorrow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "tests_paper_funds_test_ts",
+      "target": "tests_paper_funds_test_retry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "tests_paper_funds_test_ts",
+      "target": "tests_paper_funds_test_trade",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "tests_paper_funds_test_ts",
+      "target": "tests_paper_funds_test_original",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "tests_paper_funds_test_ts",
+      "target": "tests_paper_funds_test_next",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "tests_paper_funds_test_ts",
+      "target": "tests_paper_funds_test_t",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "tests_paper_funds_test_ts",
+      "target": "tests_paper_funds_test_open",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "tests_paper_funds_test_ts",
+      "target": "tests_paper_funds_test_legacy",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "tests_paper_funds_test_ts",
+      "target": "tests_paper_funds_test_tick",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-funds.test.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "tests_paper_funds_test_adjustment",
+      "target": "server_paperfunds_transferpaperfunds",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_engine_test_ts",
+      "target": "server_paperengine_js"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_engine_test_ts",
+      "target": "server_paperengine_advancepaper"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_engine_test_ts",
+      "target": "server_paperengine_newpaperaccount"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_engine_test_ts",
+      "target": "tests_paper_engine_test_start"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_engine_test_ts",
+      "target": "tests_paper_engine_test_q"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_engine_test_ts",
+      "target": "tests_paper_engine_test_signal"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_engine_test_ts",
+      "target": "tests_paper_engine_test_step"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_engine_test_ts",
+      "target": "tests_paper_engine_test_pending"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L22",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_engine_test_ts",
+      "target": "tests_paper_engine_test_s"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_engine_test_ts",
+      "target": "tests_paper_engine_test_filled"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_engine_test_ts",
+      "target": "tests_paper_engine_test_result"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L19",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_engine_test_ts",
+      "target": "tests_paper_engine_test_tick"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L61",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_engine_test_ts",
+      "target": "tests_paper_engine_test_r"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L40",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_engine_test_ts",
+      "target": "tests_paper_engine_test_sell"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L45",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_engine_test_ts",
+      "target": "api_paper_js"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L47",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_engine_test_ts",
+      "target": "tests_paper_engine_test_response"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L49",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_engine_test_ts",
+      "target": "tests_paper_engine_test_blocked"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L56",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_engine_test_ts",
+      "target": "tests_paper_engine_test_second"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_engine_test_pending",
+      "target": "tests_paper_engine_test_q"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_engine_test_pending",
+      "target": "tests_paper_engine_test_step"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_engine_test_step",
+      "target": "server_paperengine_advancepaper"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-engine.test.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_paper_engine_test_pending",
+      "target": "server_paperengine_newpaperaccount"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "server/pushBackend.js",
       "source_location": "L3",
       "weight": 1.0,
@@ -8024,6 +9226,17 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "scripts/paper-worker.mjs",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_paper_worker_mjs",
+      "target": "server_pushbackend_js"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "scripts/signal-worker.mjs",
       "source_location": "L4",
       "weight": 1.0,
@@ -8068,6 +9281,17 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "api/paper.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "api_paper_js",
+      "target": "server_pushbackend_js"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "api/mobile-alerts.js",
       "source_location": "L1",
       "weight": 1.0,
@@ -8101,6 +9325,17 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "scripts/paper-worker.mjs",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_paper_worker_mjs",
+      "target": "server_pushbackend_backend"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "scripts/signal-worker.mjs",
       "source_location": "L4",
       "weight": 1.0,
@@ -8112,11 +9347,33 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "api/paper.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "api_paper_js",
+      "target": "server_pushbackend_backend"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "api/mobile-alerts.js",
       "source_location": "L1",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "api_mobile_alerts_js",
+      "target": "server_pushbackend_backend"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/paper.js",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "api_paper_handler",
       "target": "server_pushbackend_backend"
     },
     {
@@ -8161,6 +9418,17 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "api_health_js",
+      "target": "server_pushbackend_allowrequest"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "api/paper.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "api_paper_js",
       "target": "server_pushbackend_allowrequest"
     },
     {
@@ -8212,6 +9480,17 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
+      "source_file": "api/paper.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "api_paper_handler",
+      "target": "server_pushbackend_allowrequest"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
       "source_file": "api/mobile-alerts.js",
       "source_location": "L3",
       "weight": 1.0,
@@ -8222,11 +9501,33 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "api/paper.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "api_paper_js",
+      "target": "server_pushbackend_signedinuser"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "api/mobile-alerts.js",
       "source_location": "L1",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "api_mobile_alerts_js",
+      "target": "server_pushbackend_signedinuser"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/paper.js",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "api_paper_handler",
       "target": "server_pushbackend_signedinuser"
     },
     {
@@ -8255,6 +9556,17 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "scripts/paper-worker.mjs",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_paper_worker_mjs",
+      "target": "server_pushbackend_check"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "scripts/signal-worker.mjs",
       "source_location": "L4",
       "weight": 1.0,
@@ -8266,11 +9578,44 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "api/paper.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "api_paper_js",
+      "target": "server_pushbackend_check"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "api/mobile-alerts.js",
       "source_location": "L1",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "api_mobile_alerts_js",
+      "target": "server_pushbackend_check"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/paper-worker.mjs",
+      "source_location": "L20",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_paper_worker_accounts",
+      "target": "server_pushbackend_check"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/paper-worker.mjs",
+      "source_location": "L35",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_paper_worker_cycle",
       "target": "server_pushbackend_check"
     },
     {
@@ -8424,6 +9769,423 @@
       "weight": 1.0,
       "source": "api_dispatch_alerts_handler",
       "target": "server_dispatchalerts_dispatchalerts"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperEngine.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "server_paperengine_js",
+      "target": "server_paperfunds_js",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperEngine.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "server_paperengine_js",
+      "target": "server_paperfunds_fundedcapital",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperEngine.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_paperengine_js",
+      "target": "server_paperengine_day"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperEngine.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_paperengine_js",
+      "target": "server_paperengine_minute"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperEngine.js",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_paperengine_js",
+      "target": "server_paperengine_round"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperEngine.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_paperengine_js",
+      "target": "server_paperengine_cost"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperEngine.js",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_paperengine_js",
+      "target": "server_paperengine_newpaperaccount"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperEngine.js",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_paperengine_js",
+      "target": "server_paperengine_advancepaper"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/paper-worker.mjs",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_paper_worker_mjs",
+      "target": "server_paperengine_js"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "api/paper.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "api_paper_js",
+      "target": "server_paperengine_js"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperEngine.js",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_paperengine_advancepaper",
+      "target": "server_paperengine_day"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperEngine.js",
+      "source_location": "L23",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_paperengine_advancepaper",
+      "target": "server_paperengine_minute"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperEngine.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_paperengine_cost",
+      "target": "server_paperengine_round"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperEngine.js",
+      "source_location": "L46",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_paperengine_advancepaper",
+      "target": "server_paperengine_round"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperEngine.js",
+      "source_location": "L47",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_paperengine_advancepaper",
+      "target": "server_paperengine_cost"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "api/paper.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "api_paper_js",
+      "target": "server_paperengine_newpaperaccount"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/paper.js",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "api_paper_handler",
+      "target": "server_paperengine_newpaperaccount"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/paper-worker.mjs",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_paper_worker_mjs",
+      "target": "server_paperengine_advancepaper"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/paper-worker.mjs",
+      "source_location": "L33",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_paper_worker_cycle",
+      "target": "server_paperengine_advancepaper"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "server/paperEngine.js",
+      "source_location": "L71",
+      "weight": 1.0,
+      "source": "server_paperengine_advancepaper",
+      "target": "server_paperfunds_fundedcapital"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperFunds.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "server_paperfunds_js",
+      "target": "server_paperfunds_round",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperFunds.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "server_paperfunds_js",
+      "target": "server_paperfunds_paperaccounterror",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperFunds.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "server_paperfunds_js",
+      "target": "server_paperfunds_fundedcapital",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperFunds.js",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "server_paperfunds_js",
+      "target": "server_paperfunds_paperbalance",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperFunds.js",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "server_paperfunds_js",
+      "target": "server_paperfunds_transferpaperfunds",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperFunds.js",
+      "source_location": "L30",
+      "weight": 1.0,
+      "source": "server_paperfunds_js",
+      "target": "server_paperfunds_importlegacypaper",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "api/paper.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "api_paper_js",
+      "target": "server_paperfunds_js",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperFunds.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "server_paperfunds_fundedcapital",
+      "target": "server_paperfunds_round",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperFunds.js",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "server_paperfunds_paperbalance",
+      "target": "server_paperfunds_round",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperFunds.js",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "server_paperfunds_transferpaperfunds",
+      "target": "server_paperfunds_round",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperFunds.js",
+      "source_location": "L34",
+      "weight": 1.0,
+      "source": "server_paperfunds_importlegacypaper",
+      "target": "server_paperfunds_round",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "api/paper.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "api_paper_js",
+      "target": "server_paperfunds_paperaccounterror",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperFunds.js",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "server_paperfunds_paperbalance",
+      "target": "server_paperfunds_fundedcapital",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "server/paperFunds.js",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "server_paperfunds_transferpaperfunds",
+      "target": "server_paperfunds_paperbalance",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "api/paper.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "api_paper_js",
+      "target": "server_paperfunds_paperbalance",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "api/paper.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "api_paper_js",
+      "target": "server_paperfunds_transferpaperfunds",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/paper.js",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "api_paper_handler",
+      "target": "server_paperfunds_transferpaperfunds"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "api/paper.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "api_paper_js",
+      "target": "server_paperfunds_importlegacypaper",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/paper.js",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "api_paper_handler",
+      "target": "server_paperfunds_importlegacypaper"
     },
     {
       "relation": "contains",
@@ -9035,6 +10797,100 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "scripts/paper-worker.mjs",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_paper_worker_mjs",
+      "target": "scripts_paper_worker_db"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/paper-worker.mjs",
+      "source_location": "L11",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_paper_worker_mjs",
+      "target": "scripts_paper_worker_candidates"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/paper-worker.mjs",
+      "source_location": "L13",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_paper_worker_mjs",
+      "target": "scripts_paper_worker_discover"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/paper-worker.mjs",
+      "source_location": "L19",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_paper_worker_mjs",
+      "target": "scripts_paper_worker_accounts"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/paper-worker.mjs",
+      "source_location": "L22",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_paper_worker_mjs",
+      "target": "scripts_paper_worker_cycle"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/paper-worker.mjs",
+      "source_location": "L28",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_paper_worker_cycle",
+      "target": "scripts_paper_worker_discover"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "scripts/paper-worker.mjs",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "scripts_paper_worker_discover",
+      "target": "services_stockdiscovery_discoverstocks"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/paper-worker.mjs",
+      "source_location": "L29",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_paper_worker_cycle",
+      "target": "scripts_paper_worker_accounts"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "scripts/paper-worker.mjs",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "scripts_paper_worker_cycle",
+      "target": "services_stockdiscovery_fetchquotes"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "scripts/signal-worker.mjs",
       "source_location": "L14",
       "weight": 1.0,
@@ -9112,6 +10968,16 @@
       "confidence_score": 1.0,
       "source": "api_health_js",
       "target": "api_health_handler"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "api/paper.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "api_paper_js",
+      "target": "api_paper_handler"
     },
     {
       "relation": "contains",
@@ -10427,6 +12293,28 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/components/TradesPage.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_tradespage_tsx",
+      "target": "src_components_serverpaperpage_tsx"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/TradesPage.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_tradespage_tsx",
+      "target": "components_serverpaperpage_serverpaperpage"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/TradesPage.tsx",
       "source_location": "L2",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -10575,6 +12463,27 @@
       "target": "components_tradespage_tradespage"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/TradesPage.tsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_tradespage_tsx",
+      "target": "components_tradespage_legacytradespage"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/TradesPage.tsx",
+      "source_location": "L25",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_tradespage_legacytradespage",
+      "target": "components_tradespage_money"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -10616,6 +12525,39 @@
       "source_location": "L15",
       "weight": 1.0,
       "source": "components_tradespage_tradespage",
+      "target": "services_papertrading_getpapertrades"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/components/TradesPage.tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "components_tradespage_legacytradespage",
+      "target": "hooks_usestockdiscovery_usestockdiscovery"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/components/TradesPage.tsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "components_tradespage_legacytradespage",
+      "target": "services_papertrading_getpapertradesummary"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/components/TradesPage.tsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "components_tradespage_legacytradespage",
       "target": "services_papertrading_getpapertrades"
     },
     {
@@ -10776,6 +12718,38 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_components_overviewpage_tsx",
+      "target": "src_components_serverpaperpage_tsx"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/OverviewPage.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_overviewpage_tsx",
+      "target": "components_serverpaperpage_serverpaperpage"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/OverviewPage.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_overviewpage_tsx",
+      "target": "components_overviewpage_overviewpage"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/OverviewPage.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_overviewpage_tsx",
       "target": "src_services_papertrading_ts"
     },
     {
@@ -10831,16 +12805,6 @@
       "confidence_score": 1.0,
       "source": "src_components_overviewpage_tsx",
       "target": "components_overviewpage_money"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/components/OverviewPage.tsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_components_overviewpage_tsx",
-      "target": "components_overviewpage_overviewpage"
     },
     {
       "relation": "calls",
@@ -11298,6 +13262,221 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_components_serverpaperpage_tsx",
+      "target": "src_components_paperfundspanel_tsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_components_serverpaperpage_tsx",
+      "target": "components_paperfundspanel_paperfundspanel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_components_serverpaperpage_tsx",
+      "target": "components_paperfundspanel_paperbalance",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_components_serverpaperpage_tsx",
+      "target": "components_paperfundspanel_fundingstate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_serverpaperpage_tsx",
+      "target": "src_services_supabaseclient_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_serverpaperpage_tsx",
+      "target": "services_supabaseclient_getsupabase"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_serverpaperpage_tsx",
+      "target": "src_services_tradingtime_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_serverpaperpage_tsx",
+      "target": "services_tradingtime_formatist"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_serverpaperpage_tsx",
+      "target": "services_tradingtime_istdate"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_serverpaperpage_tsx",
+      "target": "src_services_journalstorage_ts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_serverpaperpage_tsx",
+      "target": "services_journalstorage_downloadjson"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_serverpaperpage_tsx",
+      "target": "components_serverpaperpage_order"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_serverpaperpage_tsx",
+      "target": "components_serverpaperpage_account"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_serverpaperpage_tsx",
+      "target": "components_serverpaperpage_money"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_serverpaperpage_tsx",
+      "target": "components_serverpaperpage_paperevent"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_components_serverpaperpage_tsx",
+      "target": "components_serverpaperpage_serverpaperpage"
+    },
+    {
+      "relation": "references",
+      "context": "field",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "components_serverpaperpage_account",
+      "target": "components_paperfundspanel_fundingstate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L43",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_serverpaperpage_serverpaperpage",
+      "target": "components_serverpaperpage_money"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "components_serverpaperpage_serverpaperpage",
+      "target": "services_supabaseclient_getsupabase"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/components/ServerPaperPage.tsx",
+      "source_location": "L40",
+      "weight": 1.0,
+      "source": "components_serverpaperpage_serverpaperpage",
+      "target": "services_tradingtime_formatist"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/components/SignalPopup.tsx",
       "source_location": "L2",
       "weight": 1.0,
@@ -11703,6 +13882,112 @@
       "weight": 1.0,
       "source": "components_discoverypage_discoverypage",
       "target": "hooks_usestockdiscovery_usestockdiscovery"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/PaperFundsPanel.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_components_paperfundspanel_tsx",
+      "target": "src_services_papertrading_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/PaperFundsPanel.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_components_paperfundspanel_tsx",
+      "target": "services_papertrading_loadledger",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/PaperFundsPanel.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_components_paperfundspanel_tsx",
+      "target": "src_services_tradingtime_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/PaperFundsPanel.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_components_paperfundspanel_tsx",
+      "target": "services_tradingtime_formatist",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/PaperFundsPanel.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_components_paperfundspanel_tsx",
+      "target": "components_paperfundspanel_paperbalance",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/PaperFundsPanel.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_components_paperfundspanel_tsx",
+      "target": "components_paperfundspanel_fundingstate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/PaperFundsPanel.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_components_paperfundspanel_tsx",
+      "target": "components_paperfundspanel_money",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/PaperFundsPanel.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_components_paperfundspanel_tsx",
+      "target": "components_paperfundspanel_paperfundspanel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/PaperFundsPanel.tsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "components_paperfundspanel_paperfundspanel",
+      "target": "components_paperfundspanel_money",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/components/PaperFundsPanel.tsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "components_paperfundspanel_paperfundspanel",
+      "target": "services_tradingtime_formatist"
     },
     {
       "relation": "imports_from",
@@ -12198,17 +14483,6 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "src_hooks_usestockdiscovery_ts",
-      "target": "services_papertrading_openpapertrades"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/hooks/useStockDiscovery.ts",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_hooks_usestockdiscovery_ts",
       "target": "services_papertrading_updatepapertrades"
     },
     {
@@ -12335,6 +14609,17 @@
       "confidence_score": 1.0,
       "source": "src_hooks_usestockdiscovery_ts",
       "target": "hooks_usestockdiscovery_usetradingruntime"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/hooks/useStockDiscovery.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_hooks_usestockdiscovery_ts",
+      "target": "services_papertrading_openpapertrades"
     },
     {
       "relation": "calls",
@@ -16486,8 +18771,18 @@
       "source_file": "releases/android/README.md",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "android_readme_android_test_builds",
-      "target": "android_readme_production_data_audit_build_20_september_2026",
+      "target": "android_readme_production_data_audit_build_20_september_2026"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "releases/android/README.md",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "android_readme_android_test_builds",
+      "target": "android_readme_persistent_paper_account_verification_build",
       "confidence_score": 1.0
     },
     {
@@ -16719,6 +19014,56 @@
       "confidence_score": 1.0,
       "source": "docs_repair_notes_trading_audit_and_repair_18_september_2026",
       "target": "docs_repair_notes_validation"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PERSISTENT-PAPER-TRADING.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_persistent_paper_trading_md",
+      "target": "docs_persistent_paper_trading_persistent_paper_trading"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PERSISTENT-PAPER-TRADING.md",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_persistent_paper_trading_persistent_paper_trading",
+      "target": "docs_persistent_paper_trading_execution_semantics"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PERSISTENT-PAPER-TRADING.md",
+      "source_location": "L15",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_persistent_paper_trading_persistent_paper_trading",
+      "target": "docs_persistent_paper_trading_deployment_required_before_activation"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PERSISTENT-PAPER-TRADING.md",
+      "source_location": "L26",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_persistent_paper_trading_persistent_paper_trading",
+      "target": "docs_persistent_paper_trading_verification"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PERSISTENT-PAPER-TRADING.md",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "docs_persistent_paper_trading_persistent_paper_trading",
+      "target": "docs_persistent_paper_trading_historical_balance_and_paper_funding",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -17137,5 +19482,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "5744df5af4c55e505ab969ef06c3c5e7481ba3ef"
+  "built_at_commit": "088260916f6c78a4cfe636f3d74bfe6593f6b1bc"
 }

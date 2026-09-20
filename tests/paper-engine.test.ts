@@ -1,0 +1,62 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {advancePaper,newPaperAccount} from '../server/paperEngine.js';
+const start=Date.parse('2026-09-21T04:30:00Z');
+const q=(offset=0,price=100)=>({symbol:'ABC',price,timestamp:new Date(start+offset).toISOString(),source:'test-only'});
+const signal={symbol:'ABC',signalId:'2026-09-21:ABC:BUY',signalTime:new Date(start).toISOString(),side:'BUY',score:80,stop:99,target:103};
+const step=(s:any,offset:number,quotes:any[],candidates:any[]=[],enabled=true)=>advancePaper(s,{now:start+offset,quotes,candidates,marketOpen:true,acceptEntries:enabled});
+const pending=()=>step(newPaperAccount(),0,[q()],[signal]).state;
+test('persistent paper orders fill only on a later quote and keep three distinct timestamps',()=>{
+ let s=pending();assert.equal(s.orders[0].status,'PENDING');assert.equal(step(s,1000,[q()]).events.length,0);
+ const filled=step(s,2000,[q(1000)]);assert.equal(filled.state.orders[0].status,'OPEN');assert.equal(filled.state.orders[0].entryTime,new Date(start+2000).toISOString());assert.equal(filled.events[0].quoteTime,q(1000).timestamp);assert.equal(filled.state.orders[0].submittedAt,signal.signalTime);
+ assert.equal(step(filled.state,3000,[q(1000)],[signal]).events.length,0);
+});
+test('stop submits an exit, next quote fills at observed adverse price and charges net ledger',()=>{
+ let s=step(pending(),1000,[q(1000)]).state;const entry=s.orders[0].entryPrice;
+ s=step(s,2000,[q(2000,98)]).state;assert.equal(s.orders[0].status,'EXIT_PENDING');assert.equal(s.orders[0].exitTime,undefined);
+ const result=step(s,3000,[q(3000,97)]);const o=result.state.orders[0];assert.equal(o.status,'CLOSED');assert.equal(o.exitReason,'STOP');assert(o.exitPrice<97);assert(o.netPnl<o.grossPnl);assert.equal(result.state.realized,o.netPnl);assert(entry>100);
+});
+test('bid/ask size supports partial fills without consuming the same quote twice',()=>{
+ const tick={...q(1000),bid:99.9,ask:100.1,bidSize:1,askSize:1};const r=step(pending(),1000,[tick]);assert.equal(r.state.orders[0].filled,1);assert.equal(r.state.orders[0].status,'PARTIAL');assert.equal(r.events[0].model,'TOP_OF_BOOK_WITH_SLIPPAGE');assert.equal(step(r.state,2000,[tick]).state.orders[0].filled,1);
+});
+test('restart preserves deduplication and stale or future quotes never fill',()=>{
+ const s=JSON.parse(JSON.stringify(pending()));assert.equal(step(s,1000,[q(2000)],[signal]).state.orders.length,1);assert.equal(step(s,1000,[q(2000)]).state.orders[0].filled,0);
+ const r=step(s,180000,[q()]);assert.equal(r.state.orders[0].status,'CANCELLED');assert.equal(r.state.orders[0].filled,0);
+});
+test('paused accounts cancel pending entries but keep monitoring existing risk',()=>{
+ assert.equal(step(pending(),1000,[q(1000)],[],false).state.orders[0].status,'CANCELLED');
+ let s=step(pending(),1000,[q(1000)]).state;s=step(s,2000,[q(2000,104)],[],false).state;assert.equal(s.orders[0].exitReason,'TARGET');
+ assert.equal(step(s,3000,[q(3000,104)],[],false).state.orders[0].status,'CLOSED');
+});
+test('monitoring gaps are audited and missed closes never acquire invented timestamps',()=>{
+ let s=step(pending(),1000,[q(1000)]).state;let r=step(s,180000,[q(180000,104)]);assert.equal(r.state.orders[0].monitoringGap,true);assert(r.events.some(e=>e.kind==='MONITORING_GAP'));
+ s=r.state;r=step(s,86400000,[q(86400000,102)]);assert.equal(r.state.orders[0].exitTime,new Date(start+86400000).toISOString());assert.equal(r.state.orders[0].monitoringGap,true);
+});
+test('EOD closes are requested at 15:25 and cannot fill on a closed market',()=>{
+ let s=step(pending(),1000,[q(1000)]).state;const offset=(15*60+25-10*60)*60000;
+ s=step(s,offset,[q(offset)]).state;assert.equal(s.orders[0].exitReason,'EOD');
+ const r=advancePaper(s,{now:start+offset+1000,quotes:[q(offset+1000)],marketOpen:false});assert.equal(r.state.orders[0].status,'EXIT_PENDING');
+});
+test('short-side paper entry and exit use adverse prices and positive net results only after fees',()=>{
+ const sell={...signal,signalId:'SELL:ABC',side:'SELL',stop:101,target:97};let s=step(newPaperAccount(),0,[q()],[sell]).state;s=step(s,1000,[q(1000)]).state;assert(s.orders[0].entryPrice<100);s=step(s,2000,[q(2000,96)]).state;s=step(s,3000,[q(3000,96)]).state;assert(s.orders[0].exitPrice>96);assert(s.orders[0].netPnl>0);
+});
+test('fill-time risk limit resizes a price gap and never exceeds per-trade budget',()=>{
+ const s=step(pending(),1000,[q(1000,102)]).state,o=s.orders[0];assert(o.filled<40);assert((o.entryPrice-o.stop)*o.filled+40+o.entryPrice*.001*o.filled<=o.riskBudget+.01);
+});
+import paperHandler from '../api/paper.js';
+test('paper API requires authentication and denies unknown origins without querying account data',async()=>{
+ const response=()=>({code:200,payload:null as any,setHeader(){},status(code:number){this.code=code;return this;},json(data:any){this.payload=data;return this;},end(){}});
+ const r=response();await paperHandler({method:'GET',headers:{host:'example.test'},query:{}},r);assert.equal(r.code,401);
+ const blocked=response();await paperHandler({method:'GET',headers:{host:'example.test',origin:'https://attacker.test'},query:{}},blocked);assert.equal(blocked.code,403);
+});
+test('a pending manual exit is not overwritten by an older threshold quote',()=>{
+ const s=step(pending(),1000,[q(1000)]).state;const o=s.orders[0];o.exitRequestedAt=new Date(start+5000).toISOString();o.exitReason='MANUAL';o.status='EXIT_PENDING';
+ const r=step(s,6000,[q(4000,104)]);assert.equal(r.state.orders[0].exitRequestedAt,o.exitRequestedAt);assert.equal(r.state.orders[0].exitReason,'MANUAL');assert.equal(r.state.orders[0].exited,0);
+});
+test('missing quotes on existing exposure block new entries with unknown account risk',()=>{
+ const s=step(pending(),1000,[q(1000)]).state;const second={...signal,symbol:'XYZ',signalId:'XYZ'};
+ const r=step(s,2000,[{...q(2000),symbol:'XYZ'}],[second]);assert.equal(r.state.orders.length,1);
+});
+test('a delayed response cannot process a fill after the session has ended',()=>{
+ let s=step(pending(),1000,[q(1000)]).state;const cutoff=(15*60+25-10*60)*60000;s=step(s,cutoff,[q(cutoff)]).state;
+ const close=(15*60+30-10*60)*60000;const r=step(s,close,[q(close-1000)]);assert.equal(r.state.orders[0].status,'EXIT_PENDING');assert.equal(r.state.orders[0].exited,0);
+});

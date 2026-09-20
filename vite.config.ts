@@ -8,6 +8,8 @@ import marketHandler from './api/market.js'
 import { validateMobileApiBase } from './server/mobileConfig.js'
 // @ts-expect-error Shared JavaScript Vercel handler.
 import healthHandler from './api/health.js'
+// @ts-expect-error Shared authenticated paper-account API.
+import paperHandler from './api/paper.js'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_');
@@ -17,11 +19,14 @@ export default defineConfig(({ mode }) => {
   plugins: [react(), tailwindcss(), {
     name: 'local-market-api',
     configureServer(server) {
-      for (const [route, handler] of [['/api/market', marketHandler], ['/api/health', healthHandler]] as const) server.middlewares.use(route, (req, res) => {
+      for (const [route, handler] of [['/api/market', marketHandler], ['/api/health', healthHandler], ['/api/paper', paperHandler]] as const) server.middlewares.use(route, (req, res) => {
         const url = new URL(req.url || '/', 'http://localhost');
         const request = { headers: req.headers, method: req.method, query: Object.fromEntries(url.searchParams) };
         const response = { end() { res.end(); return response; }, setHeader: (key: string, value: string) => res.setHeader(key, value), status(code: number) { res.statusCode = code; return response; }, json(data: unknown) { res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(data)); return response; } };
-        void handler(request, response);
+        if(req.method==='POST') {
+          let body='';req.on('data',chunk=>{body+=chunk;if(body.length>2000000)req.destroy();});
+          req.on('end',()=>{try{void handler({...request,body:JSON.parse(body)},response);}catch{response.status(400).json({error:'Invalid JSON'});}});
+        } else void handler(request, response);
       });
     },
   }],
