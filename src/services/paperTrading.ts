@@ -1,238 +1,127 @@
-// ponytail: realistic paper trading engine — persists to localStorage
-// Entries happen ONLY when a signal fires during market hours
-// Exits happen when SL/target hit on subsequent price checks, or EOD
-
 import { isMarketOpenCached } from './marketStatus';
+import { DAY_MS, freshQuote, inSession, istDate, istMinutes, validLevels, type MarketQuote } from './tradingTime';
+import { readRecords } from './journalStorage';
 
 export interface PaperTradeRecord {
-  id: string;
-  symbol: string;
-  name: string;
-  type: 'EQUITY' | 'F&O';
-  side: 'BUY' | 'SELL';
-  quantity: number;
-  entryPrice: number;
-  entryTime: string; // ISO timestamp
-  stopLoss: number;
-  target: number;
-  strategy: string;
-  score: number;
-  // Exit info (filled when closed)
-  exitPrice?: number;
-  exitTime?: string;
+  id: string; symbol: string; name: string; type: 'EQUITY' | 'F&O'; side: 'BUY' | 'SELL';
+  quantity: number; entryPrice: number; entryTime: string; stopLoss: number; target: number;
+  strategy: string; score: number; exitPrice?: number; exitTime?: string;
   status: 'OPEN' | 'TARGET_HIT' | 'SL_HIT' | 'EOD_EXIT' | 'EXPIRED';
-  grossPnl?: number;
-  brokerage?: number;
-  netPnl?: number;
-  pnlPct?: number;
+  grossPnl?: number; brokerage?: number; netPnl?: number; pnlPct?: number;
+  signalId?: string; signalTime?: string; entryQuoteTime?: string; exitQuoteTime?: string;
+  source?: string; lastQuoteTime?: string; lastPrice?: number; monitoringGap?: boolean;
+  modelVersion?: string; events?: { at: string; quoteTime?: string; kind: string; price?: number; note: string }[];
 }
-
-const STORAGE_KEY = 'paper_trades_v2';
-const MAX_EQUITY_PER_DAY = 3;
-const MAX_FO_PER_DAY = 2;
-const EQUITY_POSITION_SIZE = 5000; // ₹5K per equity trade
-const FO_POSITION_SIZE = 7000;     // ₹7K per F&O trade
+interface Ledger { version: 3; trades: PaperTradeRecord[]; archivedNet: number; archivedCount: number }
+const KEY = 'paper_ledger_v3';
 const CAPITAL = 20000;
-
-function loadTrades(): PaperTradeRecord[] {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-  } catch { return []; }
-}
-
-function saveTrades(trades: PaperTradeRecord[]): void {
-  // ponytail: keep last 200 trades max to avoid localStorage bloat
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(trades.slice(-200)));
-}
-
-function isMarketOpen(): boolean {
-  // Hard floor: Indian market trading starts at 9:15 IST, ends 15:30
-  const now = new Date();
-  const day = now.getDay();
-  if (day === 0 || day === 6) return false;
-  const mins = now.getHours() * 60 + now.getMinutes();
-  if (mins < 9 * 60 + 15 || mins > 15 * 60 + 30) return false; // ponytail: hard guard, no trades outside 9:15-15:30
-
-  // NSE live status (handles holidays, special closures)
-  const live = isMarketOpenCached();
-  if (live !== undefined) return live;
-  return true; // Within 9:15-15:30 on weekday, assume open
-}
-
-function todayStr(): string {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function calcBrokerage(type: 'EQUITY' | 'F&O', turnover: number): number {
-  if (type === 'EQUITY') {
-    const brokerFee = Math.min(20 * 2, turnover * 0.0003 * 2);
-    const sttExchange = turnover * 0.0005;
-    return Math.round(brokerFee + sttExchange);
+export const MODEL_VERSION = 'paper-equity-v3';
+const round = (n: number) => Math.round(n * 100) / 100;
+export function loadLedger(): Ledger {
+  const raw = localStorage.getItem(KEY);
+  if (raw) {
+    const ledger = JSON.parse(raw) as Ledger;
+    if (ledger.version !== 3 || !Array.isArray(ledger.trades) || !Number.isFinite(ledger.archivedNet)) throw new Error('Invalid paper ledger; original data preserved.');
+    return ledger;
   }
-  return Math.round(40 + turnover * 0.0002);
+  return { version: 3, trades: readRecords<PaperTradeRecord>('paper_trades_v2'), archivedNet: 0, archivedCount: 0 };
 }
-
-// Open new paper trades from discovered signals
-export function openPaperTrades(signals: { symbol: string; name: string; overallScore: number; ltp: number; foAnalysis: { suggestedTarget: number; suggestedStopLoss: number; riskReward: number }; strategies: string[]; isFnO?: boolean }[]): PaperTradeRecord[] {
-  if (!isMarketOpen()) return loadTrades();
-
-  const trades = loadTrades();
-  const today = todayStr();
-
-  // Count today's trades
-  const todayTrades = trades.filter(t => t.entryTime.startsWith(today));
-  const todayEquity = todayTrades.filter(t => t.type === 'EQUITY').length;
-  const todayFO = todayTrades.filter(t => t.type === 'F&O').length;
-
-  // Check open position capital
-  const openTrades = trades.filter(t => t.status === 'OPEN');
-  const deployedCapital = openTrades.reduce((sum, t) => sum + t.entryPrice * t.quantity, 0);
-
-  // Filter high-conviction signals not already in open trades
-  const openSymbols = new Set(openTrades.map(t => t.symbol));
-  const candidates = signals
-    .filter(s => Math.abs(s.overallScore) >= 40 && !openSymbols.has(s.symbol))
-    .sort((a, b) => Math.abs(b.overallScore) - Math.abs(a.overallScore));
-
-  let equityAdded = 0;
-  let foAdded = 0;
-
-  for (const s of candidates) {
-    if (deployedCapital >= CAPITAL * 0.9) break; // Don't exceed 90% capital deployed
-
-    const isFO = s.isFnO ?? false;
-    if (isFO) {
-      if (todayFO + foAdded >= MAX_FO_PER_DAY) continue;
-    } else {
-      if (todayEquity + equityAdded >= MAX_EQUITY_PER_DAY) continue;
-    }
-
-    const type: 'EQUITY' | 'F&O' = isFO ? 'F&O' : 'EQUITY';
-    const posSize = isFO ? FO_POSITION_SIZE : EQUITY_POSITION_SIZE;
-    const quantity = Math.max(1, Math.floor(posSize / s.ltp));
-    const side: 'BUY' | 'SELL' = s.overallScore > 0 ? 'BUY' : 'SELL';
-
-    const trade: PaperTradeRecord = {
-      id: `${s.symbol}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-      symbol: s.symbol,
-      name: s.name,
-      type,
-      side,
-      quantity,
-      entryPrice: s.ltp, // ACTUAL live price at signal time
-      entryTime: new Date().toISOString(),
-      stopLoss: s.foAnalysis.suggestedStopLoss,
-      target: s.foAnalysis.suggestedTarget,
-      strategy: s.strategies[0] || 'Multi-Strategy',
-      score: s.overallScore,
-      status: 'OPEN',
-    };
-
-    trades.push(trade);
-    // WhatsApp notification for new trade
-    import('./notifications').then(n => n.notifyTradeOpened(trade.symbol, trade.side, trade.quantity, trade.entryPrice, trade.strategy));
-    if (isFO) foAdded++; else equityAdded++;
+function save(ledger: Ledger) { localStorage.setItem(KEY, JSON.stringify(ledger)); }
+export function prunePaperTrades(now = Date.now()): number {
+  const ledger = loadLedger();
+  const expired = ledger.trades.filter(t => t.status !== 'OPEN' && !!t.exitTime && Date.parse(t.exitTime) < now - 30 * DAY_MS);
+  const ids = new Set(expired.map(t => t.id));
+  ledger.trades = ledger.trades.filter(t => !ids.has(t.id));
+  ledger.archivedNet += expired.reduce((n, t) => n + (t.netPnl || 0), 0);
+  ledger.archivedCount += expired.length;
+  save(ledger); return expired.length;
+}
+// Explicit configurable approximation, not a broker contract note. 0.10% round-trip + ₹40.
+export function estimatedCosts(entry: number, exit: number, quantity: number): number {
+  return round(40 + (entry + exit) * quantity * 0.0005);
+}
+export interface PaperSignal {
+  symbol: string; name: string; overallScore: number; ltp: number; strategies: string[];
+  foAnalysis: { suggestedTarget: number; suggestedStopLoss: number; riskReward: number };
+  signalId?: string; firstSignalAt?: string; generatedAt: string; quoteTime?: string; eligible: boolean; isFnO?: boolean;
+}
+export function openPaperTrades(signals: PaperSignal[], now = Date.now()): PaperTradeRecord[] {
+  const ledger = loadLedger();
+  if (!inSession(now) || istMinutes(now) >= 915 || !isMarketOpenCached()) return ledger.trades;
+  const trades = ledger.trades;
+  const day = istDate(now);
+  const today = trades.filter(t => istDate(t.entryTime) === day);
+  const realized = ledger.archivedNet + trades.reduce((n, t) => n + (t.netPnl || 0), 0);
+  const equity = Math.max(0, CAPITAL + realized);
+  const dailyNet = trades.filter(t => t.exitTime && istDate(t.exitTime) === day).reduce((n, t) => n + (t.netPnl || 0), 0);
+  if (dailyNet <= -CAPITAL * .02 || trades.some(t => t.status === 'OPEN' && istDate(t.entryTime) < day)) return trades;
+  let deployed = trades.filter(t => t.status === 'OPEN').reduce((n, t) => n + t.entryPrice * t.quantity + 40, 0);
+  const symbols = new Set(today.map(t => t.symbol));
+  let count = today.length;
+  for (const s of [...signals].sort((a, b) => Math.abs(b.overallScore) - Math.abs(a.overallScore))) {
+    if (count >= 3) break;
+    const quote = { price: s.ltp, timestamp: s.quoteTime || '', source: 'Yahoo research feed' };
+    if (!s.eligible || !s.signalId || symbols.has(s.symbol) || !freshQuote(quote, now) || Math.abs(s.overallScore) < 40 || now - Date.parse(s.firstSignalAt || s.generatedAt) > 120_000) continue;
+    const side = s.overallScore > 0 ? 'BUY' : 'SELL';
+    const entry = round(s.ltp * (side === 'BUY' ? 1.0005 : .9995));
+    const stop = s.foAnalysis.suggestedStopLoss, target = s.foAnalysis.suggestedTarget;
+    if (!validLevels(side, entry, stop, target)) continue;
+    const risk = Math.abs(entry - stop);
+    const qty = Math.floor(Math.min(5000 / entry, (equity * .9 - deployed - 40) / entry, Math.max(0, equity * .005 - 40) / (risk + entry * .001)));
+    if (qty < 1) continue;
+    const at = new Date(now).toISOString();
+    trades.push({ id: crypto.randomUUID(), symbol: s.symbol, name: s.name, type: 'EQUITY', side,
+      quantity: qty, entryPrice: entry, entryTime: at, stopLoss: stop, target, strategy: s.strategies[0] || 'Composite', score: s.overallScore,
+      status: 'OPEN', signalId: s.signalId, signalTime: s.firstSignalAt || s.generatedAt, entryQuoteTime: s.quoteTime,
+      lastQuoteTime: s.quoteTime, lastPrice: s.ltp, source: quote.source, modelVersion: MODEL_VERSION,
+      events: [{ at, quoteTime: s.quoteTime, kind: 'ENTRY', price: entry, note: 'Observed quote with adverse 5 bps slippage; equity simulation.' }] });
+    deployed += entry * qty + 40; symbols.add(s.symbol); count++;
   }
-
-  saveTrades(trades);
-  return trades;
+  save(ledger); return trades;
 }
-
-// Check open trades against current prices — close if SL/target hit
-export function updatePaperTrades(currentPrices: Map<string, number>): PaperTradeRecord[] {
-  const trades = loadTrades();
-  let changed = false;
-
-  for (const t of trades) {
+export function updatePaperTrades(quotes: Map<string, MarketQuote>, now = Date.now()): PaperTradeRecord[] {
+  const ledger = loadLedger();
+  const at = new Date(now).toISOString();
+  for (const t of ledger.trades) {
     if (t.status !== 'OPEN') continue;
-
-    const price = currentPrices.get(t.symbol);
-    if (!price) continue;
-
-    let hit: 'TARGET_HIT' | 'SL_HIT' | null = null;
-
-    if (t.side === 'BUY') {
-      if (price >= t.target) hit = 'TARGET_HIT';
-      else if (price <= t.stopLoss) hit = 'SL_HIT';
-    } else {
-      if (price <= t.target) hit = 'TARGET_HIT';
-      else if (price >= t.stopLoss) hit = 'SL_HIT';
+    const q = quotes.get(t.symbol);
+    if (!freshQuote(q, now) || Date.parse(q.timestamp) <= Date.parse(t.lastQuoteTime || t.entryTime)) continue;
+    t.events ??= [];
+    if (Date.parse(q.timestamp) - Date.parse(t.lastQuoteTime || t.entryTime) > 120_000) {
+      if (!t.monitoringGap) t.events.push({ at, quoteTime: q.timestamp, kind: 'GAP', note: 'Missing observations: any earlier stop/target crossing is unknown.' });
+      t.monitoringGap = true;
     }
-
-    if (hit) {
-      t.status = hit;
-      t.exitPrice = price;
-      t.exitTime = new Date().toISOString();
-      const turnover = t.entryPrice * t.quantity * 2;
-      t.brokerage = calcBrokerage(t.type, turnover);
-      t.grossPnl = t.side === 'BUY'
-        ? (price - t.entryPrice) * t.quantity
-        : (t.entryPrice - price) * t.quantity;
-      t.netPnl = Math.round(t.grossPnl - t.brokerage);
-      t.grossPnl = Math.round(t.grossPnl);
-      t.pnlPct = Math.round(((t.side === 'BUY' ? price - t.entryPrice : t.entryPrice - price) / t.entryPrice) * 10000) / 100;
-      changed = true;
-      import('./notifications').then(n => n.notifyTradeClosed(t.symbol, t.side, t.netPnl!, t.pnlPct!, hit!));
-    }
+    t.lastQuoteTime = q.timestamp; t.lastPrice = q.price;
+    // Never backdate a missed close or call a next-day quote yesterday's EOD execution.
+    const overdue = istDate(t.entryTime) < istDate(q.timestamp);
+    const stop = t.side === 'BUY' ? q.price <= t.stopLoss : q.price >= t.stopLoss;
+    const target = t.side === 'BUY' ? q.price >= t.target : q.price <= t.target;
+    if (!overdue && !inSession(q.timestamp)) continue;
+    const status = overdue ? 'EXPIRED' : istMinutes(q.timestamp) >= 925 ? 'EOD_EXIT' : stop ? 'SL_HIT' : target ? 'TARGET_HIT' : null;
+    if (!status) continue;
+    t.status = status;
+    t.exitTime = at; t.exitQuoteTime = q.timestamp;
+    t.exitPrice = round(q.price * (t.side === 'BUY' ? .9995 : 1.0005));
+    t.grossPnl = round((t.exitPrice - t.entryPrice) * t.quantity * (t.side === 'BUY' ? 1 : -1));
+    t.brokerage = estimatedCosts(t.entryPrice, t.exitPrice, t.quantity);
+    t.netPnl = round(t.grossPnl - t.brokerage);
+    t.pnlPct = round(t.netPnl / (t.entryPrice * t.quantity) * 100);
+    t.events.push({ at, quoteTime: q.timestamp, kind: status, price: t.exitPrice, note: overdue ? 'Missed session close. Recovery at observed price; excluded from validated statistics.' : 'Exit observed at this quote; exact threshold-crossing time is unknown.' });
   }
-
-  // EOD exit: close trades open from previous days
-  const today = todayStr();
-  for (const t of trades) {
-    if (t.status !== 'OPEN') continue;
-    if (t.entryTime.slice(0, 10) < today) {
-      const price = currentPrices.get(t.symbol);
-      if (!price) continue;
-      t.status = 'EOD_EXIT';
-      t.exitPrice = price;
-      t.exitTime = new Date().toISOString();
-      const turnover = t.entryPrice * t.quantity * 2;
-      t.brokerage = calcBrokerage(t.type, turnover);
-      t.grossPnl = t.side === 'BUY'
-        ? (price - t.entryPrice) * t.quantity
-        : (t.entryPrice - price) * t.quantity;
-      t.netPnl = Math.round(t.grossPnl - t.brokerage);
-      t.grossPnl = Math.round(t.grossPnl);
-      t.pnlPct = Math.round(((t.side === 'BUY' ? price - t.entryPrice : t.entryPrice - price) / t.entryPrice) * 10000) / 100;
-      changed = true;
-      import('./notifications').then(n => n.notifyTradeClosed(t.symbol, t.side, t.netPnl!, t.pnlPct!, 'EOD_EXIT'));
-    }
-  }
-
-  if (changed) saveTrades(trades);
-  return trades;
+  save(ledger); return ledger.trades;
 }
-
-// Get all trades (for UI)
-export function getPaperTrades(): PaperTradeRecord[] {
-  return loadTrades();
-}
-
-// Get summary stats
+export function getPaperTrades(): PaperTradeRecord[] { return loadLedger().trades; }
 export function getPaperTradeSummary() {
-  const trades = loadTrades();
+  const ledger = loadLedger(), trades = ledger.trades;
   const closed = trades.filter(t => t.status !== 'OPEN');
-  const open = trades.filter(t => t.status === 'OPEN');
-  const wins = closed.filter(t => (t.netPnl ?? 0) > 0);
-  const losses = closed.filter(t => (t.netPnl ?? 0) <= 0);
-  const totalNet = closed.reduce((s, t) => s + (t.netPnl ?? 0), 0);
-  const totalBrokerage = closed.reduce((s, t) => s + (t.brokerage ?? 0), 0);
-
-  return {
-    totalTrades: trades.length,
-    openTrades: open.length,
-    closedTrades: closed.length,
-    wins: wins.length,
-    losses: losses.length,
-    winRate: closed.length > 0 ? Math.round((wins.length / closed.length) * 100) : 0,
-    totalNetPnl: totalNet,
-    totalBrokerage,
-    capital: CAPITAL,
-    returnPct: Math.round((totalNet / CAPITAL) * 10000) / 100,
-  };
-}
-
-// Reset all trades (fresh start)
-export function clearPaperTrades(): void {
-  localStorage.removeItem(STORAGE_KEY);
+  const evaluated = closed.filter(t => t.modelVersion === MODEL_VERSION && !t.monitoringGap && t.status !== 'EXPIRED');
+  const wins = evaluated.filter(t => (t.netPnl || 0) > 0);
+  const losses = evaluated.filter(t => (t.netPnl || 0) <= 0);
+  const totalNetPnl = round(closed.reduce((n, t) => n + (t.netPnl || 0), 0));
+  return { totalTrades: trades.length, openTrades: trades.filter(t => t.status === 'OPEN').length, closedTrades: closed.length,
+    evaluated: evaluated.length, excluded: closed.length - evaluated.length, wins: wins.length, losses: losses.length,
+    winRate: evaluated.length ? round(wins.length / evaluated.length * 100) : 0,
+    totalNetPnl, totalBrokerage: round(closed.reduce((n, t) => n + (t.brokerage || 0), 0)), capital: CAPITAL,
+    accountEquity: round(CAPITAL + ledger.archivedNet + totalNetPnl), archivedNet: ledger.archivedNet,
+    returnPct: round((totalNetPnl + ledger.archivedNet) / CAPITAL * 100) };
 }

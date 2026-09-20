@@ -48,10 +48,7 @@ async function fetchSubscriptions() {
 }
 
 export default async function handler(req, res) {
-  // Verify cron secret (optional security)
-  // if (req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) {
-  //   return res.status(401).json({ error: 'Unauthorized' });
-  // }
+  if (!process.env.CRON_SECRET || req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) return res.status(401).json({ error: 'Unauthorized' });
 
   if (!SUPABASE_URL || !SUPABASE_KEY) {
     return res.status(500).json({ error: 'Supabase not configured' });
@@ -78,6 +75,6 @@ export default async function handler(req, res) {
   } catch (e) {
     console.error('[IPO Cron] Failed:', e.message);
     // Don't overwrite existing data on failure
-    res.status(200).json({ ok: false, error: e.message, note: 'Existing cached data preserved' });
+    res.status(502).json({ ok: false, error: e.message, note: 'Existing cached data preserved' });
   }
 }

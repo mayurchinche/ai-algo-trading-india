@@ -1,125 +1,60 @@
-// ponytail: signal history — persists to localStorage, tracks accuracy over time
-// Stores every signal generated, later checks if target/SL was hit
+import type { DiscoveredStock } from './stockDiscovery';
+import { DAY_MS, freshQuote, istDate, type MarketQuote } from './tradingTime';
+import { readRecords, writeRecords } from './journalStorage';
 
 export interface StoredSignal {
-  id: string;
-  symbol: string;
-  name: string;
-  signal: 'STRONG_BUY' | 'BUY' | 'HOLD' | 'SELL' | 'STRONG_SELL';
-  score: number;
-  entryPrice: number;  // LTP at signal time
-  target: number;
-  stopLoss: number;
-  strategy: string;
-  timestamp: string;   // ISO date
-  // Outcome (filled later)
-  outcome?: 'TARGET_HIT' | 'SL_HIT' | 'PENDING' | 'EXPIRED';
-  exitPrice?: number;
-  exitDate?: string;
-  pnlPct?: number;
+  id: string; symbol: string; name: string; signal: DiscoveredStock['signal']; score: number;
+  entryPrice: number; target: number; stopLoss: number; strategy: string; timestamp: string;
+  quoteTime?: string; lastQuoteTime?: string; modelVersion?: string; monitoringGap?: boolean;
+  outcome?: 'TARGET_HIT' | 'SL_HIT' | 'PENDING' | 'EXPIRED'; exitPrice?: number; exitDate?: string; pnlPct?: number;
 }
-
 const STORAGE_KEY = 'signal_history';
-const MAX_SIGNALS = 500; // ponytail: cap at 500, old ones auto-expire
-
-function loadSignals(): StoredSignal[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch { return []; }
-}
-
-function saveSignals(signals: StoredSignal[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(signals.slice(-MAX_SIGNALS)));
-}
-
-// Store new signals from the current scan
-export function recordSignals(stocks: { symbol: string; name: string; signal: string; overallScore: number; ltp: number; foAnalysis: { suggestedTarget: number; suggestedStopLoss: number }; strategies: string[] }[]): void {
-  const existing = loadSignals();
-  const today = new Date().toISOString().slice(0, 10);
-
-  // Only record signals with conviction (score ≥ 40) and only once per day per symbol
-  const todaySymbols = new Set(existing.filter(s => s.timestamp.startsWith(today)).map(s => s.symbol));
-
-  const newSignals: StoredSignal[] = stocks
-    .filter(s => Math.abs(s.overallScore) >= 40 && !todaySymbols.has(s.symbol))
-    .slice(0, 5) // Max 5 new signals per scan
-    .map(s => ({
-      id: `${s.symbol}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-      symbol: s.symbol,
-      name: s.name,
-      signal: s.signal as StoredSignal['signal'],
-      score: s.overallScore,
-      entryPrice: s.ltp,
-      target: s.foAnalysis.suggestedTarget,
-      stopLoss: s.foAnalysis.suggestedStopLoss,
-      strategy: s.strategies[0] || 'Multi-Strategy',
-      timestamp: new Date().toISOString(),
-      outcome: 'PENDING' as const,
-    }));
-
-  if (newSignals.length > 0) {
-    saveSignals([...existing, ...newSignals]);
-  }
-}
-
-// Check outcomes: did price hit target or SL since signal was given?
-// Called with current prices to update pending signals
-export function updateOutcomes(currentPrices: Map<string, number>): void {
+const loadSignals = () => readRecords<StoredSignal>(STORAGE_KEY);
+const saveSignals = (signals: StoredSignal[]) => writeRecords(STORAGE_KEY, signals);
+export function pruneSignalHistory(now = Date.now()): number {
   const signals = loadSignals();
-  let changed = false;
-
-  signals.forEach(s => {
-    if (s.outcome !== 'PENDING') return;
-    const currentPrice = currentPrices.get(s.symbol);
-    if (!currentPrice) return;
-
-    const isBuy = s.signal === 'STRONG_BUY' || s.signal === 'BUY';
-
-    if (isBuy) {
-      if (currentPrice >= s.target) {
-        s.outcome = 'TARGET_HIT';
-        s.exitPrice = currentPrice;
-        s.exitDate = new Date().toISOString();
-        s.pnlPct = ((currentPrice - s.entryPrice) / s.entryPrice) * 100;
-        changed = true;
-      } else if (currentPrice <= s.stopLoss) {
-        s.outcome = 'SL_HIT';
-        s.exitPrice = currentPrice;
-        s.exitDate = new Date().toISOString();
-        s.pnlPct = ((currentPrice - s.entryPrice) / s.entryPrice) * 100;
-        changed = true;
-      }
-    } else if (s.signal === 'STRONG_SELL' || s.signal === 'SELL') {
-      if (currentPrice <= s.target) {
-        s.outcome = 'TARGET_HIT';
-        s.exitPrice = currentPrice;
-        s.exitDate = new Date().toISOString();
-        s.pnlPct = ((s.entryPrice - currentPrice) / s.entryPrice) * 100;
-        changed = true;
-      } else if (currentPrice >= s.stopLoss) {
-        s.outcome = 'SL_HIT';
-        s.exitPrice = currentPrice;
-        s.exitDate = new Date().toISOString();
-        s.pnlPct = ((s.entryPrice - currentPrice) / s.entryPrice) * 100;
-        changed = true;
-      }
+  const kept = signals.filter(s => s.outcome === 'PENDING' || now - Date.parse(s.exitDate || s.timestamp) <= 30 * DAY_MS);
+  saveSignals(kept); return signals.length - kept.length;
+}
+// Immutable first observation for each symbol/direction/session. Repeated scans reuse its ID/time.
+export function recordSignals(stocks: DiscoveredStock[]): void {
+  const existing = loadSignals();
+  for (const s of stocks) {
+    if (!s.eligible || Math.abs(s.overallScore) < 40 || s.signal === 'HOLD') continue;
+    const id = `${istDate(s.generatedAt)}:${s.symbol}:${s.overallScore > 0 ? 'BUY' : 'SELL'}:signals-v3`;
+    let stored = existing.find(x => x.id === id);
+    if (!stored) {
+      stored = { id, symbol: s.symbol, name: s.name, signal: s.signal, score: s.overallScore,
+        entryPrice: s.ltp, target: s.foAnalysis.suggestedTarget, stopLoss: s.foAnalysis.suggestedStopLoss,
+        strategy: s.strategies[0] || 'Composite', timestamp: s.generatedAt, quoteTime: s.quoteTime,
+        lastQuoteTime: s.quoteTime, modelVersion: 'signals-v3', outcome: 'PENDING' };
+      existing.push(stored);
     }
-
-    // Expire signals older than 15 days that haven't resolved
-    const ageMs = Date.now() - new Date(s.timestamp).getTime();
-    if (ageMs > 15 * 24 * 3600 * 1000 && s.outcome === 'PENDING') {
-      s.outcome = 'EXPIRED';
-      s.exitPrice = currentPrice;
-      s.exitDate = new Date().toISOString();
-      s.pnlPct = isBuy
-        ? ((currentPrice - s.entryPrice) / s.entryPrice) * 100
-        : ((s.entryPrice - currentPrice) / s.entryPrice) * 100;
-      changed = true;
+    s.signalId = stored.id;
+    s.firstSignalAt = stored.timestamp;
+  }
+  saveSignals(existing);
+}
+export function updateOutcomes(quotes: Map<string, MarketQuote>, now = Date.now()): void {
+  const signals = loadSignals();
+  for (const s of signals) {
+    if (s.outcome !== 'PENDING') continue;
+    if (now - Date.parse(s.timestamp) > 15 * DAY_MS) {
+      s.outcome = 'EXPIRED'; s.exitDate = new Date(now).toISOString(); continue;
     }
-  });
-
-  if (changed) saveSignals(signals);
+    const q = quotes.get(s.symbol);
+    if (!freshQuote(q, now) || Date.parse(q.timestamp) <= Date.parse(s.lastQuoteTime || s.timestamp)) continue;
+    if (Date.parse(q.timestamp) - Date.parse(s.lastQuoteTime || s.timestamp) > 120_000) s.monitoringGap = true;
+    s.lastQuoteTime = q.timestamp;
+    const buy = s.signal === 'BUY' || s.signal === 'STRONG_BUY';
+    const stop = buy ? q.price <= s.stopLoss : q.price >= s.stopLoss;
+    const target = buy ? q.price >= s.target : q.price <= s.target;
+    if (stop || target) {
+      s.outcome = stop ? 'SL_HIT' : 'TARGET_HIT'; s.exitPrice = q.price; s.exitDate = q.timestamp;
+      s.pnlPct = (q.price - s.entryPrice) / s.entryPrice * 100 * (buy ? 1 : -1);
+    }
+  }
+  saveSignals(signals);
 }
 
 // Get accuracy stats
@@ -139,9 +74,9 @@ export interface SignalAccuracy {
 
 export function getSignalAccuracy(): SignalAccuracy {
   const signals = loadSignals();
-  const resolved = signals.filter(s => s.outcome !== 'PENDING');
-  const targetHit = signals.filter(s => s.outcome === 'TARGET_HIT');
-  const slHit = signals.filter(s => s.outcome === 'SL_HIT');
+  const resolved = signals.filter(s => (s.outcome === 'TARGET_HIT' || s.outcome === 'SL_HIT') && !s.monitoringGap && s.modelVersion === 'signals-v3');
+  const targetHit = resolved.filter(s => s.outcome === 'TARGET_HIT');
+  const slHit = resolved.filter(s => s.outcome === 'SL_HIT');
   const expired = signals.filter(s => s.outcome === 'EXPIRED');
   const pending = signals.filter(s => s.outcome === 'PENDING');
 
@@ -150,7 +85,7 @@ export function getSignalAccuracy(): SignalAccuracy {
 
   // By strategy
   const stratMap: Record<string, { total: number; wins: number }> = {};
-  signals.filter(s => s.outcome !== 'PENDING').forEach(s => {
+  signals.filter(s => (s.outcome === 'TARGET_HIT' || s.outcome === 'SL_HIT') && !s.monitoringGap && s.modelVersion === 'signals-v3').forEach(s => {
     if (!stratMap[s.strategy]) stratMap[s.strategy] = { total: 0, wins: 0 };
     stratMap[s.strategy].total++;
     if (s.outcome === 'TARGET_HIT') stratMap[s.strategy].wins++;

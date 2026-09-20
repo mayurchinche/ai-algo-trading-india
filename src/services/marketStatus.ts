@@ -1,6 +1,6 @@
 // ponytail: live NSE market status — handles holidays, special sessions, weekends
 // NSE API returns actual market state (Open/Close/Pre-open etc.)
-import { apiUrl } from '../utils/apiUrl';
+import { fetchMarketJSON } from '../utils/fetchMarketJSON';
 
 export interface MarketStatus {
   isOpen: boolean;
@@ -17,9 +17,7 @@ export async function fetchMarketStatus(): Promise<MarketStatus> {
   if (cachedStatus && now - lastFetch < CACHE_MS) return cachedStatus;
 
   try {
-    const res = await fetch(apiUrl('/api/nse/api/marketStatus'));
-    if (!res.ok) throw new Error(`NSE API ${res.status}`);
-    const data = await res.json();
+    const data = await fetchMarketJSON('/api/nse/api/marketStatus');
 
     // NSE returns: { marketState: [{ market: "Capital Market", marketStatus: "Open"|"Close", ... }] }
     const capitalMarket = data.marketState?.find(
@@ -35,18 +33,8 @@ export async function fetchMarketStatus(): Promise<MarketStatus> {
     console.log('[MarketStatus] NSE:', status, '→', isOpen ? 'OPEN' : 'CLOSED');
     return cachedStatus;
   } catch (e) {
-    console.warn('[MarketStatus] NSE API failed, using time-based fallback:', e);
-    // Fallback: weekday + time check (not perfect but reasonable)
-    const d = new Date();
-    const day = d.getDay();
-    const h = d.getHours();
-    const m = d.getMinutes();
-    const mins = h * 60 + m;
-    const isWeekday = day >= 1 && day <= 5;
-    const inHours = mins >= 9 * 60 + 15 && mins <= 15 * 60 + 30;
-    const isOpen = isWeekday && inHours;
-
-    cachedStatus = { isOpen, status: isOpen ? 'Open (fallback)' : 'Closed (fallback)', lastUpdated: new Date() };
+    console.warn('[MarketStatus] NSE API failed, entries paused:', e);
+    cachedStatus = { isOpen: false, status: 'Unknown — entries paused', lastUpdated: new Date() };
     lastFetch = now;
     return cachedStatus;
   }
@@ -54,5 +42,5 @@ export async function fetchMarketStatus(): Promise<MarketStatus> {
 
 // Synchronous check using cached value (for paper trading engine)
 export function isMarketOpenCached(): boolean {
-  return cachedStatus?.isOpen ?? false;
+  return !!cachedStatus?.isOpen && Date.now() - lastFetch < CACHE_MS * 2;
 }

@@ -1,7 +1,9 @@
+import { allowRequest } from '../server/pushBackend.js';
 // Vercel serverless proxy — forwards requests with proper headers
 // ponytail: single proxy for all external APIs. Forwards method, body, and auth headers.
 
 export default async function handler(req, res) {
+  if (!allowRequest(req, res)) return;
   const { url } = req.query;
   if (!url) return res.status(400).json({ error: 'Missing url param' });
 
@@ -16,7 +18,7 @@ export default async function handler(req, res) {
 
   let targetUrl;
   try { targetUrl = new URL(url); } catch { return res.status(400).json({ error: 'Invalid URL' }); }
-  if (!allowed.some(d => targetUrl.hostname.endsWith(d))) {
+  if (targetUrl.protocol !== 'https:' || targetUrl.port || targetUrl.username || targetUrl.password || !allowed.some(d => targetUrl.hostname === d || targetUrl.hostname.endsWith('.' + d))) {
     return res.status(403).json({ error: 'Domain not allowed' });
   }
 
@@ -43,7 +45,7 @@ export default async function handler(req, res) {
     if (req.headers[h]) headers[h] = req.headers[h];
   }
 
-  const opts = { method: req.method || 'GET', headers };
+  const opts = { method: req.method || 'GET', headers, redirect: 'error', signal: AbortSignal.timeout(12000) };
 
   if (req.method === 'POST' || req.method === 'PUT') {
     opts.body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
@@ -55,7 +57,7 @@ export default async function handler(req, res) {
     const ct = upstream.headers.get('content-type') || 'text/plain';
     const body = await upstream.text();
     res.setHeader('Content-Type', ct);
-    res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300');
+    res.setHeader('Cache-Control', 'no-store');
     res.status(upstream.status).send(body);
   } catch (e) {
     res.status(502).json({ error: e.message });

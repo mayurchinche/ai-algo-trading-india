@@ -1,0 +1,34 @@
+import { PGlite } from '@electric-sql/pglite';
+import { readFile } from 'node:fs/promises';
+import assert from 'node:assert/strict';
+const db=new PGlite();
+try {
+ await db.exec(`create schema auth; create role anon; create role authenticated; create role service_role;
+ create table auth.users(id uuid primary key); create function auth.uid() returns uuid language sql as $$ select nullif(current_setting('test.user_id',true),'')::uuid $$;
+ grant usage on schema auth,public to authenticated; grant execute on function auth.uid() to authenticated;`);
+ await db.exec(await readFile('supabase/migrations/20260918_mobile_alerts.sql','utf8'));
+ const u='00000000-0000-0000-0000-000000000001',v='00000000-0000-0000-0000-000000000002';
+ await db.exec(`insert into auth.users values('${u}'),('${v}'); insert into mobile_alert_preferences(user_id,enabled)values('${u}',true),('${v}',false); insert into mobile_push_devices(user_id,installation_id,platform,token)values('${u}',gen_random_uuid(),'android','test-token'),('${v}',gen_random_uuid(),'ios','second-token');`);
+ const signal={id:'strong:ABC:BUY',assetClass:'EQUITY',score:80,expiresAt:new Date(Date.now()+120000).toISOString()};
+ const enqueue=()=>db.query('select enqueue_mobile_alert($1::jsonb) as queued',[JSON.stringify(signal)]);
+ assert.equal((await enqueue()).rows[0].queued,1);
+ assert.equal((await enqueue()).rows[0].queued,0);
+ assert.equal((await db.query('select * from claim_mobile_push_jobs()')).rows.length,1);
+ assert.equal((await db.query('select * from claim_mobile_push_jobs()')).rows.length,0);
+ await db.exec(`set role authenticated; set test.user_id='${v}';`);
+ assert.equal((await db.query('select * from mobile_alerts')).rows.length,0);
+ await assert.rejects(db.query('select * from mobile_push_devices'));
+ await assert.rejects(db.query('select claim_mobile_push_jobs()'));
+ await db.exec(`set test.user_id='${u}';`);
+ assert.equal((await db.query('select * from mobile_alerts')).rows.length,1);
+ await assert.rejects(db.query("update mobile_alert_preferences set enabled=false"));
+ await db.exec(`reset role; update mobile_alerts set expires_at=now()-interval '1 second';`);
+ assert.equal((await db.query('select * from claim_mobile_push_jobs()')).rows.length,0);
+ assert.equal((await db.query('select status from mobile_push_jobs')).rows[0].status,'expired');
+ await db.exec(`update mobile_alerts set created_at=now()-interval '29 days'; select cleanup_mobile_alerts();`);
+ assert.equal((await db.query('select * from mobile_alerts')).rows.length,1);
+ await db.exec(`update mobile_alerts set created_at=now()-interval '31 days'; select cleanup_mobile_alerts();`);
+ assert.equal((await db.query('select * from mobile_alerts')).rows.length,0);
+ assert.equal((await db.query('select * from mobile_push_jobs')).rows.length,0);
+ console.log('PASS PostgreSQL integration: migration, opt-in, deduplication, leases, row ownership, private tokens, service-only writes, expiry and 30-day cleanup');
+} finally { await db.close(); }

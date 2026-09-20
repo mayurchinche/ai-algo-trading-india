@@ -2,3 +2,15 @@ node_modules
 dist
 .DS_Store
 .env.local
+
+.test-build/
+
+.worker-build/
+.env.worker
+.env.mobile
+android/app/google-services.json
+**/GoogleService-Info.plist
+*.p8
+*.p12
+*.jks
+*.keystore

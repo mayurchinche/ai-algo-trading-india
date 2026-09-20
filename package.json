@@ -7,10 +7,21 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node tests/run.mjs",
+    "mobile:sync": "npm run build -- --mode mobile && cap sync",
+    "mobile:android": "cap open android",
+    "mobile:ios": "cap open ios",
+    "worker:signals": "node --env-file=.env.worker scripts/signal-worker.mjs",
+    "check:deployment": "node scripts/check-deployment.mjs"
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/ios": "^8.5.2",
+    "@capacitor/push-notifications": "^8.1.2",
     "@supabase/supabase-js": "^2.109.0",
+    "firebase-admin": "^14.4.0",
     "framer-motion": "^13.1.0",
     "lucide-react": "^1.31.0",
     "react": "^19.2.8",
@@ -19,14 +30,20 @@
     "recharts": "^3.10.1"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.2",
+    "@electric-sql/pglite": "^0.5.8",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.7.0",
+    "esbuild": "^0.21.5",
     "oxlint": "^1.75.0",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.2",
     "vite": "^5.4.21"
+  },
+  "engines": {
+    "node": ">=22.12.0"
   }
 }

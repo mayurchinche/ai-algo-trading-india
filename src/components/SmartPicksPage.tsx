@@ -1,3 +1,4 @@
+import { formatIST } from '../services/tradingTime';
 import { useState } from 'react';
 import { useStockDiscovery } from '../hooks/useStockDiscovery';
 import type { DiscoveredStock } from '../services/stockDiscovery';
@@ -47,6 +48,7 @@ function StockCard({ stock, variant }: { stock: DiscoveredStock; variant: 'short
         </div>
       </div>
 
+      <div className="signal-time"><p>Analysis: {formatIST(stock.generatedAt)}</p><p>First signal: {formatIST(stock.firstSignalAt)}</p><p>Quote: {formatIST(stock.quoteTime)}</p><p>{stock.eligible ? 'Research candidate · strategy unvalidated' : 'Blocked: ' + stock.blockedReasons.join('; ')}</p></div>
       {/* Price row */}
       <div className="grid grid-cols-4 gap-4 mb-3">
         <div>
@@ -149,7 +151,7 @@ export function SmartPicksPage() {
   const optionsPicks = generateOptionsPicks(stocks);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6"><div className="notice">Research only. Options premiums, volatility, strikes and probabilities are model estimates, not executable quotes or validated profit probabilities. Real contract data is required before trading.</div>
       {/* View toggle */}
       <div className="card flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
@@ -326,7 +328,7 @@ function OptionsCard({ pick }: { pick: OptionsPick }) {
             <span className="font-bold text-[var(--text)]" style={{ fontFamily: 'Poppins' }}>{s.symbol}</span>
             <span className="badge badge-blue text-[9px]">{pick.strategy}</span>
             <span className={`text-[10px] font-bold ${pick.probabilityOfProfit >= 0.6 ? 'text-[var(--green)]' : 'text-amber-500'}`}>
-              {(pick.probabilityOfProfit * 100).toFixed(0)}% PoP
+              Unvalidated model
             </span>
           </div>
           <p className="text-[11px] text-[var(--text-muted)] max-w-[400px] truncate">{s.name}</p>

@@ -1,8 +1,10 @@
 // ponytail: signals generated from live discovery engine + accuracy tracking
 import { useState } from 'react';
+import { formatIST } from '../services/tradingTime';
+import { downloadJSON } from '../services/journalStorage';
 import { useStockDiscovery } from '../hooks/useStockDiscovery';
 import type { DiscoveredStock } from '../services/stockDiscovery';
-import { getSignalAccuracy, getSignalHistory, clearSignalHistory } from '../services/signalHistory';
+import { getSignalAccuracy, getSignalHistory } from '../services/signalHistory';
 
 function directionFromSignal(s: DiscoveredStock): 'BUY' | 'SELL' | 'HOLD' {
   if (s.signal === 'STRONG_BUY' || s.signal === 'BUY') return 'BUY';
@@ -25,7 +27,7 @@ export function SignalsPage() {
   const holdSignals = signals.filter(s => s.direction === 'HOLD');
 
   const accuracy = getSignalAccuracy();
-  const history = showHistory ? getSignalHistory().slice(0, 50) : [];
+  const history = showHistory ? getSignalHistory() : [];
 
   return (
     <div className="space-y-6">
@@ -33,11 +35,11 @@ export function SignalsPage() {
       <div className="card flex items-center gap-6">
         <div className="flex items-center gap-2">
           <span className={`w-2 h-2 rounded-full ${loading ? 'bg-amber-400 pulse' : 'bg-[var(--green)]'}`}></span>
-          <span className="text-xs font-medium">{loading ? 'Scanning...' : 'AI Engine Active'}</span>
+          <span className="text-xs font-medium">{loading ? 'Scanning...' : 'Research scanner'}</span>
         </div>
         {lastScan && (
           <span className="text-xs text-[var(--text-secondary)]">
-            Last scan: {lastScan.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })} IST • Auto-refresh: 5 min
+            Last scan: {lastScan.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', second: '2-digit' })} IST • Refresh: 1 min while open
           </span>
         )}
         <div className="flex items-center gap-4 ml-auto text-xs">
@@ -57,7 +59,7 @@ export function SignalsPage() {
               {showHistory ? 'Hide History' : 'Show History'}
             </button>
             {accuracy.total > 0 && (
-              <button onClick={() => { clearSignalHistory(); window.location.reload(); }} className="text-xs text-[var(--red)] hover:underline">Reset</button>
+              <button onClick={() => downloadJSON('signal-history.json', getSignalHistory())} className="text-xs text-[var(--red)] hover:underline">Export</button>
             )}
           </div>
         </div>
@@ -129,7 +131,7 @@ export function SignalsPage() {
                   <tbody>
                     {history.map(s => (
                       <tr key={s.id}>
-                        <td className="text-[var(--text-muted)]">{new Date(s.timestamp).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}</td>
+                        <td className="text-[var(--text-muted)]">{formatIST(s.timestamp)}</td>
                         <td className="font-semibold">{s.symbol}</td>
                         <td><span className={`badge text-[9px] ${s.signal.includes('BUY') ? 'badge-green' : s.signal.includes('SELL') ? 'badge-red' : 'badge-amber'}`}>{s.signal}</span></td>
                         <td className="text-right font-mono">₹{s.entryPrice.toLocaleString('en-IN', { maximumFractionDigits: 1 })}</td>
@@ -172,6 +174,7 @@ export function SignalsPage() {
                 <span className="text-[10px] text-[var(--text-muted)]">{s.exchange}</span>
               </div>
 
+              <div className="signal-time"><p>Analysis: {formatIST(s.generatedAt)}</p><p>First signal: {formatIST(s.firstSignalAt)}</p><p>Market quote: {formatIST(s.quoteTime)}</p><p>{s.eligible ? 'Research candidate · unvalidated strategy' : 'Blocked: ' + s.blockedReasons.join('; ')}</p></div>
               {/* Price */}
               <div className="flex items-center gap-4 mb-2 text-xs">
                 <span className="text-[var(--text-secondary)]">LTP:</span>
@@ -203,7 +206,7 @@ export function SignalsPage() {
 
               {/* F&O suggestion */}
               <div className="bg-purple-50 rounded-lg px-2 py-1.5 mb-2 text-[10px]">
-                <span className="text-purple-600 font-semibold">F&O: </span>
+                <span className="text-purple-600 font-semibold">Illustrative setup: </span>
                 <span className="text-purple-800">{s.foAnalysis.optionStrategy}</span>
                 <div className="flex gap-4 mt-0.5 text-purple-600">
                   <span>SL: ₹{s.foAnalysis.suggestedStopLoss.toLocaleString('en-IN')}</span>

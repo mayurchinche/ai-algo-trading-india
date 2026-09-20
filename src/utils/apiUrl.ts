@@ -19,6 +19,11 @@ const PROXY_MAP: Record<string, string> = {
  * Production (Vercel): routes through /api/proxy serverless function
  */
 export function apiUrl(localPath: string): string {
+  const apiBase = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+  if (localPath.startsWith('/api/yahoo/') || localPath.startsWith('/api/nse/')) {
+    const provider = localPath.startsWith('/api/yahoo/') ? 'yahoo' : 'nse';
+    return `${apiBase}/api/market?provider=${provider}&path=${encodeURIComponent(localPath.slice(('/api/' + provider).length))}`;
+  }
   if (!IS_PROD) return localPath;
 
   // Find matching proxy prefix (longest match first)
@@ -26,7 +31,7 @@ export function apiUrl(localPath: string): string {
   for (const prefix of sorted) {
     if (localPath.startsWith(prefix)) {
       const realUrl = PROXY_MAP[prefix] + localPath.slice(prefix.length);
-      return `/api/proxy?url=${encodeURIComponent(realUrl)}`;
+      return `${apiBase}/api/proxy?url=${encodeURIComponent(realUrl)}`;
     }
   }
 

@@ -1,8 +1,15 @@
 // ponytail: dynamic stock discovery engine — scans live market, applies multi-strategy analysis, picks top opportunities
 // No hardcoded stocks. Discovers from Yahoo Finance screeners + computes technicals from historical data.
-import { apiUrl } from '../utils/apiUrl';
+import { fetchMarketJSON } from '../utils/fetchMarketJSON';
+import { freshQuote, istDate, validLevels } from './tradingTime';
 
 export interface DiscoveredStock {
+  generatedAt: string;
+  firstSignalAt?: string;
+  quoteTime?: string;
+  signalId?: string;
+  eligible: boolean;
+  blockedReasons: string[];
   symbol: string;
   name: string;
   exchange: string;
@@ -84,7 +91,7 @@ function computeMACD(closes: number[]): { value: number; signal: number; histogr
   const ema12 = computeEMA(closes, 12);
   const ema26 = computeEMA(closes, 26);
   const macdLine = ema12.map((v, i) => v - ema26[i]);
-  const signalLine = computeEMA(macdLine.slice(-9), 9);
+  const signalLine = computeEMA(macdLine, 9);
   const value = macdLine[macdLine.length - 1];
   const signal = signalLine[signalLine.length - 1];
   return { value, signal, histogram: value - signal };
@@ -165,8 +172,8 @@ function scoreStrategies(
 
   // Smart Money: volume spike + price near key levels = institutional activity
   let smartMoney = 0;
-  if (volumeRatio > 2) smartMoney += 40;
-  if (volumeRatio > 3) smartMoney += 30;
+  if (volumeRatio > 2) smartMoney += ltp > sma50 ? 40 : -40;
+  if (volumeRatio > 3) smartMoney += ltp > sma50 ? 30 : -30;
   if (ltp > sma200 && volumeRatio > 1.5) smartMoney += 20;
   if (distFromHigh < 0.03 && volumeRatio > 2) smartMoney += 10; // Breakout accumulation
   smartMoney = Math.max(-100, Math.min(100, Math.round(smartMoney)));
@@ -195,8 +202,9 @@ function computeFOAnalysis(ltp: number, atr: number, _sma20: number, scores: Str
   const expectedMove = (atr / ltp) * 100;
   const supportLevel = Math.round((ltp - atr * 1.5) * 100) / 100;
   const resistanceLevel = Math.round((ltp + atr * 1.5) * 100) / 100;
-  const suggestedStopLoss = Math.round((ltp - atr * 2) * 100) / 100;
-  const suggestedTarget = Math.round((ltp + atr * 3) * 100) / 100;
+  const direction = computeOverallSignal(scores).score >= 0 ? 1 : -1;
+  const suggestedStopLoss = Math.round((ltp - direction * atr * 2) * 100) / 100;
+  const suggestedTarget = Math.round((ltp + direction * atr * 3) * 100) / 100;
   const riskReward = Math.round(((suggestedTarget - ltp) / (ltp - suggestedStopLoss)) * 10) / 10;
 
   let optionStrategy = '';
@@ -231,12 +239,12 @@ function generateReasons(scores: StrategyScores, rsi: number, volumeRatio: numbe
   if (scores.momentum < -50) reasons.push('Bearish momentum — avoid or short');
   if (rsi < 30) reasons.push(`RSI oversold at ${rsi.toFixed(1)} — potential bounce candidate`);
   if (rsi > 70) reasons.push(`RSI overbought at ${rsi.toFixed(1)} — caution, potential reversal`);
-  if (volumeRatio > 2) reasons.push(`Volume spike ${volumeRatio.toFixed(1)}x avg — institutional activity likely`);
+  if (volumeRatio > 2) reasons.push(`Volume spike ${volumeRatio.toFixed(1)}x avg — unusual activity; institutional participation unverified`);
   if (ltp > sma50 && ltp > sma200) reasons.push('Price above SMA50 & SMA200 — uptrend confirmed');
   if (ltp < sma50 && ltp < sma200) reasons.push('Price below SMA50 & SMA200 — downtrend');
   if ((weekHigh52 - ltp) / weekHigh52 < 0.05) reasons.push('Near 52-week high — breakout territory');
   if (scores.breakout > 60) reasons.push('Breakout pattern — volume confirms new high attempt');
-  if (scores.smartMoney > 50) reasons.push('Smart money accumulation detected — high volume at key levels');
+  if (scores.smartMoney > 50) reasons.push('High volume at key levels; accumulation is unverified');
   if (scores.trendFollowing > 60) reasons.push('All moving averages aligned bullish (20>50>200)');
   return reasons.length ? reasons : ['Neutral — no strong conviction from any strategy'];
 }
@@ -265,25 +273,29 @@ function determineTrend(sma20: number, sma50: number, sma200: number, ltp: numbe
 
 async function fetchScreener(scrId: string, count = 25): Promise<any[]> {
   try {
-    const res = await fetch(apiUrl(`/api/yahoo/v1/finance/screener/predefined/saved?formatted=false&lang=en-IN&region=IN&scrIds=${scrId}&count=${count}`));
-    if (!res.ok) return [];
-    const d = await res.json();
+    const d = await fetchMarketJSON(`/api/yahoo/v1/finance/screener/predefined/saved?formatted=false&lang=en-IN&region=IN&scrIds=${scrId}&count=${count}`);
     return d?.finance?.result?.[0]?.quotes || [];
   } catch { return []; }
 }
 
-async function fetchHistorical(symbol: string): Promise<{ closes: number[]; highs: number[]; lows: number[] } | null> {
-  try {
-    const res = await fetch(apiUrl(`/api/yahoo/v8/finance/chart/${symbol}?interval=1d&range=3mo`));
-    if (!res.ok) return null;
-    const d = await res.json();
-    const q = d?.chart?.result?.[0]?.indicators?.quote?.[0];
-    if (!q) return null;
-    const closes = (q.close || []).filter((v: any) => v !== null);
-    const highs = (q.high || []).filter((v: any) => v !== null);
-    const lows = (q.low || []).filter((v: any) => v !== null);
-    return { closes, highs, lows };
-  } catch { return null; }
+export async function fetchHistorical(symbol: string) {
+  const d = await fetchMarketJSON(`/api/yahoo/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=2y`);
+  const result = d?.chart?.result?.[0];
+  const q = result?.indicators?.quote?.[0];
+  if (!q || !result.timestamp) return null;
+  const rows = result.timestamp.map((time: number, i: number) => ({ time, close: q.close[i], high: q.high[i], low: q.low[i], volume: q.volume[i] }))
+    .filter((r: any) => [r.close, r.high, r.low, r.volume].every(Number.isFinite) && r.low > 0 && r.low <= r.close && r.close <= r.high && istDate(r.time * 1000) < istDate());
+  return { closes: rows.map((r: any) => r.close) as number[], highs: rows.map((r: any) => r.high) as number[], lows: rows.map((r: any) => r.low) as number[], volumes: rows.map((r: any) => r.volume) as number[], meta: result.meta };
+}
+
+export async function fetchQuotes(symbols: string[]) {
+  const results = await Promise.allSettled([...new Set(symbols)].map(async symbol => {
+    const data = await fetchMarketJSON(`/api/yahoo/v8/finance/chart/${encodeURIComponent(symbol + '.NS')}?interval=1m&range=1d`);
+    const meta = data?.chart?.result?.[0]?.meta;
+    if (!Number.isFinite(meta?.regularMarketPrice) || !Number.isFinite(meta?.regularMarketTime)) throw new Error('Missing quote time');
+    return [symbol, { price: meta.regularMarketPrice, timestamp: new Date(meta.regularMarketTime * 1000).toISOString(), source: 'Yahoo research feed' }] as const;
+  }));
+  return new Map(results.flatMap(r => r.status === 'fulfilled' ? [r.value] : []));
 }
 
 // --- Main Discovery Function ---
@@ -332,9 +344,10 @@ export async function discoverStocks(): Promise<DiscoveredStock[]> {
     candidates.map(async (q) => {
       const symbol = q.symbol as string;
       const hist = await fetchHistorical(symbol);
-      if (!hist || hist.closes.length < 20) return null;
+      if (!hist || hist.closes.length < 200) return null;
 
       const { closes, highs, lows } = hist;
+      q = { ...hist.meta, ...q };
       const ltp = q.regularMarketPrice || closes[closes.length - 1];
       const prevClose = q.regularMarketPreviousClose || (closes.length > 1 ? closes[closes.length - 2] : ltp);
       const change = q.regularMarketChange ?? (ltp - prevClose);
@@ -347,13 +360,13 @@ export async function discoverStocks(): Promise<DiscoveredStock[]> {
       const atr = computeATR(highs, lows, closes);
       const bollingerPos = computeBollingerPosition(closes);
       const vol = q.regularMarketVolume || 0;
-      const avgVol = q.averageDailyVolume3Month || 1;
-      const volumeRatio = vol / avgVol || 1;
+      const avgVol = (q.averageDailyVolume3Month || hist.volumes.slice(-60).reduce((a, b) => a + b, 0) / 60);
+      const volumeRatio = avgVol > 0 ? vol / avgVol : 0;
 
       const scores = scoreStrategies(
         ltp, rsi, macd, sma20, sma50, sma200,
         volumeRatio, bollingerPos,
-        q.fiftyTwoWeekHigh || ltp, q.fiftyTwoWeekLow || ltp, atr
+        q.fiftyTwoWeekHigh || Math.max(...highs.slice(-252)), q.fiftyTwoWeekLow || Math.min(...lows.slice(-252)), atr
       );
 
       const { score: overallScore, signal } = computeOverallSignal(scores);
@@ -362,7 +375,16 @@ export async function discoverStocks(): Promise<DiscoveredStock[]> {
       const trend = determineTrend(sma20, sma50, sma200, ltp);
       const foAnalysis = computeFOAnalysis(ltp, atr, sma20, scores, rsi);
 
+      const generatedAt = new Date().toISOString();
+      const quoteTime = Number.isFinite(q.regularMarketTime) ? new Date(q.regularMarketTime * 1000).toISOString() : undefined;
+      const blockedReasons: string[] = [];
+      if (!freshQuote({ price: ltp, timestamp: quoteTime || '', source: 'Yahoo' })) blockedReasons.push('Quote older than 2 minutes or timestamp missing');
+      if (ltp < 50) blockedReasons.push('Price below ₹50 research liquidity guard');
+      if (avgVol * ltp < 100_000_000) blockedReasons.push('Average daily turnover below ₹10 crore');
+      if (Math.abs(changePct) > 8) blockedReasons.push('Large daily move; chasing/circuit risk');
+      if (!validLevels(overallScore >= 0 ? 'BUY' : 'SELL', ltp, foAnalysis.suggestedStopLoss, foAnalysis.suggestedTarget)) blockedReasons.push('Invalid risk levels');
       return {
+        generatedAt, quoteTime, eligible: blockedReasons.length === 0, blockedReasons,
         symbol: symbol.replace('.NS', ''),
         name: q.longName || q.shortName || symbol.replace('.NS', ''),
         exchange: 'NSE',
@@ -398,6 +420,12 @@ export async function discoverStocks(): Promise<DiscoveredStock[]> {
   analyses.forEach(r => {
     if (r.status === 'fulfilled' && r.value) results.push(r.value);
   });
+
+  if (!results.length) {
+    const failed = analyses.find(r => r.status === 'rejected');
+    const detail = failed?.status === 'rejected' && failed.reason instanceof Error ? failed.reason.message : 'Data feed unavailable or incomplete.';
+    throw new Error(`No stocks have sufficient valid history. ${detail} No signals generated.`);
+  }
 
   // Sort by absolute score (strongest signals first, buy or sell)
   results.sort((a, b) => Math.abs(b.overallScore) - Math.abs(a.overallScore));

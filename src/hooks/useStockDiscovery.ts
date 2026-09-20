@@ -1,57 +1,50 @@
-import { useState, useEffect, useCallback } from 'react';
-import { discoverStocks, type DiscoveredStock } from '../services/stockDiscovery';
-import { recordSignals, updateOutcomes } from '../services/signalHistory';
-import { openPaperTrades, updatePaperTrades } from '../services/paperTrading';
-import { isAvailableInFnO } from '../services/optionsEngine';
+import { useEffect, useSyncExternalStore } from 'react';
+import { discoverStocks, fetchQuotes, type DiscoveredStock } from '../services/stockDiscovery';
+import { getSignalHistory, recordSignals, updateOutcomes } from '../services/signalHistory';
+import { getPaperTrades, openPaperTrades, updatePaperTrades } from '../services/paperTrading';
 import { fetchMarketStatus } from '../services/marketStatus';
-import { notifySignalAlert } from '../services/notifications';
+import type { MarketQuote } from '../services/tradingTime';
 
+let state = { stocks: [] as DiscoveredStock[], quotes: new Map<string, MarketQuote>(), marketOpen: false, loading: false, lastScan: null as Date | null, error: null as string | null };
+const listeners = new Set<() => void>();
+let running = false;
+const publish = (patch: Partial<typeof state>) => { state = { ...state, ...patch }; listeners.forEach(fn => fn()); };
+async function runScan() {
+  if (running || document.visibilityState !== 'visible') return;
+  running = true; publish({ loading: true, error: null });
+  try {
+    const market = await fetchMarketStatus();
+    // Monitor existing positions independently of whether they appear in today's screener.
+    const symbols = [...getPaperTrades().filter(t => t.status === 'OPEN').map(t => t.symbol), ...getSignalHistory().filter(s => s.outcome === 'PENDING').map(s => s.symbol)];
+    const quotes = await fetchQuotes(symbols);
+    updatePaperTrades(quotes); updateOutcomes(quotes);
+    publish({ quotes });
+    if (symbols.some(symbol => !quotes.has(symbol))) publish({ error: 'Some open positions or signals have no quote; their outcomes remain unknown.' });
+    const stocks = await discoverStocks();
+    if (market.isOpen) { recordSignals(stocks); openPaperTrades(stocks); }
+    publish({ stocks, marketOpen: market.isOpen, lastScan: new Date() });
+  } catch (error) {
+    publish({ marketOpen: false, error: error instanceof Error ? error.message : 'Scan failed; entries paused' });
+  } finally { running = false; publish({ loading: false }); }
+}
+async function scan() {
+  // One writer across tabs. Lock held for the complete read/modify/write cycle.
+  if (!navigator.locks) { publish({ error: 'This browser lacks safe multi-tab locking. Paper trading is paused.' }); return; }
+  await navigator.locks.request('paper-trading-scan', { ifAvailable: true }, lock => lock ? runScan() : undefined);
+}
 export function useStockDiscovery() {
-  const [stocks, setStocks] = useState<DiscoveredStock[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [lastScan, setLastScan] = useState<Date | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const scan = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      // Refresh market status cache before trading logic
-      await fetchMarketStatus();
-
-      const discovered = await discoverStocks();
-      setStocks(discovered);
-      setLastScan(new Date());
-
-      // Record signals + check outcomes against current prices
-      recordSignals(discovered);
-      const priceMap = new Map(discovered.map(s => [s.symbol, s.ltp]));
-      updateOutcomes(priceMap);
-
-      // Paper trading: open new trades from signals + check SL/target
-      openPaperTrades(discovered.map(s => ({
-        ...s,
-        isFnO: isAvailableInFnO(s.symbol),
-      })));
-      updatePaperTrades(priceMap);
-
-      // WhatsApp: alert for high-conviction signals (score ≥ 70)
-      const highConviction = discovered.filter(s => Math.abs(s.overallScore) >= 70);
-      for (const s of highConviction.slice(0, 2)) { // max 2 alerts per scan
-        notifySignalAlert(s.symbol, s.signal, Math.abs(s.overallScore), s.ltp, s.foAnalysis.suggestedTarget, s.foAnalysis.suggestedStopLoss);
-      }
-    } catch (e: any) {
-      setError(e?.message || 'Discovery failed');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
+  const snapshot = useSyncExternalStore(fn => { listeners.add(fn); return () => { listeners.delete(fn); }; }, () => state);
+  return { ...snapshot, rescan: scan };
+}
+// Mounted once at the application root; page navigation never starts another engine.
+export function useTradingRuntime() {
   useEffect(() => {
-    scan();
-    const interval = setInterval(scan, 5 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, [scan]);
-
-  return { stocks, loading, lastScan, error, rescan: scan };
+    void scan();
+    const timer = setInterval(() => void scan(), 60_000);
+    const resume = () => { if (document.visibilityState === 'visible') void scan(); };
+    document.addEventListener('visibilitychange', resume);
+    const refresh = () => publish({});
+    window.addEventListener('storage', refresh);
+    return () => { document.removeEventListener('visibilitychange', resume); clearInterval(timer); window.removeEventListener('storage', refresh); };
+  }, []);
 }

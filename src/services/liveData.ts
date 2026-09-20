@@ -1,5 +1,5 @@
 // ponytail: only Nifty index fetching — stock discovery handled by stockDiscovery.ts
-import { apiUrl } from '../utils/apiUrl';
+import { fetchMarketJSON } from '../utils/fetchMarketJSON';
 
 export interface LiveStock {
   symbol: string;
@@ -32,9 +32,7 @@ interface YahooChartMeta {
 
 async function fetchSingleStock(symbol: string): Promise<LiveStock | null> {
   try {
-    const res = await fetch(apiUrl(`/api/yahoo/v8/finance/chart/${symbol}?interval=1d&range=1d`));
-    if (!res.ok) return null;
-    const data = await res.json();
+    const data = await fetchMarketJSON(`/api/yahoo/v8/finance/chart/${symbol}?interval=1d&range=1d`);
     const meta: YahooChartMeta = data?.chart?.result?.[0]?.meta;
     if (!meta) return null;
 

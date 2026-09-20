@@ -1,10 +1,30 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+// @ts-expect-error JavaScript Vercel handler is shared with local development.
+import marketHandler from './api/market.js'
 
-export default defineConfig({
+// @ts-expect-error Shared JavaScript configuration validator.
+import { validateMobileApiBase } from './server/mobileConfig.js'
+// @ts-expect-error Shared JavaScript Vercel handler.
+import healthHandler from './api/health.js'
+
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), 'VITE_');
+  if (mode === 'mobile') validateMobileApiBase(env.VITE_API_BASE_URL);
+  return {
   base: process.env.GITHUB_ACTIONS ? '/ai-algo-trading-india/' : '/',
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), {
+    name: 'local-market-api',
+    configureServer(server) {
+      for (const [route, handler] of [['/api/market', marketHandler], ['/api/health', healthHandler]] as const) server.middlewares.use(route, (req, res) => {
+        const url = new URL(req.url || '/', 'http://localhost');
+        const request = { headers: req.headers, method: req.method, query: Object.fromEntries(url.searchParams) };
+        const response = { end() { res.end(); return response; }, setHeader: (key: string, value: string) => res.setHeader(key, value), status(code: number) { res.statusCode = code; return response; }, json(data: unknown) { res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(data)); return response; } };
+        void handler(request, response);
+      });
+    },
+  }],
   server: {
     proxy: {
       '/api/yahoo': {
@@ -71,4 +91,5 @@ export default defineConfig({
       },
     },
   },
+}
 })

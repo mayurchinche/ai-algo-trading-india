@@ -1,214 +1,37 @@
-// ponytail: realistic paper trading — persisted in localStorage, entries at signal time
+import { useState } from 'react';
 import { useStockDiscovery } from '../hooks/useStockDiscovery';
-import { getPaperTrades, getPaperTradeSummary, clearPaperTrades } from '../services/paperTrading';
-
-function formatTime(iso: string): string {
-  return new Date(iso).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
-}
-
-function duration(entry: string, exit?: string): string {
-  const start = new Date(entry).getTime();
-  const end = exit ? new Date(exit).getTime() : Date.now();
-  const mins = Math.round((end - start) / 60000);
-  if (mins < 60) return `${mins}m`;
-  if (mins < 1440) return `${Math.floor(mins / 60)}h ${mins % 60}m`;
-  return `${Math.floor(mins / 1440)}d ${Math.floor((mins % 1440) / 60)}h`;
-}
-
+import { getPaperTrades, getPaperTradeSummary, loadLedger, prunePaperTrades } from '../services/paperTrading';
+import { downloadJSON } from '../services/journalStorage';
+import { formatIST, istDate } from '../services/tradingTime';
+const money = (n?: number) => n == null ? '—' : n.toLocaleString('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 });
 export function TradesPage() {
-  const { loading, lastScan, rescan, stocks } = useStockDiscovery();
-  const trades = getPaperTrades();
+  const { loading, rescan } = useStockDiscovery();
+  const [search, setSearch] = useState('');
+  const [status, setStatus] = useState('ALL');
+  const [date, setDate] = useState('');
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [notice, setNotice] = useState('');
   const summary = getPaperTradeSummary();
-
-  // Get current prices for open trades display
-  const priceMap = new Map(stocks.map(s => [s.symbol, s.ltp]));
-
-  const openTrades = trades.filter(t => t.status === 'OPEN');
-  const closedTrades = trades.filter(t => t.status !== 'OPEN').sort((a, b) =>
-    new Date(b.exitTime || b.entryTime).getTime() - new Date(a.exitTime || a.entryTime).getTime()
-  );
-
-  return (
-    <div className="space-y-6">
-      {/* Summary KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-7 gap-4">
-        <div className="card text-center">
-          <div className="text-[10px] text-[var(--text-muted)] uppercase">Capital</div>
-          <div className="text-xl font-bold" style={{ fontFamily: 'Poppins' }}>₹{summary.capital.toLocaleString('en-IN')}</div>
-        </div>
-        <div className="card text-center">
-          <div className="text-[10px] text-[var(--text-muted)] uppercase">Net P&L</div>
-          <div className={`text-xl font-bold ${summary.totalNetPnl >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`} style={{ fontFamily: 'Poppins' }}>
-            {summary.totalNetPnl >= 0 ? '+' : ''}₹{summary.totalNetPnl.toLocaleString('en-IN')}
-          </div>
-        </div>
-        <div className="card text-center">
-          <div className="text-[10px] text-[var(--text-muted)] uppercase">Return</div>
-          <div className={`text-xl font-bold ${summary.returnPct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`} style={{ fontFamily: 'Poppins' }}>
-            {summary.returnPct >= 0 ? '+' : ''}{summary.returnPct}%
-          </div>
-        </div>
-        <div className="card text-center">
-          <div className="text-[10px] text-[var(--text-muted)] uppercase">Win Rate</div>
-          <div className="text-xl font-bold" style={{ fontFamily: 'Poppins' }}>{summary.winRate}%</div>
-        </div>
-        <div className="card text-center">
-          <div className="text-[10px] text-[var(--text-muted)] uppercase">Win / Loss</div>
-          <div className="text-xl font-bold" style={{ fontFamily: 'Poppins' }}>
-            <span className="text-[var(--green)]">{summary.wins}</span>
-            <span className="text-[var(--text-muted)]"> / </span>
-            <span className="text-[var(--red)]">{summary.losses}</span>
-          </div>
-        </div>
-        <div className="card text-center">
-          <div className="text-[10px] text-[var(--text-muted)] uppercase">Brokerage</div>
-          <div className="text-xl font-bold text-[var(--red)]" style={{ fontFamily: 'Poppins' }}>-₹{summary.totalBrokerage}</div>
-        </div>
-        <div className="card text-center">
-          <div className="text-[10px] text-[var(--text-muted)] uppercase">Open</div>
-          <div className="text-xl font-bold text-[var(--amber)]" style={{ fontFamily: 'Poppins' }}>{summary.openTrades}</div>
-        </div>
-      </div>
-
-      {/* Info bar */}
-      <div className="card flex items-center justify-between">
-        <div className="text-xs text-[var(--text-secondary)]">
-          <b>🤖 Auto Paper Trading</b> — Entries happen ONLY when signals fire during market hours (Mon-Fri 9:15-15:30). Max 3 equity + 2 F&O/day. SL/Target monitored every 5 min.
-          {lastScan && <span className="ml-2 text-[var(--blue)]">Last scan: {lastScan.toLocaleTimeString('en-IN')}</span>}
-        </div>
-        <div className="flex items-center gap-3">
-          <button onClick={rescan} disabled={loading} className="text-xs font-semibold text-[var(--blue)] hover:underline disabled:opacity-50">
-            {loading ? 'Scanning...' : '↻ Refresh'}
-          </button>
-          {trades.length > 0 && (
-            <button onClick={() => { clearPaperTrades(); window.location.reload(); }} className="text-xs text-[var(--red)] hover:underline">
-              Reset All
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* No trades state */}
-      {trades.length === 0 && !loading && (
-        <div className="card text-center py-12">
-          <p className="text-sm text-[var(--text-secondary)]">No paper trades yet.</p>
-          <p className="text-xs text-[var(--text-muted)] mt-2">Trades are opened automatically when high-conviction signals fire during market hours (Mon-Fri 9:15-15:30 IST).</p>
-          <p className="text-xs text-[var(--text-muted)] mt-1">Today is {new Date().toLocaleDateString('en-IN', { weekday: 'long' })} — {new Date().getDay() >= 1 && new Date().getDay() <= 5 ? 'market day' : 'market closed (weekend)'}.</p>
-        </div>
-      )}
-
-      {/* Open Trades */}
-      {openTrades.length > 0 && (
-        <div className="card overflow-x-auto">
-          <h3 className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-3">🟢 Open Positions ({openTrades.length})</h3>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Symbol</th>
-                <th>Type</th>
-                <th>Side</th>
-                <th className="text-right">Entry Time</th>
-                <th className="text-right">Duration</th>
-                <th className="text-right">Qty</th>
-                <th className="text-right">Entry ₹</th>
-                <th className="text-right">LTP</th>
-                <th className="text-right">Unrealized</th>
-                <th className="text-right">SL</th>
-                <th className="text-right">Target</th>
-                <th>Strategy</th>
-              </tr>
-            </thead>
-            <tbody>
-              {openTrades.map(t => {
-                const ltp = priceMap.get(t.symbol) || t.entryPrice;
-                const unrealized = t.side === 'BUY'
-                  ? (ltp - t.entryPrice) * t.quantity
-                  : (t.entryPrice - ltp) * t.quantity;
-                return (
-                  <tr key={t.id}>
-                    <td>
-                      <div className="font-semibold">{t.symbol}</div>
-                      <div className="text-[10px] text-[var(--text-muted)] max-w-[120px] truncate">{t.name}</div>
-                    </td>
-                    <td><span className={`badge text-[9px] ${t.type === 'F&O' ? 'badge-purple' : 'badge-blue'}`}>{t.type}</span></td>
-                    <td><span className={`badge ${t.side === 'BUY' ? 'badge-green' : 'badge-red'}`}>{t.side}</span></td>
-                    <td className="text-right font-mono text-xs">{formatTime(t.entryTime)}</td>
-                    <td className="text-right font-mono text-xs text-[var(--text-secondary)]">{duration(t.entryTime)}</td>
-                    <td className="text-right font-mono">{t.quantity}</td>
-                    <td className="text-right font-mono">₹{t.entryPrice.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
-                    <td className="text-right font-mono font-semibold">₹{ltp.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
-                    <td className={`text-right font-mono font-bold ${unrealized >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
-                      {unrealized >= 0 ? '+' : ''}₹{Math.round(unrealized).toLocaleString('en-IN')}
-                    </td>
-                    <td className="text-right font-mono text-[var(--red)] text-xs">₹{t.stopLoss.toLocaleString('en-IN', { maximumFractionDigits: 1 })}</td>
-                    <td className="text-right font-mono text-[var(--green)] text-xs">₹{t.target.toLocaleString('en-IN', { maximumFractionDigits: 1 })}</td>
-                    <td className="text-xs">{t.strategy}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Closed Trades */}
-      {closedTrades.length > 0 && (
-        <div className="card overflow-x-auto">
-          <h3 className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-3">📋 Trade History ({closedTrades.length})</h3>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Symbol</th>
-                <th>Type</th>
-                <th>Side</th>
-                <th className="text-center">Result</th>
-                <th className="text-right">Entry</th>
-                <th className="text-right">Exit</th>
-                <th className="text-right">Duration</th>
-                <th className="text-right">Qty</th>
-                <th className="text-right">Entry ₹</th>
-                <th className="text-right">Exit ₹</th>
-                <th className="text-right">Gross</th>
-                <th className="text-right">Charges</th>
-                <th className="text-right">Net P&L</th>
-                <th>Strategy</th>
-              </tr>
-            </thead>
-            <tbody>
-              {closedTrades.map(t => (
-                <tr key={t.id}>
-                  <td>
-                    <div className="font-semibold">{t.symbol}</div>
-                    <div className="text-[10px] text-[var(--text-muted)] max-w-[120px] truncate">{t.name}</div>
-                  </td>
-                  <td><span className={`badge text-[9px] ${t.type === 'F&O' ? 'badge-purple' : 'badge-blue'}`}>{t.type}</span></td>
-                  <td><span className={`badge ${t.side === 'BUY' ? 'badge-green' : 'badge-red'}`}>{t.side}</span></td>
-                  <td className="text-center">
-                    <span className={`badge text-[9px] ${t.status === 'TARGET_HIT' ? 'badge-green' : t.status === 'SL_HIT' ? 'badge-red' : 'badge-amber'}`}>
-                      {t.status === 'TARGET_HIT' ? '✓ Target' : t.status === 'SL_HIT' ? '✗ SL Hit' : t.status === 'EOD_EXIT' ? '⏱ EOD' : '⏱ Expired'}
-                    </span>
-                  </td>
-                  <td className="text-right font-mono text-xs">{formatTime(t.entryTime)}</td>
-                  <td className="text-right font-mono text-xs">{t.exitTime ? formatTime(t.exitTime) : '—'}</td>
-                  <td className="text-right font-mono text-xs text-[var(--text-secondary)]">{duration(t.entryTime, t.exitTime)}</td>
-                  <td className="text-right font-mono">{t.quantity}</td>
-                  <td className="text-right font-mono">₹{t.entryPrice.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
-                  <td className="text-right font-mono font-semibold">₹{(t.exitPrice ?? t.entryPrice).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
-                  <td className={`text-right font-mono ${(t.grossPnl ?? 0) >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
-                    {(t.grossPnl ?? 0) >= 0 ? '+' : ''}₹{(t.grossPnl ?? 0).toLocaleString('en-IN')}
-                  </td>
-                  <td className="text-right font-mono text-[var(--red)] text-xs">-₹{t.brokerage ?? 0}</td>
-                  <td className={`text-right font-mono font-bold ${(t.netPnl ?? 0) >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
-                    {(t.netPnl ?? 0) >= 0 ? '+' : ''}₹{(t.netPnl ?? 0).toLocaleString('en-IN')}
-                    <div className="text-[9px] text-[var(--text-muted)]">{t.pnlPct != null ? `${t.pnlPct >= 0 ? '+' : ''}${t.pnlPct}%` : ''}</div>
-                  </td>
-                  <td className="text-xs">{t.strategy}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+  const trades = getPaperTrades().filter(t => t.symbol.toLowerCase().includes(search.toLowerCase()) && (status === 'ALL' || (status === 'OPEN' ? t.status === 'OPEN' : t.status !== 'OPEN')) && (!date || istDate(t.entryTime) === date)).sort((a, b) => b.entryTime.localeCompare(a.entryTime));
+  async function cleanup() {
+    if (!navigator.locks) return;
+    await navigator.locks.request('paper-trading-scan', () => { const removed = prunePaperTrades(); setNotice(`${removed} closed trades older than 30 days removed. Account balance preserved.`); });
+  }
+  return <div className="space-y-6">
+    <div className="page-title"><div><p className="eyebrow">Your trading record</p><h2>Paper journal</h2><p>Every decision has a timestamp. Every result has a trail.</p></div><button className="primary-button" onClick={() => downloadJSON(`paper-journal-${istDate()}.json`, loadLedger())}>Export journal ↓</button></div>
+    <div className="metric-grid">
+      {[['Account equity', money(summary.accountEquity)], ['Recorded net P&L', money(summary.totalNetPnl)], ['Evaluated win rate', summary.evaluated ? `${summary.winRate}%` : 'No sample'], ['Open positions', String(summary.openTrades)]].map(([label, value]) => <div className="card metric" key={label}><span>{label}</span><strong>{value}</strong></div>)}
     </div>
-  );
+    <div className="notice">Browser simulation • Equity only • Runs while this app is open • 5 bps adverse slippage per fill + estimated costs. {summary.evaluated} evaluated / {summary.excluded} excluded closed trades. Gaps and legacy trades remain visible.</div>
+    <div className="journal-toolbar"><label>Symbol<input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search symbol…" /></label><label>Entry date (IST)<input type="date" value={date} onChange={e => setDate(e.target.value)} /></label><label>Status<select value={status} onChange={e => setStatus(e.target.value)}><option value="ALL">All trades</option><option value="OPEN">Open</option><option value="CLOSED">Closed</option></select></label><button onClick={rescan} disabled={loading}>{loading ? 'Scanning…' : 'Refresh'}</button></div>
+    {!trades.length && <div className="card empty-state"><span>◎</span><h3>No matching trades</h3><p>New entries require a confirmed open market, fresh quotes, valid risk levels, and sufficient capital.</p></div>}
+    <div className="trade-list">{trades.map(t => <article className="card trade-card" key={t.id}>
+      <div className="trade-heading"><div><b>{t.symbol}</b><span>{t.strategy} · {t.quantity} shares</span></div><span className={`badge ${t.side === 'BUY' ? 'badge-green' : 'badge-red'}`}>{t.side}</span><span className="badge badge-blue">{t.status.replaceAll('_', ' ')}</span><strong className={(t.netPnl || 0) < 0 ? 'negative' : 'positive'}>{t.status === 'OPEN' ? 'Open' : money(t.netPnl)}</strong></div>
+      <div className="trade-details"><div><label>Entry observation</label><b>{money(t.entryPrice)}</b><time>{formatIST(t.entryTime)}</time></div><div><label>Exit observation</label><b>{money(t.exitPrice)}</b><time>{t.exitTime ? formatIST(t.exitTime) : 'Awaiting exit'}</time></div><div><label>Stop / target</label><b>{money(t.stopLoss)} / {money(t.target)}</b><span>Estimated costs: {money(t.brokerage)}</span></div></div>
+      {(!t.modelVersion || t.monitoringGap || t.status === 'EXPIRED') && <p className="quality-note">{!t.modelVersion ? 'Legacy record: execution quality was not captured.' : 'Monitoring gap: earlier threshold crossings are unknown.'} Excluded from evaluated win rate.</p>}
+      <button className="text-button" onClick={() => setExpanded(expanded === t.id ? null : t.id)} aria-expanded={expanded === t.id}>{expanded === t.id ? 'Hide' : 'View'} audit trail</button>
+      {expanded === t.id && <div className="audit-trail"><p>Signal: {formatIST(t.signalTime)} · ID: {t.signalId || 'Legacy / unavailable'}</p><p>Entry quote: {formatIST(t.entryQuoteTime)} · Exit quote: {formatIST(t.exitQuoteTime)}</p><p>Source: {t.source || 'Legacy / unknown'} · Model: {t.modelVersion || 'Legacy'}</p>{t.events?.map((event, i) => <p key={i}><b>{event.kind}</b> · {formatIST(event.at)} — {event.note}</p>)}</div>}
+    </article>)}</div>
+    <div className="journal-toolbar"><p>Keep at least 30 days after closing. Export before cleanup.</p><button onClick={cleanup}>Clean up older closed trades</button></div>{notice && <p role="status">{notice}</p>}
+  </div>;
 }

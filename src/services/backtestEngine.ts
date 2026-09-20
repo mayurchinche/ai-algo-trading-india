@@ -1,6 +1,8 @@
 // ponytail: backtesting engine — runs all strategies on historical data, computes accuracy %
 // This is how top 1% validate before going live: backtest everything, trust nothing untested
 import { apiUrl } from '../utils/apiUrl';
+import { estimatedCosts } from './paperTrading';
+import { validLevels } from './tradingTime';
 
 export interface BacktestConfig {
   symbol: string;
@@ -8,6 +10,7 @@ export interface BacktestConfig {
   endDate?: string;    // defaults to today
   initialCapital?: number;  // defaults to ₹5,00,000
   riskPerTrade?: number;    // defaults to 2% (top 1% rule)
+  slippageBps?: number;
   strategies?: string[];     // defaults to all
 }
 
@@ -312,201 +315,100 @@ function smartMoneySignal(closes: number[], highs: number[], lows: number[], vol
 
 // --- Main Backtest Engine ---
 
-export async function runBacktest(config: BacktestConfig): Promise<BacktestResult | null> {
-  const { symbol, initialCapital = 500000, riskPerTrade = 0.02 } = config;
-
-  // Fetch 1-year historical data
-  const yahooSymbol = symbol.includes('.') ? symbol : `${symbol}.NS`;
-  const range = '1y';
-  
-  try {
-    const res = await fetch(apiUrl(`/api/yahoo/v8/finance/chart/${yahooSymbol}?interval=1d&range=${range}`));
-    if (!res.ok) return null;
-    const data = await res.json();
-    const result = data?.chart?.result?.[0];
-    if (!result) return null;
-
-    const timestamps = result.timestamp || [];
-    const quote = result.indicators?.quote?.[0];
-    if (!quote) return null;
-
-    const closes: number[] = [];
-    const highs: number[] = [];
-    const lows: number[] = [];
-    const volumes: number[] = [];
-    const dates: string[] = [];
-
-    for (let i = 0; i < timestamps.length; i++) {
-      if (quote.close[i] == null) continue;
-      closes.push(quote.close[i]);
-      highs.push(quote.high[i] || quote.close[i]);
-      lows.push(quote.low[i] || quote.close[i]);
-      volumes.push(quote.volume[i] || 0);
-      dates.push(new Date(timestamps[i] * 1000).toISOString().slice(0, 10));
-    }
-
-    if (closes.length < 60) return null; // Need at least 60 days
-
-    const stockName = result.meta?.longName || result.meta?.shortName || symbol;
-
-    // Run backtest
-    const allTrades: BacktestTrade[] = [];
-    let capital = initialCapital;
-    let openPosition: { entry: number; date: string; side: 'BUY' | 'SELL'; qty: number; sl: number; tp: number; strategy: string; reason: string } | null = null;
-    const equityCurve: { date: string; equity: number; drawdown: number }[] = [];
-    let peakEquity = initialCapital;
-
-    for (let i = 50; i < closes.length; i++) {
-      // Check if open position hit SL or TP
-      if (openPosition) {
-        const hitSL = openPosition.side === 'BUY' 
-          ? lows[i] <= openPosition.sl 
-          : highs[i] >= openPosition.sl;
-        const hitTP = openPosition.side === 'BUY'
-          ? highs[i] >= openPosition.tp
-          : lows[i] <= openPosition.tp;
-
-        if (hitSL || hitTP) {
-          const exitPrice = hitTP ? openPosition.tp : openPosition.sl;
-          const pnl = openPosition.side === 'BUY'
-            ? (exitPrice - openPosition.entry) * openPosition.qty
-            : (openPosition.entry - exitPrice) * openPosition.qty;
-          const pnlPct = openPosition.side === 'BUY'
-            ? ((exitPrice - openPosition.entry) / openPosition.entry) * 100
-            : ((openPosition.entry - exitPrice) / openPosition.entry) * 100;
-
-          allTrades.push({
-            entryDate: openPosition.date,
-            exitDate: dates[i],
-            side: openPosition.side,
-            entryPrice: openPosition.entry,
-            exitPrice,
-            quantity: openPosition.qty,
-            pnl: Math.round(pnl),
-            pnlPct: Math.round(pnlPct * 100) / 100,
-            strategy: openPosition.strategy,
-            reason: openPosition.reason,
-            holdingDays: dates.indexOf(dates[i]) - dates.indexOf(openPosition.date),
-          });
-          capital += pnl;
-          openPosition = null;
-        }
-      }
-
-      // Generate signals (only if no open position)
-      if (!openPosition) {
-        const signals = [
-          momentumSignal(closes, highs, lows, i),
-          breakoutSignal(closes, highs, lows, volumes, i),
-          trendFollowingSignal(closes, highs, lows, i),
-          meanReversionSignal(closes, highs, lows, i),
-          smartMoneySignal(closes, highs, lows, volumes, i),
-        ].filter(s => s.direction !== 'NONE');
-
-        if (signals.length > 0) {
-          // Take the first valid signal (priority order)
-          const signal = signals[0];
-          const riskAmount = capital * riskPerTrade;
-          const slDistance = Math.abs(closes[i] - signal.stopLoss);
-          const qty = slDistance > 0 ? Math.floor(riskAmount / slDistance) : 0;
-
-          if (qty > 0 && qty * closes[i] <= capital * 0.5) { // Max 50% capital per trade
-            openPosition = {
-              entry: closes[i],
-              date: dates[i],
-              side: signal.direction as 'BUY' | 'SELL',
-              qty,
-              sl: signal.stopLoss,
-              tp: signal.target,
-              strategy: signal.strategy,
-              reason: signal.reason,
-            };
-          }
-        }
-      }
-
-      // Track equity curve
-      const unrealized = openPosition
-        ? (openPosition.side === 'BUY' 
-          ? (closes[i] - openPosition.entry) * openPosition.qty
-          : (openPosition.entry - closes[i]) * openPosition.qty)
-        : 0;
-      const currentEquity = capital + unrealized;
-      peakEquity = Math.max(peakEquity, currentEquity);
-      const drawdown = ((peakEquity - currentEquity) / peakEquity) * 100;
-      
-      equityCurve.push({ date: dates[i], equity: Math.round(currentEquity), drawdown: Math.round(drawdown * 100) / 100 });
-    }
-
-    // Close any remaining open position at last price
-    if (openPosition) {
-      const exitPrice = closes[closes.length - 1];
-      const pnl = openPosition.side === 'BUY'
-        ? (exitPrice - openPosition.entry) * openPosition.qty
-        : (openPosition.entry - exitPrice) * openPosition.qty;
-      allTrades.push({
-        entryDate: openPosition.date,
-        exitDate: dates[dates.length - 1],
-        side: openPosition.side,
-        entryPrice: openPosition.entry,
-        exitPrice,
-        quantity: openPosition.qty,
-        pnl: Math.round(pnl),
-        pnlPct: Math.round(((pnl / (openPosition.entry * openPosition.qty)) * 100) * 100) / 100,
-        strategy: openPosition.strategy,
-        reason: openPosition.reason,
-        holdingDays: 0,
-      });
-      capital += pnl;
-    }
-
-    // Compute per-strategy results
-    const strategyNames = ['Momentum', 'Breakout', 'Trend Following', 'Mean Reversion', 'Smart Money'];
-    const strategies: StrategyResult[] = strategyNames.map(name => computeStrategyResult(name, allTrades.filter(t => t.strategy === name)));
-    const combined = computeStrategyResult('Combined', allTrades);
-
-    // Buy & hold comparison
-    const buyAndHoldReturn = ((closes[closes.length - 1] - closes[50]) / closes[50]) * 100;
-    const totalReturnPct = ((capital - initialCapital) / initialCapital) * 100;
-    const totalDays = closes.length - 50;
-    const annualizedReturn = totalReturnPct * (252 / totalDays);
-
-    // Accuracy per signal type
-    const accuracy = {
-      overallSignalAccuracy: combined.winRate,
-      buySignalAccuracy: computeDirectionAccuracy(allTrades, 'BUY'),
-      sellSignalAccuracy: computeDirectionAccuracy(allTrades, 'SELL'),
-      momentumAccuracy: strategies[0].winRate,
-      breakoutAccuracy: strategies[1].winRate,
-      trendAccuracy: strategies[2].winRate,
-      meanReversionAccuracy: strategies[3].winRate,
-      smartMoneyAccuracy: strategies[4].winRate,
-    };
-
-    return {
-      symbol,
-      stockName,
-      period: `${dates[50]} to ${dates[dates.length - 1]}`,
-      totalDays,
-      initialCapital,
-      finalCapital: Math.round(capital),
-      totalReturn: Math.round(capital - initialCapital),
-      totalReturnPct: Math.round(totalReturnPct * 100) / 100,
-      annualizedReturn: Math.round(annualizedReturn * 100) / 100,
-      buyAndHoldReturn: Math.round(buyAndHoldReturn * 100) / 100,
-      alphaVsBuyHold: Math.round((totalReturnPct - buyAndHoldReturn) * 100) / 100,
-      strategies,
-      combined,
-      equityCurve,
-      trades: allTrades,
-      accuracy,
-    };
-  } catch {
-    return null;
+export interface HistoricalBar { date: string; open: number; high: number; low: number; close: number; volume: number }
+export function exitAtBar(side: 'BUY' | 'SELL', stop: number, target: number, bar: HistoricalBar): number | null {
+  // Gaps execute at the opening price. Unknown intrabar order is resolved stop-first.
+  if (side === 'BUY') {
+    if (bar.open <= stop || bar.open >= target) return bar.open;
+    if (bar.low <= stop) return stop;
+    if (bar.high >= target) return target;
+  } else {
+    if (bar.open >= stop || bar.open <= target) return bar.open;
+    if (bar.high >= stop) return stop;
+    if (bar.low <= target) return target;
   }
+  return null;
+}
+export async function runBacktest(config: BacktestConfig): Promise<BacktestResult | null> {
+  const symbol = config.symbol.includes('.') ? config.symbol : `${config.symbol}.NS`;
+  try {
+    const res = await fetch(apiUrl(`/api/yahoo/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=5y`));
+    if (!res.ok) throw new Error(`History HTTP ${res.status}`);
+    const result = (await res.json())?.chart?.result?.[0];
+    const q = result?.indicators?.quote?.[0];
+    if (!q || !result.timestamp) throw new Error('Historical data missing');
+    const bars = result.timestamp.map((ts: number, i: number) => ({ date: new Date(ts * 1000).toISOString().slice(0, 10), open: q.open[i], high: q.high[i], low: q.low[i], close: q.close[i], volume: q.volume[i] }))
+      .filter((b: HistoricalBar) => [b.open, b.high, b.low, b.close, b.volume].every(Number.isFinite) && b.low > 0 && b.low <= Math.min(b.open, b.close) && b.high >= Math.max(b.open, b.close) && b.date < new Date().toISOString().slice(0, 10));
+    return simulateBacktest(bars, config, result.meta?.longName || config.symbol);
+  } catch { return null; }
+}
+export function simulateBacktest(bars: HistoricalBar[], config: BacktestConfig, stockName = config.symbol): BacktestResult | null {
+  const initialCapital = config.initialCapital ?? 500000;
+  const riskPerTrade = config.riskPerTrade ?? .005;
+  const slip = (config.slippageBps ?? 5) / 10000;
+  if (!(initialCapital > 0) || !(riskPerTrade > 0 && riskPerTrade <= .02) || !(slip >= 0 && slip < .1)) throw new Error('Invalid risk configuration');
+  if (bars.some((bar, i) => i > 0 && bar.date <= bars[i - 1].date)) throw new Error('Bars must be unique and chronological');
+  const start = config.startDate || bars[Math.max(50, bars.length - 252)]?.date;
+  const end = config.endDate || bars.at(-1)?.date;
+  if (!start || !end || start > end) return null;
+  const closes = bars.map(b => b.close), highs = bars.map(b => b.high), lows = bars.map(b => b.low), volumes = bars.map(b => b.volume);
+  const indices = bars.map((_, i) => i).filter(i => i >= 51 && bars[i].date >= start && bars[i].date <= end);
+  if (!indices.length) return null;
+  const trades: BacktestTrade[] = [], equityCurve: BacktestResult['equityCurve'] = [];
+  let capital = initialCapital, peak = initialCapital;
+  let position: { entry: number; idx: number; qty: number; sl: number; tp: number; strategy: string; reason: string } | null = null;
+  const close = (price: number, idx: number) => {
+    const p = position!;
+    const exit = price * (1 - slip);
+    const pnl = (exit - p.entry) * p.qty - estimatedCosts(p.entry, exit, p.qty);
+    trades.push({ entryDate: bars[p.idx].date, exitDate: bars[idx].date, side: 'BUY', entryPrice: p.entry, exitPrice: exit, quantity: p.qty, pnl, pnlPct: pnl / (p.entry * p.qty) * 100, strategy: p.strategy, reason: p.reason, holdingDays: idx - p.idx });
+    capital += pnl; position = null;
+  };
+  for (const i of indices) {
+    if (!position && capital > 0) {
+      // Yesterday's completed bar creates today's order. Long-only cash-equity study.
+      const j = i - 1;
+      const signals = [momentumSignal(closes, highs, lows, j), breakoutSignal(closes, highs, lows, volumes, j), trendFollowingSignal(closes, highs, lows, j), meanReversionSignal(closes, highs, lows, j), smartMoneySignal(closes, highs, lows, volumes, j)]
+        .filter(s => s.direction === 'BUY' && (!config.strategies || config.strategies.includes(s.strategy)));
+      const signal = signals[0];
+      const entry = bars[i].open * (1 + slip);
+      if (signal && validLevels('BUY', entry, signal.stopLoss, signal.target)) {
+        const risk = entry - signal.stopLoss;
+        const qty = Math.floor(Math.min(capital * .5 / entry, Math.max(0, capital * riskPerTrade - 40) / (risk + entry * .001)));
+        if (qty > 0) position = { entry, idx: i, qty, sl: signal.stopLoss, tp: signal.target, strategy: signal.strategy, reason: signal.reason };
+      }
+    }
+    if (position) {
+      const exit = exitAtBar('BUY', position.sl, position.tp, bars[i]);
+      if (exit !== null) close(exit, i);
+      else if (i === indices.at(-1)) close(bars[i].close, i);
+    }
+    const equity = capital + (position ? (bars[i].close - position.entry) * position.qty - estimatedCosts(position.entry, bars[i].close, position.qty) : 0);
+    peak = Math.max(peak, equity);
+    equityCurve.push({ date: bars[i].date, equity, drawdown: (peak - equity) / peak * 100 });
+  }
+  const names = ['Momentum', 'Breakout', 'Trend Following', 'Mean Reversion', 'Smart Money'];
+  const strategies = names.map(name => computeStrategyResult(name, trades.filter(t => t.strategy === name), initialCapital));
+  const combined = computeStrategyResult('Combined', trades, initialCapital);
+  combined.maxDrawdownPct = Math.max(...equityCurve.map(p => p.drawdown));
+  let peakValue = initialCapital;
+  combined.maxDrawdown = equityCurve.reduce((max, p) => { peakValue = Math.max(peakValue, p.equity); return Math.max(max, peakValue - p.equity); }, 0);
+  const returns = equityCurve.map((p, i) => p.equity / (i ? equityCurve[i - 1].equity : initialCapital) - 1);
+  const mean = returns.reduce((a, b) => a + b, 0) / returns.length;
+  const std = Math.sqrt(returns.reduce((a, b) => a + (b - mean) ** 2, 0) / returns.length);
+  combined.sharpeRatio = std > 0 ? mean / std * Math.sqrt(252) : 0;
+  const first = indices[0], last = indices[indices.length - 1];
+  const benchmarkEntry = bars[first].open * (1 + slip), benchmarkExit = bars[last].close * (1 - slip);
+  const benchmarkQty = Math.floor(initialCapital / benchmarkEntry);
+  const buyAndHoldReturn = ((benchmarkExit - benchmarkEntry) * benchmarkQty - estimatedCosts(benchmarkEntry, benchmarkExit, benchmarkQty)) / initialCapital * 100;
+  const totalReturnPct = (capital / initialCapital - 1) * 100;
+  return { symbol: config.symbol, stockName, period: `${bars[first].date} to ${bars[last].date}`, totalDays: indices.length, initialCapital, finalCapital: capital, totalReturn: capital - initialCapital, totalReturnPct,
+    annualizedReturn: ((capital / initialCapital) ** (252 / indices.length) - 1) * 100, buyAndHoldReturn, alphaVsBuyHold: totalReturnPct - buyAndHoldReturn,
+    strategies, combined, equityCurve, trades, accuracy: { overallSignalAccuracy: combined.winRate, buySignalAccuracy: computeDirectionAccuracy(trades, 'BUY'), sellSignalAccuracy: 0,
+      momentumAccuracy: strategies[0].winRate, breakoutAccuracy: strategies[1].winRate, trendAccuracy: strategies[2].winRate, meanReversionAccuracy: strategies[3].winRate, smartMoneyAccuracy: strategies[4].winRate } };
 }
 
-function computeStrategyResult(name: string, trades: BacktestTrade[]): StrategyResult {
+function computeStrategyResult(name: string, trades: BacktestTrade[], initialCapital: number): StrategyResult {
   if (trades.length === 0) {
     return { name, totalTrades: 0, wins: 0, losses: 0, winRate: 0, totalPnl: 0, avgPnl: 0, avgWin: 0, avgLoss: 0, profitFactor: 0, sharpeRatio: 0, maxDrawdown: 0, maxDrawdownPct: 0, avgHoldingDays: 0, bestTrade: 0, worstTrade: 0, consecutiveWins: 0, consecutiveLosses: 0, expectancy: 0 };
   }
@@ -525,7 +427,7 @@ function computeStrategyResult(name: string, trades: BacktestTrade[]): StrategyR
   const returns = trades.map(t => t.pnlPct);
   const meanReturn = returns.reduce((a, b) => a + b, 0) / returns.length;
   const stdReturn = Math.sqrt(returns.reduce((sum, r) => sum + (r - meanReturn) ** 2, 0) / returns.length);
-  const sharpeRatio = stdReturn > 0 ? (meanReturn / stdReturn) * Math.sqrt(252 / (trades.length || 1)) : 0;
+  const sharpeRatio = stdReturn > 0 ? meanReturn / stdReturn : 0; // Trade-return ratio; not annualized.
 
   // Max drawdown
   let peak = 0, maxDD = 0, cumPnl = 0;
@@ -557,7 +459,7 @@ function computeStrategyResult(name: string, trades: BacktestTrade[]): StrategyR
     profitFactor: Math.round(profitFactor * 100) / 100,
     sharpeRatio: Math.round(sharpeRatio * 100) / 100,
     maxDrawdown: Math.round(maxDD),
-    maxDrawdownPct: Math.round((maxDD / 500000) * 100 * 100) / 100, // vs initial capital
+    maxDrawdownPct: Math.round((maxDD / initialCapital) * 100 * 100) / 100, // vs initial capital
     avgHoldingDays: Math.round(trades.reduce((a, t) => a + t.holdingDays, 0) / trades.length),
     bestTrade: Math.max(...trades.map(t => t.pnl)),
     worstTrade: Math.min(...trades.map(t => t.pnl)),

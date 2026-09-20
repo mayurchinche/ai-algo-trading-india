@@ -1,3 +1,4 @@
+import { formatIST } from '../services/tradingTime';
 import { useStockDiscovery } from '../hooks/useStockDiscovery';
 import type { DiscoveredStock } from '../services/stockDiscovery';
 import { useState } from 'react';
@@ -53,6 +54,7 @@ function StockCard({ stock, expanded, onToggle }: { stock: DiscoveredStock; expa
         </div>
       </div>
 
+      <div className="signal-time"><p>Analysis: {formatIST(stock.generatedAt)}</p><p>First signal: {formatIST(stock.firstSignalAt)}</p><p>Quote: {formatIST(stock.quoteTime)}</p><p>{stock.eligible ? 'Research candidate · strategy unvalidated' : 'Blocked: ' + stock.blockedReasons.join('; ')}</p></div>
       {/* Quick stats row */}
       <div className="flex items-center gap-4 mt-3 text-xs text-[var(--text-secondary)]">
         <span>RSI: <b className={stock.rsi > 70 ? 'text-[var(--red)]' : stock.rsi < 30 ? 'text-[var(--green)]' : ''}>{stock.rsi}</b></span>
@@ -166,12 +168,12 @@ export function DiscoveryPage() {
           <div className="flex items-center gap-2">
             <span className={`w-2.5 h-2.5 rounded-full ${loading ? 'bg-amber-400 pulse' : 'bg-[var(--green)]'}`}></span>
             <span className="text-sm font-semibold text-[var(--text)]">
-              {loading ? 'Scanning market...' : `AI Scanner found ${stocks.length} opportunities`}
+              {loading ? 'Scanning market...' : `Scanner analysed ${stocks.length} stocks`}
             </span>
           </div>
           {lastScan && (
             <span className="text-xs text-[var(--text-muted)]">
-              Last scan: {lastScan.toLocaleTimeString('en-IN')} • Auto-refresh: 5 min
+              Last scan: {lastScan.toLocaleTimeString('en-IN')} • Auto-refresh: 1 min while visible
             </span>
           )}
         </div>
@@ -185,10 +187,10 @@ export function DiscoveryPage() {
         <h3 className="text-xs font-bold text-blue-800 uppercase tracking-wide mb-2">How the AI Scanner Works</h3>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 text-[11px] text-blue-700">
           <div className="flex items-start gap-1.5"><span className="font-bold text-blue-500">1.</span> Scans top volume leaders, gainers & losers on NSE in real-time</div>
-          <div className="flex items-start gap-1.5"><span className="font-bold text-blue-500">2.</span> Fetches 3-month historical data for technical analysis</div>
+          <div className="flex items-start gap-1.5"><span className="font-bold text-blue-500">2.</span> Fetches up to 2 years of historical data for technical analysis</div>
           <div className="flex items-start gap-1.5"><span className="font-bold text-blue-500">3.</span> Computes RSI, MACD, SMA, Bollinger Bands, ATR for each stock</div>
           <div className="flex items-start gap-1.5"><span className="font-bold text-blue-500">4.</span> Applies 5 strategies: Momentum, Mean Reversion, Breakout, Trend Following, Smart Money</div>
-          <div className="flex items-start gap-1.5"><span className="font-bold text-blue-500">5.</span> Generates F&O strategy with support/resistance & risk:reward</div>
+          <div className="flex items-start gap-1.5"><span className="font-bold text-blue-500">5.</span> Shows research levels; options execution requires verified contract data</div>
         </div>
       </div>
 

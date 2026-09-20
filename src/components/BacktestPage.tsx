@@ -39,7 +39,7 @@ export function BacktestPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6"><div className="notice">Historical long-only cash-equity study. Signals use the previous completed bar; entries use the next open. Includes estimated costs, adverse slippage and stop-first ambiguous candles. These individual rules differ from the live composite score and do not validate it. Corporate-action quality and out-of-sample performance remain unverified.</div>
       {/* Input section */}
       <div className="card">
         <div className="flex items-center gap-4">
