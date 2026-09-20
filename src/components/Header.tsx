@@ -1,81 +1,18 @@
 import { useState, useEffect } from 'react';
+import { type LucideIcon, Activity, LayoutDashboard, Compass, Sparkles, BookOpen, ChartNoAxesCombined, Radio, Bell, FlaskConical, Building2, Gem, ShieldCheck, ArrowUpRight } from 'lucide-react';
 import type { LiveStock } from '../services/liveData';
 import { formatIST } from '../services/tradingTime';
 import { fetchMarketStatus } from '../services/marketStatus';
-
-interface HeaderProps {
-  activeTab: string;
-  onTabChange: (t: string) => void;
-  nifty: LiveStock | null;
-  lastUpdated: Date | null;
-}
-
-export function Header({ activeTab, onTabChange, nifty }: HeaderProps) {
-  const [marketOpen, setMarketOpen] = useState(false);
-  const [marketLabel, setMarketLabel] = useState('...');
-
-  useEffect(() => {
-    fetchMarketStatus().then(s => { setMarketOpen(s.isOpen); setMarketLabel(s.status); });
-    const interval = setInterval(() => {
-      fetchMarketStatus().then(s => { setMarketOpen(s.isOpen); setMarketLabel(s.status); });
-    }, 60_000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const now = new Date();
-  const tabs = ['AI Discovery', 'Smart Picks', 'Overview', 'Trades', 'Stock Analysis', 'Signals', 'Alerts', 'Backtest', 'IPO Tracker', 'Metals'];
-
-  return (
-    <header className="sticky top-0 z-50 glass border-b border-[rgba(0,0,0,0.06)]">
-      <div className="flex items-center justify-between px-8 xl:px-12 py-4 max-w-[1600px] mx-auto">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-blue-500/20">AT</div>
-          <div>
-            <h1 className="text-[15px] font-semibold text-[var(--text)]" style={{ fontFamily: 'Poppins', letterSpacing: '-0.01em' }}>AlgoTrader AI</h1>
-            <p className="text-[11px] text-[var(--text-muted)]">NSE RESEARCH / PAPER TRADING</p>
-          </div>
-        </div>
-
-        <div className="hidden lg:flex items-center gap-6">
-          {nifty && (
-            <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-[rgba(0,0,0,0.02)] border border-[var(--border)]">
-              <span className="text-[11px] text-[var(--text-muted)] font-medium" title={formatIST(nifty.quoteTime)}>NIFTY 50 · {formatIST(nifty.quoteTime)}</span>
-              <span className="text-[15px] font-bold text-[var(--text)]" style={{ fontFamily: 'Poppins', letterSpacing: '-0.02em' }}>
-                {nifty.ltp.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-              </span>
-              <span className={`text-xs font-semibold ${nifty.changePct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
-                {nifty.changePct >= 0 ? '↑' : '↓'} {Math.abs(nifty.changePct).toFixed(2)}%
-              </span>
-            </div>
-          )}
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => onTabChange('Alerts')}
-            className="relative p-2 rounded-lg text-[var(--text-muted)]"
-            title="In-app signal alerts" aria-label="Open signal alerts"
-          >
-            🔔
-          </button>
-          <span className="text-[11px] text-[var(--text-muted)]">
-            {now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}
-          </span>
-          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium ${marketOpen ? 'bg-[var(--green-bg)] text-[var(--green)]' : 'bg-[var(--red-bg)] text-[var(--red)]'}`}>
-            <span className={`w-1.5 h-1.5 rounded-full ${marketOpen ? 'bg-[var(--green)] pulse' : 'bg-[var(--red)]'}`}></span>
-            {marketLabel}
-          </div>
-        </div>
-      </div>
-
-      <div className="px-8 xl:px-12 max-w-[1600px] mx-auto">
-        <div className="tab-bar overflow-x-auto">
-          {tabs.map((t) => (
-            <button key={t} className={`tab whitespace-nowrap ${activeTab === t ? 'active' : ''}`} aria-current={activeTab === t ? 'page' : undefined} onClick={() => onTabChange(t)}>{t}</button>
-          ))}
-        </div>
-      </div>
-
-    </header>
-  );
+interface HeaderProps {activeTab:string;onTabChange:(tab:string)=>void;nifty:LiveStock|null;lastUpdated:Date|null}
+const sections: {label:string;items:[string,string,LucideIcon][]}[]=[{label:'YOUR WORKSPACE',items:[['Overview','Account',LayoutDashboard],['Trades','Trade journal',BookOpen],['Alerts','Alerts',Bell]]},{label:'MARKET RESEARCH',items:[['AI Discovery','Discover',Compass],['Smart Picks','Watch ideas',Sparkles],['Stock Analysis','Stock analysis',ChartNoAxesCombined],['Signals','Signals',Radio],['Backtest','Strategy lab',FlaskConical],['IPO Tracker','IPOs',Building2],['Metals','Metals',Gem]]}];
+export function Header({activeTab,onTabChange,nifty}:HeaderProps){
+ const [market,setMarket]=useState({isOpen:false,status:'Checking market'});
+ useEffect(()=>{let active=true;const update=()=>void fetchMarketStatus().then(s=>{if(active)setMarket(s);}).catch(()=>{if(active)setMarket({isOpen:false,status:'Unavailable'});});update();const timer=setInterval(update,60000);return()=>{active=false;clearInterval(timer);};},[]);
+ return <><aside className="workspace-sidebar"><a className="brand" href="#main-content" aria-label="AlgoTrader workspace"><span className="brand-mark"><Activity size={22}/></span><span>AlgoTrader<span className="brand-caption">INDIA · PAPER TRADING</span></span></a>
+ <div className="mode-label"><span className="status-dot"/>Simulation workspace</div>
+ <nav aria-label="Workspace navigation">{sections.map(group=><div className="nav-group" key={group.label}><p>{group.label}</p>{group.items.map(([id,label,Icon])=><button key={id} aria-current={activeTab===id?'page':undefined} onClick={()=>onTabChange(id)}><Icon size={18}/><span>{label}</span>{activeTab===id&&<span className="nav-active-mark"/>}</button>)}</div>)}</nav>
+ <div className="sidebar-note"><ShieldCheck size={20}/><strong>Practice with perspective.</strong><p>Virtual capital. Recorded decisions. A clearer view of your process.</p><span>No real broker orders</span></div></aside>
+ <header className="workspace-header"><div className="mobile-brand"><span className="brand-mark"><Activity size={20}/></span><strong>AlgoTrader</strong></div><div className="workspace-breadcrumb">Workspace <span>/</span> <strong>{sections.flatMap(g=>g.items).find(i=>i[0]===activeTab)?.[1]}</strong></div><div className="header-actions"><span className={`market-state ${market.isOpen?'is-open':''}`}><span className="status-dot"/>{market.isOpen?'Market open':market.status==='Unavailable'?'Status unavailable':market.status==='Checking market'?'Checking market':/close/i.test(market.status)?'Market closed':market.status}</span><button className="icon-button" onClick={()=>onTabChange('Alerts')} aria-label="Open signal alerts"><Bell size={19}/></button></div></header>
+ <nav className="mobile-research-nav" aria-label="All features">{sections.flatMap(g=>g.items).map(([id,label])=><button key={id} aria-current={activeTab===id?'page':undefined} onClick={()=>onTabChange(id)}>{label}</button>)}</nav>
+ <div className="market-strip"><span className="market-strip-label">MARKET SNAPSHOT</span>{nifty?<><strong>NIFTY 50</strong><span className="market-price">{nifty.ltp.toLocaleString('en-IN',{maximumFractionDigits:2})}</span><span className={nifty.changePct>=0?'positive':'negative'}>{nifty.changePct>=0?'+':''}{nifty.changePct.toFixed(2)}%</span><time>{formatIST(nifty.quoteTime)}</time></>:<span>Waiting for a verified market observation</span>}<span className="strip-note"><ArrowUpRight size={14}/>Provider observations</span></div></>;
 }

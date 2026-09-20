@@ -1,6 +1,12 @@
 # Persistent paper trading
 
-Implemented: account-owned database ledger, background paper worker, pending/partial/open/exit-pending/closed/cancelled order lifecycle, manual paper exit/cancel, restart-safe signal deduplication, revision-fenced atomic order/event commits, source and processing timestamps, estimated fees/slippage, risk sizing and daily loss/entry limits, paginated full-ledger export, and a signed-in app account view. Earlier device-local journals remain accessible. New local auto-entries have been removed to avoid two competing engines.
+## Default: no sign-in required
+
+The app uses a device-local paper account. Account balances, deposits, withdrawals, orders and timestamped audit events are saved together in `device_paper_account_v1`. Sign-up, Supabase authentication and a background worker are not required for this mode. The existing order engine and risk rules are shared with the optional server implementation.
+
+Automatic monitoring runs only while the app is open and visible, approximately once a minute plus provider latency. Enable new entries in the Account screen. Closing the app stops monitoring; missing intervals are marked rather than reconstructed. There is no cross-device synchronization. Export the ledger before clearing app data or reinstalling; device storage can be lost and browser storage limits still apply. Events are retained without automatic age-based deletion.
+
+On first use, an existing valid device journal is carried forward once, including retained archived P&L, without deleting the original. Corrupt account data is reported rather than silently reset. Device mutations use a browser lock and one atomic storage write. The server API retains its authentication and account-ownership restrictions; no anonymous access to server accounts has been enabled.
 
 This is paper-only: no broker order API is called. Notifications remain foreground-only.
 
@@ -12,10 +18,10 @@ The engine supports bid/ask and available-size partial fills when supplied. The 
 
 Starting capital is ₹20,000; orders use at most ₹5,000 notional, 0.5% planned risk including estimated costs, 90% total capital allocation, three submitted entries per IST day and a 2% daily realized-plus-open-loss admission guard. These are configurable development policies in code, not optimal or guaranteed risk levels. Shorts reserve full notional; borrowability, circuit restrictions and actual fills still require a broker instrument/feed integration.
 
-## Deployment required before activation
+## Optional server mode: deployment required before activation
 
 1. Apply `supabase/migrations/20260921_paper_accounts.sql` using the database owner. It creates new tables; it does not import, overwrite or delete existing local history. Review/apply the separate earlier app_data restriction as well.
-2. Configure Supabase authentication and create the intended user through the Supabase administration interface. Supply public `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` when building the app. Sign in through the app; no anonymous shared paper account is supported.
+2. Configure Supabase authentication and create the intended user through the Supabase administration interface. Supply public `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` when building the app. The default device UI does not connect to this service; a separate authenticated account UI must be restored before using server mode. No anonymous shared server account is supported.
 3. Deploy `/api/paper` and its server dependencies with `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` and the existing allowed-origin configuration. Never place service-role secrets in `VITE_*` variables or the APK.
 4. On an always-on Node host, install project dependencies and create an untracked `.env.worker` containing `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and `MARKET_API_ORIGIN=https://YOUR_DEPLOYED_HOST`. Run `npm run worker:paper`. The worker bundles the existing discovery and strong-signal policy; it scans approximately once a minute and monitors positions every five seconds plus provider latency. It does not use Firebase or the push worker.
 5. Vercel hosts the API/UI; an ordinary serverless request or infrequent cron cannot host this continuous loop. Use a supervised always-on process with restart and log monitoring. A sleeping laptop stops monitoring.
@@ -35,6 +41,6 @@ The account never resets at midnight. Ledger balance equals initial capital plus
 
 Add/withdraw controls create timestamped ledger events atomically with the balance change. Client-generated transaction IDs make retries idempotent; concurrency conflicts reject stale updates. Inputs require positive amounts with at most two decimals. Future trade sizing uses the adjusted account capital and carried-forward results.
 
-Before enabling new trades or adding funds, use **Import earlier paper journal** on the device holding the old local history. This imports closed trades, open positions and the retained archived P&L into an unused, paused server account. Duplicate or malformed records reject the entire reconciliation. Old open positions remain marked as legacy/monitoring-gap observations; future exits use the actual new observation and are credited once. Original stored times are retained; missing historical signal/order timestamps are not invented. Local records remain available, and their local monitoring stops after successful import.
+Before enabling new trades or adding funds, use **Import earlier paper journal** on the device holding the old local history. This imports closed trades, open positions and the retained archived P&L into an unused, paused account. Duplicate or malformed records reject the entire reconciliation. Old open positions remain marked as legacy/monitoring-gap observations; future exits use the actual new observation and are credited once. Original stored times are retained; missing historical signal/order timestamps are not invented. Local records remain available, and their local monitoring stops after successful import.
 
-Import cannot overwrite an account that already has trading/funding activity or be applied twice. Historical data missing from the device or old export cannot be reconstructed. Import is not automatically executed by this code change: it requires access to the actual user's saved journal and an activated authenticated backend.
+Import cannot overwrite an account that already has trading/funding activity or be applied twice. Historical data missing from the device or old export cannot be reconstructed. The default device adapter automatically performs this migration on first initialization when a previous journal exists. The manual import control is available for an unused account. The optional server API requires an explicitly authenticated import and never reads browser storage by itself.

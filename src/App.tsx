@@ -1,17 +1,18 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
+import { LayoutDashboard, Compass, Bell, BookOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertsPage } from './components/AlertsPage';
+const AlertsPage = lazy(() => import('./components/AlertsPage').then(m => ({default:m.AlertsPage})));
 import { SignalPopup } from './components/SignalPopup';
 import { Header } from './components/Header';
-import { OverviewPage } from './components/OverviewPage';
-import { TradesPage } from './components/TradesPage';
-import { StockAnalysisPage } from './components/StockAnalysisPage';
-import { SignalsPage } from './components/SignalsPage';
-import { SmartPicksPage } from './components/SmartPicksPage';
-import { MetalsPage } from './components/MetalsPage';
-import { DiscoveryPage } from './components/DiscoveryPage';
-import { BacktestPage } from './components/BacktestPage';
-import { IPOPage } from './components/IPOPage';
+const OverviewPage = lazy(() => import('./components/OverviewPage').then(m => ({default:m.OverviewPage})));
+const TradesPage = lazy(() => import('./components/TradesPage').then(m => ({default:m.TradesPage})));
+const StockAnalysisPage = lazy(() => import('./components/StockAnalysisPage').then(m => ({default:m.StockAnalysisPage})));
+const SignalsPage = lazy(() => import('./components/SignalsPage').then(m => ({default:m.SignalsPage})));
+const SmartPicksPage = lazy(() => import('./components/SmartPicksPage').then(m => ({default:m.SmartPicksPage})));
+const MetalsPage = lazy(() => import('./components/MetalsPage').then(m => ({default:m.MetalsPage})));
+const DiscoveryPage = lazy(() => import('./components/DiscoveryPage').then(m => ({default:m.DiscoveryPage})));
+const BacktestPage = lazy(() => import('./components/BacktestPage').then(m => ({default:m.BacktestPage})));
+const IPOPage = lazy(() => import('./components/IPOPage').then(m => ({default:m.IPOPage})));
 import { useLiveStocks } from './hooks/useLiveStocks';
 import { useStockDiscovery, useTradingRuntime } from './hooks/useStockDiscovery';
 
@@ -22,13 +23,14 @@ export default function App() {
   const { nifty, lastUpdated } = useLiveStocks();
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--bg)]">
+    <div className="workspace-shell min-h-screen flex flex-col bg-[var(--bg)]">
+      <a href="#main-content" className="skip-link">Skip to main content</a>
       <SignalPopup stocks={stocks} marketOpen={marketOpen} onView={() => setActiveTab('Alerts')} />
       <Header activeTab={activeTab} onTabChange={setActiveTab} nifty={nifty} lastUpdated={lastUpdated} />
 
-      <main className="app-main">
-        <div className={`runtime-status ${error ? 'runtime-error' : ''}`} role="status">{error || (loading ? 'Refreshing market observations…' : `Research feed · ${lastScan ? 'Scan ' + lastScan.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' }) + ' IST' : 'Awaiting data'} · Research scan; see paper account for worker status`)}</div>
-        <AnimatePresence mode="wait">
+      <main id="main-content" className="app-main" tabIndex={-1}>
+        <div className={`runtime-status ${error ? 'runtime-error' : ''}`} role="status">{error || (loading ? 'Refreshing market observations…' : `Research feed · ${lastScan ? 'Scan ' + lastScan.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' }) + ' IST' : 'Awaiting data'} · Paper monitoring while app is visible`)}</div>
+        <Suspense fallback={<div className="card workspace-loading" role="status"><span className="loading-line"/><span className="loading-line short"/><p>Opening workspace…</p></div>}><AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
             initial={{ opacity: 0, y: 12 }}
@@ -48,10 +50,10 @@ export default function App() {
             {activeTab === 'IPO Tracker' && <IPOPage />}
             {activeTab === 'Metals' && <MetalsPage />}
           </motion.div>
-        </AnimatePresence>
+        </AnimatePresence></Suspense>
       </main>
-      <nav className="mobile-nav" aria-label="Primary navigation">{['Overview', 'AI Discovery', 'Alerts', 'Trades'].map(tab => <button key={tab} aria-current={activeTab === tab ? 'page' : undefined} onClick={() => setActiveTab(tab)}>{tab === 'AI Discovery' ? 'Discover' : tab === 'Trades' ? 'Journal' : tab}</button>)}</nav>
-      <footer className="text-center text-[11px] text-[var(--text-muted)] py-8 mt-4 border-t border-[rgba(0,0,0,0.04)]">
+      <nav className="mobile-nav" aria-label="Primary navigation">{([{id:'Overview',label:'Account',Icon:LayoutDashboard},{id:'AI Discovery',label:'Discover',Icon:Compass},{id:'Alerts',label:'Alerts',Icon:Bell},{id:'Trades',label:'Journal',Icon:BookOpen}]).map(({id,label,Icon})=><button key={id} aria-current={activeTab===id?'page':undefined} onClick={()=>setActiveTab(id)}><Icon size={20}/><span>{label}</span></button>)}</nav>
+      <footer className="workspace-footer text-center text-[11px] text-[var(--text-muted)] py-8 mt-4 border-t border-[rgba(0,0,0,0.04)]">
         <div className="max-w-[1600px] mx-auto px-8 space-y-1">
           <p className="font-medium text-[var(--text-secondary)]" style={{ fontFamily: 'Poppins' }}>AlgoTrader AI</p>
           <p>Paper Trading Mode • NSE • Not Financial Advice • Powered by Yahoo Finance</p>

@@ -35,3 +35,7 @@ SHA-256: `edd3f60cb314618866a81294e68e910d2bf5282905d14df9a855959f37044b81`
 ## Cumulative balance and funding verification build
 
 `algotrader-paper-balance-2026-09-20.apk` — SHA256 `b1c8e36e0162f12cebdbcc784bd5d10c683576084573a76715cca16632560d6d`. Debug test APK: simulated deposits/withdrawals, cumulative account metrics and one-time local journal reconciliation. Requires the persistent paper API/database/worker activation; installing alone does not deploy the backend or import history.
+
+## Workspace UI verification build
+
+`algotrader-workspace-ui-2026-09-20.apk` — SHA256 `e124ac1dac21f421eef37b0556e536c0083a56c82d3a8eb9f2dd0be51f2ca6a8`. Redesigned mobile/desktop navigation, account styling and searchable research cards with lazy page loading. Debug-signed; backend activation is still required.

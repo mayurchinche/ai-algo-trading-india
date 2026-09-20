@@ -30,7 +30,7 @@ function ScoreBar({ score, label }: { score: number; label: string }) {
 
 function StockCard({ stock, expanded, onToggle }: { stock: DiscoveredStock; expanded: boolean; onToggle: () => void }) {
   return (
-    <div className="card hover:shadow-lg transition-shadow cursor-pointer" onClick={onToggle}>
+    <div className="card discovery-card hover:shadow-lg transition-shadow cursor-pointer" onClick={onToggle} role="button" tabIndex={0} aria-expanded={expanded} aria-label={`View ${stock.symbol} research`} onKeyDown={e=>{if(e.target===e.currentTarget&&(e.key==='Enter'||e.key===' ')){e.preventDefault();onToggle();}}}>
       {/* Header row */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -148,10 +148,12 @@ function StockCard({ stock, expanded, onToggle }: { stock: DiscoveredStock; expa
 
 export function DiscoveryPage() {
   const { stocks, loading, lastScan, rescan } = useStockDiscovery();
-  const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
+  const [expandedSymbol, setExpandedSymbol] = useState<string | null>(null);
+  const [search,setSearch]=useState('');
   const [filter, setFilter] = useState<'all' | 'buy' | 'sell'>('all');
 
   const filtered = stocks.filter(s => {
+    if(!`${s.symbol} ${s.name}`.toLowerCase().includes(search.toLowerCase()))return false;
     if (filter === 'buy') return s.overallScore > 20;
     if (filter === 'sell') return s.overallScore < -20;
     return true;
@@ -162,6 +164,7 @@ export function DiscoveryPage() {
 
   return (
     <div className="space-y-6">
+      <div className="page-title"><div><p className="eyebrow">MARKET RESEARCH</p><h2>Find your next idea.</h2><p>Explore observed signals. Review the evidence before taking risk.</p></div></div>
       {/* Scanner status */}
       <div className="card flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -182,26 +185,9 @@ export function DiscoveryPage() {
         </button>
       </div>
 
-      {/* How it works */}
-      <div className="card bg-gradient-to-r from-blue-50 to-indigo-50">
-        <h3 className="text-xs font-bold text-blue-800 uppercase tracking-wide mb-2">How the research scanner works</h3>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 text-[11px] text-blue-700">
-          <div className="flex items-start gap-1.5"><span className="font-bold text-blue-500">1.</span> Scans top volume leaders, gainers & losers from provider snapshots for NSE</div>
-          <div className="flex items-start gap-1.5"><span className="font-bold text-blue-500">2.</span> Fetches up to 2 years of historical data for technical analysis</div>
-          <div className="flex items-start gap-1.5"><span className="font-bold text-blue-500">3.</span> Computes RSI, MACD, SMA, Bollinger Bands, ATR for each stock</div>
-          <div className="flex items-start gap-1.5"><span className="font-bold text-blue-500">4.</span> Applies 5 strategies: Momentum, Mean Reversion, Breakout, Trend Following, Volume Pattern</div>
-          <div className="flex items-start gap-1.5"><span className="font-bold text-blue-500">5.</span> Shows research levels; options execution requires verified contract data</div>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="flex items-center gap-4">
-        <div className="tab-bar">
-          <div className={`tab ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>All ({stocks.length})</div>
-          <div className={`tab ${filter === 'buy' ? 'active' : ''}`} onClick={() => setFilter('buy')}>🟢 Buy Signals ({buyCount})</div>
-          <div className={`tab ${filter === 'sell' ? 'active' : ''}`} onClick={() => setFilter('sell')}>🔴 Sell Signals ({sellCount})</div>
-        </div>
-      </div>
+      <details className="card research-method"><summary>About these research signals</summary><p>Ranks a limited NSE universe using price, volume and technical indicators. Scores are unvalidated research measures, not profit probabilities. Quote freshness and eligibility are shown on every card.</p></details>
+      <div className="research-filters"><label className="research-search">Search instruments<input type="search" placeholder="Symbol or company name" value={search} onChange={e=>setSearch(e.target.value)}/></label><div className="tab-bar" role="group" aria-label="Signal direction">{([{id:'all',label:`All (${stocks.length})`},{id:'buy',label:`Buy (${buyCount})`},{id:'sell',label:`Sell (${sellCount})`} ] as const).map(item=><button key={item.id} className={`tab ${filter===item.id?'active':''}`} aria-pressed={filter===item.id} onClick={()=>setFilter(item.id)}>{item.label}</button>)}</div></div>
+      {!loading&&!filtered.length&&<div className="card empty-state"><h3>No matching observations</h3><p>Try another symbol or signal direction.</p></div>}
 
       {/* Stock cards */}
       {loading && stocks.length === 0 ? (
@@ -212,12 +198,12 @@ export function DiscoveryPage() {
         </div>
       ) : (
         <div className="space-y-5">
-          {filtered.map((stock, idx) => (
+          {filtered.map((stock) => (
             <StockCard
               key={stock.symbol}
               stock={stock}
-              expanded={expandedIdx === idx}
-              onToggle={() => setExpandedIdx(expandedIdx === idx ? null : idx)}
+              expanded={expandedSymbol === stock.symbol}
+              onToggle={() => setExpandedSymbol(expandedSymbol === stock.symbol ? null : stock.symbol)}
             />
           ))}
         </div>

@@ -1,7 +1,7 @@
 import { useEffect, useSyncExternalStore } from 'react';
 import { discoverStocks, fetchQuotes, type DiscoveredStock } from '../services/stockDiscovery';
 import { getSignalHistory, recordSignals, updateOutcomes } from '../services/signalHistory';
-import { getPaperTrades, updatePaperTrades } from '../services/paperTrading';
+import { devicePaperRequest, devicePaperSymbols, runDevicePaper } from '../services/devicePaperAccount';
 import { fetchMarketStatus, isMarketOpenCached } from '../services/marketStatus';
 import type { MarketQuote } from '../services/tradingTime';
 
@@ -15,9 +15,10 @@ async function runScan() {
   try {
     const market = await fetchMarketStatus();
     // Monitor existing positions independently of whether they appear in today's screener.
-    const symbols = [...getPaperTrades().filter(t => t.status === 'OPEN').map(t => t.symbol), ...getSignalHistory().filter(s => s.outcome === 'PENDING').map(s => s.symbol)];
+    await devicePaperRequest();
+    const symbols = [...devicePaperSymbols(), ...getSignalHistory().filter(s => s.outcome === 'PENDING').map(s => s.symbol)];
     const quotes = await fetchQuotes(symbols);
-    if(localStorage.getItem('paper_legacy_reconciled')!=='true') updatePaperTrades(quotes);
+    await runDevicePaper([],quotes,market.isOpen&&isMarketOpenCached());
     updateOutcomes(quotes);
     publish({ quotes });
     if (symbols.some(symbol => !quotes.has(symbol))) publish({ error: 'Some open positions or signals have no quote; their outcomes remain unknown.' });
@@ -27,7 +28,7 @@ async function runScan() {
     const marketOpen = market.isOpen && isMarketOpenCached();
     const observedAt = Date.now();
     if (marketOpen) recordSignals(stocks, observedAt);
-    // New paper entries belong exclusively to the persistent backend worker.
+    await runDevicePaper(stocks,quotes,marketOpen,observedAt);
     publish({ stocks, marketOpen, lastScan: new Date(observedAt) });
   } catch (error) {
     publish({ marketOpen: false, error: error instanceof Error ? error.message : 'Scan failed; entries paused' });

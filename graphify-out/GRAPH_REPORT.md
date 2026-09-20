@@ -1,16 +1,16 @@
 # Graph Report - ai-algo-trading-india  (2026-09-20)
 
 ## Corpus Check
-- 107 files · ~53,469 words
+- 109 files · ~53,677 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 683 nodes · 1265 edges · 57 communities (47 shown, 10 thin omitted)
+- 714 nodes · 1328 edges · 53 communities (43 shown, 10 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 5 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `08826091`
+- Built from commit: `4a348c0b`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -58,11 +58,7 @@
 - [[_COMMUNITY_Community 49|Community 49]]
 - [[_COMMUNITY_Community 50|Community 50]]
 - [[_COMMUNITY_Community 51|Community 51]]
-- [[_COMMUNITY_Community 52|Community 52]]
-- [[_COMMUNITY_Community 53|Community 53]]
 - [[_COMMUNITY_Community 54|Community 54]]
-- [[_COMMUNITY_Community 55|Community 55]]
-- [[_COMMUNITY_Community 56|Community 56]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `apiUrl()` - 27 edges
@@ -71,10 +67,10 @@
 4. `compilerOptions` - 16 edges
 5. `useStockDiscovery()` - 16 edges
 6. `istDate()` - 16 edges
-7. `openPaperTrades()` - 15 edges
-8. `simulateBacktest()` - 13 edges
-9. `freshQuote()` - 13 edges
-10. `scripts` - 12 edges
+7. `runScan()` - 15 edges
+8. `openPaperTrades()` - 15 edges
+9. `advancePaper()` - 13 edges
+10. `simulateBacktest()` - 13 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `advancePaper()` --calls--> `event`  [INFERRED]
@@ -88,23 +84,23 @@
 - `adjustment()` --calls--> `transferPaperFunds()`  [EXTRACTED]
   tests/paper-funds.test.ts → server/paperFunds.js
 
-## Communities (57 total, 10 thin omitted)
+## Communities (53 total, 10 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.06
-Nodes (71): AlertsPage(), SignalsPage(), listeners, publish(), runScan(), scan(), state, CandidateDecision (+63 more)
+Cohesion: 0.07
+Nodes (63): AlertsPage(), SignalsPage(), CandidateDecision, DecisionRecord, getDecisionJournal(), mergeDecisions(), retained(), collectForegroundAlerts() (+55 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.16
-Nodes (18): IPOPage(), angelOneApplyIPO(), angelOneLogin(), autoApplyForIPO(), AutoApplySettings, BrokerConfig, dhanApplyIPO(), dhanFetchIPOList() (+10 more)
+Cohesion: 0.07
+Nodes (34): IPOPage(), angelOneApplyIPO(), angelOneLogin(), autoApplyForIPO(), AutoApplySettings, BrokerConfig, dhanApplyIPO(), dhanFetchIPOList() (+26 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.08
 Nodes (13): SmartPicksPage(), StockCard(), generateOptionsPicks(), NSE_FO_SYMBOLS, OptionLeg, OptionsPick, OptionsStrategy, StoredSignal (+5 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.14
-Nodes (11): ALLOCATION, MetalsPage(), signalStyles, fetchChart(), fetchIndianRetailPrices(), fetchLiveMetals(), IndianRetailPrices, LiveMetal (+3 more)
+Cohesion: 0.05
+Nodes (45): ALLOCATION, MetalsPage(), signalStyles, listeners, publish(), runScan(), scan(), state (+37 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.20
@@ -115,16 +111,16 @@ Cohesion: 0.16
 Nodes (22): BacktestPage(), BacktestConfig, BacktestResult, BacktestTrade, breakoutSignal(), computeATR(), computeBollingerBands(), computeDirectionAccuracy() (+14 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.22
-Nodes (17): Header(), HeaderProps, LiveStock, getNotificationSettings(), NotificationSettings, notify(), notifyDailySummary(), notifyIPOAllotment() (+9 more)
+Cohesion: 0.20
+Nodes (18): Header(), HeaderProps, sections, LiveStock, getNotificationSettings(), NotificationSettings, notify(), notifyDailySummary() (+10 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.10
 Nodes (19): compilerOptions, allowArbitraryExtensions, allowImportingTsExtensions, erasableSyntaxOnly, jsx, lib, module, moduleDetection (+11 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.07
-Nodes (40): handler(), advancePaper(), cost(), day(), minute(), newPaperAccount(), round(), fundedCapital() (+32 more)
+Cohesion: 0.06
+Nodes (44): handler(), advancePaper(), cost(), day(), minute(), newPaperAccount(), round(), fundedCapital() (+36 more)
 
 ### Community 9 - "Community 9"
 Cohesion: 0.12
@@ -206,10 +202,6 @@ Nodes (4): images, info, author, version
 Cohesion: 0.50
 Nodes (3): info, author, version
 
-### Community 47 - "Community 47"
-Cohesion: 0.38
-Nodes (8): fetchNifty(), fetchSingleStock(), YahooChartMeta, fetchHistorical(), fetchScreener(), apiUrl(), PROXY_MAP, fetchMarketJSON()
-
 ### Community 48 - "Community 48"
 Cohesion: 0.29
 Nodes (6): Limitations, Release gate, Required configuration, Root cause, Vercel release and Android backend setup, Verification
@@ -219,48 +211,36 @@ Cohesion: 0.40
 Nodes (4): json(), market(), now, requireProductionData
 
 ### Community 50 - "Community 50"
-Cohesion: 0.29
-Nodes (6): Android test build, Android test builds, Persistent paper account verification build, Previous backend test build, Production-data audit build — 20 September 2026, Strong-signal policy update — 20 September 2026
+Cohesion: 0.22
+Nodes (8): Android test build, Android test builds, Cumulative balance and funding verification build, Persistent paper account verification build, Previous backend test build, Production-data audit build — 20 September 2026, Strong-signal policy update — 20 September 2026, Workspace UI verification build
 
 ### Community 51 - "Community 51"
-Cohesion: 0.12
-Nodes (28): DiscoveryPage(), StockCard(), money(), OverviewPage(), FundingState, money(), PaperBalance, PaperFundsPanel() (+20 more)
-
-### Community 52 - "Community 52"
-Cohesion: 0.24
-Nodes (9): ALLOTMENT_TIPS, fetchLiveIPOs(), fetchSubscriptionData(), financialYear(), isFreshIPOCache(), parseIPORows(), stripHtml(), SubData (+1 more)
-
-### Community 53 - "Community 53"
-Cohesion: 0.20
-Nodes (7): scoreIPO(), config, data, now, requests, res, result
+Cohesion: 0.09
+Nodes (36): DiscoveryPage(), StockCard(), money(), OverviewPage(), FundingState, money(), PaperBalance, PaperFundsPanel() (+28 more)
 
 ### Community 54 - "Community 54"
-Cohesion: 0.33
-Nodes (5): Deployment required before activation, Execution semantics, Historical balance and paper funding, Persistent paper trading, Verification
-
-### Community 55 - "Community 55"
-Cohesion: 0.16
-Nodes (8): computeBollingerPosition(), computeEMA(), computeFOAnalysis(), computeMACD(), computeOverallSignal(), computeSMA(), FOAnalysis, StrategyScores
+Cohesion: 0.25
+Nodes (7): Default: no sign-in required, Deployment required before activation, Execution semantics, Historical balance and paper funding, Optional server mode: deployment required before activation, Persistent paper trading, Verification
 
 ## Knowledge Gaps
-- **251 isolated node(s):** `tsBuildInfoFile`, `target`, `lib`, `types`, `skipLibCheck` (+246 more)
+- **273 isolated node(s):** `tsBuildInfoFile`, `target`, `lib`, `types`, `skipLibCheck` (+268 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **10 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
+- **Why does `apiUrl()` connect `Community 3` to `Community 1`, `Community 5`, `Community 6`?**
+  _High betweenness centrality (0.034) - this node is a cross-community bridge._
 - **Why does `advancePaper()` connect `Community 8` to `Community 25`?**
-  _High betweenness centrality (0.038) - this node is a cross-community bridge._
-- **Why does `cycle()` connect `Community 25` to `Community 8`, `Community 0`?**
-  _High betweenness centrality (0.038) - this node is a cross-community bridge._
-- **Why does `fetchQuotes()` connect `Community 0` to `Community 25`, `Community 55`?**
-  _High betweenness centrality (0.037) - this node is a cross-community bridge._
+  _High betweenness centrality (0.023) - this node is a cross-community bridge._
+- **Why does `discoverStocks()` connect `Community 3` to `Community 0`, `Community 1`, `Community 25`?**
+  _High betweenness centrality (0.021) - this node is a cross-community bridge._
 - **What connects `tsBuildInfoFile`, `target`, `lib` to the rest of the system?**
-  _251 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _273 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.06265389876880985 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06947368421052631 - nodes in this community are weakly interconnected._
+- **Should `Community 1` be split into smaller, more focused modules?**
+  _Cohesion score 0.07493061979648474 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.08465608465608465 - nodes in this community are weakly interconnected._
-- **Should `Community 3` be split into smaller, more focused modules?**
-  _Cohesion score 0.13725490196078433 - nodes in this community are weakly interconnected._
