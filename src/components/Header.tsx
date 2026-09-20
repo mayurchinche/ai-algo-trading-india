@@ -4,7 +4,7 @@ import type { LiveStock } from '../services/liveData';
 import { formatIST } from '../services/tradingTime';
 import { fetchMarketStatus } from '../services/marketStatus';
 interface HeaderProps {activeTab:string;onTabChange:(tab:string)=>void;nifty:LiveStock|null;lastUpdated:Date|null}
-const sections: {label:string;items:[string,string,LucideIcon][]}[]=[{label:'YOUR WORKSPACE',items:[['Overview','Account',LayoutDashboard],['Trades','Trade journal',BookOpen],['Alerts','Alerts',Bell]]},{label:'MARKET RESEARCH',items:[['AI Discovery','Discover',Compass],['Smart Picks','Watch ideas',Sparkles],['Stock Analysis','Stock analysis',ChartNoAxesCombined],['Signals','Signals',Radio],['Backtest','Strategy lab',FlaskConical],['IPO Tracker','IPOs',Building2],['Metals','Metals',Gem]]}];
+const sections: {label:string;items:[string,string,LucideIcon][]}[]=[{label:'YOUR WORKSPACE',items:[['Overview','Account',LayoutDashboard],['Trades','Paper trades',BookOpen],['Alerts','Alerts',Bell]]},{label:'MARKET RESEARCH',items:[['AI Discovery','Discover',Compass],['Smart Picks','Watch ideas',Sparkles],['Stock Analysis','Stock analysis',ChartNoAxesCombined],['Signals','Signals',Radio],['Backtest','Strategy lab',FlaskConical],['IPO Tracker','IPOs',Building2],['Metals','Metals',Gem]]}];
 export function Header({activeTab,onTabChange,nifty}:HeaderProps){
  const [market,setMarket]=useState({isOpen:false,status:'Checking market'});
  useEffect(()=>{let active=true;const update=()=>void fetchMarketStatus().then(s=>{if(active)setMarket(s);}).catch(()=>{if(active)setMarket({isOpen:false,status:'Unavailable'});});update();const timer=setInterval(update,60000);return()=>{active=false;clearInterval(timer);};},[]);

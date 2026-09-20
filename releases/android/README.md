@@ -1,5 +1,15 @@
 # Android test builds
 
+## Latest: v1.1.0 — no login, direct Paper trades
+
+[Download the current Android APK](./algotrader-paper-trades-v1.1.0.apk?raw=true)
+
+Install this APK as an update to the existing app. Do not uninstall or clear storage: paper history lives on the device. The footer must show **v1.1.0**. Open **Paper trades** in the bottom navigation; no email or password is required. If no orders exist, the screen explains how automatic paper trading starts. Account balances, simulated funding and timestamped history are available without a server account. Monitoring runs only while the app is open and visible.
+
+Debug-signed Android test build, versionCode 2. Build and packaged JavaScript verified; installation on a physical phone has not been verified. Older APKs below are historical and may still require login.
+
+SHA-256: `1b7b9d4a6dd3a65f1d89e4af765379b79945efb52c02e142365823fb99b5057c`
+
 ## Strong-signal policy update — 20 September 2026
 
 [Download the updated APK](./algotrader-strong-signals-2026-09-20.apk?raw=true)
