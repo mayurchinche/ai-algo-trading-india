@@ -47,3 +47,7 @@ Old RPCs remain in place for compatibility. Application rollback to the previous
 - Delivery/overnight execution, corporate actions, settlement and per-segment costs.
 - Recorded-data walk-forward evaluation with realistic delays/costs and out-of-sample promotion gates. No new profitability claim or strategy promotion was made here.
 - Strategy-specific signal, analysis, alert and performance views after validation; the current new-segment views intentionally remain unavailable.
+
+## Release status — 26 September 2026
+
+Production SQL migration applied and verified: user1 remains at 20,000 INR, sequence 1, zero orders; four new RPCs deny anon execution and allow service_role. Source commit 3822669 is local. Android v1.6.0/versionCode 7 built and verified against the prior signing certificate. Push/deployment and APK publication await explicit approval after automatic approval review rejected the broader production push. No production funding transactions were performed.
