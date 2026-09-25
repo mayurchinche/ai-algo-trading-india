@@ -2,7 +2,12 @@ import {randomUUID} from 'node:crypto';
 import {newPaperAccount} from './paperEngine.js';
 import {paperBalance,transferPaperFunds} from './paperFunds.js';
 import {configureExecution,reviewIntent,cancelEntryRemainder,amendPendingEntry,advanceWorkflow} from './paperWorkflow.js';
-import {backend,check,allowRequest} from './pushBackend.js';
+import {backend,allowRequest} from './pushBackend.js';
+// Log only provider status/error codes, never credentials or database row contents.
+function check(result){
+ if(result.error){console.error('Shared paper database request failed',{status:result.status,code:/^[A-Z0-9_]{1,32}$/.test(result.error.code||'')?result.error.code:'unspecified'});throw new Error('Database operation failed');}
+ return result.data;
+}
 export class SharedPaperError extends Error {constructor(message,status=400){super(message);this.status=status;}}
 const uuid=value=>typeof value==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 export function applySharedAction(account,action,now=Date.now()){
