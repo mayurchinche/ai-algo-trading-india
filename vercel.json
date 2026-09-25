@@ -18,6 +18,9 @@
   "functions": {
     "api/*.js": {
       "maxDuration": 30
+    },
+    "api/shared-paper.ts": {
+      "maxDuration": 60
     }
   }
 }

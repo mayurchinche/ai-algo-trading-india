@@ -17,7 +17,7 @@ import { useLiveStocks } from './hooks/useLiveStocks';
 import { useStockDiscovery, useTradingRuntime } from './hooks/useStockDiscovery';
 
 export default function App() {
-  useTradingRuntime();
+  const {paperError}=useTradingRuntime();
   const { error, loading, lastScan, stocks, marketOpen } = useStockDiscovery();
   const [activeTab, setActiveTab] = useState('Overview');
   const [focusSignalId,setFocusSignalId]=useState<string|undefined>();
@@ -31,6 +31,7 @@ export default function App() {
 
       <main id="main-content" className="app-main" tabIndex={-1}>
         <div className={`runtime-status ${error ? 'runtime-error' : ''}`} role="status">{error || (loading ? 'Refreshing market observations…' : `Research feed · ${lastScan ? 'Scan ' + lastScan.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' }) + ' IST' : 'Awaiting data'} · Paper monitoring while app is visible`)}</div>
+        <div role="status">{paperError&&<p className="notice">user1 monitoring: {paperError}</p>}</div>
         <Suspense fallback={<div className="card workspace-loading" role="status"><span className="loading-line"/><span className="loading-line short"/><p>Opening workspace…</p></div>}><AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -57,7 +58,7 @@ export default function App() {
       <footer className="workspace-footer text-center text-[11px] text-[var(--text-muted)] py-8 mt-4 border-t border-[rgba(0,0,0,0.04)]">
         <div className="max-w-[1600px] mx-auto px-8 space-y-1">
           <p className="font-medium text-[var(--text-secondary)]" style={{ fontFamily: 'Poppins' }}>AlgoTrader AI</p>
-          <p>Paper Trading Mode • v1.4.0 • NSE • Not Financial Advice • Powered by Yahoo Finance</p>
+          <p>Paper Trading Mode • v1.5.0 • NSE • Not Financial Advice • Powered by Yahoo Finance</p>
         </div>
       </footer>
     </div>

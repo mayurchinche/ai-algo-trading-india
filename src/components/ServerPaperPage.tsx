@@ -3,12 +3,12 @@ import {PaperAmendment} from './PaperAmendment';
 import {PaperEvidencePanel} from './PaperEvidencePanel';
 import {PaperExecutionPanel,type ExecutionSettings,type PaperIntent} from './PaperExecutionPanel';
 import { PaperFundsPanel, type PaperBalance, type FundingState } from './PaperFundsPanel';
-import { useEffect, useState } from 'react';
-import { devicePaperRequest } from '../services/devicePaperAccount';
+import { useEffect, useRef, useState } from 'react';
+import { sharedPaperRequest } from '../services/sharedPaperAccount';
 import { formatIST, istDate } from '../services/tradingTime';
 import { downloadJSON } from '../services/journalStorage';
 import {inPaperView,orderValuation,type PaperOrder as Order,type PaperView} from '../services/paperWorkspace';
-interface Account {enabled:boolean;revision:number;state:FundingState & {execution?:ExecutionSettings;intents?:PaperIntent[];capital:number;realized:number;sequence:number;orders:Order[];lastCycleAt:string|null;marketOpen?:boolean;missingQuotes?:string[]}}
+interface Account {enabled:boolean;revision:number;state:FundingState & {execution?:ExecutionSettings;intents?:PaperIntent[];capital:number;realized:number;sequence:number;orders:Order[];lastCycleAt:string|null;marketOpen?:boolean;missingQuotes?:string[];discoveryError?:string}}
 const money=(n?:number|null)=>n==null?'—':n.toLocaleString('en-IN',{style:'currency',currency:'INR'});
 interface PaperEvent {id:number;at:string;kind:string;price?:number;quantity?:number;quoteTime?:string;reason?:string;model?:string}
 export function ServerPaperPage({workspace=false,focusSignalId}:{workspace?:boolean;focusSignalId?:string}) {
@@ -17,32 +17,34 @@ export function ServerPaperPage({workspace=false,focusSignalId}:{workspace?:bool
  const [expanded,setExpanded]=useState<string|null>(null),[symbolFilter,setSymbolFilter]=useState(''),[dateFilter,setDateFilter]=useState('');
  const [account,setAccount]=useState<Account|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[loaded,setLoaded]=useState(false);
  const [balance,setBalance]=useState<PaperBalance|null>(null);
- function accept(data:{account:Account|null;balance:PaperBalance|null}){setAccount(data.account);setBalance(data.balance);}
+ const revision=useRef(-1);
+ function accept(data:{account:Account|null;balance:PaperBalance|null}){if(data.account&&data.account.revision<revision.current)return;revision.current=data.account?.revision??revision.current;setAccount(data.account);setBalance(data.balance);}
  async function accountAction(action:Record<string,unknown>){setBusy(true);try{const data=await request(action);accept(data);setError('');setLoaded(true);return true;}catch(e){setError(e instanceof Error?e.message:'Account adjustment failed');return false;}finally{setBusy(false);}}
  async function request(action?:Record<string,unknown>,after=0,until?:number,orderId?:string) {
-  return devicePaperRequest(action,after,until,orderId) as unknown as Promise<{account:Account;balance:PaperBalance;events:{sequence:number;event:PaperEvent}[];nextCursor:number;hasMore:boolean}>;
+  return sharedPaperRequest(action,after,until,orderId) as unknown as Promise<{account:Account;balance:PaperBalance;events:{sequence:number;event:PaperEvent}[];nextCursor:number;hasMore:boolean}>;
  }
  async function refresh(enabled?:boolean) {
-  setBusy(true);try {const data=await request(enabled==null?undefined:{enabled});accept(data);setError('');setLoaded(true);}catch(e){setError(e instanceof Error?e.message:'Device paper account unavailable');}finally{setBusy(false);}
+  setBusy(true);try {const data=await request(enabled==null?undefined:{enabled});accept(data);setError('');setLoaded(true);}catch(e){setError(e instanceof Error?e.message:'Shared user1 account unavailable');setLoaded(false);setAccount(null);setBalance(null);}finally{setBusy(false);}
  }
  useEffect(()=>{
   void refresh();
   const update=()=>void refresh();
-  window.addEventListener('device-paper-updated',update);window.addEventListener('storage',update);
+  window.addEventListener('shared-paper-updated',update);window.addEventListener('storage',update);
   const timer=setInterval(()=>{if(document.visibilityState==='visible')update();},15000);
-  return()=>{clearInterval(timer);window.removeEventListener('device-paper-updated',update);window.removeEventListener('storage',update);};
+  return()=>{clearInterval(timer);window.removeEventListener('shared-paper-updated',update);window.removeEventListener('storage',update);};
  // Device persistence is shared across page navigation.
  // eslint-disable-next-line react-hooks/exhaustive-deps
  },[]);
  async function closeOrder(id:string){setBusy(true);try{const data=await request({closeOrderId:id});accept(data);setError('');}catch(e){setError(e instanceof Error?e.message:'Close request failed');}finally{setBusy(false);}}
- async function exportLedger(){setBusy(true);try{let cursor=0;const events:unknown[]=[];let snapshot:Account|null=null;let data;do{data=await request(undefined,cursor,snapshot?.state.sequence);snapshot??=data.account;events.push(...data.events.map((r:{event:unknown})=>r.event));if(data.nextCursor<=cursor&&data.hasMore)throw new Error('Invalid ledger cursor');cursor=data.nextCursor;}while(data.hasMore);downloadJSON('device-paper-ledger.json',{account:snapshot,events});}catch(e){setError(e instanceof Error?e.message:'Export failed');}finally{setBusy(false);}}
+ async function exportLedger(){setBusy(true);try{let cursor=0;const events:unknown[]=[];let snapshot:Account|null=null;let data;do{data=await request(undefined,cursor,snapshot?.state.sequence);snapshot??=data.account;events.push(...data.events.map((r:{event:unknown})=>r.event));if(data.nextCursor<=cursor&&data.hasMore)throw new Error('Invalid ledger cursor');cursor=data.nextCursor;}while(data.hasMore);downloadJSON('user1-paper-ledger.json',{account:snapshot,events});}catch(e){setError(e instanceof Error?e.message:'Export failed');}finally{setBusy(false);}}
  const state=account?.state;const healthy=state?.lastCycleAt&&Date.now()-Date.parse(state.lastCycleAt)<90000;
  const orders=state?.orders||[];
  const visible=orders.filter(o=>inPaperView(o,view)&&o.symbol.toLowerCase().includes(symbolFilter.toLowerCase())&&(!dateFilter||istDate(o.submittedAt)===dateFilter));
- return <section className="space-y-4"><div className="page-title"><div><p className="eyebrow">YOUR PAPER ACCOUNT · NO SIGN-IN REQUIRED</p><h2>{workspace?'Paper trading workspace':'Paper trading account'}</h2><p>A complete record of your trades, balance and decisions.</p></div></div>
+ return <section className="space-y-4"><div className="page-title"><div><p className="eyebrow">SHARED PAPER ACCOUNT · USER1</p><h2>{workspace?'Paper trading workspace':'Paper trading account'}</h2><p>A complete record of your trades, balance and decisions.</p></div></div>
  <><div className="journal-toolbar"><button disabled={busy||!loaded} onClick={()=>void refresh(!account?.enabled)}>{account?.enabled?'Pause intraday entries':'Enable intraday paper trading'}</button><button disabled={busy} onClick={()=>void refresh()}>Refresh</button><button disabled={busy||!account} onClick={()=>void exportLedger()}>Export full ledger</button></div>
- <p className="notice">{account?`${account.enabled?'New entries enabled':'New entries paused; existing positions still monitored'}. ${healthy?'App recently checked quotes':'Waiting for the next app scan'}. Last cycle: ${formatIST(state?.lastCycleAt||undefined)}`:'No paper account yet. Enable to create a ₹20,000 virtual account.'}</p>
- <p className="notice">Saved on this device. Export your ledger before clearing app data or reinstalling. Automatic paper trading runs only while this app is open and visible; there is no cross-device sync. Public quote snapshots, not tick-by-tick exchange execution. Fills use the next eligible observed quote with estimated slippage and charges. Missing intervals stay marked as unknown. No background notifications.</p>
+ <p className="notice">{account?`${account.enabled?'New entries enabled':'New entries paused; existing positions still monitored'}. ${healthy?'App recently checked quotes':'Waiting for the next app scan'}. Last cycle: ${formatIST(state?.lastCycleAt||undefined)}`:'Waiting for the shared user1 backend. No local account is substituted.'}</p>
+ <p className="notice">Shared backend account user1. Web and Android read the same ledger and balance; every viewer can change this shared simulation. A visible app requests server-side monitoring; closing all apps stops these requests. Public quote snapshots, not tick-by-tick exchange execution. Fills use the next eligible observed quote with estimated slippage and charges. Missing intervals stay marked as unknown. No background notifications.</p>
+ {state?.discoveryError&&<p role="alert" className="notice">{state.discoveryError}</p>}
  {!!state?.missingQuotes?.length&&<p role="alert">Missing quotes: {state.missingQuotes.join(', ')}. Earlier price crossings cannot be reconstructed.</p>}
  {workspace?<details className="paper-funds-disclosure"><summary>Funds &amp; balance ledger · {money(balance?.balance)}</summary><PaperFundsPanel balance={balance} state={state} disabled={busy||!loaded} onAction={accountAction}/></details>:<PaperFundsPanel balance={balance} state={state} disabled={busy||!loaded} onAction={accountAction}/>}
  {error&&<p role="alert" className="notice">{error}</p>}

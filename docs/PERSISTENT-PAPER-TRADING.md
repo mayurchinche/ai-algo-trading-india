@@ -1,8 +1,12 @@
 # Persistent paper trading
 
-## Default: no sign-in required
+## Current source: shared user1 account — activation pending
 
-The app uses a device-local paper account. Account balances, deposits, withdrawals, orders and timestamped audit events are saved together in `device_paper_account_v1`. Sign-up, Supabase authentication and a background worker are not required for this mode. The existing order engine and risk rules are shared with the optional server implementation.
+The current source routes paper trading to a dedicated backend account named `user1`. Web and Android use `/api/shared-paper`; the old local ledger is preserved only as an archive. This is an intentionally shared simulation, not a private Supabase login. All users of this mode can see and adjust the same account. See [activation instructions](SHARED-USER1-PAPER.md). Do not publish the client before deploying its API and migration. Existing v1.4.0 APKs remain device-local.
+
+## Previous device-only mode (APKs through v1.4.0)
+
+Earlier builds use a device-local paper account. Account balances, deposits, withdrawals, orders and timestamped audit events are saved together in `device_paper_account_v1`. Sign-up, Supabase authentication and a background worker are not required for this mode. The existing order engine and risk rules are shared with the optional server implementation.
 
 Automatic monitoring runs only while the app is open and visible, approximately once a minute plus provider latency. Enable new entries in the Account screen. Closing the app stops monitoring; missing intervals are marked rather than reconstructed. There is no cross-device synchronization. Export the ledger before clearing app data or reinstalling; device storage can be lost and browser storage limits still apply. Events are retained without automatic age-based deletion.
 

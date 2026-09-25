@@ -1,6 +1,16 @@
 # Android test builds
 
-## Latest: v1.4.0 — trading home, opportunity cards and timelines
+## Latest: v1.5.0 — shared user1 paper account
+
+[Download Android v1.5.0](./algotrader-shared-user1-v1.5.0.apk?raw=true)
+
+Install as an update without clearing app data. VersionCode 6, footer v1.5.0. Web and Android use the same backend-owned user1 paper balance, orders and timestamped events without a login form. Requires the matching shared API deployment. Previous device history is preserved for export in Funds & balance ledger; it is not automatically merged into user1.
+
+This is a shared simulator: everyone can view/change the same account. No real broker orders. Monitoring runs while a client is visible; options and futures remain unavailable. Provider failures do not switch to local execution. 101 tests plus database integration, lint, TypeScript/mobile build, Capacitor sync and Android assembleDebug passed. Debug-signed test APK; physical-phone installation and open-session trading remain unverified.
+
+SHA-256: `c7c339090aaaaca5a0a0c6334a67d8b8488369f8c47392f8c17a6d6b3aa010db`
+
+## Previous: v1.4.0 — trading home, opportunity cards and timelines
 
 [Download Android v1.4.0](./algotrader-trading-home-v1.4.0.apk?raw=true)
 

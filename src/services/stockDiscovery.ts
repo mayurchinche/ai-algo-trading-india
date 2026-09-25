@@ -251,15 +251,15 @@ function determineTrend(sma20: number, sma50: number, sma200: number, ltp: numbe
 
 // --- Data Fetching ---
 
-async function fetchScreener(scrId: string, count = 25): Promise<any[]> {
+async function fetchScreener(scrId: string, count = 25, fetchJSON = fetchMarketJSON): Promise<any[]> {
   try {
-    const d = await fetchMarketJSON(`/api/yahoo/v1/finance/screener/predefined/saved?formatted=false&lang=en-IN&region=IN&scrIds=${scrId}&count=${count}`);
+    const d = await fetchJSON(`/api/yahoo/v1/finance/screener/predefined/saved?formatted=false&lang=en-IN&region=IN&scrIds=${scrId}&count=${count}`);
     return d?.finance?.result?.[0]?.quotes || [];
   } catch { return []; }
 }
 
-export async function fetchHistorical(symbol: string) {
-  const d = await fetchMarketJSON(`/api/yahoo/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=2y`);
+export async function fetchHistorical(symbol: string, fetchJSON = fetchMarketJSON) {
+  const d = await fetchJSON(`/api/yahoo/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=2y`);
   const result = d?.chart?.result?.[0];
   const q = result?.indicators?.quote?.[0];
   if (!q || !result.timestamp) return null;
@@ -268,9 +268,9 @@ export async function fetchHistorical(symbol: string) {
   return { dates: rows.map((r: any) => istDate(r.time * 1000)) as string[], closes: rows.map((r: any) => r.close) as number[], highs: rows.map((r: any) => r.high) as number[], lows: rows.map((r: any) => r.low) as number[], volumes: rows.map((r: any) => r.volume) as number[], meta: result.meta };
 }
 
-export async function fetchQuotes(symbols: string[]) {
+export async function fetchQuotes(symbols: string[], fetchJSON = fetchMarketJSON) {
   const results = await Promise.allSettled([...new Set(symbols)].map(async symbol => {
-    const data = await fetchMarketJSON(`/api/yahoo/v8/finance/chart/${encodeURIComponent(symbol + '.NS')}?interval=1m&range=1d`);
+    const data = await fetchJSON(`/api/yahoo/v8/finance/chart/${encodeURIComponent(symbol + '.NS')}?interval=1m&range=1d`);
     const meta = data?.chart?.result?.[0]?.meta;
     if (!Number.isFinite(meta?.regularMarketPrice) || !Number.isFinite(meta?.regularMarketTime)) throw new Error('Missing quote time');
     return [symbol, { price: meta.regularMarketPrice, timestamp: new Date(meta.regularMarketTime * 1000).toISOString(), source: 'Yahoo research feed' }] as const;
@@ -280,12 +280,12 @@ export async function fetchQuotes(symbols: string[]) {
 
 // --- Main Discovery Function ---
 
-export async function discoverStocks(): Promise<DiscoveredStock[]> {
+export async function discoverStocks(fetchJSON = fetchMarketJSON): Promise<DiscoveredStock[]> {
   // Step 1: Scan market — get top movers from multiple screeners
   const [actives, gainers, losers] = await Promise.all([
-    fetchScreener('most_actives_in', 25),
-    fetchScreener('day_gainers_in', 15),
-    fetchScreener('day_losers_in', 10),
+    fetchScreener('most_actives_in', 25, fetchJSON),
+    fetchScreener('day_gainers_in', 15, fetchJSON),
+    fetchScreener('day_losers_in', 10, fetchJSON),
   ]);
 
   // Deduplicate by symbol, prefer .NS over .BO
@@ -307,7 +307,7 @@ export async function discoverStocks(): Promise<DiscoveredStock[]> {
   const analyses = await Promise.allSettled(
     candidates.map(async (q) => {
       const symbol = q.symbol as string;
-      const hist = await fetchHistorical(symbol);
+      const hist = await fetchHistorical(symbol, fetchJSON);
       if (!hist || hist.closes.length < 200) return null;
 
       const { closes, highs, lows } = hist;

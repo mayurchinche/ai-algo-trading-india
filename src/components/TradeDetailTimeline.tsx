@@ -1,5 +1,5 @@
 import {useEffect,useState} from 'react';
-import {devicePaperRequest} from '../services/devicePaperAccount';
+import {sharedPaperRequest} from '../services/sharedPaperAccount';
 import {formatIST} from '../services/tradingTime';
 import {orderValuation,type PaperOrder} from '../services/paperWorkspace';
 import {rupees} from '../services/tradingHome';
@@ -8,7 +8,7 @@ export function TradeDetailTimeline({order,revision=0}:{order:PaperOrder;revisio
  const [events,setEvents]=useState<TradeEvent[]>([]),[error,setError]=useState(''),[loading,setLoading]=useState(true),[retry,setRetry]=useState(0);
  useEffect(()=>{let active=true;
   async function read(){setLoading(true);setError('');try{let cursor=0,until:number|undefined;const result:TradeEvent[]=[];let more=true;
-   while(more){const page=await devicePaperRequest(undefined,cursor,until,order.id);until??=page.account.state.sequence;result.push(...page.events.map(row=>row.event as unknown as TradeEvent));if(page.hasMore&&page.nextCursor<=cursor)throw new Error('Invalid ledger cursor');cursor=page.nextCursor;more=page.hasMore;}
+   while(more){const page=await sharedPaperRequest(undefined,cursor,until,order.id);until??=page.account.state.sequence;result.push(...page.events.map((row:{event:unknown})=>row.event as unknown as TradeEvent));if(page.hasMore&&page.nextCursor<=cursor)throw new Error('Invalid ledger cursor');cursor=page.nextCursor;more=page.hasMore;}
    if(active)setEvents(result);
   }catch(e){if(active)setError(e instanceof Error?e.message:'Timeline unavailable');}finally{if(active)setLoading(false);}}
   void read();return()=>{active=false;};

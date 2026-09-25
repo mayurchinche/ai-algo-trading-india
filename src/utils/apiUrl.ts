@@ -1,5 +1,5 @@
 // ponytail: route API calls through serverless proxy on Vercel, Vite proxy locally
-const IS_PROD = !import.meta.env.DEV;
+const IS_PROD = !import.meta.env?.DEV;
 
 // Map of Vite proxy prefixes to real base URLs
 const PROXY_MAP: Record<string, string> = {
@@ -16,7 +16,7 @@ const PROXY_MAP: Record<string, string> = {
  */
 export function apiUrl(localPath: string): string {
   if (localPath.startsWith('/api/broker/') || localPath.startsWith('/api/telegram/')) throw new Error('Broker execution and messaging integrations are unavailable');
-  const apiBase = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+  const apiBase = (import.meta.env?.VITE_API_BASE_URL || '').replace(/\/$/, '');
   if (localPath.startsWith('/api/yahoo/') || localPath.startsWith('/api/nse/')) {
     const provider = localPath.startsWith('/api/yahoo/') ? 'yahoo' : 'nse';
     return `${apiBase}/api/market?provider=${provider}&path=${encodeURIComponent(localPath.slice(('/api/' + provider).length))}`;

@@ -5,7 +5,7 @@ import { getPaperTrades, getPaperTradeSummary, loadLedger, prunePaperTrades, MOD
 import { downloadJSON } from '../services/journalStorage';
 import { formatIST, istDate } from '../services/tradingTime';
 const money = (n?: number) => n == null ? '—' : n.toLocaleString('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 });
-export function TradesPage({focusSignalId}:{focusSignalId?:string}) { return <><ServerPaperPage workspace focusSignalId={focusSignalId}/><details className="card"><summary>Earlier device-local journal</summary><LegacyTradesPage/></details></>; }
+export function TradesPage({focusSignalId}:{focusSignalId?:string}) { return <><ServerPaperPage workspace focusSignalId={focusSignalId}/><details className="card"><summary>Earlier device journal (archive only)</summary><LegacyTradesPage/></details></>; }
 function LegacyTradesPage() {
   const { loading, rescan } = useStockDiscovery();
   const [search, setSearch] = useState('');
