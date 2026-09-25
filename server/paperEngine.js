@@ -1,4 +1,4 @@
-import { fundedCapital } from './paperFunds.js';
+import { fundedCapital, paperBalance } from './paperFunds.js';
 // Deterministic paper execution only. This module never places broker orders.
 export const PAPER_VERSION = 'durable-paper-v1';
 const day = ms => new Date(new Date(ms).getTime() + 19800000).toISOString().slice(0,10);
@@ -75,11 +75,14 @@ export function advancePaper(previous, {now,quotes=[],candidates=[],marketOpen=f
   }
  }
  const occupied=state.orders.filter(o=>!['CLOSED','CANCELLED'].includes(o.status));
- const equity=fundedCapital(state)+state.realized+occupied.reduce((n,o)=>n+(o.filled?(o.lastPrice-o.entryPrice)*(o.filled-o.exited)*(o.side==='BUY'?1:-1):0),0);
- let reserved=occupied.reduce((n,o)=>n+o.quantity*o.referencePrice+40,0);
+ // Share the ledger valuation: partial-exit proceeds and estimated costs remain
+ // part of open-position P&L until closure posts the net result to realized.
+ const valuation=paperBalance(state,now);
+ const equity=valuation.equity??0;
+ let reserved=valuation.reserved;
  const today=state.orders.filter(o=>day(o.submittedAt)===date);
  const dailyRealized=state.orders.filter(o=>o.exitTime&&day(o.exitTime)===date).reduce((n,o)=>n+o.netPnl,0);
- const openPnl=occupied.reduce((n,o)=>n+(o.filled?((o.lastPrice-o.entryPrice)*(o.filled-o.exited)*(o.side==='BUY'?1:-1)):0),0);
+ const openPnl=valuation.positionPnl??0;
  for(const s of candidates) {
   const reject=reason=>event(null,'ORDER_REJECTED',{signalId:s.signalId,symbol:s.symbol,reason});
   if(s.product&&s.product!=='INTRADAY'){reject('Product lacks a verified execution adapter');continue;}
@@ -92,6 +95,7 @@ export function advancePaper(previous, {now,quotes=[],candidates=[],marketOpen=f
   if(!acceptEntries){reject('New entries paused');continue;}
   if(!marketOpen||minute(now)<555||minute(now)>=915){reject('Market closed or intraday entry cutoff reached');continue;}
   if(!valid(q)){reject('Fresh source-timestamped quote unavailable');continue;}
+  if(valuation.valuationStale){reject('Existing exposure valuation is stale');continue;}
   if(today.length>=3){reject('Daily three-order limit reached');continue;}
   if(dailyRealized+openPnl<=-Math.max(0,fundedCapital(state)+state.realized-dailyRealized)*.02){reject('Daily loss limit reached');continue;}
   if(occupied.some(o=>day(o.submittedAt)!==date || o.filled>o.exited&&!bySymbol.has(o.symbol))){reject('Existing exposure has unresolved overnight risk or missing quotes');continue;}

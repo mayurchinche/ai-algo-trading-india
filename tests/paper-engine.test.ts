@@ -80,3 +80,23 @@ test('manual exit requires a strictly later quote, including when quote timestam
  const r=step(s,6000,[q(5000,102)]);assert.equal(r.state.orders[0].exited,0);
  assert.equal(step(r.state,7000,[q(6500,102)]).state.orders[0].status,'CLOSED');
 });
+
+import {paperBalance} from '../server/paperFunds.js';
+function partialExit(side='BUY',exitPrice=85){
+ const state=newPaperAccount();state.orders=[{id:'partial-exit',signalId:'partial-exit',symbol:'ABC',side,status:'EXIT_PENDING',quantity:40,filled:40,exited:36,entryValue:4000,entryPrice:100,exitValue:36*exitPrice,referencePrice:100,lastPrice:100,lastQuoteTime:q(1000).timestamp,submittedAt:q().timestamp,exitRequestedAt:q(2000).timestamp,stop:side==='BUY'?80:120,target:side==='BUY'?120:80}];return state;
+}
+const otherSignal={...signal,symbol:'XYZ',signalId:'second-symbol'};
+test('partial exits and estimated costs count toward daily loss limits for long and short positions',()=>{
+ for(const [side,price] of [['BUY',85],['SELL',115]] as const){
+  const state=partialExit(side,price);assert(paperBalance(state,start+2000).positionPnl < -400);
+  const result=step(state,2000,[q(1000),{...q(2000),symbol:'XYZ'}],[otherSignal]);
+  assert.equal(result.state.orders.length,1);assert(result.events.some((e:any)=>e.kind==='ORDER_REJECTED'&&e.reason==='Daily loss limit reached'));
+  assert.equal(result.state.realized,0);assert.equal(result.state.orders[0].exitValue,36*price);
+ }
+});
+test('new-order risk budget uses the same net equity as the account balance view',()=>{
+ const state=partialExit('BUY',99),balance=paperBalance(state,start+2000);
+ const result=step(state,2000,[q(1000),{...q(2000),symbol:'XYZ'}],[otherSignal]);
+ assert.equal(result.state.orders.length,2);assert.equal(result.state.orders[1].riskBudget,balance.equity*.005);
+ assert.equal(result.state.realized,0);
+});
