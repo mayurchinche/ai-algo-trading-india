@@ -17,7 +17,7 @@ export async function observeSharedPaper(account:any){
  const marketOpen=market.marketStatus.trim().toLowerCase()==='open';
  let stocks:Awaited<ReturnType<typeof discoverStocks>>=[];
  let discoveryError:string|undefined;
- if(marketOpen&&account.enabled)try{stocks=await discoverStocks(serverMarketJSON);}catch{discoveryError='Opportunity scan unavailable; no new candidates. Existing positions still checked.';}
+ if(marketOpen)try{stocks=await discoverStocks(serverMarketJSON);}catch{discoveryError='Opportunity scan unavailable; no new candidates. Existing positions still checked.';}
  const now=Date.now();
  const candidates=stocks.filter(s=>!strongSignalRejection(s,now)).map(s=>({symbol:s.symbol,signalId:strongSignalId(s,now),signalTime:s.generatedAt,side:s.overallScore>0?'BUY':'SELL',score:s.overallScore,stop:s.foAnalysis.suggestedStopLoss,target:s.foAnalysis.suggestedTarget,signalPrice:s.ltp,signalQuoteTime:s.quoteTime,strategy:{id:SIGNAL_POLICY,score:s.overallScore,signal:s.signal,reasons:s.reasons,components:s.scores,strategies:s.strategies,recordedAt:s.generatedAt}}));
  const active=account.state.orders.filter((o:any)=>!['CLOSED','CANCELLED'].includes(o.status)).map((o:any)=>o.symbol);

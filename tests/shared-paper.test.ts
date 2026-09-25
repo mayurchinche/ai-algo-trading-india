@@ -4,9 +4,10 @@ import {newPaperAccount} from '../server/paperEngine.js';
 import {randomUUID} from 'node:crypto';
 const now=Date.parse('2026-09-25T04:16:00Z');
 const response=()=>({code:0,body:null as any,setHeader(){},status(code:number){this.code=code;return this;},json(body:unknown){this.body=body;return this;},end(){return this;}});
-function memoryStore(){let account={id:'user1',enabled:false,revision:0,state:newPaperAccount()},leased=false;const events:any[]=[],requests=new Map();return {
+function memoryStore(id='user1',capital=20000){let account={id,enabled:false,revision:0,state:{...newPaperAccount(),capital}},leased=false;const events:any[]=[],requests=new Map();return {
  async account(){return structuredClone(account);},async prior(id:string){return requests.get(id);},
  async commit(before:any,result:any,id?:string,action?:unknown){if(id&&requests.has(id))return 'duplicate';if(before.revision!==account.revision)return 'conflict';account={...account,state:structuredClone(result.state),enabled:result.enabled,revision:account.revision+1};events.push(...result.events);if(id)requests.set(id,{action});return 'saved';},
+ async opportunities(before:number,until:number){return events.filter(e=>e.kind==='OPPORTUNITY_RECORDED'&&e.id<before&&e.id<=until).slice().reverse().slice(0,101).map(event=>({sequence:event.id,event}));},
  async lease(){if(leased)return false;leased=true;return true;},async release(){leased=false;},
  async events(after:number,until:number,orderId?:string,signalId?:string){return events.filter(e=>e.id>after&&e.id<=until&&(!orderId||e.orderId===orderId||e.signalId===signalId)).slice(0,501).map(event=>({sequence:event.id,event}));}
  };}
@@ -60,11 +61,77 @@ test('server scanner injects provider IO into history calls as well as screeners
 });
 test('one shared signal produces one order and both clients see its later fill and audit history',async()=>{
  const store=memoryStore();let clock=now;
- const candidate={symbol:'TEST',signalId:'shared-signal',signalTime:new Date(now).toISOString(),side:'BUY',score:80,stop:98,target:104};
+ const candidate={symbol:'TEST',signalId:'shared-signal',signalTime:new Date(now).toISOString(),signalQuoteTime:new Date(now).toISOString(),signalPrice:100,side:'BUY',score:80,stop:98,target:104};
  const handler=createSharedPaperHandler({store:()=>store,enabled:()=>true,now:()=>clock,observe:async()=>({marketOpen:true,candidates:[candidate],quotes:[{symbol:'TEST',price:100,timestamp:new Date(clock).toISOString(),source:'isolated-test'}]})});
  const enabled=response();await handler(req('POST',{requestId:randomUUID(),action:{enabled:true}}),enabled);assert.equal(enabled.code,200);
  await handler(req('POST',{tick:true}),response());clock+=20000;await handler(req('POST',{tick:true}),response());
  const web=response(),android=response();await handler(req(),web);await handler(req(),android);
  assert.equal(web.body.account.state.orders.length,1);assert(web.body.account.state.orders[0].filled>0);assert.deepEqual(web.body.account,android.body.account);
  assert.equal(web.body.account.state.orders[0].entryTime,new Date(clock).toISOString());assert(web.body.events.some((row:any)=>row.event.kind==='ENTRY_FILL'));
+});
+
+import {tradingSegments} from '../shared/tradingSegments.js';
+test('five portfolios isolate funds, request IDs and history; unsupported execution fails closed',async()=>{
+ const stores=new Map(tradingSegments.map(s=>[s.id,memoryStore(s.accountId,s.capital)]));let observations=0;
+ const handler=createSharedPaperHandler({store:(segment:string)=>stores.get(segment),enabled:()=>true,now:()=>now,observe:async()=>{observations++;return {};}});
+ const requestId=randomUUID();
+ for(const segment of tradingSegments){
+  const query={segment:segment.id};const body={requestId,action:{transfer:{id:'isolated-funding-test',kind:'DEPOSIT',amount:100}}};
+  for(let retry=0;retry<2;retry++){const res=response();await handler(req('POST',body,query),res);assert.equal(res.code,200);assert.equal(res.body.balance.balance,segment.capital+100);assert.equal(res.body.account.id,segment.accountId);assert.equal(res.body.events.length,1);}
+  if(!segment.executionReady)for(const body of [{tick:true},{requestId:randomUUID(),action:{enabled:true}},{requestId:randomUUID(),action:{execution:{mode:'AUTO'}}},{requestId:randomUUID(),action:{transfer:{},enabled:true}}]){
+   const res=response();await handler(req('POST',body,query),res);assert.equal(res.code,409);
+  }
+ }
+ assert.equal(observations,0);
+ const rejected=response();await handler(req('POST',{requestId:randomUUID(),action:{transfer:{id:'overdraw-short-term',kind:'WITHDRAWAL',amount:999999}}},{segment:'short-term'}),rejected);assert.equal(rejected.code,400);
+ const untouched=response();await handler(req('GET',undefined,{segment:'options'}),untouched);assert.equal(untouched.body.balance.balance,50100);
+ const invalid=createSharedPaperHandler({store:()=>{throw new Error('must not access database');},enabled:()=>true});
+ for(const segment of ['typo','user1',['options']]){const res=response();await invalid(req('GET',undefined,{segment}),res);assert.equal(res.code,400);}
+});
+test('client scopes retry IDs to segment and rejects a different account response',async()=>{
+ const original=globalThis.fetch;const sent:{url:string;id:string}[]=[];
+ globalThis.fetch=async(url,init)=>{sent.push({url:String(url),id:JSON.parse(String(init?.body)).requestId});throw new Error('lost');};
+ try{
+  const action={transfer:{id:'client-scope-test',kind:'DEPOSIT',amount:10}};
+  for(const segment of ['options','futures','options'] as const)await assert.rejects(sharedPaperRequest(action,0,undefined,undefined,segment));
+  assert.equal(sent[0].id,sent[2].id);assert.notEqual(sent[0].id,sent[1].id);assert.match(sent[0].url,/segment=options/);
+  globalThis.fetch=async()=>new Response(JSON.stringify({account:{id:'user1',name:'user1',storage:'shared-backend',segment:'intraday',state:{orders:[]}},balance:{},events:[]}));
+  await assert.rejects(sharedPaperRequest(undefined,0,undefined,undefined,'options'),/Invalid shared account/);
+ }finally{globalThis.fetch=original;}
+});
+
+import {recordOpportunities} from '../server/sharedOpportunities.js';
+const sharedCandidate=(clock=now)=>({symbol:'TEST',signalId:'2026-09-25:TEST:BUY:strong-equity-observed-v2',signalTime:new Date(clock).toISOString(),signalQuoteTime:new Date(clock).toISOString(),side:'BUY',score:80,signalPrice:100,stop:98,target:104,strategy:{id:'test',reasons:['test observation']}});
+test('shared opportunity first observation is immutable and expired or invalid observations are not recorded',()=>{
+ const initial=recordOpportunities(newPaperAccount(),[sharedCandidate()],now,true);
+ assert.equal(initial.events.length,1);assert.equal(initial.events[0].generatedAt,new Date(now).toISOString());
+ const later=recordOpportunities(initial.state,[{...sharedCandidate(now+30000),signalPrice:101}],now+30000,true);
+ assert.equal(later.events.length,0);assert.equal(later.state.opportunityIds[sharedCandidate().signalId],new Date(now).toISOString());
+ for(const candidate of [{...sharedCandidate(),score:69},{...sharedCandidate(),signalPrice:97},sharedCandidate(now-120000),sharedCandidate(now+1),{...sharedCandidate(),signalQuoteTime:'invalid'}])assert.equal(recordOpportunities(newPaperAccount(),[candidate],now,true).events.length,0);
+ assert.equal(recordOpportunities(newPaperAccount(),[sharedCandidate()],now,false).events.length,0);
+ const cutoff=Date.parse('2026-09-25T09:44:30Z');assert.equal(recordOpportunities(newPaperAccount(),[sharedCandidate(cutoff)],cutoff,true).events[0].expiresAt,'2026-09-25T09:45:00.000Z');
+});
+test('paused accounts record shared signals without orders and web/Android return the same feed',async()=>{
+ const store=memoryStore();let clock=now;
+ const handler=createSharedPaperHandler({store:()=>store,enabled:()=>true,now:()=>clock,observe:async()=>({marketOpen:true,candidates:[sharedCandidate(clock)],quotes:[]})});
+ const tick=response();await handler(req('POST',{tick:true}),tick);assert.equal(tick.code,200);assert.equal(tick.body.account.state.orders.length,0);
+ const web=response(),android=response();await handler(req('GET',undefined,{feed:'opportunities'}),web);await handler({...req('GET',undefined,{feed:'opportunities'}),headers:{origin:'https://localhost',host:'test.local'}},android);
+ assert.deepEqual(web.body.events,android.body.events);assert.equal(web.body.events.length,1);assert.equal(web.body.events[0].event.kind,'OPPORTUNITY_RECORDED');
+ clock+=30000;await handler(req('POST',{tick:true}),response());const next=response();await handler(req('GET',undefined,{feed:'opportunities'}),next);assert.deepEqual(next.body.events,web.body.events);
+ const bad=response();const revision=(await store.account()).revision;await handler(req('POST',{requestId:randomUUID(),action:{enabled:true}},{feed:'opportunities'}),bad);assert.equal(bad.code,400);assert.equal((await store.account()).revision,revision);
+});
+test('shared opportunity history uses descending stable cursors and excludes later events',async()=>{
+ const store=memoryStore();let a=await store.account();const events=Array.from({length:102},(_,i)=>({id:i+1,kind:'OPPORTUNITY_RECORDED',signalId:`s${i}`}));
+ await store.commit(a,{state:{...a.state,sequence:102},events,enabled:false});
+ const handler=createSharedPaperHandler({store:()=>store,enabled:()=>true});const first=response();await handler(req('GET',undefined,{feed:'opportunities'}),first);
+ assert.equal(first.body.events.length,100);assert.equal(first.body.events[0].sequence,102);assert.equal(first.body.nextCursor,3);assert.equal(first.body.hasMore,true);
+ a=await store.account();await store.commit(a,{state:{...a.state,sequence:103},events:[{id:103,kind:'OPPORTUNITY_RECORDED'}],enabled:false});
+ const second=response();await handler(req('GET',undefined,{feed:'opportunities',until:'102',before:'3'}),second);assert.deepEqual(second.body.events.map((r:any)=>r.sequence),[2,1]);assert.equal(second.body.hasMore,false);
+ for(const before of ['0','-1','oops','104']){const bad=response();await handler(req('GET',undefined,{feed:'opportunities',until:'102',before}),bad);assert.equal(bad.code,400);}
+});
+
+test('expired reference quotes cannot produce either a shared signal or a new order',async()=>{
+ const store=memoryStore();const handler=createSharedPaperHandler({store:()=>store,enabled:()=>true,now:()=>now,observe:async()=>({marketOpen:true,candidates:[{...sharedCandidate(),signalQuoteTime:new Date(now-121000).toISOString()}],quotes:[{symbol:'TEST',price:100,timestamp:new Date(now).toISOString(),source:'test'}]})});
+ await handler(req('POST',{requestId:randomUUID(),action:{enabled:true}}),response());
+ const result=response();await handler(req('POST',{tick:true}),result);assert.equal(result.code,200);assert.equal(result.body.account.state.orders.length,0);assert.equal(result.body.account.state.intents.length,0);assert(!result.body.events.some((r:any)=>r.event.kind==='OPPORTUNITY_RECORDED'));
 });

@@ -3,7 +3,7 @@ import {sharedPaperRequest} from '../services/sharedPaperAccount';
 import type {PaperOrder} from '../services/paperWorkspace';
 import type {PaperBalance} from '../components/PaperFundsPanel';
 import type {ExecutionSettings,PaperIntent} from '../components/PaperExecutionPanel';
-export interface PaperSnapshot {account:{enabled:boolean;revision:number;state:{orders:PaperOrder[];sequence:number;execution?:ExecutionSettings;intents?:PaperIntent[];lastCycleAt?:string}};balance:PaperBalance}
+export interface PaperSnapshot {account:{enabled:boolean;revision:number;state:{orders:PaperOrder[];sequence:number;execution?:ExecutionSettings;intents?:PaperIntent[];marketOpen?:boolean;lastCycleAt?:string}};balance:PaperBalance}
 export function usePaperSnapshot(){
  const [data,setData]=useState<PaperSnapshot|null>(null),[error,setError]=useState(''),[now,setNow]=useState(Date.now());
  useEffect(()=>{let active=true;

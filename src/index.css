@@ -399,3 +399,5 @@ body{font-size:14px;letter-spacing:-.012em}h1,h2,h3,h4,h5,h6{font-family:'Inter'
 .home-metrics .metric strong { font-size:clamp(19px,2.1vw,28px); line-height:1.3; }
 @media(max-width:400px) { .home-metrics { grid-template-columns:1fr; } }
 @media(prefers-reduced-motion:reduce) { .paper-intent { scroll-behavior:auto; } }
+
+.segment-selector{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}.segment-selector button{flex:1 1 110px;padding:12px;border:1px solid var(--text-muted);border-radius:12px;text-align:left}.segment-selector button[aria-pressed="true"]{background:var(--text-primary,#172334);color:var(--bg,#fff)}.segment-selector small{display:block;font-size:11px;margin-top:4px}.segment-selector button:focus-visible{outline:3px solid #3b82f6;outline-offset:3px}
