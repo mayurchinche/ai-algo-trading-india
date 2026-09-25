@@ -21,3 +21,25 @@ test('earlier archived P&L is carried forward once without modifying original jo
 test('corrupt device data is preserved and hidden apps cannot execute',async()=>{
  data.clear();data.set('device_paper_account_v1','broken');await assert.rejects(devicePaperRequest());assert.equal(data.get('device_paper_account_v1'),'broken');data.clear();await devicePaperRequest();const before=data.get('device_paper_account_v1');Object.assign(document,{visibilityState:'hidden'});await runDevicePaper([],new Map(),true);assert.equal(data.get('device_paper_account_v1'),before);Object.assign(document,{visibilityState:'visible'});
 });
+test('manual signal review persists through the real device adapter and submits once',async()=>{
+ data.clear();const now=Date.parse('2026-09-25T04:15:00Z');
+ await devicePaperRequest({enabled:true});await devicePaperRequest({execution:{mode:'MANUAL',delaySeconds:0}});
+ const stock:any={symbol:'TEST',signalId:'adapter-ticket',signal:'STRONG_BUY',overallScore:80,eligible:true,ltp:100,generatedAt:new Date(now).toISOString(),firstSignalAt:new Date(now).toISOString(),quoteTime:new Date(now).toISOString(),foAnalysis:{suggestedStopLoss:99,suggestedTarget:104},reasons:['Test fixture only'],strategies:['test'],scores:{momentum:80}};
+ await runDevicePaper([stock],new Map(),true,now);let result=await devicePaperRequest();assert.equal(result.account.state.orders.length,0);assert.equal(result.account.state.intents[0].status,'REVIEW');
+ const original=Date.now;Date.now=()=>now+1000;
+ try{await devicePaperRequest({reviewIntent:{signalId:'adapter-ticket',orderType:'LIMIT',quantity:1,limitPrice:100}});}finally{Date.now=original;}
+ await runDevicePaper([],new Map([['TEST',{price:100,timestamp:new Date(now+2000).toISOString(),source:'test-only'}]]),true,now+2000);
+ result=await devicePaperRequest();assert.equal(result.account.state.orders.length,1);assert.equal(result.account.state.orders[0].filled,0);assert.equal(result.account.state.orders[0].orderType,'LIMIT');
+ await runDevicePaper([],new Map([['TEST',{price:99.8,timestamp:new Date(now+3000).toISOString(),source:'test-only'}]]),true,now+3000);
+ result=await devicePaperRequest();assert.equal(result.account.state.orders[0].filled,1);assert.equal(result.account.state.orders[0].strategy.reasons[0],'Test fixture only');
+});
+test('order timeline includes its signal workflow, isolates other signals, and paginates at a fixed sequence',async()=>{
+ data.clear();await devicePaperRequest();const saved=JSON.parse(data.get('device_paper_account_v1')!);
+ saved.state.orders=[{id:'order-a',signalId:'signal-a',status:'CANCELLED',quantity:0,filled:0,exited:0}];
+ saved.events=Array.from({length:505},(_,index)=>({id:index+1,kind:index===0?'SIGNAL_APPROVED':'ENTRY_FILL',signalId:'signal-a',orderId:index===0?null:'order-a'}));
+ saved.events.push({id:506,kind:'SIGNAL_APPROVED',signalId:'signal-b',orderId:null});saved.state.sequence=506;
+ data.set('device_paper_account_v1',JSON.stringify(saved));
+ const first=await devicePaperRequest(undefined,0,504,'order-a');assert.equal(first.events.length,500);assert.equal(first.events[0].event.kind,'SIGNAL_APPROVED');assert.equal(first.hasMore,true);
+ const second=await devicePaperRequest(undefined,first.nextCursor,504,'order-a');assert.equal(second.events.length,4);assert.equal(second.hasMore,false);assert.equal(second.nextCursor,504);
+ assert.equal((await devicePaperRequest(undefined,0,undefined,'missing-order')).events.length,0);
+});

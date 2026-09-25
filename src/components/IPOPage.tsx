@@ -7,8 +7,8 @@ function ScoreBadge({ score, recommendation }: { score: number | null; recommend
   if (score === null) return <span className="badge badge-amber">Insufficient data</span>;
   const color = score >= 70 ? 'from-green-500 to-emerald-600' : score >= 50 ? 'from-blue-500 to-indigo-600' : score >= 35 ? 'from-amber-500 to-orange-600' : 'from-red-500 to-rose-600';
   return (
-    <div className="flex items-center gap-2">
-      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center text-white font-bold text-sm shadow-lg`}>
+    <div className="ipo-score flex items-center gap-2">
+      <div className={`w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center text-white font-bold text-sm shadow-lg`}>
         {score}
       </div>
       <span className={`text-xs font-bold ${score >= 70 ? 'text-[var(--green)]' : score >= 50 ? 'text-[var(--blue)]' : score >= 35 ? 'text-amber-500' : 'text-[var(--red)]'}`}>
@@ -131,7 +131,7 @@ export function IPOPage() {
         <div className="card text-center py-12">
           <div className="text-3xl mb-3">📋</div>
           <p className="text-sm font-semibold">Fetching IPO observations from InvestorGain...</p>
-          <p className="text-xs text-[var(--text-muted)] mt-1">GMP, subscription, ratings — all real-time</p>
+          <p className="text-xs text-[var(--text-muted)] mt-1">Provider-reported GMP, subscription and ratings snapshots</p>
         </div>
       )}
 
@@ -152,13 +152,13 @@ export function IPOPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.03 }}
-            className="card cursor-pointer hover:shadow-lg transition-shadow"
+            className="card ipo-card cursor-pointer hover:shadow-lg transition-shadow"
             onClick={() => setExpanded(expanded === ipo.name ? null : ipo.name)}
           >
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
+            <div className="ipo-card-heading">
+              <div className="ipo-identity">
                 <div className="flex items-center gap-2 mb-1 flex-wrap">
-                  <h3 className="text-sm font-bold text-[var(--text)]">{ipo.name}</h3>
+                  <h3 className="ipo-company-name text-sm font-bold text-[var(--text)]">{ipo.name}</h3>
                   <StatusPill status={ipo.status} />
                   {ipo.board === 'sme' && <span className="text-[9px] bg-violet-100 text-violet-700 px-1.5 py-0.5 rounded-full font-bold">SME</span>}
                 </div>
@@ -170,14 +170,14 @@ export function IPOPage() {
                   {ipo.pe_ratio && <span>P/E: {ipo.pe_ratio.toFixed(1)}x</span>}
                 </div>
               </div>
-              <p className="text-xs">{ipo.source} · Received: {formatIST(ipo.receivedAt)}</p>
+              <p className="ipo-source text-xs">{ipo.source} · Received: {formatIST(ipo.receivedAt)}</p>
               <ScoreBadge score={ipo.score} recommendation={ipo.recommendation} />
             </div>
 
             {/* GMP & Subscription */}
             <div className="mt-3 flex items-center gap-4 flex-wrap">
               {ipo.gmp != null && (
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 flex-wrap min-w-0">
                   <span className="text-[10px] text-[var(--text-muted)]">GMP:</span>
                   <span className={`text-xs font-bold ${(ipo.gmp_pct || 0) > 30 ? 'text-[var(--green)]' : (ipo.gmp_pct || 0) > 10 ? 'text-[var(--blue)]' : 'text-[var(--text-secondary)]'}`}>
                     ₹{ipo.gmp} {ipo.gmp_pct != null && `(${ipo.gmp_pct.toFixed(1)}%)`}
@@ -185,7 +185,7 @@ export function IPOPage() {
                 </div>
               )}
               {ipo.subscription_total != null && (
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 flex-wrap min-w-0">
                   <span className="text-[10px] text-[var(--text-muted)]">Sub:</span>
                   <span className="text-xs font-bold text-purple-600">{ipo.subscription_total.toFixed(2)}x</span>
                   {ipo.subscription_qib != null && (
@@ -205,7 +205,7 @@ export function IPOPage() {
                 </div>
               )}
               {ipo.listing_gain_pct != null && (
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 flex-wrap min-w-0">
                   <span className="text-[10px] text-[var(--text-muted)]">Listed:</span>
                   <span className={`text-xs font-bold ${ipo.listing_gain_pct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
                     {ipo.listing_gain_pct >= 0 ? '+' : ''}{ipo.listing_gain_pct.toFixed(1)}%

@@ -1,6 +1,40 @@
 # Android test builds
 
-## Latest: v1.1.0 — no login, direct Paper trades
+## Latest: v1.4.0 — trading home, opportunity cards and timelines
+
+[Download Android v1.4.0](./algotrader-trading-home-v1.4.0.apk?raw=true)
+
+Install as an update without clearing app data. VersionCode 5, footer v1.4.0. Home shows ledger balance, current position P&L estimates, today's closed-trade net result by IST exit date, open positions and recent outcomes. Opportunity cards show actual signal/quote timestamps, recorded reasons, freshness/session status and gross reward/risk; open the linked signal controls in Paper trades. No new selection strategy or profitability claim is introduced.
+
+Select a recorded trade to see its timeline: signal workflow, approvals, submission, amendments, partial fills and exit events where recorded. Source quote time remains separate from processing time. Missing data and monitoring gaps remain visible. The same timeline is available from the Paper trades audit trail. Options and futures remain visibly unavailable until verified contract feeds and execution models are ready.
+
+93 regression tests plus database checks passed. Lint, TypeScript/mobile build, Capacitor sync and Android assembleDebug passed. Home/cards checked at phone widths; isolated timeline fixture verified at 320px without modifying user storage. APK contents/version verified. Debug-signed test build; no physical-device installation, open-session soak test or deployment performed. Requires the existing Vercel market-data backend.
+
+SHA-256: `338f4879a235b69d37692973ff15f48cb5f176f3947e0b491d971fb609ad6019`
+
+## Previous: v1.3.0 — signal tickets and order controls
+
+[Download Android v1.3.0](./algotrader-paper-orders-v1.3.0.apk?raw=true)
+
+Install as an update without clearing app data. VersionCode 4, footer v1.3.0. Open Paper trades → Signal → order. Choose automatic execution with no added delay, at least 30s or 60s, or review each signal manually. Manual tickets support market, limit and stop-entry orders with quantity, TTL2/DAY/IOC validity; stop-IOC is unsupported. DAY means the app intraday cutoff at 15:15 IST. Delays are serviced on the next foreground scan.
+
+Pending limit/stop orders can be amended before a fill/trigger; quantity may only stay the same or decrease. Cancel unfilled quantity without closing existing exposure. New orders record strategy reasons, policy and execution settings for descriptive evidence; this is not validated profitability. Options, futures, delivery holdings and always-on background monitoring remain unavailable. No broker order is sent.
+
+90 regression tests plus database checks passed; lint, mobile build and Android build passed. Isolated ticket UI tested at 360px without writing to user storage. Debug-signed test build; no physical-phone installation or open-session soak test performed.
+
+SHA-256: `b10e49fa69d420770b34321226716bec015f6b3f574c8be3b4356746b5387778`
+
+## Previous: v1.2.0 — IPO layout and paper workspace
+
+[Download Android v1.2.0](./algotrader-paper-workspace-v1.2.0.apk?raw=true)
+
+Install as an update without uninstalling or clearing app data. Footer: **v1.2.0**; Android versionCode 3. Fixes narrow-screen IPO name/source/score overlap. Paper trades now has Orders, Positions and Closed trades with individual P&L estimates and signal/order/entry/exit timestamps. Short-term, futures and options views explicitly remain planned; they do not create unsupported fills. Device monitoring is still foreground-only and no sign-in is required.
+
+77 tests plus database checks, lint, web/mobile builds passed. Live IPO cards were checked at 320/360px. Debug-signed test APK; physical-device installation and open-session forward trading not verified. See [phased plan](../../docs/paper-workspace-plan/task_plan.md).
+
+SHA-256: `5a7355f6b474173bc3a73571b9d610d4ab080a1267b41e66dd2ca0ebe0efcbf9`
+
+## Previous: v1.1.0 — no login, direct Paper trades
 
 [Download the current Android APK](./algotrader-paper-trades-v1.1.0.apk?raw=true)
 

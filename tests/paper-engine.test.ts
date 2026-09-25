@@ -60,3 +60,23 @@ test('a delayed response cannot process a fill after the session has ended',()=>
  let s=step(pending(),1000,[q(1000)]).state;const cutoff=(15*60+25-10*60)*60000;s=step(s,cutoff,[q(cutoff)]).state;
  const close=(15*60+30-10*60)*60000;const r=step(s,close,[q(close-1000)]);assert.equal(r.state.orders[0].status,'EXIT_PENDING');assert.equal(r.state.orders[0].exited,0);
 });
+test('09:45 signal submitted at 09:46 cannot fill at the earlier signal quote',()=>{
+ const t=Date.parse('2026-09-25T04:15:00Z');
+ const candidate={...signal,signalId:'delayed-25',signalTime:new Date(t).toISOString()};
+ const quote=(offset:number,price=100)=>({...q(),timestamp:new Date(t+offset).toISOString(),price});
+ let r=advancePaper(newPaperAccount(),{now:t+60000,quotes:[quote(0)],candidates:[candidate],marketOpen:true,acceptEntries:true});
+ assert.equal(r.state.orders[0].submittedAt,new Date(t+60000).toISOString());
+ assert.equal(r.state.orders[0].filled,0);
+ r=advancePaper(r.state,{now:t+61000,quotes:[quote(60000)],marketOpen:true,acceptEntries:true});
+ assert.equal(r.state.orders[0].filled,0);
+ r=advancePaper(r.state,{now:t+65000,quotes:[quote(64000,100.2)],marketOpen:true,acceptEntries:true});
+ assert(r.state.orders[0].filled>0);assert(r.state.orders[0].entryPrice>100.2);
+ assert.equal(r.state.orders[0].entryQuoteTime,new Date(t+64000).toISOString());
+ assert.equal(r.state.orders[0].entryTime,new Date(t+65000).toISOString());
+});
+test('manual exit requires a strictly later quote, including when quote timestamp equals request',()=>{
+ const s=step(pending(),1000,[q(1000)]).state;const o=s.orders[0];
+ o.exitRequestedAt=new Date(start+5000).toISOString();o.exitReason='MANUAL';o.status='EXIT_PENDING';
+ const r=step(s,6000,[q(5000,102)]);assert.equal(r.state.orders[0].exited,0);
+ assert.equal(step(r.state,7000,[q(6500,102)]).state.orders[0].status,'CLOSED');
+});

@@ -50,8 +50,9 @@ export function useTradingRuntime() {
     const timer = setInterval(() => void scan(), 60_000);
     const resume = () => { if (document.visibilityState === 'visible') void scan(); };
     document.addEventListener('visibilitychange', resume);
+    window.addEventListener('paper-scan-requested',resume);
     const refresh = () => publish({});
     window.addEventListener('storage', refresh);
-    return () => { document.removeEventListener('visibilitychange', resume); clearInterval(timer); window.removeEventListener('storage', refresh); };
+    return () => { document.removeEventListener('visibilitychange', resume); clearInterval(timer); window.removeEventListener('storage', refresh);window.removeEventListener('paper-scan-requested',resume); };
   }, []);
 }

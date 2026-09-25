@@ -20,6 +20,7 @@ export default function App() {
   useTradingRuntime();
   const { error, loading, lastScan, stocks, marketOpen } = useStockDiscovery();
   const [activeTab, setActiveTab] = useState('Overview');
+  const [focusSignalId,setFocusSignalId]=useState<string|undefined>();
   const { nifty, lastUpdated } = useLiveStocks();
 
   return (
@@ -42,8 +43,8 @@ export default function App() {
             {activeTab === 'Alerts' && <AlertsPage />}
             {activeTab === 'AI Discovery' && <DiscoveryPage />}
             {activeTab === 'Smart Picks' && <SmartPicksPage />}
-            {activeTab === 'Overview' && <OverviewPage />}
-            {activeTab === 'Trades' && <TradesPage />}
+            {activeTab === 'Overview' && <OverviewPage onOpenWorkspace={signalId=>{setFocusSignalId(signalId);setActiveTab('Trades');window.scrollTo({top:0});}} />}
+            {activeTab === 'Trades' && <TradesPage focusSignalId={focusSignalId}/>}
             {activeTab === 'Stock Analysis' && <StockAnalysisPage />}
             {activeTab === 'Signals' && <SignalsPage />}
             {activeTab === 'Backtest' && <BacktestPage />}
@@ -52,11 +53,11 @@ export default function App() {
           </motion.div>
         </AnimatePresence></Suspense>
       </main>
-      <nav className="mobile-nav" aria-label="Primary navigation">{([{id:'Overview',label:'Account',Icon:LayoutDashboard},{id:'AI Discovery',label:'Discover',Icon:Compass},{id:'Alerts',label:'Alerts',Icon:Bell},{id:'Trades',label:'Paper trades',Icon:BookOpen}]).map(({id,label,Icon})=><button key={id} aria-current={activeTab===id?'page':undefined} onClick={()=>setActiveTab(id)}><Icon size={20}/><span>{label}</span></button>)}</nav>
+      <nav className="mobile-nav" aria-label="Primary navigation">{([{id:'Overview',label:'Home',Icon:LayoutDashboard},{id:'AI Discovery',label:'Discover',Icon:Compass},{id:'Alerts',label:'Alerts',Icon:Bell},{id:'Trades',label:'Paper trades',Icon:BookOpen}]).map(({id,label,Icon})=><button key={id} aria-current={activeTab===id?'page':undefined} onClick={()=>setActiveTab(id)}><Icon size={20}/><span>{label}</span></button>)}</nav>
       <footer className="workspace-footer text-center text-[11px] text-[var(--text-muted)] py-8 mt-4 border-t border-[rgba(0,0,0,0.04)]">
         <div className="max-w-[1600px] mx-auto px-8 space-y-1">
           <p className="font-medium text-[var(--text-secondary)]" style={{ fontFamily: 'Poppins' }}>AlgoTrader AI</p>
-          <p>Paper Trading Mode • v1.1.0 • NSE • Not Financial Advice • Powered by Yahoo Finance</p>
+          <p>Paper Trading Mode • v1.4.0 • NSE • Not Financial Advice • Powered by Yahoo Finance</p>
         </div>
       </footer>
     </div>
