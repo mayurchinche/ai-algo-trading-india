@@ -4,7 +4,7 @@
 
 [Download Android v1.5.0](./algotrader-shared-user1-v1.5.0.apk?raw=true)
 
-Install as an update without clearing app data. VersionCode 6, footer v1.5.0. Web and Android use the same backend-owned user1 paper balance, orders and timestamped events without a login form. Requires the matching shared API deployment. Previous device history is preserved for export in Funds & balance ledger; it is not automatically merged into user1.
+Install as an update without clearing app data. VersionCode 6, footer v1.5.0. Web and Android use the same backend-owned user1 paper balance, orders and timestamped events without a login form. The matching shared API and database are deployed; live web/Android-origin reads and CORS passed on 25 September 2026. Previous device history is preserved for export in Funds & balance ledger; it is not automatically merged into user1.
 
 This is a shared simulator: everyone can view/change the same account. No real broker orders. Monitoring runs while a client is visible; options and futures remain unavailable. Provider failures do not switch to local execution. 101 tests plus database integration, lint, TypeScript/mobile build, Capacitor sync and Android assembleDebug passed. Debug-signed test APK; physical-phone installation and open-session trading remain unverified.
 

@@ -1,7 +1,11 @@
 # Shared paper account user1
 
 ## Status
-Database migration applied to Supabase project `ndiqvhvcqhlyrkpcguzk` on 25 September 2026 through its SQL editor. Verified all three shared tables have RLS enabled and anonymous SELECT denied. No earlier backend paper tables existed. Production `SUPABASE_URL` and `SHARED_PAPER_ENABLED=true` saved in Vercel. The server-only service-role secret is saved as a Vercel Production Secret with user approval. Code deployment is pending this release; existing v1.4.0 APKs still use device storage. Android v1.5.0 (versionCode 6) has been built for the shared endpoint. Local checks: 101 tests, database integration, lint and mobile build passed. No historical import has been performed.
+Database migration applied to Supabase project `ndiqvhvcqhlyrkpcguzk` on 25 September 2026. All three shared tables have RLS enabled and anonymous SELECT denied. No earlier backend paper tables existed. Production URL, enable flag and service-role secret have been saved in Vercel; source and Android v1.5.0 (versionCode 6) are committed and pushed.
+
+**Activated:** the corrected server-only credential was saved and deployment `2x76i3h1Cfyrswx2TRU3NNPktcDr` passed live shared-account reads. Independent requests with web and Android origins returned identical user1 account, balance and events; Android preflight passed. Initial snapshot: revision 0, ₹20,000 paper balance, zero orders/events, new entries paused. Earlier device-only history is not automatically imported.
+
+Verification: 101 tests, database integration, web/mobile builds and Android packaging passed. Live existing market APIs, timestamps, NSE status, screener and Android CORS passed. A Vercel ESM startup failure was fixed by bundling the scanner during the build. Production mutation/retry verification was not performed; those behaviors passed local database tests. Physical-phone installation and open-session execution remain unverified. Credentials never entered Git or the APK.
 
 ## Account behavior
 Web and Android use the same backend-owned `user1` ledger, balance, orders, intents and events. There is no sign-in form or embedded shared password. This is a deliberately shared simulation: anyone using this endpoint can view/change its paper account. It is not a private authenticated account and must contain no real money or private account data. Existing authenticated `paper_accounts` and their RLS are unchanged.

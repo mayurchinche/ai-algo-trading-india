@@ -1,8 +1,8 @@
 # Persistent paper trading
 
-## Current source: shared user1 account — activation pending
+## Current source: shared user1 account — deployed
 
-The current source routes paper trading to a dedicated backend account named `user1`. Web and Android use `/api/shared-paper`; the old local ledger is preserved only as an archive. This is an intentionally shared simulation, not a private Supabase login. All users of this mode can see and adjust the same account. See [activation instructions](SHARED-USER1-PAPER.md). Do not publish the client before deploying its API and migration. Existing v1.4.0 APKs remain device-local.
+The current source routes paper trading to a dedicated backend account named `user1`. Web and Android use `/api/shared-paper`; the old local ledger is preserved only as an archive. This is an intentionally shared simulation, not a private Supabase login. All users of this mode can see and adjust the same account. See [activation instructions](SHARED-USER1-PAPER.md). The migration and API are deployed; web/Android-origin reads and CORS passed on 25 September 2026. Install v1.5.0 for shared storage; existing v1.4.0 APKs remain device-local. Earlier device history is preserved for export, not automatically merged.
 
 ## Previous device-only mode (APKs through v1.4.0)
 
