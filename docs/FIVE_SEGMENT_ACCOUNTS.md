@@ -1,6 +1,6 @@
 # Five-segment paper account foundation
 
-Implemented locally on 2026-09-25. Not deployed; no replacement APK published.
+Implemented on 2026-09-25; deployed with Android v1.6.0 on 2026-09-26.
 
 ## Scope
 
@@ -50,4 +50,10 @@ Old RPCs remain in place for compatibility. Application rollback to the previous
 
 ## Release status — 26 September 2026
 
-Production SQL migration applied and verified: user1 remains at 20,000 INR, sequence 1, zero orders; four new RPCs deny anon execution and allow service_role. Source commit 3822669 is local. Android v1.6.0/versionCode 7 built and verified against the prior signing certificate. Push/deployment and APK publication await explicit approval after automatic approval review rejected the broader production push. No production funding transactions were performed.
+Production SQL migration applied and verified: user1 remains at 20,000 INR, sequence 1, zero orders; four new RPCs deny anon execution and allow service_role. Source commit 3822669 is local. Android v1.6.0/versionCode 7 built and verified against the prior signing certificate. The user subsequently approved this exact release; commits 3822669 and 091e04c were pushed and Vercel deployment succeeded. No production funding transactions were performed.
+
+### Live verification
+
+Web and Android-origin responses match across all five accounts: intraday 20,000 INR (preserved), short term 20,000 INR, long term 20,000 INR, options 50,000 INR, futures 50,000 INR. Each new account has exactly one opening-capital event and no orders. Intraday capital, transfers, realized result, orders, sequence and event history match the pre-release baseline. Shared opportunity feeds currently contain zero records; the market is closed.
+
+Android CORS/preflight, unknown-segment rejection, v1.6.0 frontend, equity/index histories and quote timestamps, NSE status, screener, metal observations and IPO reports passed live checks. APK published under releases/android/algotrader-shared-segments-v1.6.0.apk with the same signing certificate as v1.5.0. No physical-phone installation, new production funding adjustments or open-market execution test was performed. Short-term/long-term/options/futures execution remains disabled.

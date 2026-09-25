@@ -1,12 +1,12 @@
 # Android test builds
 
-## Prepared: v1.6.0 — five shared accounts and shared signals
+## Latest: v1.6.0 — five shared accounts and shared signals
 
 [Android v1.6.0 APK](./algotrader-shared-segments-v1.6.0.apk?raw=true)
 
 VersionCode 7; signed with the same debug certificate as v1.5.0. Install as an update without clearing app data. Includes five segment views, independent shared funding ledgers and backend-recorded intraday opportunities for Home, Signals, Alerts and foreground popups. The existing intraday balance/history is preserved. Short term, long term, options and futures remain funding-only until their execution models and data are validated.
 
-The Supabase migration was applied on 26 September 2026. Application deployment and APK publication await explicit release approval; this APK requires the new backend release. 107 tests, five database suites, lint, mobile build, Capacitor sync and assembleDebug passed. APK package/version/API URL and matching signing certificate verified. Physical-device installation and open-session trading remain unverified.
+The Supabase migration and Vercel deployment are live as of 26 September 2026. Web and Android-origin reads match across all five accounts; the existing intraday balance/history is preserved. Android CORS, shared feed reads, real market-data endpoints and v1.6.0 frontend checks passed. The new shared signal feed is empty at release; no past signals were fabricated. 107 tests, five database suites, lint, mobile build, Capacitor sync and assembleDebug passed. APK package/version/API URL and matching signing certificate verified. Physical-device installation and open-session trading remain unverified.
 
 SHA-256: `f847c47c6d6d6dfbdb1be919bba4e682f6bebe92348a7a6e3edb37af14c34bf4`
 
