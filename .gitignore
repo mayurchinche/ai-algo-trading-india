@@ -14,3 +14,5 @@ android/app/google-services.json
 *.p12
 *.jks
 *.keystore
+
+server/sharedPaperObservation.bundle.mjs
