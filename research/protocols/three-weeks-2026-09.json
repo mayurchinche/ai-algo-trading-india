@@ -1,0 +1,28 @@
+{
+  "id": "three-weeks-2026-09-v1",
+  "status": "DRAFT_BLOCKED_CALENDAR_AND_DATA",
+  "from": "2026-09-07",
+  "through": "2026-09-25",
+  "timezone": "Asia/Kolkata",
+  "sessions": null,
+  "calendarSource": null,
+  "baselinePolicy": "strong-equity-observed-v3",
+  "warmup": "Two prior years; at least 200 daily observations and full preceding year coverage",
+  "universe": {"mode":"UNRESOLVED", "required":"Archived screener snapshots or explicitly labelled point-in-time reconstructed universe"},
+  "delaysSeconds": [0,30,60],
+  "primaryDelaySeconds": 60,
+  "minutePublicationLagMs": 1000,
+  "barFillConvention": "Next bar open strictly after order eligibility; no intrabar timing invented",
+  "ambiguousStopTarget": "STOP_FIRST_WITH_AMBIGUITY_FLAG",
+  "endOfWindow": "MARK_OPEN_POSITIONS_SEPARATELY_NO_FORCED_CLOSE",
+  "costModel": "UNRESOLVED_DATE_EFFECTIVE_TARIFFS; paper-costs-v1 only as separately labelled parity comparison",
+  "segments": [
+    {"id":"intraday","capital":10000,"comparisonCapital":20000,"policy":"strong-equity-observed-v3","status":"DATA_AND_EXECUTION_MODEL_PENDING"},
+    {"id":"short-term","capital":20000,"policy":null,"status":"POLICY_NOT_READY"},
+    {"id":"long-term","capital":20000,"policy":null,"status":"POLICY_NOT_READY"},
+    {"id":"options","capital":50000,"policy":null,"status":"POLICY_AND_CONTRACT_DATA_NOT_READY"},
+    {"id":"futures","capital":50000,"policy":null,"status":"POLICY_AND_MARGIN_DATA_NOT_READY"}
+  ],
+  "promotion": "No automatic production promotion from this retrospective window",
+  "requiredBeforeFreeze": ["Verified exchange session list","Historical universe evidence","Provider coverage manifest","Date-effective fees and instrument references","All tested policy rules and source hashes"]
+}

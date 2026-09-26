@@ -16,3 +16,6 @@ android/app/google-services.json
 *.keystore
 
 server/sharedPaperObservation.bundle.mjs
+
+# Local historical research credentials
+.env.kite
