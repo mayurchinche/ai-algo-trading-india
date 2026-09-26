@@ -47,7 +47,7 @@ export interface StrategyScores {
   momentum: number;       // RSI + MACD + price vs SMA
   meanReversion: number;  // Oversold/overbought + Bollinger band position
   breakout: number;       // Volume spike + 52w high/low proximity
-  trendFollowing: number; // SMA alignment + ADX proxy
+  trendFollowing: number; // SMA alignment; volatility is not directional trend strength
   smartMoney: number;     // Volume ratio + institutional pattern detection
 }
 
@@ -130,11 +130,11 @@ function computeBollingerPosition(closes: number[], period = 20): number {
 
 // --- Strategy Scoring ---
 
-function scoreStrategies(
+export function scoreStrategies(
   ltp: number, rsi: number, macd: { value: number; signal: number; histogram: number },
   sma20: number, sma50: number, sma200: number,
   volumeRatio: number, bollingerPos: number,
-  weekHigh52: number, weekLow52: number, atr: number
+  weekHigh52: number, weekLow52: number, _atr: number
 ): StrategyScores {
   // Momentum: RSI trend + MACD + price above SMAs
   const rsiMomentum = rsi > 50 ? Math.min((rsi - 50) / 30 * 100, 100) : Math.max((rsi - 50) / 30 * 100, -100);
@@ -165,9 +165,8 @@ function scoreStrategies(
   else if (sma20 > sma50) trendFollowing = 40;
   else if (sma20 < sma50 && sma50 < sma200) trendFollowing = -80;
   else if (sma20 < sma50) trendFollowing = -40;
-  // ADX proxy: larger candles = stronger trend
-  const atrPct = (atr / ltp) * 100;
-  if (atrPct > 3) trendFollowing = Math.round(trendFollowing * 1.3);
+  // ATR measures volatility, not ADX or directional trend strength.
+  // Keep ATR for risk levels; do not inflate this score for larger ranges.
   trendFollowing = Math.max(-100, Math.min(100, trendFollowing));
 
   // Volume pattern: price and volume alone do not establish institutional activity

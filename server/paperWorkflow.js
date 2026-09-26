@@ -1,3 +1,4 @@
+import {estimatePaperEconomics} from './paperCosts.js';
 import {paperBalance} from './paperFunds.js';
 import {advancePaper} from './paperEngine.js';
 export const DEFAULT_EXECUTION={mode:'AUTOMATIC',delaySeconds:0};
@@ -72,5 +73,6 @@ export function amendPendingEntry(previous,{orderId,quantity,price},now=Date.now
  o.referencePrice=reference;o.modifiedAt=new Date(now).toISOString();
  const balance=paperBalance(state,now);
  if(balance.equity==null||balance.reserved>Math.min(balance.balance,balance.equity)*.9)throw new Error('Amendment exceeds available capital or uses stale position marks.');
- events.push({id:++state.sequence,at:o.modifiedAt,kind:'ORDER_AMENDED',orderId:o.id,before,quantity,price,note:'Original submission and fill history retained'});return {state,events};
+ o.economics=estimatePaperEconomics({side:o.side,entry:reference,stop:o.stop,target:o.target,quantity:o.quantity},now);
+ events.push({id:++state.sequence,at:o.modifiedAt,kind:'ORDER_AMENDED',orderId:o.id,before,quantity,price,economics:o.economics,note:'Original submission and fill history retained'});return {state,events};
 }

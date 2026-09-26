@@ -100,3 +100,14 @@ test('new-order risk budget uses the same net equity as the account balance view
  assert.equal(result.state.orders.length,2);assert.equal(result.state.orders[1].riskBudget,balance.equity*.005);
  assert.equal(result.state.realized,0);
 });
+
+import {estimatePaperEconomics,paperExecutionFees} from '../server/paperCosts.js';
+test('cost-adjusted references expose small-quantity target losses for both directions',()=>{
+ for(const side of ['BUY','SELL']){const e=estimatePaperEconomics({side,entry:100,stop:side==='BUY'?98:102,target:side==='BUY'?104:96,quantity:1},start);assert(e.costsExceedTarget);assert(e.targetNet<0);assert(e.stopNet<0);assert.equal(e.quantity,1);}
+ const e=estimatePaperEconomics({side:'BUY',entry:100,stop:98,target:104,quantity:40},start);assert(e.targetNet>0);assert(e.netRewardRisk<2);assert.equal(e.targetCosts,paperExecutionFees(100,103.95,40));
+ assert.equal(estimatePaperEconomics({side:'BUY',entry:100,stop:101,target:104,quantity:40}),null);
+});
+test('submitted orders retain auditable economics without changing realized ledger results',()=>{
+ const result=step(newPaperAccount(),0,[q()],[signal]);const o=result.state.orders[0];
+ assert.equal(o.economics.quantity,o.quantity);assert.equal(o.economics.at,o.submittedAt);assert.deepEqual(result.events[0].economics,o.economics);assert.equal(result.state.realized,0);
+});

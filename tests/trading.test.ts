@@ -100,3 +100,11 @@ test('corrupt decision storage blocks new entries without rewriting the account'
   assert.throws(()=>openPaperTrades([signal()],now), /Invalid paper ledger/);
   assert.equal(localStorage.getItem('paper_ledger_v3'),raw);
 });
+
+import {scoreStrategies} from '../src/services/stockDiscovery';
+test('volatility cannot inflate directional trend scores',()=>{
+ const args=[100,60,{value:1,signal:0,histogram:1},98,95,90,2,.5,101,70] as const;
+ assert.deepEqual(scoreStrategies(...args,1),scoreStrategies(...args,6));
+ assert.equal(scoreStrategies(...args,6).trendFollowing,80);
+ assert.equal(scoreStrategies(100,40,{value:-1,signal:0,histogram:-1},102,105,110,2,.5,130,99,6).trendFollowing,-80);
+});

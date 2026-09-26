@@ -1,4 +1,4 @@
-import {recordOpportunities} from './sharedOpportunities.js';
+import {recordOpportunities,opportunityDecisions} from './sharedOpportunities.js';
 import {randomUUID} from 'node:crypto';
 import {tradingSegment} from '../shared/tradingSegments.js';
 import {paperBalance,transferPaperFunds} from './paperFunds.js';
@@ -101,7 +101,8 @@ export function createSharedPaperHandler({store=sharedStore,observe,enabled=()=>
     const before=Number(req.query.before??until+1);
     if(!Number.isSafeInteger(before)||before<1||before>until+1)throw new SharedPaperError('Invalid opportunity cursor.');
     const rows=await db.opportunities(before,until),events=rows.slice(0,100);
-    return res.status(200).json({account:{id:account.id,name:'user1',storage:'shared-backend',segment,revision:account.revision,state:{sequence:until,lastCycleAt:account.state.lastCycleAt,marketOpen:account.state.marketOpen,discoveryError:account.state.discoveryError}},balance:paperBalance(account.state,now()),events,nextCursor:events.at(-1)?.sequence??before,hasMore:rows.length>100});
+    const decisions=opportunityDecisions(account.state,events.map(row=>row.event.signalId));
+    return res.status(200).json({account:{id:account.id,name:'user1',storage:'shared-backend',segment,revision:account.revision,state:{sequence:until,lastCycleAt:account.state.lastCycleAt,marketOpen:account.state.marketOpen,discoveryError:account.state.discoveryError}},balance:paperBalance(account.state,now()),decisions,decisionRevision:account.revision,events,nextCursor:events.at(-1)?.sequence??before,hasMore:rows.length>100});
    }
    const orderId=req.query?.orderId;
    if(orderId!=null&&(typeof orderId!=='string'||!/^[a-zA-Z0-9:_ .-]{1,240}$/.test(orderId)))throw new SharedPaperError('Invalid order identifier.');

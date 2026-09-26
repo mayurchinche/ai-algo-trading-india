@@ -135,3 +135,17 @@ test('expired reference quotes cannot produce either a shared signal or a new or
  await handler(req('POST',{requestId:randomUUID(),action:{enabled:true}}),response());
  const result=response();await handler(req('POST',{tick:true}),result);assert.equal(result.code,200);assert.equal(result.body.account.state.orders.length,0);assert.equal(result.body.account.state.intents.length,0);assert(!result.body.events.some((r:any)=>r.event.kind==='OPPORTUNITY_RECORDED'));
 });
+
+import {opportunityDecisions} from '../server/sharedOpportunities.js';
+test('opportunity decisions project only matching account records and never invent closed P&L',()=>{
+ const state={...newPaperAccount(),intents:[{signalId:'blocked',status:'REJECTED',reason:'Daily loss limit reached'},{signalId:'active',status:'SUBMITTED'}],orders:[{id:'one',signalId:'active',status:'PARTIAL',quantity:10,filled:4,exited:0,netPnl:999,fees:99},{id:'other-account-signal',signalId:'hidden',status:'CLOSED',netPnl:88}]};
+ const before=structuredClone(state),decisions=opportunityDecisions(state,['blocked','active','unknown']);
+ assert.equal(decisions.blocked.intent.reason,'Daily loss limit reached');assert.equal(decisions.blocked.order,null);assert.equal(decisions.active.order.filled,4);assert.equal(decisions.active.order.netPnl,undefined);assert.equal(decisions.active.order.fees,undefined);assert.equal(decisions.hidden,undefined);assert.deepEqual(decisions.unknown,{order:null,intent:null});assert.deepEqual(state,before);
+ state.orders[0].status='CLOSED';assert.equal(opportunityDecisions(state,['active']).active.order.netPnl,999);
+});
+test('shared feed returns current decision separately from unchanged opportunity event',async()=>{
+ const store=memoryStore();const before=await store.account();const event={id:1,kind:'OPPORTUNITY_RECORDED',signalId:'blocked'};
+ await store.commit(before,{state:{...before.state,sequence:1,intents:[{signalId:'blocked',status:'REJECTED',reason:'Insufficient capital or risk allowance'}]},events:[event],enabled:false});
+ const handler=createSharedPaperHandler({store:()=>store,enabled:()=>true}),res=response();await handler(req('GET',undefined,{feed:'opportunities'}),res);
+ assert.equal(res.code,200);assert.deepEqual(res.body.events[0].event,event);assert.equal(res.body.decisions.blocked.intent.reason,'Insufficient capital or risk allowance');assert.equal(res.body.decisionRevision,res.body.account.revision);
+});

@@ -1,5 +1,6 @@
 // Presentation of recorded executions only; never fabricates a mark or a trade.
 export interface PaperOrder {
+ economics?:{model:string;at:string;quantity:number;entry:number;targetCosts:number;stopCosts:number;targetNet:number;stopNet:number;netRewardRisk:number|null;costsExceedTarget:boolean}|null;
  id:string;requestedQuantity?:number;symbol:string;side:string;status:string;quantity:number;filled:number;exited:number;
  submittedAt:string;signalTime?:string;orderTimeUnknown?:boolean;entryTime?:string;exitTime?:string;
  entryQuoteTime?:string;exitQuoteTime?:string;entryPrice?:number;exitPrice?:number;netPnl?:number;

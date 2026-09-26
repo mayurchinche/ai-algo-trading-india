@@ -1,7 +1,8 @@
+import type {OpportunityDecision} from '../services/opportunityDecision';
 import {useEffect,useState} from 'react';
 import {sharedPaperRequest} from '../services/sharedPaperAccount';
 export interface SharedOpportunity {id:number;signalId:string;symbol:string;side:'BUY'|'SELL';score:number;entry:number;stop:number;target:number;at:string;generatedAt:string;quoteTime:string;expiresAt:string;strategy?:{id:string;reasons?:string[]}}
-export interface OpportunityFeed {account:{revision:number;state:{sequence:number;lastCycleAt?:string;marketOpen?:boolean;discoveryError?:string}};events:{sequence:number;event:SharedOpportunity}[];hasMore:boolean;nextCursor:number}
+export interface OpportunityFeed {decisions?:Record<string,OpportunityDecision>;decisionRevision?:number;account:{revision:number;state:{sequence:number;lastCycleAt?:string;marketOpen?:boolean;discoveryError?:string}};events:{sequence:number;event:SharedOpportunity}[];hasMore:boolean;nextCursor:number}
 export const fetchSharedOpportunities=(before?:number,until?:number):Promise<OpportunityFeed>=>sharedPaperRequest(undefined,0,until,undefined,'intraday',{before});
 export function useSharedOpportunities(){
  const [data,setData]=useState<OpportunityFeed|null>(null),[error,setError]=useState(''),[now,setNow]=useState(Date.now());

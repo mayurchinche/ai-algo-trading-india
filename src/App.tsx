@@ -48,13 +48,13 @@ export default function App() {
             className="space-y-6"
           >
             {segment.id!=='intraday'&&!separateResearch ? (['Overview','Trades'].includes(activeTab)?<SegmentPaperAccount segment={segment}/>:<section className="card space-y-4"><h1>{segment.label} · {activeTab}</h1><p>Unavailable until this segment’s data, strategy and execution checks pass. No intraday signals are reused here.</p><button onClick={()=>setActiveTab('Trades')}>View {segment.label.toLowerCase()} paper account</button></section>) : <>
-            {activeTab === 'Alerts' && <AlertsPage />}
+            {activeTab === 'Alerts' && <AlertsPage onOpen={signalId=>{setFocusSignalId(signalId);setActiveTab('Trades');}} />}
             {activeTab === 'AI Discovery' && <DiscoveryPage />}
             {activeTab === 'Smart Picks' && <SmartPicksPage />}
             {activeTab === 'Overview' && <OverviewPage onOpenWorkspace={signalId=>{setFocusSignalId(signalId);setActiveTab('Trades');window.scrollTo({top:0});}} />}
             {activeTab === 'Trades' && <TradesPage focusSignalId={focusSignalId}/>}
             {activeTab === 'Stock Analysis' && <StockAnalysisPage />}
-            {activeTab === 'Signals' && <SignalsPage />}
+            {activeTab === 'Signals' && <SignalsPage onOpen={signalId=>{setFocusSignalId(signalId);setActiveTab('Trades');}} />}
             {activeTab === 'Backtest' && <BacktestPage />}
             {activeTab === 'IPO Tracker' && <IPOPage />}
             {activeTab === 'Metals' && <MetalsPage />}
@@ -66,7 +66,7 @@ export default function App() {
       <footer className="workspace-footer text-center text-[11px] text-[var(--text-muted)] py-8 mt-4 border-t border-[rgba(0,0,0,0.04)]">
         <div className="max-w-[1600px] mx-auto px-8 space-y-1">
           <p className="font-medium text-[var(--text-secondary)]" style={{ fontFamily: 'Poppins' }}>AlgoTrader AI</p>
-          <p>Paper Trading Mode • v1.6.0 • NSE • Not Financial Advice • Powered by Yahoo Finance</p>
+          <p>Paper Trading Mode • v1.7.0 • NSE • Not Financial Advice • Powered by Yahoo Finance</p>
         </div>
       </footer>
     </div>

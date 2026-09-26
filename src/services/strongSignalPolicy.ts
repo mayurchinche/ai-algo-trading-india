@@ -1,6 +1,6 @@
 import { freshQuote, inSession, istDate, istMinutes, validLevels } from './tradingTime';
 
-export const SIGNAL_POLICY = 'strong-equity-observed-v2';
+export const SIGNAL_POLICY = 'strong-equity-observed-v3';
 export interface StrongCandidate {
   symbol: string; signal: string; overallScore: number; eligible: boolean;
   ltp: number; generatedAt: string; firstSignalAt?: string; quoteTime?: string;

@@ -1,10 +1,11 @@
+import {paperExecutionFees,estimatePaperEconomics} from './paperCosts.js';
 import { fundedCapital, paperBalance } from './paperFunds.js';
 // Deterministic paper execution only. This module never places broker orders.
 export const PAPER_VERSION = 'durable-paper-v1';
 const day = ms => new Date(new Date(ms).getTime() + 19800000).toISOString().slice(0,10);
 const minute = ms => { const d = new Date(new Date(ms).getTime()+19800000); return d.getUTCHours()*60+d.getUTCMinutes(); };
 const round = n => Math.round(n*100)/100;
-const cost = (entry,exit,qty) => round(40+(entry+exit)*qty*.0005);
+const cost = paperExecutionFees;
 export function newPaperAccount() { return {version:PAPER_VERSION,capital:20000,transfers:[],realized:0,sequence:0,orders:[],lastCycleAt:null}; }
 export function advancePaper(previous, {now,quotes=[],candidates=[],marketOpen=false,acceptEntries=false}) {
  const state=structuredClone(previous), events=[];
@@ -106,7 +107,8 @@ export function advancePaper(previous, {now,quotes=[],candidates=[],marketOpen=f
   if(quantity<1){reject('Insufficient capital or risk allowance');continue;}
   if(s.quantity!=null&&s.quantity>quantity){reject(`Requested quantity exceeds current risk allowance (${quantity})`);continue;}
   const o={id:s.signalId,signalId:s.signalId,symbol:s.symbol,side:s.side,score:s.score,signalTime:s.signalTime,submittedAt:at,referencePrice:reference,riskBudget:equity*.005,stop:s.stop,target:s.target,quantity:s.quantity??quantity,requestedQuantity:s.quantity??quantity,orderType:s.orderType||'MARKET',validity:s.validity||'TTL2',limitPrice:s.limitPrice,triggerPrice:s.triggerPrice,product:'INTRADAY',strategy:s.strategy,executionMode:s.executionMode,reactionDelaySeconds:s.reactionDelaySeconds,approvedAt:s.approvedAt,filled:0,exited:0,entryValue:0,exitValue:0,status:'PENDING',lastPrice:q.price,lastQuoteTime:q.timestamp,monitoringGap:false};
-  state.orders.push(o);today.push(o);reserved+=o.quantity*reference+40;event(o,'ORDER_SUBMITTED',{quantity:o.quantity,orderType:o.orderType,signalTime:s.signalTime,quoteTime:q.timestamp});
+  o.economics=estimatePaperEconomics({side:o.side,entry:reference,stop:o.stop,target:o.target,quantity:o.quantity},now);
+  state.orders.push(o);today.push(o);reserved+=o.quantity*reference+40;event(o,'ORDER_SUBMITTED',{quantity:o.quantity,orderType:o.orderType,signalTime:s.signalTime,quoteTime:q.timestamp,economics:o.economics});
  }
  state.lastCycleAt=at;
  return {state,events};

@@ -13,3 +13,11 @@ export function recordOpportunities(previous,candidates,now,marketOpen){
  }
  return {state,events};
 }
+
+// Current execution state is separate from immutable signal observations.
+export function opportunityDecisions(state,signalIds){
+ const wanted=new Set(signalIds),intents=new Map((state.intents||[]).filter(i=>wanted.has(i.signalId)).map(i=>[i.signalId,i])),orders=new Map(state.orders.filter(o=>wanted.has(o.signalId)).map(o=>[o.signalId,o]));
+ return Object.fromEntries(signalIds.map(id=>{const intent=intents.get(id),order=orders.get(id);
+  return [id,{intent:intent?{status:intent.status,reason:intent.reason,dueAt:intent.dueAt,expiresAt:intent.expiresAt}:null,order:order?{id:order.id,status:order.status,economics:order.economics,quantity:order.quantity,requestedQuantity:order.requestedQuantity,filled:order.filled,exited:order.exited,entryPrice:order.entryPrice,exitPrice:order.exitPrice,submittedAt:order.submittedAt,entryTime:order.entryTime,exitTime:order.exitTime,netPnl:order.status==='CLOSED'?order.netPnl:undefined,fees:order.status==='CLOSED'?order.fees:undefined,monitoringGap:order.monitoringGap}:null}];
+ }));
+}

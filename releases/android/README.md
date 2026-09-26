@@ -1,5 +1,15 @@
 # Android test builds
 
+## Prepared locally: v1.7.0 — decision cards and cost diagnostics
+
+[Android v1.7.0 APK](./algotrader-decision-cards-v1.7.0.apk?raw=true)
+
+Publication and deployment are pending approval. VersionCode 8, same signing certificate as v1.6.0; install as an update after the matching backend release, without clearing app data. Cards show recorded decisions, rejection reasons, fill quantities, closed net results, search and status filters. New orders/amendments record cost-adjusted reference estimates. Signal policy v3 removes ATR-based trend-score inflation without lowering the strong threshold. The historical audit did not establish a profitability improvement. Cost warnings are informational, not an automatic admission rule.
+
+116 tests, five database suites, lint, mobile build, Capacitor sync and assembleDebug passed. APK version, API URL, v3 policy, new UI and absence of synthetic fixtures verified. Physical-device installation and open-market execution remain unverified.
+
+SHA-256: `a1237de24bdffdeff4771e2155b089bc8472e4090a2df91702134e32f809fb11`
+
 ## Latest: v1.6.0 — five shared accounts and shared signals
 
 [Android v1.6.0 APK](./algotrader-shared-segments-v1.6.0.apk?raw=true)

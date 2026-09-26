@@ -46,3 +46,20 @@ test('opportunities distinguish stale observations, paused entries, and closed m
  assert.equal(opportunityStatus({...stock,quoteTime:undefined},true,true,now),'Quote stale or missing');
  assert.equal(opportunityStatus(stock,true,true,now+120001),'Signal expired');
 });
+
+import {describeOpportunity,type OpportunityDecision} from '../src/services/opportunityDecision';
+test('opportunity status follows executions rather than an expired signal window',()=>{
+ const order={id:'o',status:'PARTIAL',quantity:10,filled:4,exited:1,submittedAt:'2026-09-25T04:00:00Z'};
+ const decision:OpportunityDecision={order,intent:{status:'EXPIRED',expiresAt:'2026-09-25T04:02:00Z'}};
+ const now=Date.parse('2026-09-25T06:00:00Z');
+ assert.equal(describeOpportunity(decision,now,false).group,'active');assert.match(describeOpportunity(decision,now,false).reason,/3 units/);
+ decision.order={...order,status:'CLOSED',exited:4,netPnl:-20};assert.equal(describeOpportunity(decision,now,false).group,'closed');
+ decision.order=null;assert.equal(describeOpportunity(decision,now,true).group,'blocked');
+ assert.equal(describeOpportunity(undefined,now,true).group,'unknown');
+});
+test('opportunity review expiry, stale feed and rejection reasons remain explicit',()=>{
+ const now=Date.parse('2026-09-25T04:00:00Z');const decision:OpportunityDecision={order:null,intent:{status:'REVIEW',expiresAt:new Date(now+60000).toISOString()}};
+ assert.equal(describeOpportunity(decision,now,true).label,'Needs your review');assert.match(describeOpportunity(decision,now,false).label,/unavailable/);
+ assert.equal(describeOpportunity(decision,now+60000,true).group,'blocked');
+ decision.intent={status:'REJECTED',reason:'Daily loss limit reached'};assert.equal(describeOpportunity(decision,now,true).reason,'Daily loss limit reached');
+});
