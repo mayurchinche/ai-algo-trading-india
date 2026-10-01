@@ -24,6 +24,7 @@
     "@capacitor/ios": "^8.5.2",
     "@capacitor/push-notifications": "^8.1.2",
     "@supabase/supabase-js": "^2.109.0",
+    "fast-xml-parser": "^5.11.2",
     "firebase-admin": "^14.4.0",
     "framer-motion": "^13.1.0",
     "lucide-react": "^1.31.0",

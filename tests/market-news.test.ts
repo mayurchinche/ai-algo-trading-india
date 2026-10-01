@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {parseNews,fetchNews,headlineTone,summarizeNews,newsQuery} from '../server/marketNews.js';
+const now=Date.parse('2026-10-01T12:00:00Z');
+const item=(title='Stocks rally',date='Thu, 01 Oct 2026 10:00:00 GMT',link='https://news.google.com/articles/one')=>`<item><title>${title}</title><link>${link}</link><pubDate>${date}</pubDate><source url="https://example.com">Publisher</source></item>`;
+const feed=(items:string)=>`<rss><channel>${items}</channel></rss>`;
+test('parse real source fields and deduplicate news without inventing dates',()=>{const data=parseNews(feed(item()+item()+item('Missing date','')+item('Future','Fri, 02 Oct 2026 10:00:00 GMT')),now);assert.equal(data.length,1);assert.equal(data[0].publishedAt,'2026-10-01T10:00:00.000Z');assert.equal(data[0].source,'Publisher');});
+test('reject executable URLs, invalid XML and entity declarations',()=>{assert.equal(parseNews(feed(item('Unsafe',undefined,'javascript:alert(1)')),now).length,0);assert.throws(()=>parseNews('<!DOCTYPE rss><rss/>',now));assert.throws(()=>parseNews('<rss><channel>',now));assert.throws(()=>parseNews('<html>Rate limited</html>',now));});
+test('old and speculative headlines cannot create confident tone',()=>{const old=parseNews(feed(item('Stocks rally','Tue, 29 Sep 2026 10:00:00 GMT')),now);assert.equal(old[0].fresh,false);assert.equal(summarizeNews(old).sampleSize,0);assert.equal(headlineTone('Stocks may rally'),'unclear');assert.equal(headlineTone('Stocks rally but profits fall'),'unclear');assert.equal(summarizeNews([]).status,'insufficient_evidence');});
+test('reject non-string and excessive queries',()=>{assert.throws(()=>newsQuery(['x']));assert.throws(()=>newsQuery('x'.repeat(101)));assert.throws(()=>newsQuery('<script>'));});
+test('provider failures do not become a neutral summary',async()=>{await assert.rejects(fetchNews('',{now,fetcher:async()=>new Response('Limit',{status:429})}),/rate-limited/);await assert.rejects(fetchNews('',{now,fetcher:async()=>new Response('x'.repeat(1000001))}),/too large/);});
+test('working RSS produces bounded dated evidence and fixed provider URL',async()=>{let observed;const result=await fetchNews('Reliance',{now,fetcher:async url=>{observed=url;return new Response(feed(item()));}});assert.equal(observed.hostname,'news.google.com');assert.equal(result.articles.length,1);assert.equal(result.summary.status,'insufficient_evidence');assert.equal(result.receivedAt,new Date(now).toISOString());});

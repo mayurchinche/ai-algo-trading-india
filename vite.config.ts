@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 // @ts-expect-error JavaScript Vercel handler is shared with local development.
 import marketHandler from './api/market.js'
+// @ts-expect-error Shared JavaScript research API.
+import researchHandler from './api/research.js'
 
 // @ts-expect-error Shared JavaScript configuration validator.
 import { validateMobileApiBase } from './server/mobileConfig.js'
@@ -20,7 +22,7 @@ export default defineConfig(({ mode }) => {
   plugins: [react(), tailwindcss(), {
     name: 'local-market-api',
     configureServer(server) {
-      for (const [route, handler] of [['/api/market', marketHandler], ['/api/health', healthHandler], ['/api/paper', paperHandler], ['/api/shared-paper', sharedPaperHandler]] as const) server.middlewares.use(route, (req, res) => {
+      for (const [route, handler] of [['/api/research', researchHandler], ['/api/market', marketHandler], ['/api/health', healthHandler], ['/api/paper', paperHandler], ['/api/shared-paper', sharedPaperHandler]] as const) server.middlewares.use(route, (req, res) => {
         const url = new URL(req.url || '/', 'http://localhost');
         const request = { headers: req.headers, method: req.method, query: Object.fromEntries(url.searchParams) };
         const response = { end() { res.end(); return response; }, setHeader: (key: string, value: string) => res.setHeader(key, value), status(code: number) { res.statusCode = code; return response; }, json(data: unknown) { res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(data)); return response; } };
