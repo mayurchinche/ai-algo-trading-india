@@ -170,3 +170,9 @@ test('scan summary retains thirty days and separates closed markets from empty s
  recordScan(state,{marketOpen:false,candidates:[]},now,'worker');assert.equal(state.lastScan.status,'MARKET_CLOSED');assert.equal(state.scanDays['2026-07-01'],undefined);
  recordScan(state,{marketOpen:true,candidates:[],discoveryError:'unavailable'},now,'worker');assert.equal(state.lastScan.status,'SCAN_FAILED');assert.equal(state.scanDays['2026-09-25'].failures,1);
 });
+test('opening research and scan evidence reach the shared feed without creating orders',async()=>{
+ const store=memoryStore();const gapWatch={at:new Date(now).toISOString(),status:'OBSERVED',universe:1,attempted:1,failures:0,rows:[{symbol:'TEST',status:'BREAKOUT_OBSERVED'}]};
+ await runSharedPaperCycle({db:store,now:()=>now,source:'scheduler',observe:async()=>({marketOpen:true,candidates:[],quotes:[],gapWatch,scanDiagnostics:{scored:1,rejections:{SCORE_BELOW_70:1}}})});
+ const res=response();await createSharedPaperHandler({store:()=>store,enabled:()=>true,now:()=>now})(req('GET',undefined,{feed:'opportunities'}),res);
+ assert.equal(res.code,200);assert.deepEqual(res.body.account.state.gapWatch,gapWatch);assert.equal(res.body.account.state.lastScan.source,'scheduler');assert.equal(res.body.account.state.lastWorkerAttemptAt,new Date(now).toISOString());assert.equal((await store.account()).state.orders.length,0);assert.equal(res.body.events.length,0);
+});

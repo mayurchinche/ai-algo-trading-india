@@ -1,3 +1,4 @@
+import {SegmentReadiness} from './SegmentReadiness';
 import {useEffect,useState} from 'react';
 import type {TradingSegment} from '../../shared/tradingSegments';
 import {sharedPaperRequest} from '../services/sharedPaperAccount';
@@ -18,7 +19,7 @@ export function SegmentPaperAccount({segment}:{segment:TradingSegment}){
   downloadJSON(`user1-${segment.id}-ledger.json`,{account:snapshot,throughSequence:until,events});
  }catch(e){setError(e instanceof Error?e.message:'Export failed');}finally{setBusy(false);}}
  return <section className="space-y-4"><header className="card"><p>Shared user1 · {segment.label}</p><h1>{segment.label} paper account</h1><p>Web and Android use this same backend account. Its funds and history are separate from every other segment.</p></header>
- <p className="notice" role="status">Trading unavailable: {segment.id==='options'||segment.id==='futures'?'licensed contract feeds, contract sizing, margin and execution models':'holding-period strategies, delivery costs and overnight execution'} still require validation. Funding is available; no signals or simulated fills are generated for this segment.</p>
+ <SegmentReadiness segment={segment}/>
  {error&&<p className="notice" role="alert">{error}</p>}
  {!data&&!error&&<p role="status">Loading shared balance…</p>}
  <PaperFundsPanel balance={data?.balance??null} state={data?.account.state} disabled={busy||!data} onAction={action} showDeviceArchive={false}/>

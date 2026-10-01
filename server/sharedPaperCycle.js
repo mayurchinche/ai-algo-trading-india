@@ -32,6 +32,7 @@ export async function runSharedPaperCycle({db,observe,now=Date.now,source='foreg
   const result=advanceWorkflow(observed.state,{...observation,candidates:(observation.candidates||[]).filter(c=>admitted.has(c.signalId)),now:now(),acceptEntries:account.enabled});
   result.events=[...observed.events,...result.events];result.enabled=account.enabled;
   Object.assign(result.state,{marketOpen:observation.marketOpen,missingQuotes:observation.missingQuotes||[],discoveryError:observation.discoveryError||null});
+  if(observation.gapWatch)result.state.gapWatch=observation.gapWatch;
   recordScan(result.state,observation,now(),source);
   const saved=await db.commit(account,result);
   return saved==='conflict'?{status:'CONFLICT'}:{status:'SAVED',scan:result.state.lastScan};

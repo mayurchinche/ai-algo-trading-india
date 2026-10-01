@@ -1,3 +1,4 @@
+import {SegmentReadiness} from './components/SegmentReadiness';
 import {tradingSegments} from '../shared/tradingSegments';
 import {SegmentPaperAccount} from './components/SegmentPaperAccount';
 import { lazy, Suspense, useState } from 'react';
@@ -36,7 +37,7 @@ export default function App() {
       <main id="main-content" className="app-main" tabIndex={-1}>
         <nav className="segment-selector" aria-label="Trading segment">{tradingSegments.map(item=><button key={item.id} aria-pressed={segment.id===item.id} onClick={()=>{setSegment(item);setFocusSignalId(undefined);}}>{item.label}<small>{item.executionReady?'Paper trading':'Funding only'}</small></button>)}</nav>
         <p className="notice">{segment.label} · shared user1 account. Starting budgets are simulation settings, not a profitability guarantee. Existing intraday capital is preserved.</p>
-        <div className={`runtime-status ${error ? 'runtime-error' : ''}`} role="status">{error || (loading ? 'Refreshing market observations…' : `Device research scan · ${lastScan ? 'Scan ' + lastScan.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' }) + ' IST' : 'Awaiting data'} · Intraday paper monitoring while app is visible`)}</div>
+        <div className={`runtime-status ${error ? 'runtime-error' : ''}`} role="status">{error || (loading ? 'Refreshing market observations…' : `Device research scan · ${lastScan ? 'Scan ' + lastScan.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' }) + ' IST' : 'Awaiting data'} · Shared server monitoring · see Paper trades for scheduler evidence`)}</div>
         <div role="status">{paperError&&<p className="notice">user1 monitoring: {paperError}</p>}</div>
         <div key={segment.id}><Suspense fallback={<div className="card workspace-loading" role="status"><span className="loading-line"/><span className="loading-line short"/><p>Opening workspace…</p></div>}><AnimatePresence mode="wait">
           <motion.div
@@ -47,7 +48,7 @@ export default function App() {
             transition={{ duration: 0.25, ease: 'easeOut' }}
             className="space-y-6"
           >
-            {segment.id!=='intraday'&&!separateResearch ? (['Overview','Trades'].includes(activeTab)?<SegmentPaperAccount segment={segment}/>:<section className="card space-y-4"><h1>{segment.label} · {activeTab}</h1><p>Unavailable until this segment’s data, strategy and execution checks pass. No intraday signals are reused here.</p><button onClick={()=>setActiveTab('Trades')}>View {segment.label.toLowerCase()} paper account</button></section>) : <>
+            {segment.id!=='intraday'&&!separateResearch ? (['Overview','Trades'].includes(activeTab)?<SegmentPaperAccount segment={segment}/>:<section className="card space-y-4"><h1>{segment.label} · {activeTab}</h1><SegmentReadiness segment={segment}/><button onClick={()=>setActiveTab('Trades')}>View {segment.label.toLowerCase()} paper account</button></section>) : <>
             {activeTab === 'Alerts' && <AlertsPage onOpen={signalId=>{setFocusSignalId(signalId);setActiveTab('Trades');}} />}
             {activeTab === 'AI Discovery' && <DiscoveryPage />}
             {activeTab === 'Smart Picks' && <SmartPicksPage />}

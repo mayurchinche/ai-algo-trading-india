@@ -64,11 +64,12 @@ export interface FOAnalysis {
   optionReason: string;
 }
 
+export interface DiscoveryDiagnostics {screenersFailed:number; universe:number; historiesFailed:number; incomplete:number; scored:number}
 async function fetchScreener(scrId: string, count = 25, fetchJSON = fetchMarketJSON): Promise<any[]> {
-  try {
-    const d = await fetchJSON(`/api/yahoo/v1/finance/screener/predefined/saved?formatted=false&lang=en-IN&region=IN&scrIds=${scrId}&count=${count}`);
-    return d?.finance?.result?.[0]?.quotes || [];
-  } catch { return []; }
+ const d = await fetchJSON(`/api/yahoo/v1/finance/screener/predefined/saved?formatted=false&lang=en-IN&region=IN&scrIds=${scrId}&count=${count}`);
+ const quotes=d?.finance?.result?.[0]?.quotes;
+ if(!Array.isArray(quotes))throw new Error('Screener response missing quotes');
+ return quotes;
 }
 
 export async function fetchHistorical(symbol: string, fetchJSON = fetchMarketJSON) {
@@ -93,14 +94,15 @@ export async function fetchQuotes(symbols: string[], fetchJSON = fetchMarketJSON
 
 // --- Main Discovery Function ---
 
-export async function discoverStocks(fetchJSON = fetchMarketJSON): Promise<DiscoveredStock[]> {
+export async function discoverStocks(fetchJSON = fetchMarketJSON, report?:(diagnostics:DiscoveryDiagnostics)=>void): Promise<DiscoveredStock[]> {
   // Step 1: Scan market — get top movers from multiple screeners
-  const [actives, gainers, losers] = await Promise.all([
+  const screeners = await Promise.allSettled([
     fetchScreener('most_actives_in', 25, fetchJSON),
     fetchScreener('day_gainers_in', 15, fetchJSON),
     fetchScreener('day_losers_in', 10, fetchJSON),
   ]);
 
+  const [actives,gainers,losers]=screeners.map(r=>r.status==='fulfilled'?r.value:[]);
   // Deduplicate by symbol, prefer .NS over .BO
   const seen = new Map<string, any>();
   [...actives, ...gainers, ...losers].forEach(q => {
@@ -131,6 +133,7 @@ export async function discoverStocks(fetchJSON = fetchMarketJSON): Promise<Disco
     if (r.status === 'fulfilled' && r.value) results.push(r.value);
   });
 
+  report?.({screenersFailed:screeners.filter(r=>r.status==='rejected').length,universe:candidates.length,historiesFailed:analyses.filter(r=>r.status==='rejected').length,incomplete:analyses.filter(r=>r.status==='fulfilled'&&!r.value).length,scored:results.length});
   if (!results.length) {
     const failed = analyses.find(r => r.status === 'rejected');
     const detail = failed?.status === 'rejected' && failed.reason instanceof Error ? failed.reason.message : 'Data feed unavailable or incomplete.';

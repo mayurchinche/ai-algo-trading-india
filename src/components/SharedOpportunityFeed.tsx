@@ -1,3 +1,5 @@
+import {ScannerStatus} from './ScannerStatus';
+import {OpeningGapWatch} from './OpeningGapWatch';
 import {useState} from 'react';
 import {fetchSharedOpportunities,useSharedOpportunities} from '../hooks/useSharedOpportunities';
 import {formatIST} from '../services/tradingTime';
@@ -14,6 +16,7 @@ export function SharedOpportunityFeed({title='Shared strong signals',onOpen}:{ti
  }catch(e){setExportError(e instanceof Error?e.message:'Export failed');}finally{setExporting(false);}}
  return <section className="space-y-4"><div className="home-section-heading"><h2>{title}</h2><button disabled={!data||exporting} onClick={()=>void exportAll()}>{exporting?'Exporting…':'Export all signals'}</button></div>
  <p>Shared backend history · Intraday · Strong strategy scores are not probabilities of profit. These are research references, not executed fills. Actual P&amp;L appears in Paper trades.</p>
+ <ScannerStatus state={data?.account.state} now={now}/><OpeningGapWatch snapshot={data?.account.state.gapWatch} now={now}/>
  <p>Last server scan: {formatIST(data?.account.state.lastCycleAt)} · {fresh?'Feed current':'Feed not actionable: closed, stale or unavailable'}</p>
  {(error||data?.account.state.discoveryError||exportError)&&<p role="alert" className="notice">{error||data?.account.state.discoveryError||exportError}</p>}
  {!data&&!error&&<p role="status">Loading shared opportunities…</p>}
