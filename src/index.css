@@ -401,3 +401,5 @@ body{font-size:14px;letter-spacing:-.012em}h1,h2,h3,h4,h5,h6{font-family:'Inter'
 @media(prefers-reduced-motion:reduce) { .paper-intent { scroll-behavior:auto; } }
 
 .segment-selector{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}.segment-selector button{flex:1 1 110px;padding:12px;border:1px solid var(--text-muted);border-radius:12px;text-align:left}.segment-selector button[aria-pressed="true"]{background:var(--text-primary,#172334);color:var(--bg,#fff)}.segment-selector small{display:block;font-size:11px;margin-top:4px}.segment-selector button:focus-visible{outline:3px solid #3b82f6;outline-offset:3px}
+
+.news-controls button[aria-pressed="true"] { background:#eef2ff; border-color:#6366f1; color:#312e81; font-weight:600; }

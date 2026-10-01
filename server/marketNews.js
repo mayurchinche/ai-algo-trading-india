@@ -2,6 +2,20 @@ import { XMLParser, XMLValidator } from 'fast-xml-parser';
 
 const MAX_BYTES = 1_000_000;
 const DAY = 86_400_000;
+const TOPICS = {
+  market: 'India ("stock market" OR Nifty OR Sensex)',
+  company: 'India (shares OR stock OR earnings OR company)',
+  sectors: 'India (banking OR IT OR pharma OR auto OR energy) (stocks OR sector)',
+  earnings: 'India (earnings OR results OR dividend OR buyback OR merger) stocks',
+  macro: 'India (RBI OR inflation OR rupee OR crude OR FII OR DII) market',
+  derivatives: 'India (Nifty OR BankNifty) (options OR futures OR volatility OR expiry)',
+  ipo: 'India IPO ("grey market" OR GMP OR listing)',
+};
+export function newsFilters(topic='market', days='1') {
+  if(typeof topic!=='string' || !Object.hasOwn(TOPICS,topic)) throw new Error('Unknown news topic');
+  if(!['1','7','30'].includes(String(days)) || Array.isArray(days)) throw new Error('News window must be 1, 7 or 30 days');
+  return {topic,days:Number(days)};
+}
 const parser = new XMLParser({ignoreAttributes:false, processEntities:true, trimValues:true});
 export function newsQuery(value = '') {
   if (typeof value !== 'string' || value.length > 100 || (/[<>]/.test(value) || [...value].some(char=>char.charCodeAt(0)<32))) throw new Error('Search must contain at most 100 plain-text characters');
@@ -18,7 +32,7 @@ export function headlineTone(title) {
   if (/\b(not|no|may|could|unlikely|expected|defy|despite)\b/i.test(title) || positive === negative) return 'unclear';
   return positive ? 'positive' : 'negative';
 }
-export function parseNews(xml, now = Date.now()) {
+export function parseNews(xml, now = Date.now(), days = 7) {
   if (typeof xml !== 'string' || Buffer.byteLength(xml) > MAX_BYTES || /<!DOCTYPE|<!ENTITY/i.test(xml) || XMLValidator.validate(xml)!==true) throw new Error('Invalid news response');
   const root=parser.parse(xml);
   if (!root.rss?.channel) throw new Error('Invalid news feed');
@@ -28,7 +42,7 @@ export function parseNews(xml, now = Date.now()) {
     const title=plain(item.title).slice(0,500), source=plain(item.source).slice(0,120);
     const url=safeLink(plain(item.link)), timestamp=Date.parse(plain(item.pubDate));
     const fingerprint=title.toLowerCase().replace(/[^a-z0-9]/g,'');
-    if(!title || !source || !url || !Number.isFinite(timestamp) || timestamp>now+60_000 || now-timestamp>7*DAY || seen.has(fingerprint) || seen.has(url)) return [];
+    if(!title || !source || !url || !Number.isFinite(timestamp) || timestamp>now+60_000 || now-timestamp>days*DAY || seen.has(fingerprint) || seen.has(url)) return [];
     seen.add(fingerprint);seen.add(url);
     return [{title,source,url,publishedAt:new Date(timestamp).toISOString(),tone:headlineTone(title),fresh:now-timestamp<=DAY}];
   }).sort((a,b)=>Date.parse(b.publishedAt)-Date.parse(a.publishedAt)).slice(0,50);
@@ -39,10 +53,11 @@ export function summarizeNews(articles) {
   for(const item of fresh) counts[item.tone]++;
   return {status:fresh.length>=3 && publishers>=2?'available':'insufficient_evidence',sampleSize:fresh.length,publishers,counts,method:'Headline keyword counts over the last 24 hours. Not full-article analysis, overall market sentiment, or a trading signal.'};
 }
-export async function fetchNews(query, {fetcher=fetch,now=Date.now()}={}) {
+export async function fetchNews(query, {fetcher=fetch,now=Date.now(),topic='market',days=1}={}) {
   const q=newsQuery(query);
+  const filters=newsFilters(topic,days);
   const url=new URL('https://news.google.com/rss/search');
-  url.search=new URLSearchParams({q:`${q ? '"'+q.replace(/["\\]/g,' ')+'" India' : 'India stock market NSE BSE'} when:1d`,hl:'en-IN',gl:'IN',ceid:'IN:en'}).toString();
+  url.search=new URLSearchParams({q:`${q ? '"'+q.replace(/["\\]/g,' ')+'" ' : ''}${TOPICS[filters.topic]} when:${filters.days}d`,hl:'en-IN',gl:'IN',ceid:'IN:en'}).toString();
   const response=await fetcher(url,{signal:AbortSignal.timeout(8000),headers:{Accept:'application/rss+xml, application/xml'}});
   if(!response.ok) throw new Error(response.status===429?'News source rate-limited; retry later':'News source unavailable');
   if(Number(response.headers.get('content-length'))>MAX_BYTES) throw new Error('News response too large');
@@ -51,6 +66,6 @@ export async function fetchNews(query, {fetcher=fetch,now=Date.now()}={}) {
   const chunks=[];let total=0;
   try { while(true){const {done,value}=await reader.read();if(done)break;total+=value.length;if(total>MAX_BYTES)throw new Error('News response too large');chunks.push(value);} }
   finally {await reader.cancel().catch(()=>{});}
-  const articles=parseNews(Buffer.concat(chunks).toString('utf8'),now);
-  return {query:q,receivedAt:new Date(now).toISOString(),source:'Google News RSS index',status:articles.length?'available':'no_results',articles,summary:summarizeNews(articles)};
+  const articles=parseNews(Buffer.concat(chunks).toString('utf8'),now,filters.days);
+  return {query:q,...filters,receivedAt:new Date(now).toISOString(),source:'Google News RSS index',status:articles.length?'available':'no_results',articles,summary:summarizeNews(articles)};
 }

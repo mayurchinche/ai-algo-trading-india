@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {parseNews,fetchNews,headlineTone,summarizeNews,newsQuery} from '../server/marketNews.js';
+import {parseNews,fetchNews,headlineTone,summarizeNews,newsQuery,newsFilters} from '../server/marketNews.js';
 const now=Date.parse('2026-10-01T12:00:00Z');
 const item=(title='Stocks rally',date='Thu, 01 Oct 2026 10:00:00 GMT',link='https://news.google.com/articles/one')=>`<item><title>${title}</title><link>${link}</link><pubDate>${date}</pubDate><source url="https://example.com">Publisher</source></item>`;
 const feed=(items:string)=>`<rss><channel>${items}</channel></rss>`;
@@ -10,3 +10,6 @@ test('old and speculative headlines cannot create confident tone',()=>{const old
 test('reject non-string and excessive queries',()=>{assert.throws(()=>newsQuery(['x']));assert.throws(()=>newsQuery('x'.repeat(101)));assert.throws(()=>newsQuery('<script>'));});
 test('provider failures do not become a neutral summary',async()=>{await assert.rejects(fetchNews('',{now,fetcher:async()=>new Response('Limit',{status:429})}),/rate-limited/);await assert.rejects(fetchNews('',{now,fetcher:async()=>new Response('x'.repeat(1000001))}),/too large/);});
 test('working RSS produces bounded dated evidence and fixed provider URL',async()=>{let observed;const result=await fetchNews('Reliance',{now,fetcher:async url=>{observed=url;return new Response(feed(item()));}});assert.equal(observed.hostname,'news.google.com');assert.equal(result.articles.length,1);assert.equal(result.summary.status,'insufficient_evidence');assert.equal(result.receivedAt,new Date(now).toISOString());});
+
+test('topic and horizon queries are explicit, validated and sent to the source',async()=>{let observed;const result=await fetchNews('HDFC Bank',{now,topic:'earnings',days:7,fetcher:async url=>{observed=url;return new Response(feed(item()));}});assert.match(observed.searchParams.get('q'),/earnings/);assert.match(observed.searchParams.get('q'),/when:7d/);assert.equal(result.topic,'earnings');assert.equal(result.days,7);assert.throws(()=>newsFilters('__proto__'));assert.throws(()=>newsFilters('market',['7']));assert.throws(()=>newsFilters('market','365'));});
+test('longer research windows keep old news out of current headline tone',()=>{const xml=feed(item('Stocks surge','Sun, 20 Sep 2026 10:00:00 GMT'));assert.equal(parseNews(xml,now,7).length,0);const articles=parseNews(xml,now,30);assert.equal(articles.length,1);assert.equal(summarizeNews(articles).sampleSize,0);});

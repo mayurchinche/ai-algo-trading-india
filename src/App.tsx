@@ -58,7 +58,7 @@ export default function App() {
             {activeTab === 'Stock Analysis' && <StockAnalysisPage />}
             {activeTab === 'Signals' && <SignalsPage onOpen={signalId=>{setFocusSignalId(signalId);setActiveTab('Trades');}} />}
             {activeTab === 'Backtest' && <BacktestPage />}
-            {activeTab === 'Market News' && <MarketNewsPage />}
+            {activeTab === 'Market News' && <MarketNewsPage segment={segment.id} />}
             {activeTab === 'IPO Tracker' && <IPOPage />}
             {activeTab === 'Metals' && <MetalsPage />}
             </>}
