@@ -1,16 +1,16 @@
-# Graph Report - ai-algo-trading-india  (2026-09-26)
+# Graph Report - ai-algo-trading-india  (2026-10-01)
 
 ## Corpus Check
-- 176 files · ~70,565 words
+- 185 files · ~72,416 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1197 nodes · 2163 edges · 93 communities (76 shown, 17 thin omitted)
+- 1229 nodes · 2213 edges · 96 communities (77 shown, 19 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 5 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a8389d49`
+- Built from commit: `3a4a25f9`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -97,7 +97,10 @@
 - [[_COMMUNITY_Community 89|Community 89]]
 - [[_COMMUNITY_Community 90|Community 90]]
 - [[_COMMUNITY_Community 91|Community 91]]
+- [[_COMMUNITY_Community 92|Community 92]]
 - [[_COMMUNITY_Community 93|Community 93]]
+- [[_COMMUNITY_Community 94|Community 94]]
+- [[_COMMUNITY_Community 95|Community 95]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `formatIST()` - 30 edges
@@ -108,34 +111,34 @@
 6. `newPaperAccount()` - 19 edges
 7. `evaluateDiscoverySnapshot()` - 18 edges
 8. `advancePaper()` - 17 edges
-9. `DiscoveredStock` - 17 edges
-10. `compilerOptions` - 16 edges
+9. `strongSignalRejection()` - 17 edges
+10. `DiscoveredStock` - 17 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `memoryStore()` --calls--> `newPaperAccount()`  [EXTRACTED]
-  tests/shared-paper.test.ts → server/paperEngine.js
 - `advancePaper()` --calls--> `event`  [INFERRED]
   server/paperEngine.js → tests/paper-database.mjs
-- `adjustment()` --calls--> `transferPaperFunds()`  [EXTRACTED]
-  tests/paper-funds.test.ts → server/paperFunds.js
-- `discover()` --calls--> `discoverStocks()`  [INFERRED]
-  scripts/paper-worker.mjs → src/services/stockDiscovery.ts
-- `cycle()` --calls--> `fetchQuotes()`  [INFERRED]
-  scripts/paper-worker.mjs → src/services/stockDiscovery.ts
+- `run()` --calls--> `simulateFiveMinute()`  [EXTRACTED]
+  tests/five-minute.test.ts → research/fiveMinuteExecution.js
+- `simulateFiveMinute()` --calls--> `paperExecutionFees()`  [EXTRACTED]
+  research/fiveMinuteExecution.js → server/paperCosts.js
+- `researchDecision()` --calls--> `scoreStrategies()`  [EXTRACTED]
+  research/volumeVariants.ts → src/services/discoveryScoring.ts
+- `risk()` --calls--> `zerodhaIntradayCosts()`  [EXTRACTED]
+  tests/zerodha-costs.test.ts → research/zerodhaCosts.js
 
-## Communities (93 total, 17 thin omitted)
+## Communities (96 total, 19 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
-Nodes (72): AlertsPage(), listeners, publish(), runScan(), scan(), state, CandidateDecision, DecisionRecord (+64 more)
+Nodes (83): AlertsPage(), SignalsPage(), StockAnalysisPage(), LegacyTradesPage(), money(), TradesPage(), listeners, publish() (+75 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.16
 Nodes (18): IPOPage(), angelOneApplyIPO(), angelOneLogin(), autoApplyForIPO(), AutoApplySettings, BrokerConfig, dhanApplyIPO(), dhanFetchIPOList() (+10 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.04
-Nodes (41): opportunityDecisions(), recordOpportunities(), action, android, bad, before, body, candidate (+33 more)
+Cohesion: 0.05
+Nodes (38): action, android, bad, before, body, candidate, changed, cutoff (+30 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.20
@@ -150,16 +153,16 @@ Cohesion: 0.16
 Nodes (22): BacktestPage(), BacktestConfig, BacktestResult, BacktestTrade, breakoutSignal(), computeATR(), computeBollingerBands(), computeDirectionAccuracy() (+14 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.17
-Nodes (16): PaperAmendment(), PaperEvidencePanel(), ExecutionSettings, PaperExecutionPanel(), PaperIntent, PaperBalance, Account, money() (+8 more)
+Cohesion: 0.06
+Nodes (61): OpportunityCard(), money(), OverviewPage(), PaperAmendment(), PaperEvidencePanel(), Action, ExecutionSettings, PaperIntent (+53 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.10
 Nodes (19): compilerOptions, allowArbitraryExtensions, allowImportingTsExtensions, erasableSyntaxOnly, jsx, lib, module, moduleDetection (+11 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.12
-Nodes (20): amendPendingEntry(), cancelEntryRemainder(), configureExecution(), DEFAULT_EXECUTION, live, record(), reviewIntent(), applySharedAction() (+12 more)
+Cohesion: 0.16
+Nodes (19): PaperExecutionPanel(), advanceWorkflow(), amendPendingEntry(), cancelEntryRemainder(), configureExecution(), DEFAULT_EXECUTION, live, record() (+11 more)
 
 ### Community 9 - "Community 9"
 Cohesion: 0.12
@@ -190,8 +193,8 @@ Cohesion: 0.33
 Nodes (4): code:json ({), Expanding the Oxlint configuration, React Compiler, React + TypeScript + Vite
 
 ### Community 17 - "Community 17"
-Cohesion: 0.14
-Nodes (13): maxDuration, maxDuration, buildCommand, crons, framework, functions, api/*.js, api/shared-paper.ts (+5 more)
+Cohesion: 0.12
+Nodes (15): maxDuration, maxDuration, maxDuration, buildCommand, crons, framework, functions, api/*.js (+7 more)
 
 ### Community 21 - "Community 21"
 Cohesion: 0.14
@@ -210,12 +213,12 @@ Cohesion: 0.15
 Nodes (12): engines, node, name, private, type, version, engines, node (+4 more)
 
 ### Community 25 - "Community 25"
-Cohesion: 0.07
-Nodes (41): env, handler(), handler(), handler(), handler(), handler(), handler(), accounts() (+33 more)
+Cohesion: 0.06
+Nodes (45): env, handler(), handler(), handler(), handler(), handler(), handler(), accounts() (+37 more)
 
 ### Community 26 - "Community 26"
-Cohesion: 0.15
-Nodes (13): scripts, build, build:server, check:deployment, dev, lint, mobile:android, mobile:ios (+5 more)
+Cohesion: 0.14
+Nodes (14): scripts, build, build:server, check:deployment, dev, lint, mobile:android, mobile:ios (+6 more)
 
 ### Community 27 - "Community 27"
 Cohesion: 0.20
@@ -270,8 +273,8 @@ Cohesion: 0.18
 Nodes (10): Current source: shared user1 account — activation pending, Current source: shared user1 account — deployed, Default: no sign-in required, Deployment required before activation, Execution semantics, Historical balance and paper funding, Optional server mode: deployment required before activation, Persistent paper trading (+2 more)
 
 ### Community 56 - "Community 56"
-Cohesion: 0.11
-Nodes (22): newPaperAccount(), balance, blocked, candidate, e, filled, otherSignal, partialExit() (+14 more)
+Cohesion: 0.10
+Nodes (21): balance, blocked, candidate, e, filled, otherSignal, partialExit(), pending() (+13 more)
 
 ### Community 57 - "Community 57"
 Cohesion: 0.11
@@ -282,16 +285,16 @@ Cohesion: 0.22
 Nodes (6): [origin,output], reports, tradingSegments, db, existing, result
 
 ### Community 60 - "Community 60"
-Cohesion: 0.05
-Nodes (53): cases, note, now, sourceSha256, createAsOfMarket(), ResearchBar, validateBars(), kinds (+45 more)
+Cohesion: 0.11
+Nodes (17): all, [bar], bars, closes, daily, direct, five, hist (+9 more)
 
 ### Community 61 - "Community 61"
-Cohesion: 0.11
-Nodes (26): SegmentPaperAccount(), SignalsPage(), StockAnalysisPage(), LegacyTradesPage(), money(), TradesPage(), useLiveStocks(), useNativeAlerts() (+18 more)
+Cohesion: 0.30
+Nodes (10): fetchNifty(), fetchSingleStock(), YahooChartMeta, fetchMarketStatus(), MarketStatus, fetchHistorical(), fetchScreener(), apiUrl() (+2 more)
 
 ### Community 62 - "Community 62"
 Cohesion: 0.13
-Nodes (12): adjustment(), b, legacy, next, now, open, original, r (+4 more)
+Nodes (18): fundedCapital(), importLegacyPaper(), PaperAccountError, paperBalance(), round(), transferPaperFunds(), adjustment(), b (+10 more)
 
 ### Community 64 - "Community 64"
 Cohesion: 0.33
@@ -302,12 +305,12 @@ Cohesion: 0.26
 Nodes (10): estimatePaperEconomics(), paperExecutionFees(), round(), advancePaper(), cost(), day(), minute(), round() (+2 more)
 
 ### Community 66 - "Community 66"
-Cohesion: 0.31
-Nodes (10): fundedCapital(), importLegacyPaper(), paperBalance(), round(), transferPaperFunds(), DeviceLedger, devicePaperSymbols(), deviceSymbols() (+2 more)
+Cohesion: 0.27
+Nodes (14): computeATR(), computeBollingerPosition(), computeEMA(), computeFOAnalysis(), computeMACD(), computeOverallSignal(), computeRSI(), computeSMA() (+6 more)
 
 ### Community 67 - "Community 67"
-Cohesion: 0.16
-Nodes (14): [input,output], recording, sourceFiles, sourceHashes, evaluatePaperPerformance(), metrics(), round(), replayPaper() (+6 more)
+Cohesion: 0.15
+Nodes (15): [input,output], recording, sourceFiles, sourceHashes, newPaperAccount(), evaluatePaperPerformance(), metrics(), round() (+7 more)
 
 ### Community 69 - "Community 69"
 Cohesion: 0.07
@@ -318,8 +321,8 @@ Cohesion: 0.25
 Nodes (7): Deployment order, Five-segment paper account foundation, Live verification, Release status — 26 September 2026, Remaining phases, Scope, Verification
 
 ### Community 71 - "Community 71"
-Cohesion: 0.16
-Nodes (14): fetchNifty(), fetchSingleStock(), YahooChartMeta, fetchChart(), fetchIndianRetailPrices(), fetchLiveMetals(), IndianRetailPrices, MetalConfig (+6 more)
+Cohesion: 0.15
+Nodes (10): ALLOCATION, MetalsPage(), signalStyles, fetchChart(), fetchIndianRetailPrices(), fetchLiveMetals(), IndianRetailPrices, LiveMetal (+2 more)
 
 ### Community 72 - "Community 72"
 Cohesion: 0.25
@@ -330,28 +333,28 @@ Cohesion: 0.09
 Nodes (22): ambiguousStopTarget, barFillConvention, baselinePolicy, calendarSource, costModel, delaysSeconds, endOfWindow, from (+14 more)
 
 ### Community 74 - "Community 74"
-Cohesion: 0.21
-Nodes (14): OpportunityCard(), money(), OverviewPage(), TradeDetailTimeline(), TradeEvent, TradeTimelineView(), usePaperSnapshot(), orderValuation() (+6 more)
+Cohesion: 0.20
+Nodes (12): createAsOfMarket(), ResearchBar, validateBars(), createSameTimeVolume(), researchDecision(), variantNames, bars, expected (+4 more)
 
 ### Community 75 - "Community 75"
-Cohesion: 0.16
-Nodes (14): fetchSharedOpportunities(), OpportunityFeed, DecisionGroup, describeOpportunity(), OpportunityDecision, sharedPaperRequest(), boundary, closed (+6 more)
+Cohesion: 0.12
+Nodes (15): once, createScheduledPaperHandler(), scheduledPaperWindow(), opportunityDecisions(), recordOpportunities(), canonical(), same(), SharedPaperError (+7 more)
 
 ### Community 77 - "Community 77"
 Cohesion: 0.29
 Nodes (6): Behaviour, Limits, Live verification, Release status — 26 September 2026, Shared opportunity feed, Verification and deployment
 
 ### Community 79 - "Community 79"
-Cohesion: 0.13
-Nodes (14): createSharedPaperHandler(), observeSharedPaper(), serverMarketJSON(), computeBollingerPosition(), computeEMA(), computeFOAnalysis(), computeMACD(), computeOverallSignal() (+6 more)
+Cohesion: 0.16
+Nodes (9): computeBollingerPosition(), computeEMA(), computeFOAnalysis(), computeMACD(), computeOverallSignal(), computeSMA(), FOAnalysis, scoreStrategies() (+1 more)
 
 ### Community 80 - "Community 80"
 Cohesion: 0.33
 Nodes (5): Corrected score inflation, Cost-adjusted paper references, Measured impact, Signal calibration and cost diagnostics, Validation
 
 ### Community 81 - "Community 81"
-Cohesion: 0.18
-Nodes (10): JournalErrorBoundary, FundingState, money(), PaperFundsPanel(), Snapshot, downloadJSON(), apiBase, exportEarlierDeviceAccount() (+2 more)
+Cohesion: 0.33
+Nodes (4): alerts, now, sell, storage
 
 ### Community 82 - "Community 82"
 Cohesion: 0.22
@@ -365,13 +368,9 @@ Nodes (7): parseMetalChart(), config, data, now, requests, res, result
 Cohesion: 0.25
 Nodes (7): round(), simulateFiveMinute(), b, open, r, run(), signal
 
-### Community 86 - "Community 86"
-Cohesion: 0.14
-Nodes (11): DiscoveryPage(), StockCard(), Action, SignalTicket(), SharedOpportunityFeed(), seen, SignalPopup(), SharedOpportunity (+3 more)
-
 ### Community 87 - "Community 87"
-Cohesion: 0.20
-Nodes (17): AlertPreferences, alertRequest(), defaultAlertPreferences, disableDevicePush(), enableDevicePush(), installationId(), MobileAlert, DEVICE_ID (+9 more)
+Cohesion: 0.07
+Nodes (34): DiscoveryPage(), StockCard(), JournalErrorBoundary, useLiveStocks(), useNativeAlerts(), useTradingRuntime(), AlertPreferences, alertRequest() (+26 more)
 
 ### Community 88 - "Community 88"
 Cohesion: 0.29
@@ -382,32 +381,40 @@ Cohesion: 0.21
 Nodes (12): round(), sizeWithTariff(), zerodhaIntradayCosts(), args, bars, base, c, open (+4 more)
 
 ### Community 90 - "Community 90"
-Cohesion: 0.40
-Nodes (4): ALLOCATION, MetalsPage(), signalStyles, LiveMetal
+Cohesion: 0.32
+Nodes (6): kinds, [output,manifestPath], results, sample, fetchKiteHistory(), normalizeKiteCandles()
 
 ### Community 91 - "Community 91"
 Cohesion: 0.20
 Nodes (8): bars, manifest, prior, [priorPath,dataset,output], repriced, runs, sourceHashes, tariffSources
 
+### Community 92 - "Community 92"
+Cohesion: 0.29
+Nodes (6): Activation order, code:sql (select cron.alter_job(jobid, active := true)), code:sql (select cron.alter_job(jobid, active := false)), code:sql (select jobname, schedule, active from cron.job where jobname), Supabase-scheduled paper trading, Verification and troubleshooting
+
+### Community 94 - "Community 94"
+Cohesion: 0.40
+Nodes (4): cases, note, now, sourceSha256
+
 ## Knowledge Gaps
-- **553 isolated node(s):** `tsBuildInfoFile`, `target`, `lib`, `types`, `skipLibCheck` (+548 more)
+- **566 isolated node(s):** `tsBuildInfoFile`, `target`, `lib`, `types`, `skipLibCheck` (+561 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **17 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **19 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `paperExecutionFees()` connect `Community 65` to `Community 56`, `Community 89`, `Community 85`?**
-  _High betweenness centrality (0.054) - this node is a cross-community bridge._
-- **Why does `simulateFiveMinute()` connect `Community 85` to `Community 65`, `Community 69`, `Community 10`, `Community 89`, `Community 91`?**
-  _High betweenness centrality (0.028) - this node is a cross-community bridge._
-- **Why does `discoverStocks()` connect `Community 79` to `Community 0`, `Community 2`, `Community 71`, `Community 84`, `Community 25`?**
-  _High betweenness centrality (0.021) - this node is a cross-community bridge._
+  _High betweenness centrality (0.046) - this node is a cross-community bridge._
+- **Why does `advancePaper()` connect `Community 65` to `Community 0`, `Community 8`, `Community 56`, `Community 25`, `Community 62`?**
+  _High betweenness centrality (0.025) - this node is a cross-community bridge._
+- **Why does `apiUrl()` connect `Community 61` to `Community 1`, `Community 3`, `Community 5`, `Community 71`, `Community 79`, `Community 82`?**
+  _High betweenness centrality (0.022) - this node is a cross-community bridge._
 - **What connects `tsBuildInfoFile`, `target`, `lib` to the rest of the system?**
-  _553 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _566 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.05994397759103642 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05742574257425743 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
-  _Cohesion score 0.04440333024976873 - nodes in this community are weakly interconnected._
-- **Should `Community 7` be split into smaller, more focused modules?**
-  _Cohesion score 0.1 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.046511627906976744 - nodes in this community are weakly interconnected._
+- **Should `Community 6` be split into smaller, more focused modules?**
+  _Cohesion score 0.058823529411764705 - nodes in this community are weakly interconnected._

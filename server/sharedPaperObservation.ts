@@ -19,9 +19,12 @@ export async function observeSharedPaper(account:any){
  let discoveryError:string|undefined;
  if(marketOpen)try{stocks=await discoverStocks(serverMarketJSON);}catch{discoveryError='Opportunity scan unavailable; no new candidates. Existing positions still checked.';}
  const now=Date.now();
+ const rejections:Record<string,number>={};
+ for(const stock of stocks){const reason=strongSignalRejection(stock,now)||'ADMITTED';rejections[reason]=(rejections[reason]||0)+1;}
+ const scanDiagnostics={scored:stocks.length,rejections,maxAbsoluteScore:stocks.length?Math.max(...stocks.map(s=>Math.abs(s.overallScore))):null};
  const candidates=stocks.filter(s=>!strongSignalRejection(s,now)).map(s=>({symbol:s.symbol,signalId:strongSignalId(s,now),signalTime:s.generatedAt,side:s.overallScore>0?'BUY':'SELL',score:s.overallScore,stop:s.foAnalysis.suggestedStopLoss,target:s.foAnalysis.suggestedTarget,signalPrice:s.ltp,signalQuoteTime:s.quoteTime,strategy:{id:SIGNAL_POLICY,score:s.overallScore,signal:s.signal,reasons:s.reasons,components:s.scores,strategies:s.strategies,recordedAt:s.generatedAt}}));
  const active=account.state.orders.filter((o:any)=>!['CLOSED','CANCELLED'].includes(o.status)).map((o:any)=>o.symbol);
  const symbols=[...new Set<string>([...active,...(account.state.intents||[]).filter((i:any)=>['REVIEW','WAITING','APPROVED'].includes(i.status)).map((i:any)=>i.symbol),...candidates.map(c=>c.symbol)])];
  const quotes=await fetchQuotes(symbols,serverMarketJSON);
- return {marketOpen,discoveryError,candidates,quotes:[...quotes].map(([symbol,q])=>({symbol,...q})),missingQuotes:symbols.filter(s=>!quotes.has(s))};
+ return {marketOpen,discoveryError,scanDiagnostics,candidates,quotes:[...quotes].map(([symbol,q])=>({symbol,...q})),missingQuotes:symbols.filter(s=>!quotes.has(s))};
 }

@@ -1,8 +1,8 @@
-import {recordOpportunities,opportunityDecisions} from './sharedOpportunities.js';
-import {randomUUID} from 'node:crypto';
+import {opportunityDecisions} from './sharedOpportunities.js';
+import {runSharedPaperCycle} from './sharedPaperCycle.js';
 import {tradingSegment} from '../shared/tradingSegments.js';
 import {paperBalance,transferPaperFunds} from './paperFunds.js';
-import {configureExecution,reviewIntent,cancelEntryRemainder,amendPendingEntry,advanceWorkflow} from './paperWorkflow.js';
+import {configureExecution,reviewIntent,cancelEntryRemainder,amendPendingEntry} from './paperWorkflow.js';
 import {backend,allowRequest} from './pushBackend.js';
 // Log only provider status/error codes, never credentials or database row contents.
 function check(result){
@@ -68,20 +68,7 @@ export function createSharedPaperHandler({store=sharedStore,observe,enabled=()=>
     if(!body||typeof body!=='object'||Array.isArray(body)||JSON.stringify(body).length>10000)throw new SharedPaperError('Invalid paper request.');
     if(!config.executionReady&&!(body.action&&Object.keys(body.action).length===1&&body.action.transfer))throw new SharedPaperError('Trading for this segment is unavailable pending feed and execution validation. Only paper funding is enabled.',409);
     if(body.tick===true&&Object.keys(body).length===1){
-     const token=randomUUID();
-     if(await db.lease(token))try{
-      account=await db.account();
-      // A database lease prevents web and Android running the same cycle concurrently.
-      if(now()-Date.parse(account.state.lastCycleAt||'')>=10000||!account.state.lastCycleAt){
-       const observation=await observe(account,now());
-       const observed=recordOpportunities(account.state,observation.candidates,now(),observation.marketOpen);
-       const admitted=new Set(observed.events.map(event=>event.signalId));
-       const result=advanceWorkflow(observed.state,{...observation,candidates:(observation.candidates||[]).filter(candidate=>admitted.has(candidate.signalId)),now:now(),acceptEntries:account.enabled});
-       result.events=[...observed.events,...result.events];
-       result.enabled=account.enabled;result.state.marketOpen=observation.marketOpen;result.state.missingQuotes=observation.missingQuotes||[];result.state.discoveryError=observation.discoveryError||null;
-       await db.commit(account,result); // Conflict means another control won; discard this cycle.
-      }
-     }finally{await db.release(token);}
+     await runSharedPaperCycle({db,observe,now});
     }else{
      if(!uuid(body.requestId)||Object.keys(body).some(k=>!['requestId','action'].includes(k)))throw new SharedPaperError('A unique requestId and action are required.');
      const prior=await db.prior(body.requestId);

@@ -36,7 +36,7 @@ test('mutating controls during a slow observation discard the stale cycle',async
 test('shared service fails closed before activation, on provider failure and for unsupported actions',async()=>{
  const disabled=createSharedPaperHandler({enabled:()=>false,store:()=>{throw new Error('must not read');}}),res=response();await disabled(req(),res);assert.equal(res.code,503);
  const store=memoryStore(),handler=createSharedPaperHandler({store:()=>store,enabled:()=>true,observe:async()=>{throw new Error('provider unavailable');}});
- const failure=response();await handler(req('POST',{tick:true}),failure);assert.equal(failure.code,503);assert.equal((await store.account()).revision,0);
+ const failure=response();await handler(req('POST',{tick:true}),failure);assert.equal(failure.code,503);assert.equal((await store.account()).state.lastScan.status,'OBSERVATION_FAILED');assert.equal((await store.account()).state.lastCycleAt,null);
  assert.throws(()=>applySharedAction({state:newPaperAccount(),enabled:false},{quotes:[]}));
  assert.throws(()=>applySharedAction({state:newPaperAccount(),enabled:false},{enabled:true,transfer:{}}));
  for(const query of [{after:'-1'},{until:'999'},{orderId:'x,account_id.neq.user1'}]){const res=response();await handler(req('GET',undefined,query),res);assert.equal(res.code,400);}
@@ -148,4 +148,25 @@ test('shared feed returns current decision separately from unchanged opportunity
  await store.commit(before,{state:{...before.state,sequence:1,intents:[{signalId:'blocked',status:'REJECTED',reason:'Insufficient capital or risk allowance'}]},events:[event],enabled:false});
  const handler=createSharedPaperHandler({store:()=>store,enabled:()=>true}),res=response();await handler(req('GET',undefined,{feed:'opportunities'}),res);
  assert.equal(res.code,200);assert.deepEqual(res.body.events[0].event,event);assert.equal(res.body.decisions.blocked.intent.reason,'Insufficient capital or risk allowance');assert.equal(res.body.decisionRevision,res.body.account.revision);
+});
+
+import {runSharedPaperCycle,recordScan} from '../server/sharedPaperCycle.js';
+test('background worker advances the same shared ledger and records no-signal diagnostics',async()=>{
+ const store=memoryStore();
+ const result=await runSharedPaperCycle({db:store,now:()=>now,source:'worker',observe:async()=>({marketOpen:true,candidates:[],quotes:[],scanDiagnostics:{scored:22,maxAbsoluteScore:56,rejections:{SCORE_BELOW_70:22}}})});
+ assert.equal(result.status,'SAVED');const a=await store.account();
+ assert.equal(a.state.lastScan.source,'worker');assert.equal(a.state.lastScan.status,'NO_ELIGIBLE_SIGNALS');assert.equal(a.state.lastScan.scored,22);assert.equal(a.state.orders.length,0);assert.equal(a.state.scanDays['2026-09-25'].cycles,1);
+ const res=response();await createSharedPaperHandler({store:()=>store,enabled:()=>true,now:()=>now})(req(),res);assert.deepEqual(res.body.account.state.lastScan,a.state.lastScan);
+});
+test('worker and foreground share leases; failures are recorded without successful-cycle timestamps',async()=>{
+ const store=memoryStore();await store.lease();
+ assert.equal((await runSharedPaperCycle({db:store,observe:async()=>{throw Error('must not run');}})).status,'BUSY');await store.release();
+ await assert.rejects(runSharedPaperCycle({db:store,now:()=>now,source:'worker',observe:async()=>{throw Error('provider');}}));
+ const state=(await store.account()).state;assert.equal(state.lastScan.status,'OBSERVATION_FAILED');assert.equal(state.lastCycleAt,null);
+ assert.equal(await store.lease(),true);
+});
+test('scan summary retains thirty days and separates closed markets from empty scans',()=>{
+ const state:any={scanDays:{'2026-07-01':{cycles:1}}};
+ recordScan(state,{marketOpen:false,candidates:[]},now,'worker');assert.equal(state.lastScan.status,'MARKET_CLOSED');assert.equal(state.scanDays['2026-07-01'],undefined);
+ recordScan(state,{marketOpen:true,candidates:[],discoveryError:'unavailable'},now,'worker');assert.equal(state.lastScan.status,'SCAN_FAILED');assert.equal(state.scanDays['2026-09-25'].failures,1);
 });

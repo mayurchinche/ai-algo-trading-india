@@ -265,6 +265,24 @@
       "norm_label": "maxduration"
     },
     {
+      "label": "api/scheduled-paper.ts",
+      "file_type": "code",
+      "source_file": "vercel.json",
+      "source_location": "L25",
+      "id": "ai_algo_trading_india_vercel_functions_api_scheduled_paper_ts",
+      "community": 17,
+      "norm_label": "api/scheduled-paper.ts"
+    },
+    {
+      "label": "maxDuration",
+      "file_type": "code",
+      "source_file": "vercel.json",
+      "source_location": "L26",
+      "id": "ai_algo_trading_india_vercel_api_scheduled_paper_ts_maxduration",
+      "community": 17,
+      "norm_label": "maxduration"
+    },
+    {
       "label": "tsconfig.app.json",
       "file_type": "code",
       "source_file": "/Users/mayur.chinche/Documents/Codex/2026-09-18/gr/work/trading-app/tsconfig.app.json",
@@ -661,10 +679,19 @@
       "norm_label": "build:server"
     },
     {
+      "label": "worker:shared-paper",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L19",
+      "id": "ai_algo_trading_india_package_scripts_worker_shared_paper",
+      "community": 26,
+      "norm_label": "worker:shared-paper"
+    },
+    {
       "label": "dependencies",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L20",
+      "source_location": "L21",
       "id": "ai_algo_trading_india_package_dependencies",
       "community": 22,
       "norm_label": "dependencies"
@@ -673,7 +700,7 @@
       "label": "@capacitor/android",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L21",
+      "source_location": "L22",
       "id": "ai_algo_trading_india_package_dependencies_capacitor_android",
       "community": 22,
       "norm_label": "@capacitor/android"
@@ -682,7 +709,7 @@
       "label": "@capacitor/core",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L22",
+      "source_location": "L23",
       "id": "ai_algo_trading_india_package_dependencies_capacitor_core",
       "community": 22,
       "norm_label": "@capacitor/core"
@@ -691,7 +718,7 @@
       "label": "@capacitor/ios",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L23",
+      "source_location": "L24",
       "id": "ai_algo_trading_india_package_dependencies_capacitor_ios",
       "community": 22,
       "norm_label": "@capacitor/ios"
@@ -700,7 +727,7 @@
       "label": "@capacitor/push-notifications",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L24",
+      "source_location": "L25",
       "id": "ai_algo_trading_india_package_dependencies_capacitor_push_notifications",
       "community": 22,
       "norm_label": "@capacitor/push-notifications"
@@ -709,7 +736,7 @@
       "label": "@supabase/supabase-js",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L25",
+      "source_location": "L26",
       "id": "ai_algo_trading_india_package_dependencies_supabase_supabase_js",
       "community": 22,
       "norm_label": "@supabase/supabase-js"
@@ -718,7 +745,7 @@
       "label": "firebase-admin",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L26",
+      "source_location": "L27",
       "id": "ai_algo_trading_india_package_dependencies_firebase_admin",
       "community": 22,
       "norm_label": "firebase-admin"
@@ -727,7 +754,7 @@
       "label": "framer-motion",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L27",
+      "source_location": "L28",
       "id": "ai_algo_trading_india_package_dependencies_framer_motion",
       "community": 22,
       "norm_label": "framer-motion"
@@ -736,7 +763,7 @@
       "label": "lucide-react",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L28",
+      "source_location": "L29",
       "id": "ai_algo_trading_india_package_dependencies_lucide_react",
       "community": 22,
       "norm_label": "lucide-react"
@@ -745,7 +772,7 @@
       "label": "react",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L29",
+      "source_location": "L30",
       "id": "ai_algo_trading_india_package_dependencies_react",
       "community": 22,
       "norm_label": "react"
@@ -754,7 +781,7 @@
       "label": "react-dom",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L30",
+      "source_location": "L31",
       "id": "ai_algo_trading_india_package_dependencies_react_dom",
       "community": 22,
       "norm_label": "react-dom"
@@ -763,7 +790,7 @@
       "label": "react-is",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L31",
+      "source_location": "L32",
       "id": "ai_algo_trading_india_package_dependencies_react_is",
       "community": 22,
       "norm_label": "react-is"
@@ -772,7 +799,7 @@
       "label": "recharts",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L32",
+      "source_location": "L33",
       "id": "ai_algo_trading_india_package_dependencies_recharts",
       "community": 22,
       "norm_label": "recharts"
@@ -781,7 +808,7 @@
       "label": "devDependencies",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L34",
+      "source_location": "L35",
       "id": "ai_algo_trading_india_package_devdependencies",
       "community": 23,
       "norm_label": "devdependencies"
@@ -790,7 +817,7 @@
       "label": "@capacitor/cli",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L35",
+      "source_location": "L36",
       "id": "ai_algo_trading_india_package_devdependencies_capacitor_cli",
       "community": 23,
       "norm_label": "@capacitor/cli"
@@ -799,7 +826,7 @@
       "label": "@electric-sql/pglite",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L36",
+      "source_location": "L37",
       "id": "ai_algo_trading_india_package_devdependencies_electric_sql_pglite",
       "community": 23,
       "norm_label": "@electric-sql/pglite"
@@ -808,7 +835,7 @@
       "label": "@tailwindcss/vite",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L37",
+      "source_location": "L38",
       "id": "ai_algo_trading_india_package_devdependencies_tailwindcss_vite",
       "community": 23,
       "norm_label": "@tailwindcss/vite"
@@ -817,7 +844,7 @@
       "label": "@types/node",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L38",
+      "source_location": "L39",
       "id": "ai_algo_trading_india_package_devdependencies_types_node",
       "community": 23,
       "norm_label": "@types/node"
@@ -826,7 +853,7 @@
       "label": "@types/react",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L39",
+      "source_location": "L40",
       "id": "ai_algo_trading_india_package_devdependencies_types_react",
       "community": 23,
       "norm_label": "@types/react"
@@ -835,7 +862,7 @@
       "label": "@types/react-dom",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L40",
+      "source_location": "L41",
       "id": "ai_algo_trading_india_package_devdependencies_types_react_dom",
       "community": 23,
       "norm_label": "@types/react-dom"
@@ -844,7 +871,7 @@
       "label": "@vitejs/plugin-react",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L41",
+      "source_location": "L42",
       "id": "ai_algo_trading_india_package_devdependencies_vitejs_plugin_react",
       "community": 23,
       "norm_label": "@vitejs/plugin-react"
@@ -853,7 +880,7 @@
       "label": "esbuild",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L42",
+      "source_location": "L43",
       "id": "ai_algo_trading_india_package_devdependencies_esbuild",
       "community": 23,
       "norm_label": "esbuild"
@@ -862,7 +889,7 @@
       "label": "oxlint",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L43",
+      "source_location": "L44",
       "id": "ai_algo_trading_india_package_devdependencies_oxlint",
       "community": 23,
       "norm_label": "oxlint"
@@ -871,7 +898,7 @@
       "label": "tailwindcss",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L44",
+      "source_location": "L45",
       "id": "ai_algo_trading_india_package_devdependencies_tailwindcss",
       "community": 23,
       "norm_label": "tailwindcss"
@@ -880,7 +907,7 @@
       "label": "typescript",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L45",
+      "source_location": "L46",
       "id": "ai_algo_trading_india_package_devdependencies_typescript",
       "community": 23,
       "norm_label": "typescript"
@@ -889,7 +916,7 @@
       "label": "vite",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L46",
+      "source_location": "L47",
       "id": "ai_algo_trading_india_package_devdependencies_vite",
       "community": 23,
       "norm_label": "vite"
@@ -898,7 +925,7 @@
       "label": "engines",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L48",
+      "source_location": "L49",
       "id": "ai_algo_trading_india_package_engines",
       "community": 24,
       "norm_label": "engines"
@@ -907,7 +934,7 @@
       "label": "node",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L49",
+      "source_location": "L50",
       "id": "ai_algo_trading_india_package_engines_node",
       "community": 24,
       "norm_label": "node"
@@ -1017,7 +1044,7 @@
       "source_file": "research/kiteHistory.js",
       "source_location": "L1",
       "id": "research_kitehistory_js",
-      "community": 60,
+      "community": 90,
       "norm_label": "kitehistory.js"
     },
     {
@@ -1026,7 +1053,7 @@
       "source_file": "research/kiteHistory.js",
       "source_location": "L2",
       "id": "research_kitehistory_normalizekitecandles",
-      "community": 60,
+      "community": 90,
       "norm_label": "normalizekitecandles()"
     },
     {
@@ -1035,7 +1062,7 @@
       "source_file": "research/kiteHistory.js",
       "source_location": "L15",
       "id": "research_kitehistory_fetchkitehistory",
-      "community": 60,
+      "community": 90,
       "norm_label": "fetchkitehistory()"
     },
     {
@@ -1044,7 +1071,7 @@
       "source_file": "research/volumeVariants.ts",
       "source_location": "L1",
       "id": "research_volumevariants_ts",
-      "community": 60,
+      "community": 74,
       "norm_label": "volumevariants.ts"
     },
     {
@@ -1053,7 +1080,7 @@
       "source_file": "research/volumeVariants.ts",
       "source_location": "L8",
       "id": "research_volumevariants_createsametimevolume",
-      "community": 60,
+      "community": 74,
       "norm_label": "createsametimevolume()"
     },
     {
@@ -1062,7 +1089,7 @@
       "source_file": "research/volumeVariants.ts",
       "source_location": "L34",
       "id": "research_volumevariants_variantnames",
-      "community": 60,
+      "community": 74,
       "norm_label": "variantnames"
     },
     {
@@ -1071,7 +1098,7 @@
       "source_file": "research/volumeVariants.ts",
       "source_location": "L35",
       "id": "research_volumevariants_researchdecision",
-      "community": 60,
+      "community": 74,
       "norm_label": "researchdecision()"
     },
     {
@@ -1080,7 +1107,7 @@
       "source_file": "research/asOfMarket.ts",
       "source_location": "L1",
       "id": "research_asofmarket_ts",
-      "community": 60,
+      "community": 0,
       "norm_label": "asofmarket.ts"
     },
     {
@@ -1089,7 +1116,7 @@
       "source_file": "research/asOfMarket.ts",
       "source_location": "L4",
       "id": "research_asofmarket_researchbar",
-      "community": 60,
+      "community": 74,
       "norm_label": "researchbar"
     },
     {
@@ -1098,7 +1125,7 @@
       "source_file": "research/asOfMarket.ts",
       "source_location": "L8",
       "id": "research_asofmarket_validatebars",
-      "community": 60,
+      "community": 74,
       "norm_label": "validatebars()"
     },
     {
@@ -1107,7 +1134,7 @@
       "source_file": "research/asOfMarket.ts",
       "source_location": "L17",
       "id": "research_asofmarket_createasofmarket",
-      "community": 60,
+      "community": 74,
       "norm_label": "createasofmarket()"
     },
     {
@@ -1395,7 +1422,7 @@
       "source_file": "tests/shared-paper.test.ts",
       "source_location": "L7",
       "id": "tests_shared_paper_test_memorystore",
-      "community": 2,
+      "community": 67,
       "norm_label": "memorystore()"
     },
     {
@@ -2088,7 +2115,7 @@
       "source_file": "tests/paper-workspace.test.ts",
       "source_location": "L1",
       "id": "tests_paper_workspace_test_ts",
-      "community": 75,
+      "community": 6,
       "norm_label": "paper-workspace.test.ts"
     },
     {
@@ -2097,7 +2124,7 @@
       "source_file": "tests/paper-workspace.test.ts",
       "source_location": "L4",
       "id": "tests_paper_workspace_test_now",
-      "community": 75,
+      "community": 6,
       "norm_label": "now"
     },
     {
@@ -2106,7 +2133,7 @@
       "source_file": "tests/paper-workspace.test.ts",
       "source_location": "L5",
       "id": "tests_paper_workspace_test_order",
-      "community": 75,
+      "community": 6,
       "norm_label": "order"
     },
     {
@@ -2115,7 +2142,7 @@
       "source_file": "tests/paper-workspace.test.ts",
       "source_location": "L7",
       "id": "tests_paper_workspace_test_v",
-      "community": 75,
+      "community": 6,
       "norm_label": "v"
     },
     {
@@ -2124,7 +2151,7 @@
       "source_file": "tests/paper-workspace.test.ts",
       "source_location": "L20",
       "id": "tests_paper_workspace_test_closed",
-      "community": 75,
+      "community": 6,
       "norm_label": "closed"
     },
     {
@@ -2133,7 +2160,7 @@
       "source_file": "tests/paper-workspace.test.ts",
       "source_location": "L27",
       "id": "tests_paper_workspace_test_result",
-      "community": 75,
+      "community": 6,
       "norm_label": "result"
     },
     {
@@ -2142,7 +2169,7 @@
       "source_file": "tests/paper-workspace.test.ts",
       "source_location": "L34",
       "id": "tests_paper_workspace_test_boundary",
-      "community": 75,
+      "community": 6,
       "norm_label": "boundary"
     },
     {
@@ -2151,7 +2178,7 @@
       "source_file": "tests/paper-workspace.test.ts",
       "source_location": "L35",
       "id": "tests_paper_workspace_test_make",
-      "community": 75,
+      "community": 6,
       "norm_label": "make()"
     },
     {
@@ -2160,7 +2187,7 @@
       "source_file": "tests/paper-workspace.test.ts",
       "source_location": "L42",
       "id": "tests_paper_workspace_test_stock",
-      "community": 75,
+      "community": 6,
       "norm_label": "stock"
     },
     {
@@ -2169,7 +2196,7 @@
       "source_file": "tests/paper-workspace.test.ts",
       "source_location": "L53",
       "id": "tests_paper_workspace_test_decision",
-      "community": 75,
+      "community": 6,
       "norm_label": "decision"
     },
     {
@@ -2268,7 +2295,7 @@
       "source_file": "tests/foreground-alerts.test.ts",
       "source_location": "L1",
       "id": "tests_foreground_alerts_test_ts",
-      "community": 0,
+      "community": 81,
       "norm_label": "foreground-alerts.test.ts"
     },
     {
@@ -2277,7 +2304,7 @@
       "source_file": "tests/foreground-alerts.test.ts",
       "source_location": "L5",
       "id": "tests_foreground_alerts_test_storage",
-      "community": 0,
+      "community": 81,
       "norm_label": "storage"
     },
     {
@@ -2286,7 +2313,7 @@
       "source_file": "tests/foreground-alerts.test.ts",
       "source_location": "L7",
       "id": "tests_foreground_alerts_test_now",
-      "community": 0,
+      "community": 81,
       "norm_label": "now"
     },
     {
@@ -2295,7 +2322,7 @@
       "source_file": "tests/foreground-alerts.test.ts",
       "source_location": "L8",
       "id": "tests_foreground_alerts_test_stock",
-      "community": 0,
+      "community": 81,
       "norm_label": "stock()"
     },
     {
@@ -2304,7 +2331,7 @@
       "source_file": "tests/foreground-alerts.test.ts",
       "source_location": "L21",
       "id": "tests_foreground_alerts_test_sell",
-      "community": 0,
+      "community": 81,
       "norm_label": "sell"
     },
     {
@@ -2313,7 +2340,7 @@
       "source_file": "tests/foreground-alerts.test.ts",
       "source_location": "L22",
       "id": "tests_foreground_alerts_test_alerts",
-      "community": 0,
+      "community": 81,
       "norm_label": "alerts"
     },
     {
@@ -2817,7 +2844,7 @@
       "source_file": "tests/volume-variants.test.ts",
       "source_location": "L1",
       "id": "tests_volume_variants_test_ts",
-      "community": 60,
+      "community": 74,
       "norm_label": "volume-variants.test.ts"
     },
     {
@@ -2826,7 +2853,7 @@
       "source_file": "tests/volume-variants.test.ts",
       "source_location": "L5",
       "id": "tests_volume_variants_test_open",
-      "community": 60,
+      "community": 74,
       "norm_label": "open"
     },
     {
@@ -2835,7 +2862,7 @@
       "source_file": "tests/volume-variants.test.ts",
       "source_location": "L6",
       "id": "tests_volume_variants_test_bars",
-      "community": 60,
+      "community": 74,
       "norm_label": "bars"
     },
     {
@@ -2844,7 +2871,7 @@
       "source_file": "tests/volume-variants.test.ts",
       "source_location": "L8",
       "id": "tests_volume_variants_test_expected",
-      "community": 60,
+      "community": 74,
       "norm_label": "expected"
     },
     {
@@ -2853,7 +2880,7 @@
       "source_file": "tests/volume-variants.test.ts",
       "source_location": "L14",
       "id": "tests_volume_variants_test_missing",
-      "community": 60,
+      "community": 74,
       "norm_label": "missing"
     },
     {
@@ -2862,7 +2889,7 @@
       "source_file": "tests/volume-variants.test.ts",
       "source_location": "L21",
       "id": "tests_volume_variants_test_stock",
-      "community": 60,
+      "community": 74,
       "norm_label": "stock"
     },
     {
@@ -2871,7 +2898,7 @@
       "source_file": "tests/volume-variants.test.ts",
       "source_location": "L22",
       "id": "tests_volume_variants_test_trend",
-      "community": 60,
+      "community": 74,
       "norm_label": "trend"
     },
     {
@@ -2990,6 +3017,69 @@
       "id": "tests_paper_database_commit",
       "community": 65,
       "norm_label": "commit()"
+    },
+    {
+      "label": "scheduled-paper.test.ts",
+      "file_type": "code",
+      "source_file": "tests/scheduled-paper.test.ts",
+      "source_location": "L1",
+      "id": "tests_scheduled_paper_test_ts",
+      "community": 75,
+      "norm_label": "scheduled-paper.test.ts"
+    },
+    {
+      "label": "now",
+      "file_type": "code",
+      "source_file": "tests/scheduled-paper.test.ts",
+      "source_location": "L3",
+      "id": "tests_scheduled_paper_test_now",
+      "community": 75,
+      "norm_label": "now"
+    },
+    {
+      "label": "response()",
+      "file_type": "code",
+      "source_file": "tests/scheduled-paper.test.ts",
+      "source_location": "L4",
+      "id": "tests_scheduled_paper_test_response",
+      "community": 75,
+      "norm_label": "response()"
+    },
+    {
+      "label": "req()",
+      "file_type": "code",
+      "source_file": "tests/scheduled-paper.test.ts",
+      "source_location": "L5",
+      "id": "tests_scheduled_paper_test_req",
+      "community": 75,
+      "norm_label": "req()"
+    },
+    {
+      "label": "res",
+      "file_type": "code",
+      "source_file": "tests/scheduled-paper.test.ts",
+      "source_location": "L8",
+      "id": "tests_scheduled_paper_test_res",
+      "community": 75,
+      "norm_label": "res"
+    },
+    {
+      "label": "handler",
+      "file_type": "code",
+      "source_file": "tests/scheduled-paper.test.ts",
+      "source_location": "L12",
+      "id": "tests_scheduled_paper_test_handler",
+      "community": 75,
+      "norm_label": "handler"
+    },
+    {
+      "label": "bad",
+      "file_type": "code",
+      "source_file": "tests/scheduled-paper.test.ts",
+      "source_location": "L14",
+      "id": "tests_scheduled_paper_test_bad",
+      "community": 75,
+      "norm_label": "bad"
     },
     {
       "label": "manual-ticket.tsx",
@@ -3528,7 +3618,7 @@
       "source_file": "tests/trading-home.tsx",
       "source_location": "L1",
       "id": "tests_trading_home_tsx",
-      "community": 74,
+      "community": 6,
       "norm_label": "trading-home.tsx"
     },
     {
@@ -3537,7 +3627,7 @@
       "source_file": "tests/trading-home.tsx",
       "source_location": "L7",
       "id": "tests_trading_home_now",
-      "community": 74,
+      "community": 6,
       "norm_label": "now"
     },
     {
@@ -3546,7 +3636,7 @@
       "source_file": "tests/trading-home.tsx",
       "source_location": "L8",
       "id": "tests_trading_home_stock",
-      "community": 74,
+      "community": 6,
       "norm_label": "stock"
     },
     {
@@ -3555,8 +3645,35 @@
       "source_file": "tests/trading-home.tsx",
       "source_location": "L9",
       "id": "tests_trading_home_tradinghomefixture",
-      "community": 74,
+      "community": 6,
       "norm_label": "tradinghomefixture()"
+    },
+    {
+      "label": "paper-scheduler-database.mjs",
+      "file_type": "code",
+      "source_file": "tests/paper-scheduler-database.mjs",
+      "source_location": "L1",
+      "id": "tests_paper_scheduler_database_mjs",
+      "community": 95,
+      "norm_label": "paper-scheduler-database.mjs"
+    },
+    {
+      "label": "db",
+      "file_type": "code",
+      "source_file": "tests/paper-scheduler-database.mjs",
+      "source_location": "L4",
+      "id": "tests_paper_scheduler_database_db",
+      "community": 95,
+      "norm_label": "db"
+    },
+    {
+      "label": "migration",
+      "file_type": "code",
+      "source_file": "tests/paper-scheduler-database.mjs",
+      "source_location": "L15",
+      "id": "tests_paper_scheduler_database_migration",
+      "community": 95,
+      "norm_label": "migration"
     },
     {
       "label": "discovery-golden.json",
@@ -3564,7 +3681,7 @@
       "source_file": "tests/fixtures/discovery-golden.json",
       "source_location": "L1",
       "id": "tests_fixtures_discovery_golden_json",
-      "community": 60,
+      "community": 94,
       "norm_label": "discovery-golden.json"
     },
     {
@@ -3573,7 +3690,7 @@
       "source_file": "tests/fixtures/discovery-golden.json",
       "source_location": "L2",
       "id": "fixtures_discovery_golden_sourcesha256",
-      "community": 60,
+      "community": 94,
       "norm_label": "sourcesha256"
     },
     {
@@ -3582,7 +3699,7 @@
       "source_file": "tests/fixtures/discovery-golden.json",
       "source_location": "L3",
       "id": "fixtures_discovery_golden_note",
-      "community": 60,
+      "community": 94,
       "norm_label": "note"
     },
     {
@@ -3591,7 +3708,7 @@
       "source_file": "tests/fixtures/discovery-golden.json",
       "source_location": "L4",
       "id": "fixtures_discovery_golden_now",
-      "community": 60,
+      "community": 94,
       "norm_label": "now"
     },
     {
@@ -3600,7 +3717,7 @@
       "source_file": "tests/fixtures/discovery-golden.json",
       "source_location": "L5",
       "id": "fixtures_discovery_golden_cases",
-      "community": 60,
+      "community": 94,
       "norm_label": "cases"
     },
     {
@@ -3609,7 +3726,7 @@
       "source_file": "server/sharedPaper.js",
       "source_location": "L1",
       "id": "server_sharedpaper_js",
-      "community": 8,
+      "community": 75,
       "norm_label": "sharedpaper.js"
     },
     {
@@ -3618,7 +3735,7 @@
       "source_file": "server/sharedPaper.js",
       "source_location": "L8",
       "id": "server_sharedpaper_check",
-      "community": 8,
+      "community": 75,
       "norm_label": "check()"
     },
     {
@@ -3627,7 +3744,7 @@
       "source_file": "server/sharedPaper.js",
       "source_location": "L12",
       "id": "server_sharedpaper_sharedpapererror",
-      "community": 8,
+      "community": 75,
       "norm_label": "sharedpapererror"
     },
     {
@@ -3636,7 +3753,7 @@
       "source_file": "server/sharedPaper.js",
       "source_location": "L12",
       "id": "server_sharedpaper_sharedpapererror_constructor",
-      "community": 8,
+      "community": 75,
       "norm_label": ".constructor()"
     },
     {
@@ -3645,7 +3762,7 @@
       "source_file": "server/sharedPaper.js",
       "source_location": "L13",
       "id": "server_sharedpaper_uuid",
-      "community": 8,
+      "community": 75,
       "norm_label": "uuid()"
     },
     {
@@ -3663,7 +3780,7 @@
       "source_file": "server/sharedPaper.js",
       "source_location": "L37",
       "id": "server_sharedpaper_sharedstore",
-      "community": 8,
+      "community": 75,
       "norm_label": "sharedstore()"
     },
     {
@@ -3672,7 +3789,7 @@
       "source_file": "server/sharedPaper.js",
       "source_location": "L53",
       "id": "server_sharedpaper_same",
-      "community": 8,
+      "community": 75,
       "norm_label": "same()"
     },
     {
@@ -3681,7 +3798,7 @@
       "source_file": "server/sharedPaper.js",
       "source_location": "L54",
       "id": "server_sharedpaper_canonical",
-      "community": 8,
+      "community": 75,
       "norm_label": "canonical()"
     },
     {
@@ -3690,8 +3807,35 @@
       "source_file": "server/sharedPaper.js",
       "source_location": "L55",
       "id": "server_sharedpaper_createsharedpaperhandler",
-      "community": 79,
+      "community": 25,
       "norm_label": "createsharedpaperhandler()"
+    },
+    {
+      "label": "sharedPaperCycle.js",
+      "file_type": "code",
+      "source_file": "server/sharedPaperCycle.js",
+      "source_location": "L1",
+      "id": "server_sharedpapercycle_js",
+      "community": 75,
+      "norm_label": "sharedpapercycle.js"
+    },
+    {
+      "label": "recordScan()",
+      "file_type": "code",
+      "source_file": "server/sharedPaperCycle.js",
+      "source_location": "L4",
+      "id": "server_sharedpapercycle_recordscan",
+      "community": 75,
+      "norm_label": "recordscan()"
+    },
+    {
+      "label": "runSharedPaperCycle()",
+      "file_type": "code",
+      "source_file": "server/sharedPaperCycle.js",
+      "source_location": "L18",
+      "id": "server_sharedpapercycle_runsharedpapercycle",
+      "community": 75,
+      "norm_label": "runsharedpapercycle()"
     },
     {
       "label": "pushBackend.js",
@@ -3834,7 +3978,7 @@
       "source_file": "server/sharedPaperObservation.ts",
       "source_location": "L1",
       "id": "server_sharedpaperobservation_ts",
-      "community": 79,
+      "community": 25,
       "norm_label": "sharedpaperobservation.ts"
     },
     {
@@ -3843,7 +3987,7 @@
       "source_file": "server/sharedPaperObservation.ts",
       "source_location": "L5",
       "id": "server_sharedpaperobservation_servermarketjson",
-      "community": 79,
+      "community": 25,
       "norm_label": "servermarketjson()"
     },
     {
@@ -3852,7 +3996,7 @@
       "source_file": "server/sharedPaperObservation.ts",
       "source_location": "L13",
       "id": "server_sharedpaperobservation_observesharedpaper",
-      "community": 79,
+      "community": 25,
       "norm_label": "observesharedpaper()"
     },
     {
@@ -3897,7 +4041,7 @@
       "source_file": "server/paperEngine.js",
       "source_location": "L9",
       "id": "server_paperengine_newpaperaccount",
-      "community": 56,
+      "community": 67,
       "norm_label": "newpaperaccount()"
     },
     {
@@ -3951,7 +4095,7 @@
       "source_file": "server/paperFunds.js",
       "source_location": "L1",
       "id": "server_paperfunds_js",
-      "community": 66,
+      "community": 62,
       "norm_label": "paperfunds.js"
     },
     {
@@ -3960,7 +4104,7 @@
       "source_file": "server/paperFunds.js",
       "source_location": "L2",
       "id": "server_paperfunds_round",
-      "community": 66,
+      "community": 62,
       "norm_label": "round()"
     },
     {
@@ -3969,7 +4113,7 @@
       "source_file": "server/paperFunds.js",
       "source_location": "L3",
       "id": "server_paperfunds_paperaccounterror",
-      "community": 25,
+      "community": 62,
       "norm_label": "paperaccounterror"
     },
     {
@@ -3978,7 +4122,7 @@
       "source_file": "server/paperFunds.js",
       "source_location": "L4",
       "id": "server_paperfunds_fundedcapital",
-      "community": 66,
+      "community": 62,
       "norm_label": "fundedcapital()"
     },
     {
@@ -3987,7 +4131,7 @@
       "source_file": "server/paperFunds.js",
       "source_location": "L5",
       "id": "server_paperfunds_paperbalance",
-      "community": 66,
+      "community": 62,
       "norm_label": "paperbalance()"
     },
     {
@@ -3996,7 +4140,7 @@
       "source_file": "server/paperFunds.js",
       "source_location": "L18",
       "id": "server_paperfunds_transferpaperfunds",
-      "community": 66,
+      "community": 62,
       "norm_label": "transferpaperfunds()"
     },
     {
@@ -4005,7 +4149,7 @@
       "source_file": "server/paperFunds.js",
       "source_location": "L30",
       "id": "server_paperfunds_importlegacypaper",
-      "community": 66,
+      "community": 62,
       "norm_label": "importlegacypaper()"
     },
     {
@@ -4095,7 +4239,7 @@
       "source_file": "server/sharedOpportunities.js",
       "source_location": "L1",
       "id": "server_sharedopportunities_js",
-      "community": 2,
+      "community": 75,
       "norm_label": "sharedopportunities.js"
     },
     {
@@ -4104,7 +4248,7 @@
       "source_file": "server/sharedOpportunities.js",
       "source_location": "L2",
       "id": "server_sharedopportunities_recordopportunities",
-      "community": 2,
+      "community": 75,
       "norm_label": "recordopportunities()"
     },
     {
@@ -4113,8 +4257,35 @@
       "source_file": "server/sharedOpportunities.js",
       "source_location": "L18",
       "id": "server_sharedopportunities_opportunitydecisions",
-      "community": 2,
+      "community": 75,
       "norm_label": "opportunitydecisions()"
+    },
+    {
+      "label": "scheduledPaper.js",
+      "file_type": "code",
+      "source_file": "server/scheduledPaper.js",
+      "source_location": "L1",
+      "id": "server_scheduledpaper_js",
+      "community": 75,
+      "norm_label": "scheduledpaper.js"
+    },
+    {
+      "label": "scheduledPaperWindow()",
+      "file_type": "code",
+      "source_file": "server/scheduledPaper.js",
+      "source_location": "L4",
+      "id": "server_scheduledpaper_scheduledpaperwindow",
+      "community": 75,
+      "norm_label": "scheduledpaperwindow()"
+    },
+    {
+      "label": "createScheduledPaperHandler()",
+      "file_type": "code",
+      "source_file": "server/scheduledPaper.js",
+      "source_location": "L9",
+      "id": "server_scheduledpaper_createscheduledpaperhandler",
+      "community": 75,
+      "norm_label": "createscheduledpaperhandler()"
     },
     {
       "label": "paperWorkflow.js",
@@ -4176,7 +4347,7 @@
       "source_file": "server/paperWorkflow.js",
       "source_location": "L32",
       "id": "server_paperworkflow_advanceworkflow",
-      "community": 67,
+      "community": 8,
       "norm_label": "advanceworkflow()"
     },
     {
@@ -4221,7 +4392,7 @@
       "source_file": "shared/tradingSegments.js",
       "source_location": "L9",
       "id": "shared_tradingsegments_tradingsegment",
-      "community": 81,
+      "community": 6,
       "norm_label": "tradingsegment()"
     },
     {
@@ -4792,6 +4963,24 @@
       "norm_label": "cycle()"
     },
     {
+      "label": "shared-paper-worker.mjs",
+      "file_type": "code",
+      "source_file": "scripts/shared-paper-worker.mjs",
+      "source_location": "L1",
+      "id": "scripts_shared_paper_worker_mjs",
+      "community": 75,
+      "norm_label": "shared-paper-worker.mjs"
+    },
+    {
+      "label": "once",
+      "file_type": "code",
+      "source_file": "scripts/shared-paper-worker.mjs",
+      "source_location": "L7",
+      "id": "scripts_shared_paper_worker_once",
+      "community": 75,
+      "norm_label": "once"
+    },
+    {
       "label": "signal-worker.mjs",
       "file_type": "code",
       "source_file": "scripts/signal-worker.mjs",
@@ -4923,7 +5112,7 @@
       "source_file": "scripts/research/data-preflight.mjs",
       "source_location": "L1",
       "id": "scripts_research_data_preflight_mjs",
-      "community": 60,
+      "community": 90,
       "norm_label": "data-preflight.mjs"
     },
     {
@@ -4932,7 +5121,7 @@
       "source_file": "scripts/research/data-preflight.mjs",
       "source_location": "L4",
       "id": "research_data_preflight_output_manifestpath",
-      "community": 60,
+      "community": 90,
       "norm_label": "[output,manifestpath]"
     },
     {
@@ -4941,7 +5130,7 @@
       "source_file": "scripts/research/data-preflight.mjs",
       "source_location": "L8",
       "id": "research_data_preflight_kinds",
-      "community": 60,
+      "community": 90,
       "norm_label": "kinds"
     },
     {
@@ -4950,7 +5139,7 @@
       "source_file": "scripts/research/data-preflight.mjs",
       "source_location": "L8",
       "id": "research_data_preflight_results",
-      "community": 60,
+      "community": 90,
       "norm_label": "results"
     },
     {
@@ -4959,7 +5148,7 @@
       "source_file": "scripts/research/data-preflight.mjs",
       "source_location": "L10",
       "id": "research_data_preflight_sample",
-      "community": 60,
+      "community": 90,
       "norm_label": "sample"
     },
     {
@@ -5634,7 +5823,7 @@
       "source_file": "api/shared-paper.ts",
       "source_location": "L1",
       "id": "api_shared_paper_ts",
-      "community": 79,
+      "community": 25,
       "norm_label": "shared-paper.ts"
     },
     {
@@ -5692,12 +5881,21 @@
       "norm_label": "handler()"
     },
     {
+      "label": "scheduled-paper.ts",
+      "file_type": "code",
+      "source_file": "api/scheduled-paper.ts",
+      "source_location": "L1",
+      "id": "api_scheduled_paper_ts",
+      "community": 75,
+      "norm_label": "scheduled-paper.ts"
+    },
+    {
       "label": "App.tsx",
       "file_type": "code",
       "source_file": "src/App.tsx",
       "source_location": "L1",
       "id": "src_app_tsx",
-      "community": 61,
+      "community": 87,
       "norm_label": "app.tsx"
     },
     {
@@ -5706,7 +5904,7 @@
       "source_file": "src/App.tsx",
       "source_location": "L6",
       "id": "src_app_alertspage",
-      "community": 61,
+      "community": 87,
       "norm_label": "alertspage"
     },
     {
@@ -5715,7 +5913,7 @@
       "source_file": "src/App.tsx",
       "source_location": "L9",
       "id": "src_app_overviewpage",
-      "community": 61,
+      "community": 87,
       "norm_label": "overviewpage"
     },
     {
@@ -5724,7 +5922,7 @@
       "source_file": "src/App.tsx",
       "source_location": "L10",
       "id": "src_app_tradespage",
-      "community": 61,
+      "community": 87,
       "norm_label": "tradespage"
     },
     {
@@ -5733,7 +5931,7 @@
       "source_file": "src/App.tsx",
       "source_location": "L11",
       "id": "src_app_stockanalysispage",
-      "community": 61,
+      "community": 87,
       "norm_label": "stockanalysispage"
     },
     {
@@ -5742,7 +5940,7 @@
       "source_file": "src/App.tsx",
       "source_location": "L12",
       "id": "src_app_signalspage",
-      "community": 61,
+      "community": 87,
       "norm_label": "signalspage"
     },
     {
@@ -5751,7 +5949,7 @@
       "source_file": "src/App.tsx",
       "source_location": "L13",
       "id": "src_app_smartpickspage",
-      "community": 61,
+      "community": 87,
       "norm_label": "smartpickspage"
     },
     {
@@ -5760,7 +5958,7 @@
       "source_file": "src/App.tsx",
       "source_location": "L14",
       "id": "src_app_metalspage",
-      "community": 61,
+      "community": 87,
       "norm_label": "metalspage"
     },
     {
@@ -5769,7 +5967,7 @@
       "source_file": "src/App.tsx",
       "source_location": "L15",
       "id": "src_app_discoverypage",
-      "community": 61,
+      "community": 87,
       "norm_label": "discoverypage"
     },
     {
@@ -5778,7 +5976,7 @@
       "source_file": "src/App.tsx",
       "source_location": "L16",
       "id": "src_app_backtestpage",
-      "community": 61,
+      "community": 87,
       "norm_label": "backtestpage"
     },
     {
@@ -5787,7 +5985,7 @@
       "source_file": "src/App.tsx",
       "source_location": "L17",
       "id": "src_app_ipopage",
-      "community": 61,
+      "community": 87,
       "norm_label": "ipopage"
     },
     {
@@ -5796,7 +5994,7 @@
       "source_file": "src/App.tsx",
       "source_location": "L21",
       "id": "src_app_app",
-      "community": 61,
+      "community": 87,
       "norm_label": "app()"
     },
     {
@@ -5805,7 +6003,7 @@
       "source_file": "src/main.tsx",
       "source_location": "L1",
       "id": "src_main_tsx",
-      "community": 81,
+      "community": 87,
       "norm_label": "main.tsx"
     },
     {
@@ -5814,7 +6012,7 @@
       "source_file": "src/utils/fetchMarketJSON.ts",
       "source_location": "L1",
       "id": "src_utils_fetchmarketjson_ts",
-      "community": 71,
+      "community": 61,
       "norm_label": "fetchmarketjson.ts"
     },
     {
@@ -5823,7 +6021,7 @@
       "source_file": "src/utils/fetchMarketJSON.ts",
       "source_location": "L3",
       "id": "utils_fetchmarketjson_fetchmarketjson",
-      "community": 71,
+      "community": 61,
       "norm_label": "fetchmarketjson()"
     },
     {
@@ -5832,7 +6030,7 @@
       "source_file": "src/utils/apiUrl.ts",
       "source_location": "L1",
       "id": "src_utils_apiurl_ts",
-      "community": 71,
+      "community": 61,
       "norm_label": "apiurl.ts"
     },
     {
@@ -5841,7 +6039,7 @@
       "source_file": "src/utils/apiUrl.ts",
       "source_location": "L5",
       "id": "utils_apiurl_proxy_map",
-      "community": 71,
+      "community": 61,
       "norm_label": "proxy_map"
     },
     {
@@ -5850,7 +6048,7 @@
       "source_file": "src/utils/apiUrl.ts",
       "source_location": "L17",
       "id": "utils_apiurl_apiurl",
-      "community": 71,
+      "community": 61,
       "norm_label": "apiurl()"
     },
     {
@@ -5859,7 +6057,7 @@
       "source_file": "src/components/SharedOpportunityFeed.tsx",
       "source_location": "L1",
       "id": "src_components_sharedopportunityfeed_tsx",
-      "community": 75,
+      "community": 6,
       "norm_label": "sharedopportunityfeed.tsx"
     },
     {
@@ -5868,7 +6066,7 @@
       "source_file": "src/components/SharedOpportunityFeed.tsx",
       "source_location": "L6",
       "id": "components_sharedopportunityfeed_sharedopportunityfeed",
-      "community": 86,
+      "community": 6,
       "norm_label": "sharedopportunityfeed()"
     },
     {
@@ -5877,7 +6075,7 @@
       "source_file": "src/components/SegmentPaperAccount.tsx",
       "source_location": "L1",
       "id": "src_components_segmentpaperaccount_tsx",
-      "community": 81,
+      "community": 6,
       "norm_label": "segmentpaperaccount.tsx"
     },
     {
@@ -5886,7 +6084,7 @@
       "source_file": "src/components/SegmentPaperAccount.tsx",
       "source_location": "L7",
       "id": "components_segmentpaperaccount_snapshot",
-      "community": 81,
+      "community": 6,
       "norm_label": "snapshot"
     },
     {
@@ -5895,7 +6093,7 @@
       "source_file": "src/components/SegmentPaperAccount.tsx",
       "source_location": "L8",
       "id": "components_segmentpaperaccount_segmentpaperaccount",
-      "community": 61,
+      "community": 6,
       "norm_label": "segmentpaperaccount()"
     },
     {
@@ -5922,7 +6120,7 @@
       "source_file": "src/components/TradesPage.tsx",
       "source_location": "L1",
       "id": "src_components_tradespage_tsx",
-      "community": 61,
+      "community": 0,
       "norm_label": "tradespage.tsx"
     },
     {
@@ -5931,7 +6129,7 @@
       "source_file": "src/components/TradesPage.tsx",
       "source_location": "L7",
       "id": "components_tradespage_money",
-      "community": 61,
+      "community": 0,
       "norm_label": "money()"
     },
     {
@@ -5940,7 +6138,7 @@
       "source_file": "src/components/TradesPage.tsx",
       "source_location": "L8",
       "id": "components_tradespage_tradespage",
-      "community": 61,
+      "community": 0,
       "norm_label": "tradespage()"
     },
     {
@@ -5949,7 +6147,7 @@
       "source_file": "src/components/TradesPage.tsx",
       "source_location": "L9",
       "id": "components_tradespage_legacytradespage",
-      "community": 61,
+      "community": 0,
       "norm_label": "legacytradespage()"
     },
     {
@@ -5985,7 +6183,7 @@
       "source_file": "src/components/MetalsPage.tsx",
       "source_location": "L1",
       "id": "src_components_metalspage_tsx",
-      "community": 90,
+      "community": 71,
       "norm_label": "metalspage.tsx"
     },
     {
@@ -5994,7 +6192,7 @@
       "source_file": "src/components/MetalsPage.tsx",
       "source_location": "L6",
       "id": "components_metalspage_metalspage",
-      "community": 90,
+      "community": 71,
       "norm_label": "metalspage()"
     },
     {
@@ -6003,7 +6201,7 @@
       "source_file": "src/components/OverviewPage.tsx",
       "source_location": "L1",
       "id": "src_components_overviewpage_tsx",
-      "community": 74,
+      "community": 6,
       "norm_label": "overviewpage.tsx"
     },
     {
@@ -6012,7 +6210,7 @@
       "source_file": "src/components/OverviewPage.tsx",
       "source_location": "L8",
       "id": "components_overviewpage_overviewpage",
-      "community": 74,
+      "community": 6,
       "norm_label": "overviewpage()"
     },
     {
@@ -6021,7 +6219,7 @@
       "source_file": "src/components/OpportunityCard.tsx",
       "source_location": "L1",
       "id": "src_components_opportunitycard_tsx",
-      "community": 74,
+      "community": 6,
       "norm_label": "opportunitycard.tsx"
     },
     {
@@ -6030,7 +6228,7 @@
       "source_file": "src/components/OpportunityCard.tsx",
       "source_location": "L5",
       "id": "components_opportunitycard_opportunitycard",
-      "community": 74,
+      "community": 6,
       "norm_label": "opportunitycard()"
     },
     {
@@ -6039,7 +6237,7 @@
       "source_file": "src/components/PaperExecutionPanel.tsx",
       "source_location": "L1",
       "id": "src_components_paperexecutionpanel_tsx",
-      "community": 86,
+      "community": 6,
       "norm_label": "paperexecutionpanel.tsx"
     },
     {
@@ -6066,7 +6264,7 @@
       "source_file": "src/components/PaperExecutionPanel.tsx",
       "source_location": "L5",
       "id": "components_paperexecutionpanel_action",
-      "community": 86,
+      "community": 6,
       "norm_label": "action"
     },
     {
@@ -6075,7 +6273,7 @@
       "source_file": "src/components/PaperExecutionPanel.tsx",
       "source_location": "L6",
       "id": "components_paperexecutionpanel_executionsettingsform",
-      "community": 86,
+      "community": 6,
       "norm_label": "executionsettingsform()"
     },
     {
@@ -6084,7 +6282,7 @@
       "source_file": "src/components/PaperExecutionPanel.tsx",
       "source_location": "L10",
       "id": "components_paperexecutionpanel_signalticket",
-      "community": 86,
+      "community": 6,
       "norm_label": "signalticket()"
     },
     {
@@ -6093,7 +6291,7 @@
       "source_file": "src/components/PaperExecutionPanel.tsx",
       "source_location": "L20",
       "id": "components_paperexecutionpanel_paperexecutionpanel",
-      "community": 6,
+      "community": 8,
       "norm_label": "paperexecutionpanel()"
     },
     {
@@ -6102,7 +6300,7 @@
       "source_file": "src/components/JournalErrorBoundary.tsx",
       "source_location": "L1",
       "id": "src_components_journalerrorboundary_tsx",
-      "community": 81,
+      "community": 87,
       "norm_label": "journalerrorboundary.tsx"
     },
     {
@@ -6111,7 +6309,7 @@
       "source_file": "src/components/JournalErrorBoundary.tsx",
       "source_location": "L3",
       "id": "components_journalerrorboundary_journalerrorboundary",
-      "community": 81,
+      "community": 87,
       "norm_label": "journalerrorboundary"
     },
     {
@@ -6120,7 +6318,7 @@
       "source_file": "src/components/JournalErrorBoundary.tsx",
       "source_location": "L5",
       "id": "components_journalerrorboundary_journalerrorboundary_getderivedstatefromerror",
-      "community": 81,
+      "community": 87,
       "norm_label": ".getderivedstatefromerror()"
     },
     {
@@ -6129,7 +6327,7 @@
       "source_file": "src/components/JournalErrorBoundary.tsx",
       "source_location": "L6",
       "id": "components_journalerrorboundary_journalerrorboundary_render",
-      "community": 81,
+      "community": 87,
       "norm_label": ".render()"
     },
     {
@@ -6183,7 +6381,7 @@
       "source_file": "src/components/SignalsPage.tsx",
       "source_location": "L1",
       "id": "src_components_signalspage_tsx",
-      "community": 61,
+      "community": 0,
       "norm_label": "signalspage.tsx"
     },
     {
@@ -6192,7 +6390,7 @@
       "source_file": "src/components/SignalsPage.tsx",
       "source_location": "L2",
       "id": "components_signalspage_signalspage",
-      "community": 61,
+      "community": 0,
       "norm_label": "signalspage()"
     },
     {
@@ -6201,7 +6399,7 @@
       "source_file": "src/components/TradeDetailTimeline.tsx",
       "source_location": "L1",
       "id": "src_components_tradedetailtimeline_tsx",
-      "community": 74,
+      "community": 6,
       "norm_label": "tradedetailtimeline.tsx"
     },
     {
@@ -6210,7 +6408,7 @@
       "source_file": "src/components/TradeDetailTimeline.tsx",
       "source_location": "L6",
       "id": "components_tradedetailtimeline_tradeevent",
-      "community": 74,
+      "community": 6,
       "norm_label": "tradeevent"
     },
     {
@@ -6219,7 +6417,7 @@
       "source_file": "src/components/TradeDetailTimeline.tsx",
       "source_location": "L7",
       "id": "components_tradedetailtimeline_tradedetailtimeline",
-      "community": 74,
+      "community": 6,
       "norm_label": "tradedetailtimeline()"
     },
     {
@@ -6228,7 +6426,7 @@
       "source_file": "src/components/TradeDetailTimeline.tsx",
       "source_location": "L18",
       "id": "components_tradedetailtimeline_tradetimelineview",
-      "community": 74,
+      "community": 6,
       "norm_label": "tradetimelineview()"
     },
     {
@@ -6309,7 +6507,7 @@
       "source_file": "src/components/SignalPopup.tsx",
       "source_location": "L1",
       "id": "src_components_signalpopup_tsx",
-      "community": 86,
+      "community": 6,
       "norm_label": "signalpopup.tsx"
     },
     {
@@ -6318,7 +6516,7 @@
       "source_file": "src/components/SignalPopup.tsx",
       "source_location": "L4",
       "id": "components_signalpopup_seen",
-      "community": 86,
+      "community": 6,
       "norm_label": "seen"
     },
     {
@@ -6327,7 +6525,7 @@
       "source_file": "src/components/SignalPopup.tsx",
       "source_location": "L5",
       "id": "components_signalpopup_signalpopup",
-      "community": 86,
+      "community": 6,
       "norm_label": "signalpopup()"
     },
     {
@@ -6372,7 +6570,7 @@
       "source_file": "src/components/DiscoveryPage.tsx",
       "source_location": "L1",
       "id": "src_components_discoverypage_tsx",
-      "community": 86,
+      "community": 87,
       "norm_label": "discoverypage.tsx"
     },
     {
@@ -6381,7 +6579,7 @@
       "source_file": "src/components/DiscoveryPage.tsx",
       "source_location": "L6",
       "id": "components_discoverypage_signalbadge",
-      "community": 86,
+      "community": 87,
       "norm_label": "signalbadge()"
     },
     {
@@ -6390,7 +6588,7 @@
       "source_file": "src/components/DiscoveryPage.tsx",
       "source_location": "L11",
       "id": "components_discoverypage_trendbadge",
-      "community": 86,
+      "community": 87,
       "norm_label": "trendbadge()"
     },
     {
@@ -6399,7 +6597,7 @@
       "source_file": "src/components/DiscoveryPage.tsx",
       "source_location": "L17",
       "id": "components_discoverypage_scorebar",
-      "community": 86,
+      "community": 87,
       "norm_label": "scorebar()"
     },
     {
@@ -6408,7 +6606,7 @@
       "source_file": "src/components/DiscoveryPage.tsx",
       "source_location": "L31",
       "id": "components_discoverypage_stockcard",
-      "community": 86,
+      "community": 87,
       "norm_label": "stockcard()"
     },
     {
@@ -6417,7 +6615,7 @@
       "source_file": "src/components/DiscoveryPage.tsx",
       "source_location": "L149",
       "id": "components_discoverypage_discoverypage",
-      "community": 86,
+      "community": 87,
       "norm_label": "discoverypage()"
     },
     {
@@ -6426,7 +6624,7 @@
       "source_file": "src/components/PaperFundsPanel.tsx",
       "source_location": "L1",
       "id": "src_components_paperfundspanel_tsx",
-      "community": 81,
+      "community": 6,
       "norm_label": "paperfundspanel.tsx"
     },
     {
@@ -6444,7 +6642,7 @@
       "source_file": "src/components/PaperFundsPanel.tsx",
       "source_location": "L6",
       "id": "components_paperfundspanel_fundingstate",
-      "community": 81,
+      "community": 6,
       "norm_label": "fundingstate"
     },
     {
@@ -6453,7 +6651,7 @@
       "source_file": "src/components/PaperFundsPanel.tsx",
       "source_location": "L7",
       "id": "components_paperfundspanel_money",
-      "community": 81,
+      "community": 6,
       "norm_label": "money()"
     },
     {
@@ -6462,7 +6660,7 @@
       "source_file": "src/components/PaperFundsPanel.tsx",
       "source_location": "L8",
       "id": "components_paperfundspanel_paperfundspanel",
-      "community": 81,
+      "community": 6,
       "norm_label": "paperfundspanel()"
     },
     {
@@ -6489,7 +6687,7 @@
       "source_file": "src/components/StockAnalysisPage.tsx",
       "source_location": "L1",
       "id": "src_components_stockanalysispage_tsx",
-      "community": 61,
+      "community": 0,
       "norm_label": "stockanalysispage.tsx"
     },
     {
@@ -6498,7 +6696,7 @@
       "source_file": "src/components/StockAnalysisPage.tsx",
       "source_location": "L6",
       "id": "components_stockanalysispage_stockanalysispage",
-      "community": 61,
+      "community": 0,
       "norm_label": "stockanalysispage()"
     },
     {
@@ -6606,7 +6804,7 @@
       "source_file": "src/hooks/useNativeAlerts.ts",
       "source_location": "L6",
       "id": "hooks_usenativealerts_usenativealerts",
-      "community": 61,
+      "community": 87,
       "norm_label": "usenativealerts()"
     },
     {
@@ -6615,7 +6813,7 @@
       "source_file": "src/hooks/useSharedOpportunities.ts",
       "source_location": "L1",
       "id": "src_hooks_usesharedopportunities_ts",
-      "community": 75,
+      "community": 6,
       "norm_label": "usesharedopportunities.ts"
     },
     {
@@ -6624,7 +6822,7 @@
       "source_file": "src/hooks/useSharedOpportunities.ts",
       "source_location": "L4",
       "id": "hooks_usesharedopportunities_sharedopportunity",
-      "community": 86,
+      "community": 6,
       "norm_label": "sharedopportunity"
     },
     {
@@ -6633,7 +6831,7 @@
       "source_file": "src/hooks/useSharedOpportunities.ts",
       "source_location": "L5",
       "id": "hooks_usesharedopportunities_opportunityfeed",
-      "community": 75,
+      "community": 6,
       "norm_label": "opportunityfeed"
     },
     {
@@ -6642,7 +6840,7 @@
       "source_file": "src/hooks/useSharedOpportunities.ts",
       "source_location": "L6",
       "id": "hooks_usesharedopportunities_fetchsharedopportunities",
-      "community": 75,
+      "community": 6,
       "norm_label": "fetchsharedopportunities()"
     },
     {
@@ -6651,7 +6849,7 @@
       "source_file": "src/hooks/useSharedOpportunities.ts",
       "source_location": "L7",
       "id": "hooks_usesharedopportunities_usesharedopportunities",
-      "community": 86,
+      "community": 6,
       "norm_label": "usesharedopportunities()"
     },
     {
@@ -6678,7 +6876,7 @@
       "source_file": "src/hooks/usePaperSnapshot.ts",
       "source_location": "L7",
       "id": "hooks_usepapersnapshot_usepapersnapshot",
-      "community": 74,
+      "community": 6,
       "norm_label": "usepapersnapshot()"
     },
     {
@@ -6741,7 +6939,7 @@
       "source_file": "src/hooks/useStockDiscovery.ts",
       "source_location": "L41",
       "id": "hooks_usestockdiscovery_usestockdiscovery",
-      "community": 61,
+      "community": 0,
       "norm_label": "usestockdiscovery()"
     },
     {
@@ -6750,7 +6948,7 @@
       "source_file": "src/hooks/useStockDiscovery.ts",
       "source_location": "L46",
       "id": "hooks_usestockdiscovery_usetradingruntime",
-      "community": 61,
+      "community": 87,
       "norm_label": "usetradingruntime()"
     },
     {
@@ -6768,7 +6966,7 @@
       "source_file": "src/hooks/useLiveStocks.ts",
       "source_location": "L6",
       "id": "hooks_uselivestocks_uselivestocks",
-      "community": 61,
+      "community": 87,
       "norm_label": "uselivestocks()"
     },
     {
@@ -6975,7 +7173,7 @@
       "source_file": "src/services/sharedPaperAccount.ts",
       "source_location": "L1",
       "id": "src_services_sharedpaperaccount_ts",
-      "community": 81,
+      "community": 6,
       "norm_label": "sharedpaperaccount.ts"
     },
     {
@@ -6984,7 +7182,7 @@
       "source_file": "src/services/sharedPaperAccount.ts",
       "source_location": "L3",
       "id": "services_sharedpaperaccount_apibase",
-      "community": 81,
+      "community": 6,
       "norm_label": "apibase"
     },
     {
@@ -6993,7 +7191,7 @@
       "source_file": "src/services/sharedPaperAccount.ts",
       "source_location": "L4",
       "id": "services_sharedpaperaccount_pending",
-      "community": 81,
+      "community": 6,
       "norm_label": "pending"
     },
     {
@@ -7002,7 +7200,7 @@
       "source_file": "src/services/sharedPaperAccount.ts",
       "source_location": "L5",
       "id": "services_sharedpaperaccount_sharedpaperrequest",
-      "community": 75,
+      "community": 6,
       "norm_label": "sharedpaperrequest()"
     },
     {
@@ -7011,7 +7209,7 @@
       "source_file": "src/services/sharedPaperAccount.ts",
       "source_location": "L20",
       "id": "services_sharedpaperaccount_exportearlierdeviceaccount",
-      "community": 81,
+      "community": 6,
       "norm_label": "exportearlierdeviceaccount()"
     },
     {
@@ -7038,7 +7236,7 @@
       "source_file": "src/services/journalStorage.ts",
       "source_location": "L1",
       "id": "src_services_journalstorage_ts",
-      "community": 81,
+      "community": 0,
       "norm_label": "journalstorage.ts"
     },
     {
@@ -7065,7 +7263,7 @@
       "source_file": "src/services/journalStorage.ts",
       "source_location": "L12",
       "id": "services_journalstorage_downloadjson",
-      "community": 81,
+      "community": 0,
       "norm_label": "downloadjson()"
     },
     {
@@ -7074,7 +7272,7 @@
       "source_file": "src/services/discoveryScoring.ts",
       "source_location": "L1",
       "id": "src_services_discoveryscoring_ts",
-      "community": 60,
+      "community": 66,
       "norm_label": "discoveryscoring.ts"
     },
     {
@@ -7083,7 +7281,7 @@
       "source_file": "src/services/discoveryScoring.ts",
       "source_location": "L6",
       "id": "services_discoveryscoring_computersi",
-      "community": 60,
+      "community": 66,
       "norm_label": "computersi()"
     },
     {
@@ -7092,7 +7290,7 @@
       "source_file": "src/services/discoveryScoring.ts",
       "source_location": "L19",
       "id": "services_discoveryscoring_computeema",
-      "community": 60,
+      "community": 66,
       "norm_label": "computeema()"
     },
     {
@@ -7101,7 +7299,7 @@
       "source_file": "src/services/discoveryScoring.ts",
       "source_location": "L28",
       "id": "services_discoveryscoring_computemacd",
-      "community": 60,
+      "community": 66,
       "norm_label": "computemacd()"
     },
     {
@@ -7110,7 +7308,7 @@
       "source_file": "src/services/discoveryScoring.ts",
       "source_location": "L39",
       "id": "services_discoveryscoring_computesma",
-      "community": 60,
+      "community": 66,
       "norm_label": "computesma()"
     },
     {
@@ -7119,7 +7317,7 @@
       "source_file": "src/services/discoveryScoring.ts",
       "source_location": "L45",
       "id": "services_discoveryscoring_computeatr",
-      "community": 60,
+      "community": 66,
       "norm_label": "computeatr()"
     },
     {
@@ -7128,7 +7326,7 @@
       "source_file": "src/services/discoveryScoring.ts",
       "source_location": "L59",
       "id": "services_discoveryscoring_computebollingerposition",
-      "community": 60,
+      "community": 66,
       "norm_label": "computebollingerposition()"
     },
     {
@@ -7137,7 +7335,7 @@
       "source_file": "src/services/discoveryScoring.ts",
       "source_location": "L72",
       "id": "services_discoveryscoring_scorestrategies",
-      "community": 60,
+      "community": 66,
       "norm_label": "scorestrategies()"
     },
     {
@@ -7146,7 +7344,7 @@
       "source_file": "src/services/discoveryScoring.ts",
       "source_location": "L122",
       "id": "services_discoveryscoring_computeoverallsignal",
-      "community": 60,
+      "community": 66,
       "norm_label": "computeoverallsignal()"
     },
     {
@@ -7155,7 +7353,7 @@
       "source_file": "src/services/discoveryScoring.ts",
       "source_location": "L139",
       "id": "services_discoveryscoring_computefoanalysis",
-      "community": 60,
+      "community": 66,
       "norm_label": "computefoanalysis()"
     },
     {
@@ -7164,7 +7362,7 @@
       "source_file": "src/services/discoveryScoring.ts",
       "source_location": "L154",
       "id": "services_discoveryscoring_generatereasons",
-      "community": 60,
+      "community": 66,
       "norm_label": "generatereasons()"
     },
     {
@@ -7173,7 +7371,7 @@
       "source_file": "src/services/discoveryScoring.ts",
       "source_location": "L170",
       "id": "services_discoveryscoring_identifystrategies",
-      "community": 60,
+      "community": 66,
       "norm_label": "identifystrategies()"
     },
     {
@@ -7182,7 +7380,7 @@
       "source_file": "src/services/discoveryScoring.ts",
       "source_location": "L182",
       "id": "services_discoveryscoring_determinetrend",
-      "community": 60,
+      "community": 66,
       "norm_label": "determinetrend()"
     },
     {
@@ -7191,7 +7389,7 @@
       "source_file": "src/services/discoveryScoring.ts",
       "source_location": "L192",
       "id": "services_discoveryscoring_discoveryhistory",
-      "community": 60,
+      "community": 66,
       "norm_label": "discoveryhistory"
     },
     {
@@ -7200,7 +7398,7 @@
       "source_file": "src/services/discoveryScoring.ts",
       "source_location": "L194",
       "id": "services_discoveryscoring_evaluatediscoverysnapshot",
-      "community": 60,
+      "community": 66,
       "norm_label": "evaluatediscoverysnapshot()"
     },
     {
@@ -7281,7 +7479,7 @@
       "source_file": "src/services/signalHistory.ts",
       "source_location": "L76",
       "id": "services_signalhistory_getsignalaccuracy",
-      "community": 61,
+      "community": 0,
       "norm_label": "getsignalaccuracy()"
     },
     {
@@ -7335,7 +7533,7 @@
       "source_file": "src/services/strongSignalPolicy.ts",
       "source_location": "L4",
       "id": "services_strongsignalpolicy_strongcandidate",
-      "community": 74,
+      "community": 6,
       "norm_label": "strongcandidate"
     },
     {
@@ -7398,7 +7596,7 @@
       "source_file": "src/services/foregroundAlerts.ts",
       "source_location": "L5",
       "id": "services_foregroundalerts_foregroundalert",
-      "community": 86,
+      "community": 6,
       "norm_label": "foregroundalert"
     },
     {
@@ -7659,7 +7857,7 @@
       "source_file": "src/services/stockDiscovery.ts",
       "source_location": "L67",
       "id": "services_stockdiscovery_fetchscreener",
-      "community": 71,
+      "community": 61,
       "norm_label": "fetchscreener()"
     },
     {
@@ -7668,7 +7866,7 @@
       "source_file": "src/services/stockDiscovery.ts",
       "source_location": "L74",
       "id": "services_stockdiscovery_fetchhistorical",
-      "community": 71,
+      "community": 61,
       "norm_label": "fetchhistorical()"
     },
     {
@@ -7677,7 +7875,7 @@
       "source_file": "src/services/stockDiscovery.ts",
       "source_location": "L84",
       "id": "services_stockdiscovery_fetchquotes",
-      "community": 79,
+      "community": 25,
       "norm_label": "fetchquotes()"
     },
     {
@@ -7686,7 +7884,7 @@
       "source_file": "src/services/stockDiscovery.ts",
       "source_location": "L96",
       "id": "services_stockdiscovery_discoverstocks",
-      "community": 79,
+      "community": 25,
       "norm_label": "discoverstocks()"
     },
     {
@@ -7704,7 +7902,7 @@
       "source_file": "src/services/metalsService.ts",
       "source_location": "L3",
       "id": "services_metalsservice_livemetal",
-      "community": 90,
+      "community": 71,
       "norm_label": "livemetal"
     },
     {
@@ -7740,7 +7938,7 @@
       "source_file": "src/services/opportunityDecision.ts",
       "source_location": "L1",
       "id": "src_services_opportunitydecision_ts",
-      "community": 75,
+      "community": 6,
       "norm_label": "opportunitydecision.ts"
     },
     {
@@ -7749,7 +7947,7 @@
       "source_file": "src/services/opportunityDecision.ts",
       "source_location": "L2",
       "id": "services_opportunitydecision_opportunitydecision",
-      "community": 75,
+      "community": 6,
       "norm_label": "opportunitydecision"
     },
     {
@@ -7758,7 +7956,7 @@
       "source_file": "src/services/opportunityDecision.ts",
       "source_location": "L3",
       "id": "services_opportunitydecision_decisiongroup",
-      "community": 75,
+      "community": 6,
       "norm_label": "decisiongroup"
     },
     {
@@ -7767,7 +7965,7 @@
       "source_file": "src/services/opportunityDecision.ts",
       "source_location": "L4",
       "id": "services_opportunitydecision_describeopportunity",
-      "community": 75,
+      "community": 6,
       "norm_label": "describeopportunity()"
     },
     {
@@ -7812,7 +8010,7 @@
       "source_file": "src/services/paperTrading.ts",
       "source_location": "L22",
       "id": "services_papertrading_loadledger",
-      "community": 61,
+      "community": 0,
       "norm_label": "loadledger()"
     },
     {
@@ -7830,7 +8028,7 @@
       "source_file": "src/services/paperTrading.ts",
       "source_location": "L32",
       "id": "services_papertrading_prunepapertrades",
-      "community": 61,
+      "community": 0,
       "norm_label": "prunepapertrades()"
     },
     {
@@ -7875,7 +8073,7 @@
       "source_file": "src/services/paperTrading.ts",
       "source_location": "L125",
       "id": "services_papertrading_getpapertrades",
-      "community": 61,
+      "community": 0,
       "norm_label": "getpapertrades()"
     },
     {
@@ -7884,7 +8082,7 @@
       "source_file": "src/services/paperTrading.ts",
       "source_location": "L126",
       "id": "services_papertrading_getpapertradesummary",
-      "community": 61,
+      "community": 0,
       "norm_label": "getpapertradesummary()"
     },
     {
@@ -7929,7 +8127,7 @@
       "source_file": "src/services/tradingTime.ts",
       "source_location": "L13",
       "id": "services_tradingtime_formatist",
-      "community": 86,
+      "community": 6,
       "norm_label": "formatist()"
     },
     {
@@ -7965,7 +8163,7 @@
       "source_file": "src/services/devicePaperAccount.ts",
       "source_location": "L1",
       "id": "src_services_devicepaperaccount_ts",
-      "community": 66,
+      "community": 0,
       "norm_label": "devicepaperaccount.ts"
     },
     {
@@ -7974,7 +8172,7 @@
       "source_file": "src/services/devicePaperAccount.ts",
       "source_location": "L14",
       "id": "services_devicepaperaccount_recorddata",
-      "community": 66,
+      "community": 0,
       "norm_label": "recorddata"
     },
     {
@@ -7983,7 +8181,7 @@
       "source_file": "src/services/devicePaperAccount.ts",
       "source_location": "L15",
       "id": "services_devicepaperaccount_deviceledger",
-      "community": 66,
+      "community": 0,
       "norm_label": "deviceledger"
     },
     {
@@ -7992,7 +8190,7 @@
       "source_file": "src/services/devicePaperAccount.ts",
       "source_location": "L16",
       "id": "services_devicepaperaccount_read",
-      "community": 66,
+      "community": 0,
       "norm_label": "read()"
     },
     {
@@ -8001,7 +8199,7 @@
       "source_file": "src/services/devicePaperAccount.ts",
       "source_location": "L24",
       "id": "services_devicepaperaccount_save",
-      "community": 66,
+      "community": 0,
       "norm_label": "save()"
     },
     {
@@ -8019,7 +8217,7 @@
       "source_file": "src/services/devicePaperAccount.ts",
       "source_location": "L26",
       "id": "services_devicepaperaccount_devicepapersymbols",
-      "community": 66,
+      "community": 0,
       "norm_label": "devicepapersymbols()"
     },
     {
@@ -8046,7 +8244,7 @@
       "source_file": "src/services/devicePaperAccount.ts",
       "source_location": "L62",
       "id": "services_devicepaperaccount_devicesymbols",
-      "community": 66,
+      "community": 0,
       "norm_label": "devicesymbols()"
     },
     {
@@ -8055,7 +8253,7 @@
       "source_file": "src/services/marketStatus.ts",
       "source_location": "L1",
       "id": "src_services_marketstatus_ts",
-      "community": 0,
+      "community": 61,
       "norm_label": "marketstatus.ts"
     },
     {
@@ -8064,7 +8262,7 @@
       "source_file": "src/services/marketStatus.ts",
       "source_location": "L5",
       "id": "services_marketstatus_marketstatus",
-      "community": 0,
+      "community": 61,
       "norm_label": "marketstatus"
     },
     {
@@ -8073,7 +8271,7 @@
       "source_file": "src/services/marketStatus.ts",
       "source_location": "L15",
       "id": "services_marketstatus_fetchmarketstatus",
-      "community": 0,
+      "community": 61,
       "norm_label": "fetchmarketstatus()"
     },
     {
@@ -8163,7 +8361,7 @@
       "source_file": "src/services/tradingHome.ts",
       "source_location": "L1",
       "id": "src_services_tradinghome_ts",
-      "community": 74,
+      "community": 6,
       "norm_label": "tradinghome.ts"
     },
     {
@@ -8172,7 +8370,7 @@
       "source_file": "src/services/tradingHome.ts",
       "source_location": "L5",
       "id": "services_tradinghome_dailyresult",
-      "community": 74,
+      "community": 6,
       "norm_label": "dailyresult()"
     },
     {
@@ -8181,7 +8379,7 @@
       "source_file": "src/services/tradingHome.ts",
       "source_location": "L9",
       "id": "services_tradinghome_opportunitystatus",
-      "community": 74,
+      "community": 6,
       "norm_label": "opportunitystatus()"
     },
     {
@@ -8190,7 +8388,7 @@
       "source_file": "src/services/tradingHome.ts",
       "source_location": "L15",
       "id": "services_tradinghome_rupees",
-      "community": 74,
+      "community": 6,
       "norm_label": "rupees()"
     },
     {
@@ -8289,7 +8487,7 @@
       "source_file": "src/services/paperWorkspace.ts",
       "source_location": "L17",
       "id": "services_paperworkspace_ordervaluation",
-      "community": 74,
+      "community": 6,
       "norm_label": "ordervaluation()"
     },
     {
@@ -8298,7 +8496,7 @@
       "source_file": "src/services/liveData.ts",
       "source_location": "L1",
       "id": "src_services_livedata_ts",
-      "community": 71,
+      "community": 61,
       "norm_label": "livedata.ts"
     },
     {
@@ -8316,7 +8514,7 @@
       "source_file": "src/services/liveData.ts",
       "source_location": "L3",
       "id": "services_livedata_fetchnifty",
-      "community": 71,
+      "community": 61,
       "norm_label": "fetchnifty()"
     },
     {
@@ -8597,6 +8795,69 @@
       "id": "docs_five_segment_accounts_live_verification",
       "community": 70,
       "norm_label": "live verification"
+    },
+    {
+      "label": "SUPABASE_PAPER_SCHEDULER.md",
+      "file_type": "document",
+      "source_file": "docs/SUPABASE_PAPER_SCHEDULER.md",
+      "source_location": "L1",
+      "id": "docs_supabase_paper_scheduler_md",
+      "community": 92,
+      "norm_label": "supabase_paper_scheduler.md"
+    },
+    {
+      "label": "Supabase-scheduled paper trading",
+      "file_type": "document",
+      "source_file": "docs/SUPABASE_PAPER_SCHEDULER.md",
+      "source_location": "L1",
+      "id": "docs_supabase_paper_scheduler_supabase_scheduled_paper_trading",
+      "community": 92,
+      "norm_label": "supabase-scheduled paper trading"
+    },
+    {
+      "label": "Activation order",
+      "file_type": "document",
+      "source_file": "docs/SUPABASE_PAPER_SCHEDULER.md",
+      "source_location": "L7",
+      "id": "docs_supabase_paper_scheduler_activation_order",
+      "community": 92,
+      "norm_label": "activation order"
+    },
+    {
+      "label": "code:sql (select cron.alter_job(jobid, active := true))",
+      "file_type": "document",
+      "source_file": "docs/SUPABASE_PAPER_SCHEDULER.md",
+      "source_location": "L15",
+      "id": "docs_supabase_paper_scheduler_codeblock_1",
+      "community": 92,
+      "norm_label": "code:sql (select cron.alter_job(jobid, active := true))"
+    },
+    {
+      "label": "code:sql (select cron.alter_job(jobid, active := false))",
+      "file_type": "document",
+      "source_file": "docs/SUPABASE_PAPER_SCHEDULER.md",
+      "source_location": "L22",
+      "id": "docs_supabase_paper_scheduler_codeblock_2",
+      "community": 92,
+      "norm_label": "code:sql (select cron.alter_job(jobid, active := false))"
+    },
+    {
+      "label": "Verification and troubleshooting",
+      "file_type": "document",
+      "source_file": "docs/SUPABASE_PAPER_SCHEDULER.md",
+      "source_location": "L29",
+      "id": "docs_supabase_paper_scheduler_verification_and_troubleshooting",
+      "community": 92,
+      "norm_label": "verification and troubleshooting"
+    },
+    {
+      "label": "code:sql (select jobname, schedule, active from cron.job where jobname)",
+      "file_type": "document",
+      "source_file": "docs/SUPABASE_PAPER_SCHEDULER.md",
+      "source_location": "L33",
+      "id": "docs_supabase_paper_scheduler_codeblock_3",
+      "community": 92,
+      "norm_label": "code:sql (select jobname, schedule, active from cron.job where jobname)"
     },
     {
       "label": "VERCEL_RELEASE.md",
@@ -9137,6 +9398,33 @@
       "id": "docs_performance_evaluation_data_needed_before_a_strategy_claim",
       "community": 72,
       "norm_label": "data needed before a strategy claim"
+    },
+    {
+      "label": "PAPER_MONITORING_DEBUG.md",
+      "file_type": "document",
+      "source_file": "docs/PAPER_MONITORING_DEBUG.md",
+      "source_location": "L1",
+      "id": "docs_paper_monitoring_debug_md",
+      "community": 86,
+      "norm_label": "paper_monitoring_debug.md"
+    },
+    {
+      "label": "Shared paper monitoring audit \u2014 September 30, 2026",
+      "file_type": "document",
+      "source_file": "docs/PAPER_MONITORING_DEBUG.md",
+      "source_location": "L1",
+      "id": "docs_paper_monitoring_debug_shared_paper_monitoring_audit_september_30_2026",
+      "community": 86,
+      "norm_label": "shared paper monitoring audit \u2014 september 30, 2026"
+    },
+    {
+      "label": "Deployment boundary",
+      "file_type": "document",
+      "source_file": "docs/PAPER_MONITORING_DEBUG.md",
+      "source_location": "L17",
+      "id": "docs_paper_monitoring_debug_deployment_boundary",
+      "community": 86,
+      "norm_label": "deployment boundary"
     },
     {
       "label": "SIGNAL_TUNING.md",
@@ -9719,7 +10007,7 @@
       "file_type": "code",
       "source_file": "src/components/SignalsPage.tsx",
       "source_location": "L9",
-      "community": 61,
+      "community": 0,
       "norm_label": "directionfromsignal()",
       "id": "components_signalspage_directionfromsignal"
     },
@@ -9836,7 +10124,7 @@
       "file_type": "code",
       "source_file": "src/components/OverviewPage.tsx",
       "source_location": "L3",
-      "community": 74,
+      "community": 6,
       "norm_label": "money()",
       "id": "components_overviewpage_money"
     },
@@ -9845,7 +10133,7 @@
       "file_type": "code",
       "source_file": "src/components/MetalsPage.tsx",
       "source_location": "L5",
-      "community": 90,
+      "community": 71,
       "norm_label": "signalstyles",
       "id": "components_metalspage_signalstyles"
     },
@@ -9854,7 +10142,7 @@
       "file_type": "code",
       "source_file": "src/components/MetalsPage.tsx",
       "source_location": "L13",
-      "community": 90,
+      "community": 71,
       "norm_label": "allocation",
       "id": "components_metalspage_allocation"
     },
@@ -10394,7 +10682,7 @@
       "file_type": "code",
       "source_file": "src/services/liveData.ts",
       "source_location": "L20",
-      "community": 71,
+      "community": 61,
       "norm_label": "yahoochartmeta",
       "id": "services_livedata_yahoochartmeta"
     },
@@ -10403,7 +10691,7 @@
       "file_type": "code",
       "source_file": "src/services/liveData.ts",
       "source_location": "L33",
-      "community": 71,
+      "community": 61,
       "norm_label": "fetchsinglestock()",
       "id": "services_livedata_fetchsinglestock"
     },
@@ -11072,6 +11360,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "vercel.json",
+      "source_location": "L25",
+      "weight": 1.0,
+      "source": "ai_algo_trading_india_vercel_functions",
+      "target": "ai_algo_trading_india_vercel_functions_api_scheduled_paper_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "vercel.json",
       "source_location": "L20",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -11087,6 +11385,16 @@
       "confidence_score": 1.0,
       "source": "ai_algo_trading_india_vercel_functions_api_shared_paper_ts",
       "target": "ai_algo_trading_india_vercel_api_shared_paper_ts_maxduration"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "vercel.json",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "ai_algo_trading_india_vercel_functions_api_scheduled_paper_ts",
+      "target": "ai_algo_trading_india_vercel_api_scheduled_paper_ts_maxduration",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -11657,6 +11965,16 @@
       "confidence_score": 1.0,
       "source": "ai_algo_trading_india_package_scripts",
       "target": "ai_algo_trading_india_package_scripts_build_server"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L19",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "ai_algo_trading_india_package_scripts",
+      "target": "ai_algo_trading_india_package_scripts_worker_shared_paper"
     },
     {
       "relation": "contains",
@@ -13690,6 +14008,39 @@
       "confidence_score": 1.0,
       "source": "tests_shared_paper_test_ts",
       "target": "tests_shared_paper_test_event"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/shared-paper.test.ts",
+      "source_location": "L153",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_shared_paper_test_ts",
+      "target": "server_sharedpapercycle_js"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/shared-paper.test.ts",
+      "source_location": "L153",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_shared_paper_test_ts",
+      "target": "server_sharedpapercycle_runsharedpapercycle"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/shared-paper.test.ts",
+      "source_location": "L153",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_shared_paper_test_ts",
+      "target": "server_sharedpapercycle_recordscan"
     },
     {
       "relation": "calls",
@@ -16148,6 +16499,99 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "tests/scheduled-paper.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "tests_scheduled_paper_test_ts",
+      "target": "server_scheduledpaper_js",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/scheduled-paper.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "tests_scheduled_paper_test_ts",
+      "target": "server_scheduledpaper_createscheduledpaperhandler",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/scheduled-paper.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "tests_scheduled_paper_test_ts",
+      "target": "server_scheduledpaper_scheduledpaperwindow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/scheduled-paper.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "tests_scheduled_paper_test_ts",
+      "target": "tests_scheduled_paper_test_now",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/scheduled-paper.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "tests_scheduled_paper_test_ts",
+      "target": "tests_scheduled_paper_test_response",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/scheduled-paper.test.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "tests_scheduled_paper_test_ts",
+      "target": "tests_scheduled_paper_test_req",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/scheduled-paper.test.ts",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "tests_scheduled_paper_test_ts",
+      "target": "tests_scheduled_paper_test_res",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/scheduled-paper.test.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "tests_scheduled_paper_test_ts",
+      "target": "tests_scheduled_paper_test_handler",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/scheduled-paper.test.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "tests_scheduled_paper_test_ts",
+      "target": "tests_scheduled_paper_test_bad",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "tests/manual-ticket.tsx",
       "source_location": "L3",
       "weight": 1.0,
@@ -17212,6 +17656,26 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "tests/paper-scheduler-database.mjs",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "tests_paper_scheduler_database_mjs",
+      "target": "tests_paper_scheduler_database_db",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/paper-scheduler-database.mjs",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "tests_paper_scheduler_database_mjs",
+      "target": "tests_paper_scheduler_database_migration",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "tests/fixtures/discovery-golden.json",
       "source_location": "L2",
       "weight": 1.0,
@@ -17269,18 +17733,29 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "server_sharedpaper_js",
-      "target": "server_sharedopportunities_recordopportunities"
+      "target": "server_sharedopportunities_opportunitydecisions"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/sharedPaper.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_sharedpaper_js",
+      "target": "server_sharedpapercycle_js"
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "server/sharedPaper.js",
-      "source_location": "L1",
+      "source_location": "L2",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "server_sharedpaper_js",
-      "target": "server_sharedopportunities_opportunitydecisions"
+      "target": "server_sharedpapercycle_runsharedpapercycle"
     },
     {
       "relation": "imports_from",
@@ -17391,17 +17866,6 @@
       "confidence_score": 1.0,
       "source": "server_sharedpaper_js",
       "target": "server_paperworkflow_amendpendingentry"
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "server/sharedPaper.js",
-      "source_location": "L4",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "server_sharedpaper_js",
-      "target": "server_paperworkflow_advanceworkflow"
     },
     {
       "relation": "imports_from",
@@ -17520,12 +17984,56 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "server/scheduledPaper.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "server_scheduledpaper_js",
+      "target": "server_sharedpaper_js",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/shared-paper-worker.mjs",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_shared_paper_worker_mjs",
+      "target": "server_sharedpaper_js"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "api/shared-paper.ts",
       "source_location": "L2",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "api_shared_paper_ts",
       "target": "server_sharedpaper_js"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/sharedPaper.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_sharedpaper_js",
+      "target": "server_sharedopportunities_recordopportunities"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/sharedPaper.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_sharedpaper_js",
+      "target": "server_paperworkflow_advanceworkflow"
     },
     {
       "relation": "imports_from",
@@ -17626,6 +18134,28 @@
       "target": "server_paperfunds_transferpaperfunds"
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/scheduledPaper.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "server_scheduledpaper_js",
+      "target": "server_sharedpaper_sharedstore",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/shared-paper-worker.mjs",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_shared_paper_worker_mjs",
+      "target": "server_sharedpaper_sharedstore"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -17646,6 +18176,147 @@
       "confidence_score": 1.0,
       "source": "api_shared_paper_ts",
       "target": "server_sharedpaper_createsharedpaperhandler"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/sharedPaperCycle.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_sharedpapercycle_js",
+      "target": "server_sharedopportunities_js"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/sharedPaperCycle.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_sharedpapercycle_js",
+      "target": "server_sharedopportunities_recordopportunities"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/sharedPaperCycle.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_sharedpapercycle_js",
+      "target": "server_paperworkflow_js"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/sharedPaperCycle.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_sharedpapercycle_js",
+      "target": "server_paperworkflow_advanceworkflow"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/sharedPaperCycle.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_sharedpapercycle_js",
+      "target": "server_sharedpapercycle_recordscan"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/sharedPaperCycle.js",
+      "source_location": "L18",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_sharedpapercycle_js",
+      "target": "server_sharedpapercycle_runsharedpapercycle"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/scheduledPaper.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "server_scheduledpaper_js",
+      "target": "server_sharedpapercycle_js",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/shared-paper-worker.mjs",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_shared_paper_worker_mjs",
+      "target": "server_sharedpapercycle_js"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "server/sharedPaperCycle.js",
+      "source_location": "L26",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "server_sharedpapercycle_runsharedpapercycle",
+      "target": "server_sharedpapercycle_recordscan"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server/scheduledPaper.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "server_scheduledpaper_js",
+      "target": "server_sharedpapercycle_runsharedpapercycle",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/shared-paper-worker.mjs",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_shared_paper_worker_mjs",
+      "target": "server_sharedpapercycle_runsharedpapercycle"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "server/sharedPaperCycle.js",
+      "source_location": "L30",
+      "weight": 1.0,
+      "source": "server_sharedpapercycle_runsharedpapercycle",
+      "target": "server_sharedopportunities_recordopportunities"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "server/sharedPaperCycle.js",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "server_sharedpapercycle_runsharedpapercycle",
+      "target": "server_paperworkflow_advanceworkflow"
     },
     {
       "relation": "contains",
@@ -18591,6 +19262,17 @@
       "weight": 1.0,
       "source": "server_sharedpaperobservation_observesharedpaper",
       "target": "services_stockdiscovery_discoverstocks"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "server/sharedPaperObservation.ts",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "server_sharedpaperobservation_observesharedpaper",
+      "target": "services_strongsignalpolicy_strongsignalrejection"
     },
     {
       "relation": "calls",
@@ -19550,6 +20232,48 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "server/scheduledPaper.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "server_scheduledpaper_js",
+      "target": "server_scheduledpaper_scheduledpaperwindow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server/scheduledPaper.js",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "server_scheduledpaper_js",
+      "target": "server_scheduledpaper_createscheduledpaperhandler",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "api/scheduled-paper.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "api_scheduled_paper_ts",
+      "target": "server_scheduledpaper_js",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "api/scheduled-paper.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "api_scheduled_paper_ts",
+      "target": "server_scheduledpaper_createscheduledpaperhandler",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "server/paperWorkflow.js",
       "source_location": "L3",
       "weight": 1.0,
@@ -20363,6 +21087,16 @@
       "weight": 1.0,
       "source": "scripts_paper_worker_cycle",
       "target": "services_stockdiscovery_fetchquotes"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/shared-paper-worker.mjs",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "scripts_shared_paper_worker_mjs",
+      "target": "scripts_shared_paper_worker_once"
     },
     {
       "relation": "contains",
@@ -32112,6 +32846,66 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "docs/SUPABASE_PAPER_SCHEDULER.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "docs_supabase_paper_scheduler_md",
+      "target": "docs_supabase_paper_scheduler_supabase_scheduled_paper_trading",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SUPABASE_PAPER_SCHEDULER.md",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "docs_supabase_paper_scheduler_supabase_scheduled_paper_trading",
+      "target": "docs_supabase_paper_scheduler_activation_order",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SUPABASE_PAPER_SCHEDULER.md",
+      "source_location": "L29",
+      "weight": 1.0,
+      "source": "docs_supabase_paper_scheduler_supabase_scheduled_paper_trading",
+      "target": "docs_supabase_paper_scheduler_verification_and_troubleshooting",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SUPABASE_PAPER_SCHEDULER.md",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "docs_supabase_paper_scheduler_activation_order",
+      "target": "docs_supabase_paper_scheduler_codeblock_1",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SUPABASE_PAPER_SCHEDULER.md",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "docs_supabase_paper_scheduler_activation_order",
+      "target": "docs_supabase_paper_scheduler_codeblock_2",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/SUPABASE_PAPER_SCHEDULER.md",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "docs_supabase_paper_scheduler_verification_and_troubleshooting",
+      "target": "docs_supabase_paper_scheduler_codeblock_3",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "docs/VERCEL_RELEASE.md",
       "source_location": "L1",
       "weight": 1.0,
@@ -32255,9 +33049,9 @@
       "source_file": "docs/BROKERAGE_AND_EXIT_AUDIT.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_brokerage_and_exit_audit_md",
-      "target": "docs_brokerage_and_exit_audit_brokerage_and_exit_data_audit_2026_09_26",
-      "confidence_score": 1.0
+      "target": "docs_brokerage_and_exit_audit_brokerage_and_exit_data_audit_2026_09_26"
     },
     {
       "relation": "contains",
@@ -32265,9 +33059,9 @@
       "source_file": "docs/BROKERAGE_AND_EXIT_AUDIT.md",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_brokerage_and_exit_audit_brokerage_and_exit_data_audit_2026_09_26",
-      "target": "docs_brokerage_and_exit_audit_result",
-      "confidence_score": 1.0
+      "target": "docs_brokerage_and_exit_audit_result"
     },
     {
       "relation": "contains",
@@ -32275,9 +33069,9 @@
       "source_file": "docs/BROKERAGE_AND_EXIT_AUDIT.md",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_brokerage_and_exit_audit_brokerage_and_exit_data_audit_2026_09_26",
-      "target": "docs_brokerage_and_exit_audit_verified_published_tariff",
-      "confidence_score": 1.0
+      "target": "docs_brokerage_and_exit_audit_verified_published_tariff"
     },
     {
       "relation": "contains",
@@ -32285,9 +33079,9 @@
       "source_file": "docs/BROKERAGE_AND_EXIT_AUDIT.md",
       "source_location": "L24",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_brokerage_and_exit_audit_brokerage_and_exit_data_audit_2026_09_26",
-      "target": "docs_brokerage_and_exit_audit_cost_only_comparison_same_trades_same_quantities",
-      "confidence_score": 1.0
+      "target": "docs_brokerage_and_exit_audit_cost_only_comparison_same_trades_same_quantities"
     },
     {
       "relation": "contains",
@@ -32295,9 +33089,9 @@
       "source_file": "docs/BROKERAGE_AND_EXIT_AUDIT.md",
       "source_location": "L42",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_brokerage_and_exit_audit_brokerage_and_exit_data_audit_2026_09_26",
-      "target": "docs_brokerage_and_exit_audit_exit_data_recovery",
-      "confidence_score": 1.0
+      "target": "docs_brokerage_and_exit_audit_exit_data_recovery"
     },
     {
       "relation": "contains",
@@ -32305,9 +33099,9 @@
       "source_file": "docs/BROKERAGE_AND_EXIT_AUDIT.md",
       "source_location": "L51",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_brokerage_and_exit_audit_brokerage_and_exit_data_audit_2026_09_26",
-      "target": "docs_brokerage_and_exit_audit_readiness_gate",
-      "confidence_score": 1.0
+      "target": "docs_brokerage_and_exit_audit_readiness_gate"
     },
     {
       "relation": "contains",
@@ -32618,6 +33412,26 @@
       "confidence_score": 1.0,
       "source": "docs_performance_evaluation_execution_replay",
       "target": "docs_performance_evaluation_codeblock_2"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PAPER_MONITORING_DEBUG.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_paper_monitoring_debug_md",
+      "target": "docs_paper_monitoring_debug_shared_paper_monitoring_audit_september_30_2026"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/PAPER_MONITORING_DEBUG.md",
+      "source_location": "L17",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_paper_monitoring_debug_shared_paper_monitoring_audit_september_30_2026",
+      "target": "docs_paper_monitoring_debug_deployment_boundary"
     },
     {
       "relation": "contains",
@@ -33539,5 +34353,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "a8389d497dacea3a2e088cc59e79fae657c09806"
+  "built_at_commit": "3a4a25f9f28d56d88f140dfff24a7ee9fda386a8"
 }

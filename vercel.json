@@ -21,6 +21,9 @@
     },
     "api/shared-paper.ts": {
       "maxDuration": 60
+    },
+    "api/scheduled-paper.ts": {
+      "maxDuration": 60
     }
   }
 }
