@@ -24,6 +24,12 @@
     },
     "api/scheduled-paper.ts": {
       "maxDuration": 60
+    },
+    "api/premarket.js": {
+      "maxDuration": 60
+    },
+    "api/scheduled-premarket.js": {
+      "maxDuration": 60
     }
   }
 }

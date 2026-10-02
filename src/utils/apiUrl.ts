@@ -21,7 +21,7 @@ export function apiUrl(localPath: string): string {
     const provider = localPath.startsWith('/api/yahoo/') ? 'yahoo' : 'nse';
     return `${apiBase}/api/market?provider=${provider}&path=${encodeURIComponent(localPath.slice(('/api/' + provider).length))}`;
   }
-  if (localPath.startsWith('/api/research?')) return `${apiBase}${localPath}`;
+  if (localPath.startsWith('/api/research?') || localPath.startsWith('/api/premarket?')) return `${apiBase}${localPath}`;
   if (!IS_PROD) return localPath;
 
   // Find matching proxy prefix (longest match first)

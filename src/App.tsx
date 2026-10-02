@@ -15,6 +15,7 @@ const SmartPicksPage = lazy(() => import('./components/SmartPicksPage').then(m =
 const MetalsPage = lazy(() => import('./components/MetalsPage').then(m => ({default:m.MetalsPage})));
 const DiscoveryPage = lazy(() => import('./components/DiscoveryPage').then(m => ({default:m.DiscoveryPage})));
 const BacktestPage = lazy(() => import('./components/BacktestPage').then(m => ({default:m.BacktestPage})));
+const PremarketPage = lazy(() => import('./components/PremarketPage').then(m => ({default:m.PremarketPage})));
 const MarketNewsPage = lazy(() => import('./components/MarketNewsPage').then(m => ({default:m.MarketNewsPage})));
 const IPOPage = lazy(() => import('./components/IPOPage').then(m => ({default:m.IPOPage})));
 import { useLiveStocks } from './hooks/useLiveStocks';
@@ -25,7 +26,7 @@ export default function App() {
   const { error, loading, lastScan } = useStockDiscovery();
   const [segment,setSegment]=useState(tradingSegments[0]);
   const [activeTab, setActiveTab] = useState('Overview');
-  const separateResearch=['IPO Tracker','Metals','Market News'].includes(activeTab);
+  const separateResearch=['IPO Tracker','Metals','Market News','Pre-market'].includes(activeTab);
   const [focusSignalId,setFocusSignalId]=useState<string|undefined>();
   const { nifty, lastUpdated } = useLiveStocks();
 
@@ -58,6 +59,7 @@ export default function App() {
             {activeTab === 'Stock Analysis' && <StockAnalysisPage />}
             {activeTab === 'Signals' && <SignalsPage onOpen={signalId=>{setFocusSignalId(signalId);setActiveTab('Trades');}} />}
             {activeTab === 'Backtest' && <BacktestPage />}
+            {activeTab === 'Pre-market' && <PremarketPage />}
             {activeTab === 'Market News' && <MarketNewsPage segment={segment.id} />}
             {activeTab === 'IPO Tracker' && <IPOPage />}
             {activeTab === 'Metals' && <MetalsPage />}
