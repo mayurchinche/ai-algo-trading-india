@@ -1,6 +1,8 @@
+import {segmentFees} from '../../shared/segmentExecution';
 // Presentation of recorded executions only; never fabricates a mark or a trade.
 export interface PaperOrder {
  economics?:{model:string;at:string;quantity:number;entry:number;targetCosts:number;stopCosts:number;targetNet:number;stopNet:number;netRewardRisk:number|null;costsExceedTarget:boolean}|null;
+ costModel?:string;evaluationExcludedReason?:string;instrumentKey?:string;lotSize?:number;expiry?:number;
  id:string;requestedQuantity?:number;symbol:string;side:string;status:string;quantity:number;filled:number;exited:number;
  submittedAt:string;signalTime?:string;orderTimeUnknown?:boolean;entryTime?:string;exitTime?:string;
  entryQuoteTime?:string;exitQuoteTime?:string;entryPrice?:number;exitPrice?:number;netPnl?:number;
@@ -22,7 +24,7 @@ export function orderValuation(o:PaperOrder,now=Date.now()){
  if(!o.filled||stale)return {remaining,stale,gross:null,net:null,fees:null};
  const exitValue=o.exitValue+o.lastPrice!*remaining;
  const gross=(exitValue-o.entryValue)*(o.side==='BUY'?1:-1);
- const fees=40+(o.entryValue+exitValue)*.0005;
+ const fees=o.costModel==='segment-conservative-allowance-v1'?segmentFees(o.product!,o.entryValue/o.filled,exitValue/o.filled,o.filled):40+(o.entryValue+exitValue)*.0005;
  const round=(n:number)=>Math.round(n*100)/100;
  return {remaining,stale:false,gross:round(gross),net:round(gross-fees),fees:round(fees)};
 }

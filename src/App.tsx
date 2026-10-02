@@ -37,7 +37,7 @@ export default function App() {
       <Header activeTab={activeTab} onTabChange={setActiveTab} nifty={nifty} lastUpdated={lastUpdated} />
 
       <main id="main-content" className="app-main" tabIndex={-1}>
-        <nav className="segment-selector" aria-label="Trading segment">{tradingSegments.map(item=><button key={item.id} aria-pressed={segment.id===item.id} onClick={()=>{setSegment(item);setFocusSignalId(undefined);}}>{item.label}<small>{item.executionReady?'Paper trading':'Funding only'}</small></button>)}</nav>
+        <nav className="segment-selector" aria-label="Trading segment">{tradingSegments.map(item=><button key={item.id} aria-pressed={segment.id===item.id} onClick={()=>{setSegment(item);setFocusSignalId(undefined);}}>{item.label}<small>{item.executionReady?'Paper trading':'Paper pilot setup'}</small></button>)}</nav>
         <p className="notice">{segment.label} · shared user1 account. Starting budgets are simulation settings, not a profitability guarantee. Existing intraday capital is preserved.</p>
         <div className={`runtime-status ${error ? 'runtime-error' : ''}`} role="status">{error || (loading ? 'Refreshing market observations…' : `Device research scan · ${lastScan ? 'Scan ' + lastScan.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' }) + ' IST' : 'Awaiting data'} · Shared server monitoring · see Paper trades for scheduler evidence`)}</div>
         <div role="status">{paperError&&<p className="notice">user1 monitoring: {paperError}</p>}</div>
@@ -50,7 +50,7 @@ export default function App() {
             transition={{ duration: 0.25, ease: 'easeOut' }}
             className="space-y-6"
           >
-            {segment.id!=='intraday'&&!separateResearch ? (['Overview','Trades'].includes(activeTab)?<SegmentPaperAccount segment={segment}/>:<section className="card space-y-4"><h1>{segment.label} · {activeTab}</h1><SegmentReadiness segment={segment}/><button onClick={()=>setActiveTab('Trades')}>View {segment.label.toLowerCase()} paper account</button></section>) : <>
+            {segment.id!=='intraday'&&!separateResearch ? (['Overview','Trades','Signals','Alerts'].includes(activeTab)?<SegmentPaperAccount segment={segment} initialView={['Signals','Alerts'].includes(activeTab)?'signals':'positions'}/>:<section className="card space-y-4"><h1>{segment.label} · {activeTab}</h1><SegmentReadiness segment={segment}/><button onClick={()=>setActiveTab('Trades')}>View {segment.label.toLowerCase()} paper account</button></section>) : <>
             {activeTab === 'Alerts' && <AlertsPage onOpen={signalId=>{setFocusSignalId(signalId);setActiveTab('Trades');}} />}
             {activeTab === 'AI Discovery' && <DiscoveryPage />}
             {activeTab === 'Smart Picks' && <SmartPicksPage />}

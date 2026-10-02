@@ -1,3 +1,4 @@
+import {segmentFees} from '../shared/segmentExecution.js';
 // Pure paper-account accounting. Deposits and withdrawals never move real money.
 const round=n=>Math.round(n*100)/100;
 export class PaperAccountError extends Error {}
@@ -10,7 +11,7 @@ export function paperBalance(s,now=Date.now()) {
  const positionPnl=stale?null:round(active.reduce((n,o)=>{
   if(!o.filled)return n;
   const remaining=o.filled-o.exited,estimatedExit=o.exitValue+o.lastPrice*remaining;
-  return n+(estimatedExit-o.entryValue)*(o.side==='BUY'?1:-1)-(40+(o.entryValue+estimatedExit)*.0005);
+  return n+(estimatedExit-o.entryValue)*(o.side==='BUY'?1:-1)-(o.costModel==='segment-conservative-allowance-v1'?segmentFees(o.product,o.entryValue/o.filled,estimatedExit/o.filled,o.filled):40+(o.entryValue+estimatedExit)*.0005);
  },0));
  const equity=positionPnl==null?null:round(balance+positionPnl);
  return {principal:fundedCapital(s),deposits:round((s.transfers||[]).filter(t=>t.kind==='DEPOSIT').reduce((n,t)=>n+t.amount,0)),withdrawals:round((s.transfers||[]).filter(t=>t.kind==='WITHDRAWAL').reduce((n,t)=>n+t.amount,0)),realized:s.realized,balance,reserved,positionPnl,equity,available:equity==null?0:Math.max(0,round(Math.min(balance,equity)-reserved)),valuationStale:stale};

@@ -2,7 +2,7 @@ import type {PaperOrder} from './paperWorkspace';
 const round=(n:number)=>Math.round(n*100)/100;
 export function paperEvidence(orders:PaperOrder[]){
  const closed=orders.filter(o=>o.status==='CLOSED');
- const usable=closed.filter(o=>!o.legacy&&!o.monitoringGap&&o.strategy?.id&&Number.isFinite(o.netPnl)&&[o.signalTime,o.submittedAt,o.entryTime,o.exitTime,o.entryQuoteTime,o.exitQuoteTime].every(t=>t&&Number.isFinite(Date.parse(t)))&&Date.parse(o.signalTime!)<=Date.parse(o.submittedAt)&&Date.parse(o.submittedAt)<Date.parse(o.entryQuoteTime!)&&Date.parse(o.entryQuoteTime!)<=Date.parse(o.entryTime!)&&Date.parse(o.entryTime!)<Date.parse(o.exitQuoteTime!)&&Date.parse(o.exitQuoteTime!)<=Date.parse(o.exitTime!));
+ const usable=closed.filter(o=>!o.legacy&&!o.monitoringGap&&!o.evaluationExcludedReason&&o.strategy?.id&&Number.isFinite(o.netPnl)&&[o.signalTime,o.submittedAt,o.entryTime,o.exitTime,o.entryQuoteTime,o.exitQuoteTime].every(t=>t&&Number.isFinite(Date.parse(t)))&&Date.parse(o.signalTime!)<=Date.parse(o.submittedAt)&&Date.parse(o.submittedAt)<Date.parse(o.entryQuoteTime!)&&Date.parse(o.entryQuoteTime!)<=Date.parse(o.entryTime!)&&Date.parse(o.entryTime!)<Date.parse(o.exitQuoteTime!)&&Date.parse(o.exitQuoteTime!)<=Date.parse(o.exitTime!));
  const groups=new Map<string,PaperOrder[]>();
  for(const o of usable){const key=`${o.strategy!.id} · ${o.executionMode||'UNRECORDED'} · ${o.reactionDelaySeconds??'unknown'}s · ${o.orderType||'MARKET'}`;groups.set(key,[...(groups.get(key)||[]),o]);}
  return {closed:closed.length,excluded:closed.length-usable.length,groups:[...groups].map(([policy,rows])=>{

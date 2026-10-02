@@ -1,3 +1,4 @@
+import {runSegmentPaperCycle} from './segmentPaperCycle.js';
 import {opportunityDecisions} from './sharedOpportunities.js';
 import {runSharedPaperCycle} from './sharedPaperCycle.js';
 import {tradingSegment} from '../shared/tradingSegments.js';
@@ -62,19 +63,23 @@ export function createSharedPaperHandler({store=sharedStore,observe,enabled=()=>
    const segment=req.query?.segment??'intraday';
    const config=tradingSegment(segment);
    if(!config)throw new SharedPaperError('Unknown trading segment.');
+   const executionReady=segment==='intraday'||process.env.MULTI_MODE_PAPER_ENABLED==='true';
    const db=store(segment);let account=await db.account();
    if(req.method==='POST'){
     const body=req.body;
     if(!body||typeof body!=='object'||Array.isArray(body)||JSON.stringify(body).length>10000)throw new SharedPaperError('Invalid paper request.');
-    if(!config.executionReady&&!(body.action&&Object.keys(body.action).length===1&&body.action.transfer))throw new SharedPaperError('Trading for this segment is unavailable pending feed and execution validation. Only paper funding is enabled.',409);
+    if(!executionReady&&!(body.action&&Object.keys(body.action).length===1&&body.action.transfer))throw new SharedPaperError('Trading for this segment is unavailable pending feed and execution validation. Only paper funding is enabled.',409);
     if(body.tick===true&&Object.keys(body).length===1){
-     await runSharedPaperCycle({db,observe,now});
+     if(segment==='intraday')await runSharedPaperCycle({db,observe,now});
+     else await runSegmentPaperCycle({db,segment,now});
     }else{
      if(!uuid(body.requestId)||Object.keys(body).some(k=>!['requestId','action'].includes(k)))throw new SharedPaperError('A unique requestId and action are required.');
      const prior=await db.prior(body.requestId);
      if(prior&&!same(prior.action,body.action))throw new SharedPaperError('Request ID belongs to a different action.',409);
      if(!prior){
+      if(segment!=='intraday'&&!['transfer','enabled','closeOrderId','cancelRemainder'].includes(Object.keys(body.action||{})[0]))throw new SharedPaperError('This experimental segment supports automatic market entries, pause, funding and exit requests only.');
       const result=applySharedAction(account,body.action,now());
+      if(segment!=='intraday')result.state.segment=segment;
       const saved=await db.commit(account,result,body.requestId,body.action);
       if(saved==='conflict')throw new SharedPaperError('Account changed on another device. Refresh and retry.',409);
      }
@@ -98,7 +103,7 @@ export function createSharedPaperHandler({store=sharedStore,observe,enabled=()=>
    if(signalId&&!/^[a-zA-Z0-9:_ .-]{1,240}$/.test(signalId))throw new SharedPaperError('Unsupported signal identifier.');
    const rows=orderId&&!order?[]:await db.events(after,until,orderId,signalId);
    const events=rows.slice(0,500);
-   return res.status(200).json({account:{...account,name:'user1',segment,executionReady:config.executionReady,storage:'shared-backend'},balance:paperBalance(account.state,now()),events,nextCursor:events.at(-1)?.sequence??after,hasMore:rows.length>500});
+   return res.status(200).json({account:{...account,name:'user1',segment,executionReady,activation:{workerEnabled:executionReady,marketDataConfigured:segment==='intraday'||Boolean(process.env.UPSTOX_ANALYTICS_TOKEN),model:segment==='intraday'?'intraday-v1':'experimental-segment-v1'},storage:'shared-backend'},balance:paperBalance(account.state,now()),events,nextCursor:events.at(-1)?.sequence??after,hasMore:rows.length>500});
   }catch(e){return res.status(e instanceof SharedPaperError?e.status:503).json({error:e instanceof SharedPaperError?e.message:'Shared paper backend unavailable. Existing records are preserved; no local replacement trades are generated.'});}
  };
 }
