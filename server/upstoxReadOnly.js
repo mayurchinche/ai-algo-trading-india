@@ -43,3 +43,21 @@ export function normalizeUpstoxQuotes(data,keys,now){
  }
  return quotes;
 }
+export function createUpstoxProbe({read=createUpstoxReader(),clock=Date.now}={}){
+ let cached,pending;
+ return async()=>{
+  if(cached&&clock()-cached.at<60000)return cached.result;
+  if(!pending)pending=(async()=>{
+   let result;
+   try{
+    const [market,quotes]=await Promise.all([read('/v2/market/status/NSE'),read('/v3/market-quote/quotes?instrument_key=NSE_INDEX%7CNifty%2050')]);
+    const q=Object.values(quotes).find(q=>q.instrument_token==='NSE_INDEX|Nifty 50');
+    if(typeof market.status!=='string'||!q||!Number.isFinite(q.last_price)||q.last_price<=0||!Number.isFinite(Number(q.last_trade_time)))throw new MarketDataError('UPSTOX_QUOTE_SCHEMA_UNVERIFIED');
+    result={status:'CONNECTED',marketStatus:market.status,checkedAt:new Date(clock()).toISOString(),quoteTime:new Date(Number(q.last_trade_time)).toISOString(),note:'Market-status and index-quote reads succeeded. This does not verify fresh derivative books or enable paper execution.'};
+   }catch(e){result={status:'UNAVAILABLE',reason:e instanceof MarketDataError?e.code:'UPSTOX_CONNECTION_FAILED',checkedAt:new Date(clock()).toISOString()};}
+   cached={at:clock(),result};return result;
+  })().finally(()=>{pending=null;});
+  return pending;
+ };
+}
+export const probeUpstox=createUpstoxProbe();

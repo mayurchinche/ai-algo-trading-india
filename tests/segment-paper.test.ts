@@ -87,3 +87,9 @@ test('future candles and conflicting duplicate completed bars cannot influence q
  const rows=Array.from({length:60},(_,i)=>[new Date(now-(60-i)*86400000).toISOString(),100+i,101+i,99+i,100+i,1000]);
  const conflict=[...rows[0]];conflict[4]=100.5;assert.equal(trendDecision([...rows,conflict],'short-term',now).reason,'CONFLICTING_DUPLICATE_BARS');
 });
+import {createUpstoxProbe} from '../server/upstoxReadOnly.js';
+test('connection probe verifies read access only, caches results, and sanitizes auth failure',async()=>{
+ let calls=0;const probe=createUpstoxProbe({clock:()=>now,read:async(path:string)=>{calls++;return path.includes('market/status')?{status:'CLOSED'}:{index:{instrument_token:'NSE_INDEX|Nifty 50',last_price:22000,last_trade_time:String(now-86400000)}};}});
+ const result=await probe();assert.equal(result.status,'CONNECTED');assert.equal(result.marketStatus,'CLOSED');assert.match(result.note,/does not verify/);await probe();assert.equal(calls,2);
+ const failure=await createUpstoxProbe({read:async()=>{throw Error('private credential');},clock:()=>now})();assert.equal(failure.reason,'UPSTOX_CONNECTION_FAILED');assert(!JSON.stringify(failure).includes('private credential'));
+});

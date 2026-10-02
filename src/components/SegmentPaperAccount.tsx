@@ -1,7 +1,7 @@
 import {SegmentComparison} from './SegmentComparison';
 import {useEffect,useState} from 'react';
 import type {TradingSegment} from '../../shared/tradingSegments';
-import {sharedPaperRequest} from '../services/sharedPaperAccount';
+import {sharedPaperRequest,sharedPaperConnection} from '../services/sharedPaperAccount';
 import {PaperFundsPanel,type PaperBalance,type FundingState} from './PaperFundsPanel';
 import {PaperEvidencePanel} from './PaperEvidencePanel';
 import {TradeDetailTimeline} from './TradeDetailTimeline';
@@ -14,6 +14,8 @@ type Snapshot={account:{id:string;revision:number;enabled:boolean;executionReady
 const money=(n:number|null|undefined)=>n==null?'Unavailable':n.toLocaleString('en-IN',{style:'currency',currency:'INR'});
 export function SegmentPaperAccount({segment,initialView='positions'}:{segment:TradingSegment;initialView?:'positions'|'signals'}){
  const [data,setData]=useState<Snapshot|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[expanded,setExpanded]=useState<string>();
+ const [connection,setConnection]=useState('');
+ async function checkConnection(){setBusy(true);try{const value=await sharedPaperConnection(segment.id);setConnection(`${value.status}: ${value.reason||value.marketStatus||''}. ${value.note||''} Checked ${formatIST(value.checkedAt)}`);}catch{setConnection('Connection check unavailable');}finally{setBusy(false);}}
  const [view,setView]=useState<'positions'|'history'|'signals'>(initialView);
  useEffect(()=>{let active=true;
   async function refresh(){try{const next=await sharedPaperRequest(undefined,0,undefined,undefined,segment.id);if(active){setData(previous=>previous&&previous.account.revision>next.account.revision?previous:next);setError('');}}catch(e){if(active){setData(null);setError(e instanceof Error?e.message:'Account unavailable');}}}
@@ -32,6 +34,7 @@ export function SegmentPaperAccount({segment,initialView='positions'}:{segment:T
  <section className="notice space-y-2"><h3>{!data?(error?'Execution setup unavailable':'Checking execution setup'):!data.account.executionReady?'Deployment activation required':!data.account.activation?.marketDataConfigured?'Upstox read-only token required':data.account.enabled?'Automatic paper entries enabled':'Paper entries paused'}</h3>
  <p>{derivative?'Index contracts only. Whole lots, fresh bid/ask quotes and session exits; no expiry-day entries. Options buy calls or puts only. Futures reserve full notional until verified margin support is added.':'Cash-funded, long-only delivery simulation. Completed daily-bar trend signals; positions carry across sessions with stops, targets and a holding limit.'}</p>
  <p>Experimental strategies and conservative cost allowances are not verified broker returns. Missing quotes never create fills. Delivery settlement and corporate actions are not reconciled; those outcomes are excluded from validated accuracy.</p>
+ <button disabled={busy} onClick={()=>void checkConnection()}>Check Upstox connection</button>{connection&&<p role="status">{connection}</p>}
  <button disabled={busy||!ready} onClick={()=>void action({enabled:!data?.account.enabled})}>{data?.account.enabled?'Pause new entries':'Enable automatic paper entries'}</button>{data?.account.executionReady&&<button disabled={busy} onClick={()=>void action({tick:true})}>Run server scan</button>}</section>
  {error&&<p className="notice" role="alert">{error}</p>}
  <ScannerStatus state={state}/>{state?.discoveryError&&<p className="notice" role="alert">Feed/scan failure: {state.discoveryError}</p>}

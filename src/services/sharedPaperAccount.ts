@@ -24,3 +24,9 @@ export function exportEarlierDeviceAccount(){
  if(!data.state||!Array.isArray(data.events))throw new Error('Device archive is invalid. Original storage has been preserved.');
  return data;
 }
+
+export async function sharedPaperConnection(segment:TradingSegmentId){
+ const response=await fetch(`${apiBase}/api/shared-paper?segment=${encodeURIComponent(segment)}&feed=readiness`,{signal:AbortSignal.timeout(20000)});
+ const data=await response.json();if(!response.ok||data.segment!==segment||!data.connection)throw new Error('Connection check unavailable');
+ return data.connection as {status:string;reason?:string;marketStatus?:string;checkedAt:string;quoteTime?:string;note?:string};
+}

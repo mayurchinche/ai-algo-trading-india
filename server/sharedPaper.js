@@ -1,3 +1,4 @@
+import {probeUpstox} from './upstoxReadOnly.js';
 import {runSegmentPaperCycle} from './segmentPaperCycle.js';
 import {opportunityDecisions} from './sharedOpportunities.js';
 import {runSharedPaperCycle} from './sharedPaperCycle.js';
@@ -59,10 +60,11 @@ export function createSharedPaperHandler({store=sharedStore,observe,enabled=()=>
   if(!['GET','POST'].includes(req.method))return res.status(405).json({error:'GET or POST required'});
   if(!enabled())return res.status(503).json({error:'Shared user1 paper account is not activated. No device account is used as a replacement.'});
   try{
-   if(req.query?.feed!=null&&(req.query.feed!=='opportunities'||req.method!=='GET'))throw new SharedPaperError('Invalid feed request.');
+   if(req.query?.feed!=null&&(!['opportunities','readiness'].includes(req.query.feed)||req.method!=='GET'))throw new SharedPaperError('Invalid feed request.');
    const segment=req.query?.segment??'intraday';
    const config=tradingSegment(segment);
    if(!config)throw new SharedPaperError('Unknown trading segment.');
+   if(req.query?.feed==='readiness')return res.status(200).json({segment,connection:await probeUpstox()});
    const executionReady=segment==='intraday'||process.env.MULTI_MODE_PAPER_ENABLED==='true';
    const db=store(segment);let account=await db.account();
    if(req.method==='POST'){
