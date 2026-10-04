@@ -1,3 +1,4 @@
+import {DecisionEvidencePanel} from './DecisionEvidencePanel';
 import {ScannerStatus} from './ScannerStatus';
 import {OpeningGapWatch} from './OpeningGapWatch';
 import {useState} from 'react';
@@ -29,7 +30,7 @@ export function SharedOpportunityFeed({title='Shared strong signals',onOpen}:{ti
  <div className="notice"><strong>{summary.label}</strong><p>{summary.reason}</p></div>
  {o&&<div><p>Filled {o.filled} · Exited {o.exited} · Remaining position {Math.max(0,o.filled-o.exited)}</p><p>Submitted: {formatIST(o.submittedAt)}</p>{o.entryPrice!=null&&<p>Average entry ₹{o.entryPrice.toFixed(2)} · {formatIST(o.entryTime)}</p>}{o.status==='CLOSED'&&<><p>Exit: {formatIST(o.exitTime)}{o.exitPrice!=null?` · ₹${o.exitPrice.toFixed(2)}`:''}</p><p>Recorded net P&amp;L: {o.netPnl!=null?o.netPnl.toLocaleString('en-IN',{style:'currency',currency:'INR'}):'Not recorded'} · Costs: {o.fees!=null?`₹${o.fees.toFixed(2)}`:'Not recorded'}</p></>}{o.monitoringGap&&<p className="notice">Monitoring gap recorded. Intervening price crossings are unknown.</p>}</div>}
  {o?.economics&&<details><summary>Cost-adjusted reference · {o.economics.quantity} units</summary><p>Calculated {formatIST(o.economics.at)} at reference ₹{o.economics.entry.toFixed(2)}.</p><p>Estimated net at target: ₹{o.economics.targetNet.toFixed(2)} · Estimated net at stop: ₹{o.economics.stopNet.toFixed(2)}</p><p>Net reward / risk: {o.economics.netRewardRisk??'Unavailable'} · Target-side estimated costs: ₹{o.economics.targetCosts.toFixed(2)}</p>{o.economics.costsExceedTarget&&<p className="notice">Estimated costs exceed the target reward at this quantity.</p>}<p>Submission/amendment diagnostic, not realized P&amp;L or a current quote. Uses the simulator’s approximate charges and exit slippage; spreads, gaps and liquidity can worsen outcomes. No profitability probability is implied.</p></details>}
- <p>Signal: {formatIST(s.generatedAt)}</p><p>Quote: {formatIST(s.quoteTime)}</p>
+ <DecisionEvidencePanel evidence={s.decisionEvidence}/><p>Signal: {formatIST(s.generatedAt)}</p><p>Quote: {formatIST(s.quoteTime)}</p>
  <p>{fresh&&Date.parse(s.expiresAt)>now?`Reference window: ${Math.ceil((Date.parse(s.expiresAt)-now)/1000)}s remaining`:'Historical reference · not a current entry price'}</p>
  <p>Reference ₹{s.entry.toFixed(2)} · Stop ₹{s.stop.toFixed(2)} · Target ₹{s.target.toFixed(2)}</p>
  <details><summary>Signal evidence and timing</summary><p>{s.strategy?.reasons?.join(' · ')||'No strategy reasons recorded.'}</p><p>Recorded: {formatIST(s.at)}</p><p>Reference expires: {formatIST(s.expiresAt)}</p><p>Strategy: {s.strategy?.id||'Not recorded'}</p></details>

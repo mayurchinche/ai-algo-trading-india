@@ -1,3 +1,4 @@
+import {attachDecisionEvidence} from './decisionEvidence.js';
 import {randomUUID} from 'node:crypto';
 import {advanceSegmentPaper} from './segmentPaperEngine.js';
 import {recordScan} from './sharedPaperCycle.js';
@@ -12,7 +13,7 @@ export async function runSegmentPaperCycle({db,segment,observe=observeSegmentPap
   try{observation=await observe(account,now());}catch{observation={marketOpen:false,candidates:[],quotes:[],discoveryError:'SEGMENT_OBSERVATION_FAILED',scanDiagnostics:{status:'OBSERVATION_FAILED'}};}
   const before=structuredClone(account.state),signalEvents=[];before.segmentSignals??=[];
   const firstSeen=new Map(before.segmentSignals.map(s=>[s.signalId,s]));
-  observation.candidates=(observation.candidates||[]).map(s=>firstSeen.get(s.signalId)||s);
+  observation.candidates=(observation.candidates||[]).map(s=>firstSeen.get(s.signalId)||attachDecisionEvidence(s,segment,new Date(now()).toISOString()));
   const known=new Set(before.segmentSignals.map(s=>s.signalId));
   for(const s of observation.candidates||[])if(!known.has(s.signalId)){known.add(s.signalId);before.segmentSignals.push(s);signalEvents.push({id:++before.sequence,at:new Date(now()).toISOString(),kind:'SEGMENT_SIGNAL_RECORDED',signalId:s.signalId,segment,signal:s});}
   const result=advanceSegmentPaper(before,{...observation,segment,now:now(),acceptEntries:account.enabled});
