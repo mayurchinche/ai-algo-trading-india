@@ -1,6 +1,16 @@
 # Android test builds
 
-## Prepared locally: v1.7.0 — decision cards and cost diagnostics
+## Latest: v1.8.0 — research portfolio and evidence views
+
+[Android v1.8.0 APK](./algotrader-research-evidence-v1.8.0.apk?raw=true)
+
+VersionCode 9, footer v1.8.0; same signing certificate as v1.7.0. Install as an update without clearing app data. Built from commit 7c80165 and adds the research portfolio page, company disclosures inbox, company history, report evidence archive and passages, candidate financial evidence, portfolio coverage, and external indicator CSV inspection. These views need the matching Vercel API (`company-disclosures`, `company-history`, `report-evidence`, `research-portfolios`) to be deployed. No new trading policy or profitability claim is introduced.
+
+271 tests, nine database suites, lint, TypeScript/mobile build, Capacitor sync and assembleDebug passed on 13 October 2026. Verified: APK package/version, API URL, signing certificate and the v1.8.0 footer. Physical-device installation and open-market execution are unverified.
+
+SHA-256: `62c08757c6b571f0c9098685275f6b851faab3542f60afd0e37ff6e167d00bb4`
+
+## Previous: v1.7.0 — decision cards and cost diagnostics
 
 [Android v1.7.0 APK](./algotrader-decision-cards-v1.7.0.apk?raw=true)
 
@@ -10,7 +20,7 @@ Publication and deployment are pending approval. VersionCode 8, same signing cer
 
 SHA-256: `a1237de24bdffdeff4771e2155b089bc8472e4090a2df91702134e32f809fb11`
 
-## Latest: v1.6.0 — five shared accounts and shared signals
+## Previous: v1.6.0 — five shared accounts and shared signals
 
 [Android v1.6.0 APK](./algotrader-shared-segments-v1.6.0.apk?raw=true)
 
