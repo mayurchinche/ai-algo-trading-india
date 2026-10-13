@@ -1,16 +1,16 @@
 // @ts-expect-error Shared JavaScript evidence archive API.
-import reportEvidenceHandler from './api/report-evidence.js'
+import reportEvidenceHandler from './api/_report-evidence.js'
 // @ts-expect-error Shared JavaScript company-history API.
-import companyHistoryHandler from './api/company-history.js'
+import companyHistoryHandler from './api/_company-history.js'
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 // @ts-expect-error JavaScript Vercel handler is shared with local development.
 import marketHandler from './api/market.js'
 // @ts-expect-error Shared JavaScript disclosure API.
-import disclosureHandler from './api/company-disclosures.js'
+import disclosureHandler from './api/_company-disclosures.js'
 // @ts-expect-error Shared JavaScript portfolio API.
-import portfolioHandler from './api/research-portfolios.js'
+import portfolioHandler from './api/_research-portfolios.js'
 // @ts-expect-error Shared JavaScript research API.
 import researchHandler from './api/research.js'
 // @ts-expect-error Shared JavaScript research history API.

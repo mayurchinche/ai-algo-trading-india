@@ -1,7 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {buildResearchPortfolio,validateMandate} from '../server/researchPortfolio.js';
 import {evidenceRequirements} from '../server/decisionEvidence.js';
-import {createPortfolioHandler} from '../api/research-portfolios.js';
+import {createPortfolioHandler} from '../api/_research-portfolios.js';
 import {researchPillars,sectorResearchFields} from '../shared/businessResearch.js';
 const asOf='2026-10-04T04:30:00.000Z';
 const mandate={name:'Test research',segment:'long-term',budget:10000,maxStockPct:20,maxSectorPct:35,cashReservePct:20,maxPositions:5,riskBudgetPct:2};

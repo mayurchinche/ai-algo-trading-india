@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {disclosureTime,parseDisclosures,parseOrderDisclosure,createDisclosureReader,DISCLOSURE_FEED} from '../server/companyDisclosures.js';
-import {createDisclosureHandler} from '../api/company-disclosures.js';
+import {createDisclosureHandler} from '../api/_company-disclosures.js';
 const now=Date.parse('2026-10-04T06:30:00Z');
 const item=(description='Test Company Limited received an award letter',url='https://nsearchives.nseindia.com/corporate/xbrl/test.xml',date='04-Oct-2026 10:27:35')=>`<item><title>Test Company Limited</title><link>${url}</link><description>${description}</description><pubDate>${date}</pubDate></item>`;
 const feed=(items:string)=>`<rss><channel><title>NSE News - Latest Announcements</title>${items}</channel></rss>`;

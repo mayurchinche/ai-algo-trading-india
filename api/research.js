@@ -1,7 +1,24 @@
 import { allowRequest } from '../server/pushBackend.js';
 import { fetchNews, newsQuery, newsFilters } from '../server/marketNews.js';
+import disclosureHandler from './_company-disclosures.js';
+import companyHistoryHandler from './_company-history.js';
+import reportEvidenceHandler from './_report-evidence.js';
+import portfolioHandler from './_research-portfolios.js';
 const cache=new Map(), inflight=new Map();
-export default async function handler(req,res) {
+// The Vercel Hobby plan allows 12 functions per deployment. vercel.json rewrites these
+// public paths to /api/research?route=<name>, and the router removes `route` before
+// calling the handler, because each handler only accepts its own query keys.
+export const researchRoutes={'company-disclosures':disclosureHandler,'company-history':companyHistoryHandler,'report-evidence':reportEvidenceHandler,'research-portfolios':portfolioHandler};
+export function createResearchRouter(routes=researchRoutes,news=newsHandler){return async(req,res)=>{
+  const {route,...query}=req.query||{};
+  if(route===undefined)return news(req,res);
+  const target=typeof route==='string'&&Object.hasOwn(routes,route)?routes[route]:null;
+  if(!target)return res.status(404).json({error:'Unknown research route'});
+  try{req.query=query;}catch{delete req.query.route;}
+  return target(req,res);
+};}
+export default createResearchRouter();
+async function newsHandler(req,res) {
   if(!allowRequest(req,res))return;
   if(req.method!=='GET')return res.status(405).json({error:'GET required'});
   let q,filters;try{q=newsQuery(req.query.q??'');filters=newsFilters(req.query.topic,req.query.days);}catch(error){return res.status(400).json({error:error.message});}

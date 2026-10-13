@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {createReportEvidenceHandler} from '../api/report-evidence.js';
+import {createReportEvidenceHandler} from '../api/_report-evidence.js';
 const reference={requestId:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',symbol:'TEST',segment:'equities',id:'b'.repeat(64),documentHash:'c'.repeat(64)};
 const res=()=>({statusCode:0,body:null as any,setHeader(){},status(n:number){this.statusCode=n;return this;},json(b:any){this.body=b;}});
 const req=(body:any)=>({method:'POST',headers:{host:'test'},body});

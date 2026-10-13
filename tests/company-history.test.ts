@@ -1,7 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {createElement} from 'react';import {renderToStaticMarkup} from 'react-dom/server';
 import {parseCompanyHistory,createCompanyHistoryReader,captureCompanyHistories} from '../server/companyHistory.js';
-import {createCompanyHistoryHandler} from '../api/company-history.js';
+import {createCompanyHistoryHandler} from '../api/_company-history.js';
 import {CompanyHistoryView} from '../src/components/CompanyHistoryResearch';
 const now=Date.parse('2026-10-04T06:00:00Z');
 const row={companyName:'Test fixture',fromYr:'2025',toYr:'2026',submission_type:'Revised',broadcast_dttm:'30-MAY-2026 20:04:13',disseminationDateTime:'30-MAY-2026 20:04:14',fileName:'https://nsearchives.nseindia.com/annual_reports/test.pdf'};

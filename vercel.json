@@ -7,6 +7,10 @@
   ],
   "rewrites": [
     {
+      "source": "/api/:route(company-disclosures|company-history|report-evidence|research-portfolios)",
+      "destination": "/api/research?route=:route"
+    },
+    {
       "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
@@ -22,6 +26,9 @@
     "api/scheduled-premarket.js": {
       "maxDuration": 60
     },
+    "api/research.js": {
+      "maxDuration": 60
+    },
     "api/*.js": {
       "maxDuration": 30
     },
@@ -29,15 +36,6 @@
       "maxDuration": 60
     },
     "api/scheduled-paper.ts": {
-      "maxDuration": 60
-    },
-    "api/research-portfolios.js": {
-      "maxDuration": 60
-    },
-    "api/company-history.js": {
-      "maxDuration": 60
-    },
-    "api/report-evidence.js": {
       "maxDuration": 60
     }
   }

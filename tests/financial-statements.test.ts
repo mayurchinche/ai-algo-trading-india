@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {parseFinancialDisclosure} from '../server/financialStatements.js';
-import {createDisclosureHandler} from '../api/company-disclosures.js';
+import {createDisclosureHandler} from '../api/_company-disclosures.js';
 const now=Date.parse('2026-10-04T06:30:00Z');
 const item={id:'a'.repeat(64),url:'https://nsearchives.nseindia.com/corporate/xbrl/test.xml',publishedAt:'2026-10-01T14:45:12Z'};
 const context='<context id="P"><entity><identifier>123</identifier></entity><period><startDate>2026-04-01</startDate><endDate>2026-06-30</endDate></period></context>';
