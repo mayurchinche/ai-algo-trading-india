@@ -17,6 +17,7 @@ const DiscoveryPage = lazy(() => import('./components/DiscoveryPage').then(m => 
 const BacktestPage = lazy(() => import('./components/BacktestPage').then(m => ({default:m.BacktestPage})));
 const PremarketPage = lazy(() => import('./components/PremarketPage').then(m => ({default:m.PremarketPage})));
 const MarketNewsPage = lazy(() => import('./components/MarketNewsPage').then(m => ({default:m.MarketNewsPage})));
+const ResearchPortfolioPage = lazy(() => import('./components/ResearchPortfolioPage').then(m => ({default:m.ResearchPortfolioPage})));
 const IPOPage = lazy(() => import('./components/IPOPage').then(m => ({default:m.IPOPage})));
 import { useLiveStocks } from './hooks/useLiveStocks';
 import { useStockDiscovery, useTradingRuntime } from './hooks/useStockDiscovery';
@@ -26,21 +27,23 @@ export default function App() {
   const { error, loading, lastScan } = useStockDiscovery();
   const [segment,setSegment]=useState(tradingSegments[0]);
   const [activeTab, setActiveTab] = useState('Overview');
-  const separateResearch=['IPO Tracker','Metals','Market News','Pre-market'].includes(activeTab);
+  const portfolioResearch=activeTab==='Portfolios';
+  const separateResearch=['IPO Tracker','Metals','Market News','Pre-market','Portfolios'].includes(activeTab);
   const [focusSignalId,setFocusSignalId]=useState<string|undefined>();
   const { nifty, lastUpdated } = useLiveStocks();
 
   return (
     <div className="workspace-shell min-h-screen flex flex-col bg-[var(--bg)]">
       <a href="#main-content" className="skip-link">Skip to main content</a>
-      {segment.id==='intraday'&&<SignalPopup onView={() => setActiveTab('Alerts')} />}
+      {!portfolioResearch&&segment.id==='intraday'&&<SignalPopup onView={() => setActiveTab('Alerts')} />}
       <Header activeTab={activeTab} onTabChange={setActiveTab} nifty={nifty} lastUpdated={lastUpdated} />
 
       <main id="main-content" className="app-main" tabIndex={-1}>
-        <nav className="segment-selector" aria-label="Trading segment">{tradingSegments.map(item=><button key={item.id} aria-pressed={segment.id===item.id} onClick={()=>{setSegment(item);setFocusSignalId(undefined);}}>{item.label}<small>{item.executionReady?'Paper trading':'Paper pilot setup'}</small></button>)}</nav>
+        {!portfolioResearch&&<><nav className="segment-selector" aria-label="Trading segment">{tradingSegments.map(item=><button key={item.id} aria-pressed={segment.id===item.id} onClick={()=>{setSegment(item);setFocusSignalId(undefined);}}>{item.label}<small>{item.executionReady?'Paper trading':'Paper pilot setup'}</small></button>)}</nav>
         <p className="notice">{segment.label} · shared user1 account. Starting budgets are simulation settings, not a profitability guarantee. Existing intraday capital is preserved.</p>
         <div className={`runtime-status ${error ? 'runtime-error' : ''}`} role="status">{error || (loading ? 'Refreshing market observations…' : `Device research scan · ${lastScan ? 'Scan ' + lastScan.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' }) + ' IST' : 'Awaiting data'} · Shared server monitoring · see Paper trades for scheduler evidence`)}</div>
         <div role="status">{paperError&&<p className="notice">user1 monitoring: {paperError}</p>}</div>
+        </>}
         <div key={segment.id}><Suspense fallback={<div className="card workspace-loading" role="status"><span className="loading-line"/><span className="loading-line short"/><p>Opening workspace…</p></div>}><AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -59,6 +62,7 @@ export default function App() {
             {activeTab === 'Stock Analysis' && <StockAnalysisPage />}
             {activeTab === 'Signals' && <SignalsPage onOpen={signalId=>{setFocusSignalId(signalId);setActiveTab('Trades');}} />}
             {activeTab === 'Backtest' && <BacktestPage />}
+            {activeTab === 'Portfolios' && <ResearchPortfolioPage />}
             {activeTab === 'Pre-market' && <PremarketPage />}
             {activeTab === 'Market News' && <MarketNewsPage segment={segment.id} />}
             {activeTab === 'IPO Tracker' && <IPOPage />}

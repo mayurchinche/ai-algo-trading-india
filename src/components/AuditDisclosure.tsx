@@ -1,0 +1,5 @@
+export type AuditEvidence={status:string;contextId:string;scope:string;period:{start:string;end:string}|null;note:string;fields:{key:string;label:string;tag:string;contextId:string|null;value:string|null;status:string}[]};
+export function AuditDisclosure({evidence}:{evidence?:AuditEvidence}){
+ if(!evidence)return <p className="text-sm">Audit declarations were not captured in this observation. Governance remains unassessed.</p>;
+ return <section className="border rounded-lg p-3 space-y-2"><h4 className="font-semibold">Audit declarations · source review required</h4><p className="text-sm">{evidence.scope} · {evidence.period?`${evidence.period.start} to ${evidence.period.end}`:'Reporting period unavailable'}</p>{evidence.fields.map(field=><div key={field.key}><p className="font-medium">{field.label}</p><p className="break-words">{field.value??'Unavailable · '+field.status.replaceAll('_',' ').toLowerCase()}</p><p className="text-xs break-all">Source field: {field.tag} · Context: {field.contextId??'unverified'}</p></div>)}<p className="text-sm">{evidence.note}</p></section>;
+}

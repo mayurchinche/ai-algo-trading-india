@@ -270,8 +270,8 @@
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/vercel.json": {
-    "mtime": 1790875120.257472,
-    "ast_hash": "a22b5754ab91b95458ba10e4ef4dafb5",
+    "mtime": 1791099575.5409715,
+    "ast_hash": "7e45185563a1268fa627a68b40e7ec81",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tsconfig.app.json": {
@@ -290,8 +290,8 @@
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/package.json": {
-    "mtime": 1790755356.274921,
-    "ast_hash": "329db411d3f3d295f15960f3129fa11e",
+    "mtime": 1791099126.2539423,
+    "ast_hash": "1caff2996754292f158be3dc059b6774",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tsconfig.json": {
@@ -300,8 +300,8 @@
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/vite.config.ts": {
-    "mtime": 1790352864.5678985,
-    "ast_hash": "f26c70a018c92ae6f6a4aeab2316bf26",
+    "mtime": 1791099575.5366926,
+    "ast_hash": "d25c38bba3ceaa57025098828e7e0b16",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/capacitor.config.ts": {
@@ -310,8 +310,8 @@
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/run.mjs": {
-    "mtime": 1790875209.408493,
-    "ast_hash": "8aafc125f10b57fc3e97009f48d71b6d",
+    "mtime": 1791101851.2422729,
+    "ast_hash": "ef0db0a910fe183db795e1950d6155f0",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/mobile-alerts.test.ts": {
@@ -480,8 +480,8 @@
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/App.tsx": {
-    "mtime": 1790362535.6706865,
-    "ast_hash": "20066704db511dc11d3b9bc4d84f1463",
+    "mtime": 1791092064.5432453,
+    "ast_hash": "a1db9c44a583a203457cae01e0286459",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/main.tsx": {
@@ -490,8 +490,8 @@
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/utils/apiUrl.ts": {
-    "mtime": 1790352672.5021534,
-    "ast_hash": "0c209bec75494ebfab32663756456d35",
+    "mtime": 1791099575.5370693,
+    "ast_hash": "f7c677d29567d5b87176ca49407e2758",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/AlertsPage.tsx": {
@@ -515,8 +515,8 @@
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/OverviewPage.tsx": {
-    "mtime": 1790360792.331223,
-    "ast_hash": "6f27a576108484ac00580175443f0b0d",
+    "mtime": 1790908047.1421056,
+    "ast_hash": "c2c0086f4191cdd78c86f42e1293e19a",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/JournalErrorBoundary.tsx": {
@@ -535,8 +535,8 @@
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/Header.tsx": {
-    "mtime": 1790350545.96669,
-    "ast_hash": "9569cb3c1a4b80ae44934ec9c116d024",
+    "mtime": 1791091752.6664083,
+    "ast_hash": "f2b20b6dfe099f1cb48bd36178340c47",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/DiscoveryPage.tsx": {
@@ -615,8 +615,8 @@
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/services/stockDiscovery.ts": {
-    "mtime": 1790400958.829631,
-    "ast_hash": "97e492fc32912e227d2687fa46c2d666",
+    "mtime": 1790877906.129026,
+    "ast_hash": "bde9d99de4480f17912d301a434d3897",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/services/metalsService.ts": {
@@ -955,8 +955,8 @@
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/ServerPaperPage.tsx": {
-    "mtime": 1790875120.2948842,
-    "ast_hash": "388bce541c2d052f28524a057d679309",
+    "mtime": 1790877827.2459834,
+    "ast_hash": "2f355680402b52e86ff088059ce15988",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/docs/PERSISTENT-PAPER-TRADING.md": {
@@ -970,8 +970,8 @@
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/paperFunds.js": {
-    "mtime": 1789895418.0236003,
-    "ast_hash": "814af615e13eecc48a3218cb5cd54bdb",
+    "mtime": 1790907191.3581262,
+    "ast_hash": "2a73ade1fb97856cb0132a227c7875bf",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/PaperFundsPanel.tsx": {
@@ -995,8 +995,8 @@
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/services/paperWorkspace.ts": {
-    "mtime": 1790362358.1492894,
-    "ast_hash": "65aa22ab5c2005386c8956e27d36f6f9",
+    "mtime": 1790907191.3587213,
+    "ast_hash": "f54da35357ddc7b1461dbf4bfdd175c9",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/docs/paper-workspace-plan/progress.md": {
@@ -1050,8 +1050,8 @@
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/services/paperEvidence.ts": {
-    "mtime": 1790348408.4983175,
-    "ast_hash": "e2805ac36be6c273cfc6fc90794fca60",
+    "mtime": 1790907191.3590994,
+    "ast_hash": "d5a92f1a172161e2caadec2702350efd",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/manual-ticket.html": {
@@ -1070,8 +1070,8 @@
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/TradeDetailTimeline.tsx": {
-    "mtime": 1790352864.5662756,
-    "ast_hash": "f3469881059d58279f7c4c21919262ff",
+    "mtime": 1790907275.0137105,
+    "ast_hash": "89b12ba9d2c9cdbef60c41ffc3df8dd4",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/hooks/usePaperSnapshot.ts": {
@@ -1090,8 +1090,8 @@
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/shared-paper.test.ts": {
-    "mtime": 1790755392.1712945,
-    "ast_hash": "14e4676056e769e157d74d5219acacfd",
+    "mtime": 1790878093.9633255,
+    "ast_hash": "4571ac87f28bdcc38d22f5b582c3f98a",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/shared-paper-database.mjs": {
@@ -1100,13 +1100,13 @@
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/sharedPaper.js": {
-    "mtime": 1790755356.1338506,
-    "ast_hash": "1cf05ebc6a94e25d59124a80767342bd",
+    "mtime": 1790908379.7874594,
+    "ast_hash": "3989c11fe5b0d9002286ad1344b46e13",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/sharedPaperObservation.ts": {
-    "mtime": 1790755356.1344562,
-    "ast_hash": "73aa2be0bac9bc967bdb71c126386b32",
+    "mtime": 1790877906.1293745,
+    "ast_hash": "bb3be0af8d3e8d497e68c708a86b696b",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/supabase/migrations/20260925_shared_paper_user1.sql": {
@@ -1120,8 +1120,8 @@
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/services/sharedPaperAccount.ts": {
-    "mtime": 1790360792.329012,
-    "ast_hash": "af1c0fd7547ec9ebd4084ab76a2e4ed8",
+    "mtime": 1790908379.7879574,
+    "ast_hash": "f94abb123ab68d21afdda810863293dc",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/docs/SHARED-USER1-PAPER.md": {
@@ -1155,8 +1155,8 @@
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/SegmentPaperAccount.tsx": {
-    "mtime": 1790360173.2538688,
-    "ast_hash": "da03650b89d2d84fcf8c0c79fbaaa677",
+    "mtime": 1791090263.193268,
+    "ast_hash": "3a059091c6bcd235978674c0df145033",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/docs/FIVE_SEGMENT_ACCOUNTS.md": {
@@ -1165,18 +1165,18 @@
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/sharedOpportunities.js": {
-    "mtime": 1790362358.1486087,
-    "ast_hash": "27efdd7a85e16b8bc40a58ebb17e5356",
+    "mtime": 1791090263.1922822,
+    "ast_hash": "1da25e4f1ab3e2aba3e008d41e3c2f34",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/SharedOpportunityFeed.tsx": {
-    "mtime": 1790362358.1505225,
-    "ast_hash": "f01e3c18c610ab6de4e6c794eb9bc966",
+    "mtime": 1791090457.1119378,
+    "ast_hash": "fc0ff5deff72180eaab86adfd215fbf7",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/hooks/useSharedOpportunities.ts": {
-    "mtime": 1790361982.37152,
-    "ast_hash": "b03e2eb3043afce720d9d4863dbfaa3d",
+    "mtime": 1791090457.1114917,
+    "ast_hash": "74a4c8827e366be8f2444ead0b92ec61",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/docs/SHARED_OPPORTUNITIES.md": {
@@ -1335,8 +1335,8 @@
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/sharedPaperCycle.js": {
-    "mtime": 1790875120.2663674,
-    "ast_hash": "98b047a33fb123f97da5cd56c3a80b9c",
+    "mtime": 1790877758.2602348,
+    "ast_hash": "38aee3a3ce202592d955eea8fac839de",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/scripts/shared-paper-worker.mjs": {
@@ -1360,8 +1360,8 @@
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/scheduledPaper.js": {
-    "mtime": 1790875119.806716,
-    "ast_hash": "122451597e0432279ecfa715870d6c92",
+    "mtime": 1790907191.357647,
+    "ast_hash": "59a3740919bb4349a447e42531186153",
     "semantic_hash": ""
   },
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/supabase/migrations/20261001_paper_scheduler.sql": {
@@ -1377,6 +1377,451 @@
   "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/docs/SUPABASE_PAPER_SCHEDULER.md": {
     "mtime": 1790875164.391041,
     "ast_hash": "26ce6ada39a28c27cbfeb0e514145698",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/opening-gap.test.ts": {
+    "mtime": 1790877906.144575,
+    "ast_hash": "ce7cfb92145801a6c03dac74883ec3e6",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/SegmentReadiness.tsx": {
+    "mtime": 1790907324.2969193,
+    "ast_hash": "30c0849b33a71491024ab587a463c6fa",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/ScannerStatus.tsx": {
+    "mtime": 1790877906.129687,
+    "ast_hash": "3afae3cb7700bdd59fef22baff28b183",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/OpeningGapWatch.tsx": {
+    "mtime": 1790877827.2437515,
+    "ast_hash": "f94986f823c91068ad2bc5696e42b597",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/services/openingGap.ts": {
+    "mtime": 1790877758.2592494,
+    "ast_hash": "45e1d97e813339cd79603c1d46d5078a",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/docs/OPENING_GAP_AND_MONITORING.md": {
+    "mtime": 1790878093.9718454,
+    "ast_hash": "e50040a0b2d044a000ae4ac8510c2a55",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/market-news.test.ts": {
+    "mtime": 1790879758.359217,
+    "ast_hash": "6772acacd4f680cf5c3412878e1bb74d",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/marketNews.js": {
+    "mtime": 1790879758.3574696,
+    "ast_hash": "36998d0deca84133ffcb18dd32692d64",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/api/research.js": {
+    "mtime": 1790879758.3578525,
+    "ast_hash": "ca1745b54b56f84256059939a18c5faf",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/MarketNewsPage.tsx": {
+    "mtime": 1790879878.9859264,
+    "ast_hash": "21220b19916f2924aef5dcf4217511a9",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/docs/MARKET_INTELLIGENCE_AND_DERIVATIVES.md": {
+    "mtime": 1790879878.9870687,
+    "ast_hash": "f59a29e3bab865c4e509e6d43d589b41",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/premarket-database.mjs": {
+    "mtime": 1790905524.1666381,
+    "ast_hash": "68834e5d766c2aff898bfac8bb11d230",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/premarket.test.ts": {
+    "mtime": 1790905636.25339,
+    "ast_hash": "06d7dea6f9f59c76c23429f0d6e86cf8",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/scheduledPremarket.js": {
+    "mtime": 1790905303.7831461,
+    "ast_hash": "869a8b0af7e71ae32a990ef702886fe6",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/premarketStore.js": {
+    "mtime": 1790905303.7786653,
+    "ast_hash": "04b28aafd21c985c86f4a295af69052f",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/premarket.js": {
+    "mtime": 1790905636.2529573,
+    "ast_hash": "ffc516075f1bca1d95ceb5641320e7f2",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/supabase/migrations/20261002_premarket_research.sql": {
+    "mtime": 1790905580.6080651,
+    "ast_hash": "bafd09df693e975b81b23c64bb004f33",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/api/premarket.js": {
+    "mtime": 1790905303.7927012,
+    "ast_hash": "d1ff0b97c904f8b2f4652df3d6534fc2",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/api/scheduled-premarket.js": {
+    "mtime": 1790905303.7887561,
+    "ast_hash": "eba8fb48368b26cf25d8bca3f1a2289a",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/PremarketPage.tsx": {
+    "mtime": 1790905443.1033287,
+    "ast_hash": "fdaec13131790bd751c94763c867987a",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/docs/PREMARKET_RESEARCH.md": {
+    "mtime": 1790905822.1746051,
+    "ast_hash": "a5142649cae0fb7c60e62e5930a6d7dc",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/segment-paper.test.ts": {
+    "mtime": 1790908379.7967632,
+    "ast_hash": "374a1b5b97ec4f70ceaa1fe9129bba0e",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/multi-mode-database.mjs": {
+    "mtime": 1790907526.707209,
+    "ast_hash": "e0fcff78b093ceddbbeb9c72f3db8a81",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/segmentPaperEngine.js": {
+    "mtime": 1790908092.043441,
+    "ast_hash": "3439536ccd6a12bfbc355c68f47a2470",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/segmentObservation.js": {
+    "mtime": 1790907526.6935668,
+    "ast_hash": "f725d3ac605cb3f6d5b08437e39f207f",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/upstoxReadOnly.js": {
+    "mtime": 1790908379.7107344,
+    "ast_hash": "c5483e0eda5d50bf1b5de4476e3b8a3a",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/segmentPaperCycle.js": {
+    "mtime": 1791090263.1928256,
+    "ast_hash": "c8a9bbd6746b1d6b088ce8ef35dab206",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/shared/segmentExecution.d.ts": {
+    "mtime": 1790907191.3582747,
+    "ast_hash": "01eb8d7f0188d79641fc58bc03345527",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/shared/segmentExecution.js": {
+    "mtime": 1790907015.663074,
+    "ast_hash": "ace060a30ed304ae610e991b7b84de24",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/supabase/migrations/20261002_multi_mode_paper.sql": {
+    "mtime": 1790907191.3600855,
+    "ast_hash": "227cb878971d25042f167b7e19fab8ed",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/docs/MULTI_MODE_PAPER.md": {
+    "mtime": 1790907526.7897027,
+    "ast_hash": "21fc83ad7f88b789545c13e60579a29c",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/SegmentComparison.tsx": {
+    "mtime": 1790907968.6456642,
+    "ast_hash": "64f06ac9923530b579188f8bbcaba64f",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/decision-evidence.test.ts": {
+    "mtime": 1791090569.6526556,
+    "ast_hash": "2966ea5c7c15366084f79e3f61499e22",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/decisionEvidence.js": {
+    "mtime": 1791090569.6424081,
+    "ast_hash": "27c3bf3c74036d302415399decce28f5",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/evidenceComparison.js": {
+    "mtime": 1791090457.12072,
+    "ast_hash": "a9a2320f1a6487531e91226be9a120ac",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/shared/decisionEvidence.d.ts": {
+    "mtime": 1791090263.1160843,
+    "ast_hash": "9a0796380fd69ed1006d0b3877b4df51",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/DecisionEvidencePanel.tsx": {
+    "mtime": 1791090263.1207564,
+    "ast_hash": "32745bcaf5a3858fca17f01ece3415f6",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/docs/EVIDENCE_REQUIREMENTS.md": {
+    "mtime": 1791090457.126089,
+    "ast_hash": "cb3d25b1f245799f432184fa5b24c74c",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/research-portfolio-database.mjs": {
+    "mtime": 1791096018.6406224,
+    "ast_hash": "ff4f908be1de52b268f61b926fa26992",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/research-portfolio.test.ts": {
+    "mtime": 1791099899.7914028,
+    "ast_hash": "d699d115a8060126444265e63e61a286",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/researchPortfolio.js": {
+    "mtime": 1791096394.1548412,
+    "ast_hash": "a00303fa00f57fe9ed1ee99503b3312b",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/researchPortfolioStore.js": {
+    "mtime": 1791091617.2499526,
+    "ast_hash": "8fb63b07988e16c723e9744e895a7270",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/supabase/migrations/20261004_research_portfolios.sql": {
+    "mtime": 1791091617.2590425,
+    "ast_hash": "2cba8618ab2e5b6c7d73d5b714d34691",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/api/research-portfolios.js": {
+    "mtime": 1791099899.790874,
+    "ast_hash": "6ee33d7d64e743569dff317081de4189",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/ResearchPortfolioPage.tsx": {
+    "mtime": 1791101223.0865917,
+    "ast_hash": "e2e7c844d70a9b8864e5ea2326b28cca",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/docs/AFIB_PORTFOLIO_REVIEW.md": {
+    "mtime": 1791127393.598468,
+    "ast_hash": "735f01b1e05b3eb683e6ed046006ebc5",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/businessResearch.js": {
+    "mtime": 1791094219.0344932,
+    "ast_hash": "ca5da7d33a468d0842782938bc2d72f1",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/shared/businessResearch.d.ts": {
+    "mtime": 1791094052.4757767,
+    "ast_hash": "9dbac4c8bc9121f566a765bbf313a87a",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/shared/businessResearch.js": {
+    "mtime": 1791094052.4706194,
+    "ast_hash": "b056e401c59c5007b742b7d543935c9b",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/company-disclosures.test.ts": {
+    "mtime": 1791094883.5875134,
+    "ast_hash": "8730a26e0e0c58352185740a8ecbf544",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/companyDisclosures.js": {
+    "mtime": 1791095314.1907172,
+    "ast_hash": "5a9b915a375213e51f571408ce5722da",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/api/company-disclosures.js": {
+    "mtime": 1791095314.1910045,
+    "ast_hash": "dd0af9bf348d77932126e6f49c0b86e3",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/CompanyDisclosureInbox.tsx": {
+    "mtime": 1791127348.3514698,
+    "ast_hash": "970c49857f89102d1ad12b23dc7a27bf",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/financial-statements.test.ts": {
+    "mtime": 1791127348.3522525,
+    "ast_hash": "fc4eebfc846979e4b7a6b2f4904a7310",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/financialStatements.js": {
+    "mtime": 1791127348.2764657,
+    "ast_hash": "cc4073537e9b36eab2cdb925b7ae46ba",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/financial-snapshot.test.ts": {
+    "mtime": 1791095956.3563943,
+    "ast_hash": "890473aa90e8b338acf338bbade7e930",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/financialEvidenceSnapshot.js": {
+    "mtime": 1791095912.1056533,
+    "ast_hash": "82a495677d9403875a701e589595faa6",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/candidate-financials.test.ts": {
+    "mtime": 1791100158.1469593,
+    "ast_hash": "29cdc6753425c1255466ca733cabd4ce",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/candidateFinancials.js": {
+    "mtime": 1791100107.1103406,
+    "ast_hash": "743f776fbadc42457ace148287242e2d",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/CandidateFinancialEvidence.tsx": {
+    "mtime": 1791127348.3509188,
+    "ast_hash": "06823a73c82b5b6d5282fc14ddc189ff",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/portfolio-coverage.test.ts": {
+    "mtime": 1791096394.23321,
+    "ast_hash": "4ec0ccd93cf09b0a01a74aa35d806e70",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/portfolioCoverage.js": {
+    "mtime": 1791096394.0803063,
+    "ast_hash": "e9101f1b247cdf6b61b5b0ae7afcec7c",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/PortfolioCoveragePanel.tsx": {
+    "mtime": 1791096394.1626515,
+    "ast_hash": "884699bd2a29658f73d08564fff541a7",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/company-history.test.ts": {
+    "mtime": 1791098485.7204382,
+    "ast_hash": "8625f3782467bf0627e131274f306a10",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/companyHistory.js": {
+    "mtime": 1791099403.1422102,
+    "ast_hash": "405e09c96875723b56dc08128078c060",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/shared/scrapResearch.js": {
+    "mtime": 1791098430.11833,
+    "ast_hash": "39a8170351f377856944cdfd4e68117f",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/shared/scrapResearch.d.ts": {
+    "mtime": 1791098430.1228123,
+    "ast_hash": "7864155653f4390d64ed955c6584df02",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/api/company-history.js": {
+    "mtime": 1791099126.3476973,
+    "ast_hash": "73cd814b9dab77da41e1724a67ec3e76",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/CompanyHistoryResearch.tsx": {
+    "mtime": 1791099206.0378585,
+    "ast_hash": "719e62ce9efef0f96e3f305e3390e7a1",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/report-passages.test.ts": {
+    "mtime": 1791099206.0528646,
+    "ast_hash": "e48dbf7128417253dfa28e03bf2bc397",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/reportPassages.js": {
+    "mtime": 1791099126.263654,
+    "ast_hash": "893f8b2b05a80ae5b53f07f88f39bc2b",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/ReportPassages.tsx": {
+    "mtime": 1791099744.7919903,
+    "ast_hash": "8195056192dc659b7084d6d962fe616b",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/report-evidence-database.mjs": {
+    "mtime": 1791099683.9656348,
+    "ast_hash": "f7b70bff55e305eada21ddfc2d6cf09e",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/report-evidence.test.ts": {
+    "mtime": 1791099683.9580107,
+    "ast_hash": "9ca116cb2ac61ee11833bbb907a7be78",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/reportEvidenceStore.js": {
+    "mtime": 1791099575.4243188,
+    "ast_hash": "0adc0c14232c35b379882f13c7a28c7c",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/supabase/migrations/20261004_report_evidence.sql": {
+    "mtime": 1791099575.4176838,
+    "ast_hash": "3641855ff84e95a816d0e494e81f572d",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/api/report-evidence.js": {
+    "mtime": 1791099943.365784,
+    "ast_hash": "fc3a605bf94557878cfbbf1732b9a5ff",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/ReportEvidenceArchive.tsx": {
+    "mtime": 1791099943.3654857,
+    "ast_hash": "8447e0bdee40c300cbcbc0f6ad3ab297",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/archived-portfolio.test.ts": {
+    "mtime": 1791099899.8029513,
+    "ast_hash": "a8cddd36f040094c2e588ded52832d0e",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/archivedPortfolioEvidence.js": {
+    "mtime": 1791099899.6846533,
+    "ast_hash": "9cd4f607044b8d076377744e9ecb5774",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/financial-growth.test.ts": {
+    "mtime": 1791100107.1228616,
+    "ast_hash": "0c3f0b47ef4482d73295adb2796aa1c0",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/server/financialGrowth.js": {
+    "mtime": 1791100107.0248713,
+    "ast_hash": "0c2476d4c659c71174eecf437330f2de",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/external-indicator.test.ts": {
+    "mtime": 1791101223.0955317,
+    "ast_hash": "dc0fc5f21f44b3fcdafec58daf16e243",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/ExternalIndicatorReview.tsx": {
+    "mtime": 1791101851.2417593,
+    "ast_hash": "254d3bc58fcd1b935b159422ad576bdd",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/tests/indicator-csv.test.ts": {
+    "mtime": 1791102084.216801,
+    "ast_hash": "45585a7f44ffc731bc45da5135db0ca6",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/utils/inspectIndicatorCsv.ts": {
+    "mtime": 1791102084.2156923,
+    "ast_hash": "bb6db68221be8f8854f781ddb69570b0",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/IndicatorCsvInspector.tsx": {
+    "mtime": 1791102084.216304,
+    "ast_hash": "dec6ca23ba608c7892c1c094ede5330f",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/utils/inspectCsvTimes.ts": {
+    "mtime": 1791102084.1302464,
+    "ast_hash": "891724998b9b7f3d2a10acf8cce3432e",
+    "semantic_hash": ""
+  },
+  "/Users/mayur.chinche/PycharmProjects/ai-algo-trading-india/src/components/AuditDisclosure.tsx": {
+    "mtime": 1791127348.284564,
+    "ast_hash": "11a78b933df507f305e72addb1ee6dbc",
     "semantic_hash": ""
   }
 }

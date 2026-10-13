@@ -1,0 +1,5 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {createElement} from 'react';import {renderToStaticMarkup} from 'react-dom/server';
+import {indicatorChartUrl,ExternalIndicatorReview} from '../src/components/ExternalIndicatorReview';
+test('chart links encode NSE symbols and restrict supported review timeframes',()=>{const url=new URL(indicatorChartUrl(' m&m ','W')!);assert.equal(url.origin,'https://www.tradingview.com');assert.equal(url.searchParams.get('symbol'),'NSE:M&M');assert.equal(url.searchParams.get('interval'),'W');for(const s of ['','https://evil.test','AAA&interval=1','<script>'])assert.equal(indicatorChartUrl(s,'D'),null);assert.equal(indicatorChartUrl('INFY','1'),null);});
+test('external review never presents a generated signal or installation claim',()=>{const html=renderToStaticMarkup(createElement(ExternalIndicatorReview,{symbol:'INFY'}));assert(html.includes('Open NSE:INFY chart'));assert(html.includes('does not install'));assert(html.includes('not connected or validated'));assert(html.includes('does not affect scores'));});

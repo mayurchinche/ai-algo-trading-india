@@ -30,6 +30,15 @@
     },
     "api/scheduled-paper.ts": {
       "maxDuration": 60
+    },
+    "api/research-portfolios.js": {
+      "maxDuration": 60
+    },
+    "api/company-history.js": {
+      "maxDuration": 60
+    },
+    "api/report-evidence.js": {
+      "maxDuration": 60
     }
   }
 }

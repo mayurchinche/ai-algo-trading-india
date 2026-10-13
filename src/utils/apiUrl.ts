@@ -21,6 +21,10 @@ export function apiUrl(localPath: string): string {
     const provider = localPath.startsWith('/api/yahoo/') ? 'yahoo' : 'nse';
     return `${apiBase}/api/market?provider=${provider}&path=${encodeURIComponent(localPath.slice(('/api/' + provider).length))}`;
   }
+  if (localPath === '/api/report-evidence') return `${apiBase}${localPath}`;
+  if (localPath === '/api/company-history' || localPath.startsWith('/api/company-history?')) return `${apiBase}${localPath}`;
+  if (localPath === '/api/company-disclosures' || localPath.startsWith('/api/company-disclosures?')) return `${apiBase}${localPath}`;
+  if (localPath === '/api/research-portfolios') return `${apiBase}${localPath}`;
   if (localPath.startsWith('/api/research?') || localPath.startsWith('/api/premarket?')) return `${apiBase}${localPath}`;
   if (!IS_PROD) return localPath;
 
