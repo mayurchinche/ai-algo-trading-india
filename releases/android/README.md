@@ -1,6 +1,16 @@
 # Android test builds
 
-## Latest: v1.8.0 — research portfolio and evidence views
+## Latest: v1.8.1 — scan evidence in "Why are there no new trades?"
+
+[Android v1.8.1 APK](./algotrader-scan-evidence-v1.8.1.apk?raw=true)
+
+VersionCode 10, footer v1.8.1; same signing certificate as v1.8.0. Install as an update without clearing app data. Built from commit 885d8a8. The scanner panel on Paper trades and Signals now opens with a 30-day summary (checks, qualifying signal observations, best score vs the 70 entry threshold). Each day also shows its best score, symbol and time, plus rejection reasons. Days recorded before 16 October 2026 show "best score not recorded"; no values are estimated. The trading policy, threshold, sizing and paper capital are unchanged. The absence of trades reflects no qualifying signals, not a monitoring failure (see `tests/paper-e2e.test.ts`).
+
+277 tests, ten database suites, lint, TypeScript/mobile build, Capacitor sync and assembleDebug passed on 16 October 2026. Verified: APK package/version, API URL, signing certificate, v1.8.1 footer and the new panel text. The backend change is live (production recorded today's best score). Physical-device installation is unverified.
+
+SHA-256: `2662491a87e9ef533ea493882aa40f69d772edb189bee619cc7f919c65486014`
+
+## Previous: v1.8.0 — research portfolio and evidence views
 
 [Android v1.8.0 APK](./algotrader-research-evidence-v1.8.0.apk?raw=true)
 
