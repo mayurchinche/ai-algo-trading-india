@@ -9,6 +9,10 @@ export interface StrongCandidate {
 export function strongSignalId(s: StrongCandidate, now: number): string {
   return `${istDate(now)}:${s.symbol}:${s.overallScore > 0 ? 'BUY' : 'SELL'}:${SIGNAL_POLICY}`;
 }
+// Exact shape the server paper cycle receives for an admitted signal.
+export function toPaperCandidate(s: StrongCandidate & { generatedAt: string; reasons?: string[]; scores?: unknown; strategies?: string[] }, now: number) {
+  return { symbol: s.symbol, signalId: strongSignalId(s, now), signalTime: s.generatedAt, side: s.overallScore > 0 ? 'BUY' : 'SELL', score: s.overallScore, stop: s.foAnalysis.suggestedStopLoss, target: s.foAnalysis.suggestedTarget, signalPrice: s.ltp, signalQuoteTime: s.quoteTime, strategy: { id: SIGNAL_POLICY, score: s.overallScore, signal: s.signal, reasons: s.reasons, components: s.scores, strategies: s.strategies, recordedAt: s.generatedAt } };
+}
 // Shared admission rules for research alerts, signal history and paper entries.
 // Account constraints are applied separately by paper trading.
 export function strongSignalRejection(s: StrongCandidate, now = Date.now()): string | null {
