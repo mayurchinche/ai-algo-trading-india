@@ -176,3 +176,19 @@ test('opening research and scan evidence reach the shared feed without creating 
  const res=response();await createSharedPaperHandler({store:()=>store,enabled:()=>true,now:()=>now})(req('GET',undefined,{feed:'opportunities'}),res);
  assert.equal(res.code,200);assert.deepEqual(res.body.account.state.gapWatch,gapWatch);assert.equal(res.body.account.state.lastScan.source,'scheduler');assert.equal(res.body.account.state.lastWorkerAttemptAt,new Date(now).toISOString());assert.equal((await store.account()).state.orders.length,0);assert.equal(res.body.events.length,0);
 });
+import {createElement} from 'react';import {renderToStaticMarkup} from 'react-dom/server';
+import {ScannerStatus} from '../src/components/ScannerStatus';import {scanHistorySummary} from '../src/services/scanHistory';
+test('daily scan evidence keeps the best score, its symbol and time without lowering it later',()=>{
+ const state:any={};const scan=(max:number|null,symbol:string,at:number)=>recordScan(state,{marketOpen:true,candidates:[],scanDiagnostics:{scored:3,maxAbsoluteScore:max,watchlist:[{symbol,score:-max!,reason:'SCORE_BELOW_70',blockedReasons:[]}],rejections:{SCORE_BELOW_70:3}}},at,'scheduler');
+ scan(40,'AAA',now);scan(47,'BBB',now+60000);scan(12,'CCC',now+120000);scan(null,'DDD',now+180000);
+ const day=state.scanDays['2026-09-25'];
+ assert.deepEqual({max:day.maxAbsoluteScore,symbol:day.maxScoreSymbol,at:day.maxScoreAt},{max:47,symbol:'BBB',at:new Date(now+60000).toISOString()});
+ assert.equal(day.rejections.SCORE_BELOW_70,12);assert.equal(day.cycles,4);
+});
+test('scanner panel summarises 30 days and never invents a best score for older days',()=>{
+ const scanDays={'2026-09-24':{cycles:300,candidates:0,failures:0,lastStatus:'MARKET_CLOSED'},'2026-09-25':{cycles:380,candidates:0,failures:1,lastStatus:'NO_ELIGIBLE_SIGNALS',maxAbsoluteScore:47,maxScoreSymbol:'BBB',maxScoreAt:'2026-09-25T05:00:00Z',rejections:{SCORE_BELOW_70:9}}};
+ assert.deepEqual(scanHistorySummary(scanDays),{days:2,checks:680,candidates:0,best:47,bestDays:1});
+ const html=renderToStaticMarkup(createElement(ScannerStatus,{state:{scanDays},now}));
+ assert(html.includes('Last 2 days: 680 checks · 0 qualifying signal observations · best score 47/100 (recorded on 1 days) vs entry threshold 70'));
+ assert(html.includes('best score not recorded'));assert(html.includes('best score 47/100 (BBB,'));assert(html.includes('SCORE BELOW 70: 9'));
+});

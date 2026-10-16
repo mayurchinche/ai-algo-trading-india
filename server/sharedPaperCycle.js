@@ -9,6 +9,11 @@ export function recordScan(state,observation,now,source){
  const daily=history[day]||{cycles:0,candidates:0,failures:0,firstAt:at};
  daily.rejections??={};for(const [reason,count] of Object.entries(scan.rejections||{}))daily.rejections[reason]=(daily.rejections[reason]||0)+count;
  daily.scored=(daily.scored||0)+(scan.scored||0);
+ // Best score of the day shows how close the session came to the entry threshold.
+ if(Number.isFinite(scan.maxAbsoluteScore)&&!(daily.maxAbsoluteScore>=scan.maxAbsoluteScore)){
+  const best=scan.watchlist?.find(w=>Math.abs(w.score)===scan.maxAbsoluteScore);
+  Object.assign(daily,{maxAbsoluteScore:scan.maxAbsoluteScore,maxScoreAt:at,maxScoreSymbol:best?.symbol??null});
+ }
  daily.cycles++;daily.candidates+=observation.candidates?.length||0;daily.failures+=['SCAN_FAILED','OBSERVATION_FAILED'].includes(scan.status)?1:0;daily.lastAt=at;daily.lastStatus=scan.status;history[day]=daily;
  const cutoff=new Date(now-30*86400000+19800000).toISOString().slice(0,10);
  state.scanDays=Object.fromEntries(Object.entries(history).filter(([date])=>date>=cutoff));
