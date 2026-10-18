@@ -1,15 +1,10 @@
-import {timingSafeEqual} from 'node:crypto';
+import {authorizeScheduler,emptySchedulerBody} from './schedulerAuth.js';
 import {premarketSlot,observePremarket} from './premarket.js';
 import {premarketStore} from './premarketStore.js';
 export function createScheduledPremarketHandler({now=Date.now,secret=()=>process.env.PAPER_SCHEDULER_SECRET,store=premarketStore,observe=observePremarket}={}){
  return async(req,res)=>{
-  res.setHeader('Cache-Control','no-store');
-  if(req.method!=='POST')return res.status(405).json({error:'POST required'});
-  const expected=secret(),provided=req.headers?.authorization;
-  const token=typeof provided==='string'&&provided.startsWith('Bearer ')?provided.slice(7):'';
-  if(typeof expected!=='string'||expected.length<32)return res.status(503).json({error:'Scheduler not configured'});
-  if(Buffer.byteLength(token)!==Buffer.byteLength(expected)||!timingSafeEqual(Buffer.from(token),Buffer.from(expected)))return res.status(401).json({error:'Unauthorized'});
-  if(req.body!=null&&(typeof req.body!=='object'||Array.isArray(req.body)||Object.keys(req.body).length))return res.status(400).json({error:'Empty scheduler body required'});
+  if(!authorizeScheduler(req,res,secret()))return;
+  if(!emptySchedulerBody(req.body))return res.status(400).json({error:'Empty scheduler body required'});
   const started=now(),slot=premarketSlot(started);
   if(!slot)return res.status(200).json({status:'OUTSIDE_RESEARCH_WINDOW'});
   try{
