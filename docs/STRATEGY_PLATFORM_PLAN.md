@@ -193,7 +193,7 @@ The fit score weighs diversification, concentration, quality (always 50%) and st
 - **Screener (Phase 1, item 3)**
   - **Screener** tab (`src/components/ScreenerPage.tsx`) over the same `/api/scorecards` data: 20 columns in the four groups (price and returns, scores, fundamentals, growth), a column picker remembered in the browser, sorting with unavailable values always last, symbol/ISIN search, and CSV export of the current view.
   - `src/services/screener.ts` owns every column's label, unit and value for both the table and the CSV. CSV blanks are unavailable values, numbers stay numeric, and text that a spreadsheet would run as a formula is prefixed with an apostrophe.
-  - Market cap is not shown: share counts are not extracted yet.
+  - Market cap (₹ crore) = previous close × filed paid-up equity capital ÷ face value from the latest reported period, at most 200 days old (`SHARES_STALE` otherwise). Checked on live filings: TCS 3.62bn, Reliance 13.53bn and ITC 12.53bn shares; INFY's 4.05bn is net of treasury shares in its consolidated filing. Not adjusted for splits, bonuses or buybacks after that period.
   - Tests: `tests/screener.test.ts`.
 
 ### Next
@@ -201,5 +201,4 @@ The fit score weighs diversification, concentration, quality (always 50%) and st
 1. Before enabling the fundamentals job: apply the migration, verify one manual `POST /api/fundamentals`, then activate `fundamental-filings` in pg_cron.
 2. Run `npm run fundamentals:backfill -- --nifty50` against Supabase after the migration is applied. Integrated filings start with FY2025, so 3- and 5-year growth and PEG need another data source or will accrue from FY2027 onwards.
 3. Scorecard coverage: with the Upstox token, Value and Momentum score; Growth, GARP and Compounder need FY2027 filings or an older-history source.
-4. Market cap from filed paid-up capital and face value, for the screener.
-5. Risk profile and portfolio fit (Phase 1, item 4).
+4. Risk profile and portfolio fit (Phase 1, item 4).

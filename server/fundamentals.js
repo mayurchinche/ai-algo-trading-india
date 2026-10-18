@@ -1,9 +1,11 @@
 // Fundamentals from stored NSE XBRL filings. One owner for the stored filing shape
 // (toFundamentalFiling) and for every derived value (deriveFundamentals).
 export const FILING_POLICY='fundamental-filing-v1';
-export const PARSER_VERSION='nse-xbrl-financials-v2';
+export const PARSER_VERSION='nse-xbrl-financials-v3';
 export const RATIO_VERSION='fundamental-ratios-v2';
 export const PRICE_MAX_AGE_DAYS=10;
+// Share counts come from the latest reported period; older counts may predate splits, bonuses or buybacks.
+export const SHARES_MAX_AGE_DAYS=200;
 const SCOPES=['Consolidated','Standalone'];
 const GROWTH_KEYS=['revenue','continuingProfit','totalProfit'];
 const GROWTH_YEARS=[1,3,5];
@@ -59,7 +61,7 @@ export function deriveFundamentals(filings,{instrumentKey,asOf,truncated=false,p
   usable.push(f);
  }
  // Durations are keyed start..end and balance-sheet positions @date, both per reporting scope.
- const versions=new Map(),annualPeriods=new Map();
+ const versions=new Map(),annualPeriods=new Map(),durations=new Map();
  const add=(f,pk,period,contextId,facts)=>{for(const x of facts||[]){
   if(!Number.isFinite(x.value))continue;
   const k=[f.scope,pk,x.key].join('|');if(!versions.has(k))versions.set(k,[]);
@@ -69,6 +71,7 @@ export function deriveFundamentals(filings,{instrumentKey,asOf,truncated=false,p
   for(const p of f.periods){
    if(!validDate(p.start)||!validDate(p.end)||p.start>p.end)continue;
    if(annual(p.start,p.end))annualPeriods.set(f.scope+'|'+p.start+'..'+p.end,{scope:f.scope,start:p.start,end:p.end});
+   durations.set(f.scope+'|'+p.start+'..'+p.end,{scope:f.scope,start:p.start,end:p.end});
    add(f,p.start+'..'+p.end,{start:p.start,end:p.end},p.contextId,p.facts);
   }
   for(const p of f.positions||[])if(validDate(p.instant))add(f,'@'+p.instant,{instant:p.instant},p.contextId,p.facts);
@@ -120,14 +123,31 @@ export function deriveFundamentals(filings,{instrumentKey,asOf,truncated=false,p
   peg.warnings=[...new Set([...pe.warnings,...cagr.warnings])];
   return [roce,roe,debtToEquity,pe,peg];
  };
+ // Market cap = latest completed close × (paid-up equity capital ÷ face value), both from one reported period.
+ const marketCapFor=scope=>{
+  const formula='previous close × paid-up equity share capital ÷ face value per share';
+  const base={formula,formulaVersion:RATIO_VERSION,value:null,shares:null,inputs:[]};
+  const candidates=[...durations.values()].filter(p=>p.scope===scope).sort((a,b)=>b.end.localeCompare(a.end)||b.start.localeCompare(a.start));
+  const period=candidates.find(p=>['paidUpEquityCapital','faceValue'].every(k=>resolve(scope,p.start+'..'+p.end,k).status==='ISSUER_REPORTED'));
+  if(!period)return {...base,status:'INPUT_UNAVAILABLE',missingInputs:['paidUpEquityCapital','faceValue']};
+  const paid=resolve(scope,period.start+'..'+period.end,'paidUpEquityCapital'),face=resolve(scope,period.start+'..'+period.end,'faceValue');
+  const inputs=[{name:'price',...priced},{name:'paidUpEquityCapital',...paid},{name:'faceValue',...face}];
+  if(Date.parse(istDate(asOf))-Date.parse(period.end)>SHARES_MAX_AGE_DAYS*DAY)return {...base,inputs,status:'SHARES_STALE',sharesAsOf:period.end};
+  if(paid.value<=0||face.value<=0)return {...base,inputs,status:'NON_POSITIVE_INPUT'};
+  if(paid.currency!==face.currency)return {...base,inputs,status:'CURRENCY_MISMATCH'};
+  const shares=paid.value/face.value;
+  if(priced.status!=='OBSERVED')return {...base,inputs,shares,sharesAsOf:period.end,status:'INPUT_UNAVAILABLE',missingInputs:['price']};
+  if(priced.currency!==paid.currency)return {...base,inputs,shares,sharesAsOf:period.end,status:'CURRENCY_MISMATCH'};
+  return {...base,inputs,shares,sharesAsOf:period.end,currency:paid.currency,value:priced.value*shares,status:'CALCULATED_REQUIRES_REVIEW',warnings:symbolWarnings([paid,face])};
+ };
  const scopes={};
  for(const scope of SCOPES){
   if(!usable.some(f=>f.scope===scope))continue;
   const periods=[...annualPeriods.values()].filter(p=>p.scope===scope).sort((a,b)=>a.end.localeCompare(b.end)||a.start.localeCompare(b.start));
   const latest=periods.at(-1)||null;
   const growth=GROWTH_KEYS.flatMap(key=>GROWTH_YEARS.map(years=>growthOf(scope,latest,key,years)));
-  scopes[scope]={latestAnnualPeriod:latest&&{start:latest.start,end:latest.end},annualPeriods:periods.length,growth,ratios:ratiosFor(scope,latest,growth)};
+  scopes[scope]={latestAnnualPeriod:latest&&{start:latest.start,end:latest.end},annualPeriods:periods.length,growth,ratios:ratiosFor(scope,latest,growth),marketCap:marketCapFor(scope)};
  }
  return {policy:'fundamentals-v2',instrumentKey,asOf:new Date(asOf).toISOString(),status:usable.length?'DERIVED_REQUIRES_REVIEW':'NO_FILINGS',coverage:{filings:filings.length,used:usable.length,...excluded,truncated},price:priced,scopes,
-  note:'Issuer-reported values from stored NSE XBRL filings (Ind AS format), using the latest revision published by asOf. Growth and ratios use the latest exact annual period (365 or 366 days); quarters and half-years are never annualised and missing history is not zero. Balance-sheet inputs come from year-end positions. P/E uses the latest annual basic EPS, not trailing twelve months, and the previous trading day’s close, which may not be adjusted for splits or bonuses after that year. Banking-format filings are not supported, and older balance-sheet layouts without an Ind AS equity total are not mapped. Mergers, demergers and renames are not adjusted; FILED_SYMBOL_CHANGED marks inputs filed under different symbols. No valuation score or allocation approval.'};
+  note:'Issuer-reported values from stored NSE XBRL filings (Ind AS format), using the latest revision published by asOf. Growth and ratios use the latest exact annual period (365 or 366 days); quarters and half-years are never annualised and missing history is not zero. Balance-sheet inputs come from year-end positions. Market cap uses paid-up equity capital ÷ face value from the latest reported period (up to 200 days old), which is rounded to the filing’s reported precision, may be net of treasury shares in consolidated filings, and may predate later splits, bonuses or buybacks. P/E uses the latest annual basic EPS, not trailing twelve months, and the previous trading day’s close, which may not be adjusted for splits or bonuses after that year. Banking-format filings are not supported, and older balance-sheet layouts without an Ind AS equity total are not mapped. Mergers, demergers and renames are not adjusted; FILED_SYMBOL_CHANGED marks inputs filed under different symbols. No valuation score or allocation approval.'};
 }

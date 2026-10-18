@@ -39,7 +39,9 @@ export function companyMetrics(fundamentals,price){
  const p=price?.status==='OBSERVED';
  m.return12m=p?{value:price.return12mPct,status:'OBSERVED'}:{value:null,status:price?.status??'PRICE_NOT_REQUESTED'};
  m.belowHigh=p?{value:price.belowHighPct,status:'OBSERVED'}:{value:null,status:price?.status??'PRICE_NOT_REQUESTED'};
- // Display only: the close is not a scored criterion.
+ // Display only: close and market cap are not scored criteria.
+ const mc=basis?.marketCap;
+ m.marketCap=mc?{value:mc.value,status:mc.status,sharesAsOf:mc.sharesAsOf??null,warnings:mc.warnings||[]}:{value:null,status:'NO_ANNUAL_PERIOD'};
  m.close=p?{value:price.close,status:'OBSERVED',date:price.to}:{value:null,status:price?.status??'PRICE_NOT_REQUESTED'};
  const sources=new Map();
  for(const r of basis?.ratios||[])for(const i of r.inputs||[])if(i.source?.url)sources.set(i.source.url,{url:i.source.url,publishedAt:i.source.publishedAt,symbol:i.source.symbol});

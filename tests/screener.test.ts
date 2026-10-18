@@ -14,7 +14,7 @@ const byId=(id:string)=>SCREENER_COLUMNS.find(c=>c.id===id)!;
 
 test('every column has a known group and unique id; defaults and stored selections are validated',()=>{
  assert.equal(new Set(SCREENER_COLUMNS.map(c=>c.id)).size,SCREENER_COLUMNS.length);
- assert(SCREENER_COLUMNS.every(c=>COLUMN_GROUPS.includes(c.group)));assert.deepEqual(COLUMN_GROUPS.map(g=>SCREENER_COLUMNS.filter(c=>c.group===g).length),[3,6,5,6]);
+ assert(SCREENER_COLUMNS.every(c=>COLUMN_GROUPS.includes(c.group)));assert.deepEqual(COLUMN_GROUPS.map(g=>SCREENER_COLUMNS.filter(c=>c.group===g).length),[4,6,5,6]);
  assert.equal(columnsFor(DEFAULT_COLUMNS).length,DEFAULT_COLUMNS.length);
  assert.deepEqual(parseColumnSelection(['roe','nope','roe',7,'score:garp']),['roe','score:garp']);
  assert.deepEqual(parseColumnSelection(['nope']),[...DEFAULT_COLUMNS]);assert.deepEqual(parseColumnSelection({}),[...DEFAULT_COLUMNS]);
@@ -25,6 +25,8 @@ test('columns read scorecard metrics and scores; close comes from observed price
  assert.equal(byId('close').value(top),null);assert.equal(byId('close').status(top),'PRICE_UNAVAILABLE');
  assert.equal(byId('score:value').value(top),top.styles.find((s:any)=>s.id==='value').score);assert.equal(byId('score:composite').value(top),null);
  assert.equal(companyMetrics(f('2026-03-31',{}) as any,null).metrics.close.status,'PRICE_NOT_REQUESTED');
+ const capped:any=companyMetrics({scopes:{Consolidated:{...(f('2026-03-31',{}) as any).scopes.Consolidated,marketCap:{value:4.8e12,status:'CALCULATED_REQUIRES_REVIEW',sharesAsOf:'2026-09-30'}}}} as any,null);
+ assert.equal(byId('marketCap').value({metrics:capped.metrics} as any),480000);assert.equal(formatCell(480000,'₹ cr'),'4,80,000');assert.equal(bank.metrics.marketCap.status,'NO_ANNUAL_PERIOD');
 });
 test('sorting puts unavailable values last in both directions; filters match symbol, ISIN and filing support',()=>{
  const desc=sortCompanies(data.companies,{column:'roe',direction:'desc'}).map((c:any)=>c.symbol),asc=sortCompanies(data.companies,{column:'roe',direction:'asc'}).map((c:any)=>c.symbol);

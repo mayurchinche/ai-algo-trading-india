@@ -4,7 +4,8 @@ const list=v=>v===undefined?[]:Array.isArray(v)?v:[v];
 const text=v=>typeof v==='string'?v:typeof v?.['#text']==='string'?v['#text']:'';
 const date=v=>typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v)&&Number.isFinite(Date.parse(v))&&new Date(v).toISOString().slice(0,10)===v;
 // [key,label,tag,unit]: unit 'money' needs one ISO currency; 'perShare' needs currency per xbrli:shares.
-const metrics=[['revenue','Revenue from operations','RevenueFromOperations'],['continuingProfit','Profit from continuing operations','ProfitLossForPeriodFromContinuingOperations'],['totalProfit','Profit for period','ProfitLossForPeriod'],['profitBeforeTax','Profit before tax','ProfitBeforeTax'],['financeCosts','Finance costs','FinanceCosts'],['basicEps','Basic EPS per share (continuing and discontinued operations)','BasicEarningsLossPerShareFromContinuingAndDiscontinuedOperations','perShare']];
+const metrics=[['revenue','Revenue from operations','RevenueFromOperations'],['continuingProfit','Profit from continuing operations','ProfitLossForPeriodFromContinuingOperations'],['totalProfit','Profit for period','ProfitLossForPeriod'],['profitBeforeTax','Profit before tax','ProfitBeforeTax'],['financeCosts','Finance costs','FinanceCosts'],['basicEps','Basic EPS per share (continuing and discontinued operations)','BasicEarningsLossPerShareFromContinuingAndDiscontinuedOperations','perShare'],['paidUpEquityCapital','Paid-up equity share capital','PaidUpValueOfEquityShareCapital'],['faceValue','Face value per equity share','FaceValueOfEquityShareCapital','perShare']];
+const SHARE_CAPITAL_KEYS=['paidUpEquityCapital','faceValue'];
 // Ind AS statement of assets and liabilities, reported at a single date (instant contexts).
 const positions=[['totalAssets','Total assets','Assets'],['currentLiabilities','Current liabilities','CurrentLiabilities'],['equity','Total equity','Equity'],['borrowingsNoncurrent','Non-current borrowings','BorrowingsNoncurrent'],['borrowingsCurrent','Current borrowings','BorrowingsCurrent']];
 const unitCurrency=(unit,kind)=>{
@@ -64,7 +65,8 @@ export function parseFinancialDisclosure(body,item,now){
    if(!usable(context,id)||!date(instant)||instant>latestDate){rejectedContexts.push(id||'UNKNOWN');continue;}
    balanceSheet.push({contextId:id,instant,scope,metrics:factsIn(positions,id)});continue;
   }
-  if(!used(metrics))continue;
+  // Share-capital facts appear in every format (including banking); a period needs an Ind AS income-statement fact.
+  if(!used(metrics.filter(([key])=>!SHARE_CAPITAL_KEYS.includes(key))))continue;
   if(!usable(context,id)||!date(start)||!date(end)||start>end||end>latestDate){rejectedContexts.push(id||'UNKNOWN');continue;}
   // The filing also declares each period's dates as facts. Older NSE files label full-year facts with
   // quarter contexts, so a context whose dates disagree with its declaration is never used.

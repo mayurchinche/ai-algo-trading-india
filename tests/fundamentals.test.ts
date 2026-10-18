@@ -26,8 +26,8 @@ test('parsed filings keep issuer-reported facts and explicit non-reported status
  const doc=parseFinancialDisclosure(xml,{id:'e'.repeat(64),url:'https://nsearchives.nseindia.com/corporate/xbrl/t.xml',publishedAt:'2026-05-01T10:00:00Z'},Date.parse('2026-05-01T10:05:00Z'));
  const f=toFundamentalFiling(doc);
  assert.equal(f.instrumentKey,KEY);assert.equal(f.documentHash,doc.documentHash);assert.deepEqual(f.periods[0].facts.map((x:any)=>[x.key,x.value]),[['revenue',1000]]);
- assert.deepEqual(f.periods[0].unavailable.map((x:any)=>[x.key,x.status]),['continuingProfit','totalProfit','profitBeforeTax','financeCosts','basicEps'].map(k=>[k,'NOT_REPORTED']));
- assert.equal(f.parser,'nse-xbrl-financials-v2');assert.deepEqual(f.positions,[]);
+ assert.deepEqual(f.periods[0].unavailable.map((x:any)=>[x.key,x.status]),['continuingProfit','totalProfit','profitBeforeTax','financeCosts','basicEps','paidUpEquityCapital','faceValue'].map(k=>[k,'NOT_REPORTED']));
+ assert.equal(f.parser,'nse-xbrl-financials-v3');assert.deepEqual(f.positions,[]);
  assert.throws(()=>toFundamentalFiling({kind:'ORDERS'}));
 });
 test('annual growth uses exact prior years: percent change for 1y and CAGR for 3y and 5y',()=>{
@@ -125,4 +125,14 @@ test('POST ingestion requires the scheduler secret and an empty body before any 
  assert.equal(r.code,200);assert.equal(r.body.status,'NO_STRUCTURED_FILINGS');
  const failed=response();await createFundamentalsHandler({secret:()=>secret,store:()=>({}) as any,reader:{feed:async()=>{throw Error('down');}} as any})({method:'POST',headers:{authorization:'Bearer '+secret},body:{}},failed);assert.equal(failed.code,503);
  assert.equal(typeof researchRoutes.fundamentals,'function');
+});
+test('market cap uses the latest period with paid-up capital and face value, and fails closed',()=>{
+ const asOf=Date.parse('2026-10-18T06:00:00Z'),half={start:'2026-04-01',end:'2026-09-30'};
+ const withShares=[...history,filing('k','2026-10-15T10:00:00Z',[period(half,[fact('paidUpEquityCapital',2000),{...fact('faceValue',5),unit:'perShare'}])]),filing('l','2026-05-20T10:00:00Z',[period(fy(2026),[fact('paidUpEquityCapital',1000),fact('faceValue',10)])])];
+ const mc=(p:any,f=withShares,at=asOf)=>deriveFundamentals(f,{instrumentKey:KEY,asOf:at,price:p}).scopes.Consolidated.marketCap;
+ const ok=mc(price({date:'2026-10-16'}));assert.equal(ok.status,'CALCULATED_REQUIRES_REVIEW');assert.equal(ok.shares,400);assert.equal(ok.value,96000);assert.equal(ok.sharesAsOf,'2026-09-30');
+ assert.deepEqual(ok.inputs.map((i:any)=>i.name),['price','paidUpEquityCapital','faceValue']);assert.equal(ok.inputs[1].source.filingId,'k'.repeat(64));
+ const noPrice=mc(price({status:'UNAVAILABLE'}));assert.equal(noPrice.status,'INPUT_UNAVAILABLE');assert.deepEqual(noPrice.missingInputs,['price']);assert.equal(noPrice.shares,400);
+ assert.equal(mc(price({date:'2026-10-16'}),history).status,'INPUT_UNAVAILABLE');
+ assert.equal(mc(price({date:'2027-05-10'}),withShares,Date.parse('2027-05-12T06:00:00Z')).status,'SHARES_STALE');
 });

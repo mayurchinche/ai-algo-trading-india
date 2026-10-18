@@ -46,7 +46,7 @@ export function ScreenerPage() {
  return <div className="space-y-6">
   <div className="page-title"><div><h2>Screener</h2><p>{data ? `${data.universe.name} (NSE list of ${data.universe.asOf}) · computed ${formatIST(data.computedAt)}` : 'Fundamentals, growth, returns and style scores in one table.'}</p></div>
    <div className="flex gap-2"><button className="btn btn-secondary" disabled={!data} onClick={exportCsv}>Export CSV</button><button className="btn btn-secondary" disabled={loading} onClick={() => setRevision(r => r + 1)}>{loading ? 'Loading…' : 'Refresh'}</button></div></div>
-  {data && <section className="notice" role="note"><p className="text-sm"><strong>{data.disclaimer}</strong> Blank cells are unavailable, not zero; hover for the reason. Market cap is not shown because share counts are not extracted yet.</p></section>}
+  {data && <section className="notice" role="note"><p className="text-sm"><strong>{data.disclaimer}</strong> Blank cells are unavailable, not zero; hover for the reason. Market cap is in ₹ crore, from the previous close and filed paid-up capital ÷ face value; it may lag later splits, bonuses or buybacks.</p></section>}
   {error && <section className="card" role="status"><p>{error}</p></section>}
   {data && <details className="card research-method"><summary>Columns ({columnIds.length} of {SCREENER_COLUMNS.length})</summary><div className="grid md:grid-cols-4 gap-4 text-sm">
    {COLUMN_GROUPS.map(group => <fieldset key={group}><legend className="font-semibold">{group}</legend>{SCREENER_COLUMNS.filter(c => c.group === group).map(c => <label key={c.id} className="flex gap-2 items-center"><input type="checkbox" checked={columnIds.includes(c.id)} onChange={() => toggle(c.id)} />{c.label}</label>)}</fieldset>)}

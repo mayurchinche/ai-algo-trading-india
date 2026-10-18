@@ -82,6 +82,8 @@ test('disagreeing scopes are rejected and banking-format filings are classified 
  assert.throws(()=>parseFinancialDisclosure(integrated().replace('contextRef="FourD">Standalone','contextRef="FourD">Consolidated'),integratedItem,Date.parse('2026-10-17T04:00:00Z')),/reporting scope/);
  const bank=integrated().replace(/<RevenueFromOperations[^]*?<\/RevenueFromOperations>/g,'').replace(/<BasicEarnings[^]*?<\/BasicEarningsLossPerShareFromContinuingAndDiscontinuedOperations>/,'').replace(/<FinanceCosts[^]*?<\/FinanceCosts>/,'').replace(/NameOfTheCompany/g,'NameOfBank');
  assert.throws(()=>parseFinancialDisclosure(bank,integratedItem,Date.parse('2026-10-17T04:00:00Z')),(e:any)=>e.code==='UNSUPPORTED_FINANCIAL_FORMAT');
+ const bankWithCapital=bank.replace('</xbrl>','<PaidUpValueOfEquityShareCapital contextRef="OneD" unitRef="INR" decimals="-5">100</PaidUpValueOfEquityShareCapital></xbrl>');
+ assert.throws(()=>parseFinancialDisclosure(bankWithCapital,integratedItem,Date.parse('2026-10-17T04:00:00Z')),(e:any)=>e.code==='UNSUPPORTED_FINANCIAL_FORMAT','share capital alone is not a supported period');
 });
 test('a context whose dates contradict the declared reporting period is never used',()=>{
  const declared=`<DateOfStartOfReportingPeriod contextRef="OneD">2026-07-01</DateOfStartOfReportingPeriod><DateOfEndOfReportingPeriod contextRef="OneD">2026-09-30</DateOfEndOfReportingPeriod><DateOfStartOfReportingPeriod contextRef="FourD">2025-10-01</DateOfStartOfReportingPeriod><DateOfEndOfReportingPeriod contextRef="FourD">2026-09-30</DateOfEndOfReportingPeriod>`;
