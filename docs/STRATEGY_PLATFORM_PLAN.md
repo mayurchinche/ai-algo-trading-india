@@ -195,10 +195,19 @@ The fit score weighs diversification, concentration, quality (always 50%) and st
   - `src/services/screener.ts` owns every column's label, unit and value for both the table and the CSV. CSV blanks are unavailable values, numbers stay numeric, and text that a spreadsheet would run as a formula is prefixed with an apostrophe.
   - Market cap (₹ crore) = previous close × filed paid-up equity capital ÷ face value from the latest reported period, at most 200 days old (`SHARES_STALE` otherwise). Checked on live filings: TCS 3.62bn, Reliance 13.53bn and ITC 12.53bn shares; INFY's 4.05bn is net of treasury shares in its consolidated filing. Not adjusted for splits, bonuses or buybacks after that period.
   - Tests: `tests/screener.test.ts`.
+- **Risk profile and portfolio fit (Phase 1, item 4)**
+  - `shared/riskProfile.js` (`risk-profile-v1`): our own four-question self-assessment (horizon, reaction to a 30% fall, reliance on the money, experience). The profile — Conservative, Balanced or Growth — is the most cautious answer, never an average; answers two levels apart are shown as tensions. Not SuperInvesting's questionnaire or table, and not a regulatory suitability assessment.
+  - Each profile sets limits (largest holding, top five, largest sector, minimum holdings) and research-portfolio mandate defaults; the **Portfolios** form can apply them ("Use its limits"), and every profile's mandate passes `validateMandate`.
+  - `shared/holdingsImport.js`: RFC 4180 CSV import with listed header aliases (for example Instrument / Qty. / Avg. cost), symbol or ISIN, merged repeats and per-line skip reasons. XLSX is not read: save as CSV.
+  - `shared/portfolioFit.js` (`portfolio-fit-v1`): each check is PASS, BREACH or UNKNOWN. Weight checks need every holding priced; a sector pass needs room for all unclassified holdings, while a proven sector breach is reported regardless. Quality is reported as coverage (supported filings, Value-score coverage and weighted Value score), not a fit score.
+  - Sectors come from NSE's industry column in the same NIFTY 50 constituent file (now in `shared/universes.js`); other holdings are unclassified. Prices are the latest completed Yahoo daily close, at most 10 days old.
+  - **Portfolio fit** tab. Answers are kept in the browser; the holdings file is read in the browser and never uploaded or saved.
+  - Tests: `tests/portfolio-fit.test.ts`.
 
 ### Next
 
 1. Before enabling the fundamentals job: apply the migration, verify one manual `POST /api/fundamentals`, then activate `fundamental-filings` in pg_cron.
 2. Run `npm run fundamentals:backfill -- --nifty50` against Supabase after the migration is applied. Integrated filings start with FY2025, so 3- and 5-year growth and PEG need another data source or will accrue from FY2027 onwards.
 3. Scorecard coverage: with the Upstox token, Value and Momentum score; Growth, GARP and Compounder need FY2027 filings or an older-history source.
-4. Risk profile and portfolio fit (Phase 1, item 4).
+4. XLSX holdings import, if needed: requires choosing a spreadsheet parser dependency.
+5. Baskets: saved screens with daily returns against NIFTY and an FD line (Phase 1, item 5).

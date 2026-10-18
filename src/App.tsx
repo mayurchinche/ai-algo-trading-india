@@ -19,6 +19,7 @@ const PremarketPage = lazy(() => import('./components/PremarketPage').then(m => 
 const MarketNewsPage = lazy(() => import('./components/MarketNewsPage').then(m => ({default:m.MarketNewsPage})));
 const ResearchPortfolioPage = lazy(() => import('./components/ResearchPortfolioPage').then(m => ({default:m.ResearchPortfolioPage})));
 const IPOPage = lazy(() => import('./components/IPOPage').then(m => ({default:m.IPOPage})));
+const PortfolioFitPage = lazy(() => import('./components/PortfolioFitPage').then(m => ({default:m.PortfolioFitPage})));
 const ScreenerPage = lazy(() => import('./components/ScreenerPage').then(m => ({default:m.ScreenerPage})));
 const ScorecardsPage = lazy(() => import('./components/ScorecardsPage').then(m => ({default:m.ScorecardsPage})));
 const TrendDashboardPage = lazy(() => import('./components/TrendDashboardPage').then(m => ({default:m.TrendDashboardPage})));
@@ -31,7 +32,7 @@ export default function App() {
   const [segment,setSegment]=useState(tradingSegments[0]);
   const [activeTab, setActiveTab] = useState('Overview');
   const portfolioResearch=activeTab==='Portfolios';
-  const separateResearch=['IPO Tracker','Metals','Market News','Pre-market','Portfolios','Trend','Scorecards','Screener'].includes(activeTab);
+  const separateResearch=['IPO Tracker','Metals','Market News','Pre-market','Portfolios','Trend','Scorecards','Screener','Portfolio fit'].includes(activeTab);
   const [focusSignalId,setFocusSignalId]=useState<string|undefined>();
   const { nifty, lastUpdated } = useLiveStocks();
 
@@ -73,6 +74,7 @@ export default function App() {
             {activeTab === 'Trend' && <TrendDashboardPage />}
             {activeTab === 'Scorecards' && <ScorecardsPage />}
             {activeTab === 'Screener' && <ScreenerPage />}
+            {activeTab === 'Portfolio fit' && <PortfolioFitPage />}
             </>}
           </motion.div>
         </AnimatePresence></Suspense></div>
