@@ -14,7 +14,7 @@ test('equal-weight buy-and-hold from the first session on or after the start dat
  assert.deepEqual(r.excluded,[{symbol:'C',reason:'NO_CLOSE_ON_START_DATE'},{symbol:'Z',reason:'NO_PRICE_HISTORY'}]);
  assert(Math.abs(r.summary.basketPct-((1.3+0.8)/2*100-100))<1e-9);assert(Math.abs(r.summary.benchmarkPct-3)<1e-9);
  assert(Math.abs(r.summary.fdPct-(Math.pow(1.073,5/365)-1)*100)<1e-9);assert(Math.abs(r.summary.excessVsBenchmarkPct-2)<1e-9);
- assert(r.summary.maxDrawdownPct===0||r.summary.maxDrawdownPct>0);
+ assert.equal(r.summary.maxDrawdownPct,0,'basket 100, 105, 105, 105 never falls');
 });
 test('missing later closes carry forward and are counted; no data and bad inputs are explicit',()=>{
  const closes=new Map([['A',series([D[0],D[1],D[3]],[100,80,90])]]);

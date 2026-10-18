@@ -11,7 +11,7 @@ async function bounded(response,max){
 }
 export function createUpstoxReader({fetcher=fetch,token=()=>process.env.UPSTOX_ANALYTICS_TOKEN}={}){
  return async function read(path){
-  if(!/^\/v[23]\/(market-quote\/quotes\?|market\/status\/NSE$|historical-candle\/)/.test(path))throw new MarketDataError('UNSUPPORTED_READ_PATH');
+  if(!/^\/v[23]\/(market-quote\/quotes\?|market\/status\/NSE$|historical-candle\/|option\/chain\?)/.test(path))throw new MarketDataError('UNSUPPORTED_READ_PATH');
   const secret=token();if(!secret)throw new MarketDataError('UPSTOX_TOKEN_MISSING');
   let response;try{response=await fetcher(ROOT+path,{method:'GET',headers:{Authorization:`Bearer ${secret}`,Accept:'application/json'},redirect:'error',signal:AbortSignal.timeout(8000)});}catch{throw new MarketDataError('UPSTOX_TRANSPORT_FAILED');}
   if(!response.ok)throw new MarketDataError(response.status===401||response.status===403?'UPSTOX_AUTH_FAILED':response.status===429?'UPSTOX_RATE_LIMITED':'UPSTOX_PROVIDER_FAILED');

@@ -26,6 +26,7 @@ export function apiUrl(localPath: string): string {
   if (localPath === '/api/company-disclosures' || localPath.startsWith('/api/company-disclosures?')) return `${apiBase}${localPath}`;
   if (localPath === '/api/research-portfolios') return `${apiBase}${localPath}`;
   if (localPath.startsWith('/api/scorecards?')) return `${apiBase}${localPath}`;
+  if (localPath.startsWith('/api/option-chain?') || localPath === '/api/option-chain') return `${apiBase}${localPath}`;
   if (localPath.startsWith('/api/research?') || localPath.startsWith('/api/premarket?')) return `${apiBase}${localPath}`;
   if (!IS_PROD) return localPath;
 
