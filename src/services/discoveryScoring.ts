@@ -1,70 +1,27 @@
 import type { DiscoveredStock, StrategyScores, FOAnalysis } from './stockDiscovery';
 import { freshQuote, istDate, validLevels } from './tradingTime';
+import { atr, bollinger, macd, rsi, sma } from '../../shared/indicators';
 
 // --- Technical Analysis Computations ---
+// Legacy scanner variants (Cutler RSI, simple-mean ATR, first-value-seeded EMA) are kept explicit so
+// historical signals and stored evidence stay reproducible. Callers guarantee 200+ finite bars.
 
-function computeRSI(closes: number[], period = 14): number {
-  if (closes.length < period + 1) return 50;
-  let gains = 0, losses = 0;
-  for (let i = closes.length - period; i < closes.length; i++) {
-    const diff = closes[i] - closes[i - 1];
-    if (diff > 0) gains += diff;
-    else losses -= diff;
-  }
-  if (losses === 0) return 100;
-  const rs = (gains / period) / (losses / period);
-  return 100 - (100 / (1 + rs));
-}
+const last = (series: number[]) => series[series.length - 1];
 
-function computeEMA(data: number[], period: number): number[] {
-  const k = 2 / (period + 1);
-  const ema = [data[0]];
-  for (let i = 1; i < data.length; i++) {
-    ema.push(data[i] * k + ema[i - 1] * (1 - k));
-  }
-  return ema;
-}
-
-function computeMACD(closes: number[]): { value: number; signal: number; histogram: number } {
-  if (closes.length < 26) return { value: 0, signal: 0, histogram: 0 };
-  const ema12 = computeEMA(closes, 12);
-  const ema26 = computeEMA(closes, 26);
-  const macdLine = ema12.map((v, i) => v - ema26[i]);
-  const signalLine = computeEMA(macdLine, 9);
-  const value = macdLine[macdLine.length - 1];
-  const signal = signalLine[signalLine.length - 1];
-  return { value, signal, histogram: value - signal };
-}
-
-function computeSMA(data: number[], period: number): number {
-  if (data.length < period) return data[data.length - 1] || 0;
-  const slice = data.slice(-period);
-  return slice.reduce((a, b) => a + b, 0) / period;
-}
-
-function computeATR(highs: number[], lows: number[], closes: number[], period = 14): number {
-  if (highs.length < period + 1) return 0;
-  let atr = 0;
-  for (let i = highs.length - period; i < highs.length; i++) {
-    const tr = Math.max(
-      highs[i] - lows[i],
-      Math.abs(highs[i] - closes[i - 1]),
-      Math.abs(lows[i] - closes[i - 1])
-    );
-    atr += tr;
-  }
-  return atr / period;
-}
-
-function computeBollingerPosition(closes: number[], period = 20): number {
-  const sma = computeSMA(closes, period);
-  const slice = closes.slice(-period);
-  const std = Math.sqrt(slice.reduce((sum, v) => sum + (v - sma) ** 2, 0) / period);
-  const upper = sma + 2 * std;
-  const lower = sma - 2 * std;
-  const current = closes[closes.length - 1];
-  if (upper === lower) return 0.5;
-  return (current - lower) / (upper - lower); // 0 = at lower band, 1 = at upper band
+function legacyIndicators(closes: number[], highs: number[], lows: number[]) {
+  const macdLines = macd(closes, { seed: 'first' });
+  const bands = bollinger(closes, 20, 2);
+  const percentB = last(bands.percentB);
+  return {
+    rsi: last(rsi(closes, 14, { method: 'simple' })),
+    macd: { value: last(macdLines.macd), signal: last(macdLines.signal), histogram: last(macdLines.histogram) },
+    sma20: last(sma(closes, 20)),
+    sma50: last(sma(closes, 50)),
+    sma200: last(sma(closes, 200)),
+    atr: last(atr(highs, lows, closes, 14, { method: 'simple' })),
+    // 0 = at lower band, 1 = at upper band; collapsed bands are treated as mid-band.
+    bollingerPos: Number.isNaN(percentB) ? 0.5 : percentB,
+  };
 }
 
 // --- Strategy Scoring ---
@@ -193,6 +150,8 @@ export interface DiscoveryHistory { dates: string[]; closes: number[]; highs: nu
 // No network or wall clock: callers own data availability and supply observation time.
 export function evaluateDiscoverySnapshot(symbol: string, hist: DiscoveryHistory, now: number): DiscoveredStock | null {
   if (!Number.isFinite(now) || hist.closes.length < 200) return null;
+  const n = hist.closes.length;
+  if ([hist.highs, hist.lows].some(series => series.length !== n) || [hist.closes, hist.highs, hist.lows].some(series => !series.every(Number.isFinite))) return null;
       const { closes, highs, lows } = hist;
       // Price and timestamp must originate from the same chart response.
       const q = hist.meta;
@@ -209,13 +168,7 @@ export function evaluateDiscoverySnapshot(symbol: string, hist: DiscoveryHistory
       if ((!Number.isFinite(q.fiftyTwoWeekHigh) || !Number.isFinite(q.fiftyTwoWeekLow)) && (!yearRows.length || hist.dates[0] > yearStart)) return null;
       const weekHigh52 = Number.isFinite(q.fiftyTwoWeekHigh) && q.fiftyTwoWeekHigh > 0 ? q.fiftyTwoWeekHigh : Math.max(...yearRows.map(row => row.high));
       const weekLow52 = Number.isFinite(q.fiftyTwoWeekLow) && q.fiftyTwoWeekLow > 0 ? q.fiftyTwoWeekLow : Math.min(...yearRows.map(row => row.low));
-      const rsi = computeRSI(closes);
-      const macd = computeMACD(closes);
-      const sma20 = computeSMA(closes, 20);
-      const sma50 = computeSMA(closes, 50);
-      const sma200 = computeSMA(closes, 200);
-      const atr = computeATR(highs, lows, closes);
-      const bollingerPos = computeBollingerPosition(closes);
+      const { rsi, macd, sma20, sma50, sma200, atr, bollingerPos } = legacyIndicators(closes, highs, lows);
       const vol = q.regularMarketVolume || 0;
       const avgVol = (q.averageDailyVolume3Month || hist.volumes.slice(-60).reduce((a, b) => a + b, 0) / 60);
       const volumeRatio = avgVol > 0 ? vol / avgVol : 0;

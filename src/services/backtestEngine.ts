@@ -3,6 +3,7 @@
 import { apiUrl } from '../utils/apiUrl';
 import { estimatedCosts } from './paperTrading';
 import { validLevels } from './tradingTime';
+import { atr, bollinger, ema, rsi, sma } from '../../shared/indicators';
 
 export interface BacktestConfig {
   symbol: string;
@@ -83,59 +84,37 @@ export interface BacktestResult {
   };
 }
 
-// --- Technical Analysis (reuse from stockDiscovery but standalone for backtest) ---
+// --- Technical Analysis ---
+// Series are computed once per run from the shared library. The accessors below keep this study's
+// legacy warm-up fallbacks and indicator variants so existing results remain reproducible.
 
-function computeRSI(closes: number[], idx: number, period = 14): number {
-  if (idx < period) return 50;
-  let gains = 0, losses = 0;
-  for (let i = idx - period + 1; i <= idx; i++) {
-    const diff = closes[i] - closes[i - 1];
-    if (diff > 0) gains += diff;
-    else losses -= diff;
-  }
-  if (losses === 0) return 100;
-  const rs = (gains / period) / (losses / period);
-  return 100 - (100 / (1 + rs));
+interface IndicatorSeries {
+  closes: number[]; highs: number[]; lows: number[]; volumes: number[];
+  rsi: number[]; sma20: number[]; sma50: number[]; ema12: number[]; ema26: number[]; atr: number[];
+  bands: { upper: number[]; lower: number[]; middle: number[] };
 }
 
-function computeSMA(closes: number[], idx: number, period: number): number {
-  if (idx < period - 1) return closes[idx];
-  let sum = 0;
-  for (let i = idx - period + 1; i <= idx; i++) sum += closes[i];
-  return sum / period;
+function computeIndicatorSeries(bars: HistoricalBar[]): IndicatorSeries {
+  const closes = bars.map(b => b.close), highs = bars.map(b => b.high), lows = bars.map(b => b.low), volumes = bars.map(b => b.volume);
+  return {
+    closes, highs, lows, volumes,
+    rsi: rsi(closes, 14, { method: 'simple' }),
+    sma20: sma(closes, 20),
+    sma50: sma(closes, 50),
+    ema12: ema(closes, 12, { seed: 'first' }),
+    ema26: ema(closes, 26, { seed: 'first' }),
+    atr: atr(highs, lows, closes, 14, { method: 'simple' }),
+    bands: bollinger(closes, 20, 2),
+  };
 }
 
-function computeEMAAt(data: number[], idx: number, period: number): number {
-  if (idx < period) return data[idx];
-  const k = 2 / (period + 1);
-  let ema = data[0];
-  for (let i = 1; i <= idx; i++) {
-    ema = data[i] * k + ema * (1 - k);
-  }
-  return ema;
-}
-
-function computeATR(highs: number[], lows: number[], closes: number[], idx: number, period = 14): number {
-  if (idx < period) return (highs[idx] - lows[idx]);
-  let atr = 0;
-  for (let i = idx - period + 1; i <= idx; i++) {
-    const tr = Math.max(
-      highs[i] - lows[i],
-      Math.abs(highs[i] - closes[i - 1]),
-      Math.abs(lows[i] - closes[i - 1])
-    );
-    atr += tr;
-  }
-  return atr / period;
-}
-
-function computeBollingerBands(closes: number[], idx: number, period = 20): { upper: number; lower: number; middle: number } {
-  const sma = computeSMA(closes, idx, period);
-  if (idx < period - 1) return { upper: sma * 1.02, lower: sma * 0.98, middle: sma };
-  let sumSq = 0;
-  for (let i = idx - period + 1; i <= idx; i++) sumSq += (closes[i] - sma) ** 2;
-  const std = Math.sqrt(sumSq / period);
-  return { upper: sma + 2 * std, lower: sma - 2 * std, middle: sma };
+const rsiAt = (s: IndicatorSeries, idx: number) => idx < 14 ? 50 : s.rsi[idx];
+const smaAt = (s: IndicatorSeries, series: number[], idx: number, period: number) => idx < period - 1 ? s.closes[idx] : series[idx];
+const emaAt = (s: IndicatorSeries, series: number[], idx: number, period: number) => idx < period ? s.closes[idx] : series[idx];
+const atrAt = (s: IndicatorSeries, idx: number) => idx < 14 ? s.highs[idx] - s.lows[idx] : s.atr[idx];
+function bandsAt(s: IndicatorSeries, idx: number) {
+  if (idx < 19) return { upper: s.closes[idx] * 1.02, lower: s.closes[idx] * 0.98, middle: s.closes[idx] };
+  return { upper: s.bands.upper[idx], lower: s.bands.lower[idx], middle: s.bands.middle[idx] };
 }
 
 // --- Strategy Signal Generators ---
@@ -148,16 +127,15 @@ interface Signal {
   target: number;
 }
 
-function momentumSignal(closes: number[], highs: number[], lows: number[], idx: number): Signal {
+function momentumSignal(s: IndicatorSeries, idx: number): Signal {
+  const { closes } = s;
   if (idx < 26) return { direction: 'NONE', strategy: 'Momentum', reason: '', stopLoss: 0, target: 0 };
   
-  const rsi = computeRSI(closes, idx);
-  const ema12 = computeEMAAt(closes, idx, 12);
-  const ema26 = computeEMAAt(closes, idx, 26);
-  const macdLine = ema12 - ema26;
-  const prevMacd = computeEMAAt(closes, idx - 1, 12) - computeEMAAt(closes, idx - 1, 26);
-  const sma20 = computeSMA(closes, idx, 20);
-  const atr = computeATR(highs, lows, closes, idx);
+  const rsi = rsiAt(s, idx);
+  const macdLine = emaAt(s, s.ema12, idx, 12) - emaAt(s, s.ema26, idx, 26);
+  const prevMacd = emaAt(s, s.ema12, idx - 1, 12) - emaAt(s, s.ema26, idx - 1, 26);
+  const sma20 = smaAt(s, s.sma20, idx, 20);
+  const atr = atrAt(s, idx);
 
   // BUY: RSI > 50, MACD crossing up, price > SMA20
   if (rsi > 50 && rsi < 75 && macdLine > 0 && prevMacd <= 0 && closes[idx] > sma20) {
@@ -182,10 +160,11 @@ function momentumSignal(closes: number[], highs: number[], lows: number[], idx: 
   return { direction: 'NONE', strategy: 'Momentum', reason: '', stopLoss: 0, target: 0 };
 }
 
-function breakoutSignal(closes: number[], highs: number[], lows: number[], volumes: number[], idx: number): Signal {
+function breakoutSignal(s: IndicatorSeries, idx: number): Signal {
+  const { closes, highs, lows, volumes } = s;
   if (idx < 20) return { direction: 'NONE', strategy: 'Breakout', reason: '', stopLoss: 0, target: 0 };
 
-  const atr = computeATR(highs, lows, closes, idx);
+  const atr = atrAt(s, idx);
   const avgVol = volumes.slice(Math.max(0, idx - 20), idx).reduce((a, b) => a + b, 0) / 20;
   const volRatio = volumes[idx] / (avgVol || 1);
   
@@ -219,14 +198,15 @@ function breakoutSignal(closes: number[], highs: number[], lows: number[], volum
   return { direction: 'NONE', strategy: 'Breakout', reason: '', stopLoss: 0, target: 0 };
 }
 
-function trendFollowingSignal(closes: number[], highs: number[], lows: number[], idx: number): Signal {
+function trendFollowingSignal(s: IndicatorSeries, idx: number): Signal {
+  const { closes } = s;
   if (idx < 50) return { direction: 'NONE', strategy: 'Trend Following', reason: '', stopLoss: 0, target: 0 };
 
-  const sma20 = computeSMA(closes, idx, 20);
-  const sma50 = computeSMA(closes, idx, 50);
-  const prevSma20 = computeSMA(closes, idx - 1, 20);
-  const prevSma50 = computeSMA(closes, idx - 1, 50);
-  const atr = computeATR(highs, lows, closes, idx);
+  const sma20 = smaAt(s, s.sma20, idx, 20);
+  const sma50 = smaAt(s, s.sma50, idx, 50);
+  const prevSma20 = smaAt(s, s.sma20, idx - 1, 20);
+  const prevSma50 = smaAt(s, s.sma50, idx - 1, 50);
+  const atr = atrAt(s, idx);
 
   // Golden cross: SMA20 crosses above SMA50
   if (sma20 > sma50 && prevSma20 <= prevSma50 && closes[idx] > sma20) {
@@ -251,13 +231,14 @@ function trendFollowingSignal(closes: number[], highs: number[], lows: number[],
   return { direction: 'NONE', strategy: 'Trend Following', reason: '', stopLoss: 0, target: 0 };
 }
 
-function meanReversionSignal(closes: number[], highs: number[], lows: number[], idx: number): Signal {
+function meanReversionSignal(s: IndicatorSeries, idx: number): Signal {
+  const { closes } = s;
   if (idx < 20) return { direction: 'NONE', strategy: 'Mean Reversion', reason: '', stopLoss: 0, target: 0 };
 
-  const rsi = computeRSI(closes, idx);
-  const prevRsi = computeRSI(closes, idx - 1);
-  const bb = computeBollingerBands(closes, idx);
-  const atr = computeATR(highs, lows, closes, idx);
+  const rsi = rsiAt(s, idx);
+  const prevRsi = rsiAt(s, idx - 1);
+  const bb = bandsAt(s, idx);
+  const atr = atrAt(s, idx);
 
   // Oversold bounce: RSI crosses above 30 from below + at lower Bollinger
   if (rsi > 30 && prevRsi <= 30 && closes[idx] <= bb.lower * 1.01) {
@@ -282,13 +263,14 @@ function meanReversionSignal(closes: number[], highs: number[], lows: number[], 
   return { direction: 'NONE', strategy: 'Mean Reversion', reason: '', stopLoss: 0, target: 0 };
 }
 
-function smartMoneySignal(closes: number[], highs: number[], lows: number[], volumes: number[], idx: number): Signal {
+function smartMoneySignal(s: IndicatorSeries, idx: number): Signal {
+  const { closes, volumes } = s;
   if (idx < 20) return { direction: 'NONE', strategy: 'Volume Pattern', reason: '', stopLoss: 0, target: 0 };
 
   const avgVol = volumes.slice(Math.max(0, idx - 20), idx).reduce((a, b) => a + b, 0) / 20;
   const volRatio = volumes[idx] / (avgVol || 1);
-  const sma50 = computeSMA(closes, idx, 50);
-  const atr = computeATR(highs, lows, closes, idx);
+  const sma50 = smaAt(s, s.sma50, idx, 50);
+  const atr = atrAt(s, idx);
 
   // Volume spike (2x+) with price above SMA50 and bullish candle
   if (volRatio >= 2 && closes[idx] > sma50 && closes[idx] > closes[idx - 1]) {
@@ -351,7 +333,7 @@ export function simulateBacktest(bars: HistoricalBar[], config: BacktestConfig, 
   const start = config.startDate || bars[Math.max(50, bars.length - 252)]?.date;
   const end = config.endDate || bars.at(-1)?.date;
   if (!start || !end || start > end) return null;
-  const closes = bars.map(b => b.close), highs = bars.map(b => b.high), lows = bars.map(b => b.low), volumes = bars.map(b => b.volume);
+  const series = computeIndicatorSeries(bars);
   const indices = bars.map((_, i) => i).filter(i => i >= 51 && bars[i].date >= start && bars[i].date <= end);
   if (!indices.length) return null;
   const trades: BacktestTrade[] = [], equityCurve: BacktestResult['equityCurve'] = [];
@@ -368,7 +350,7 @@ export function simulateBacktest(bars: HistoricalBar[], config: BacktestConfig, 
     if (!position && capital > 0) {
       // Yesterday's completed bar creates today's order. Long-only cash-equity study.
       const j = i - 1;
-      const signals = [momentumSignal(closes, highs, lows, j), breakoutSignal(closes, highs, lows, volumes, j), trendFollowingSignal(closes, highs, lows, j), meanReversionSignal(closes, highs, lows, j), smartMoneySignal(closes, highs, lows, volumes, j)]
+      const signals = [momentumSignal(series, j), breakoutSignal(series, j), trendFollowingSignal(series, j), meanReversionSignal(series, j), smartMoneySignal(series, j)]
         .filter(s => s.direction === 'BUY' && (!config.strategies || config.strategies.includes(s.strategy)));
       const signal = signals[0];
       const entry = bars[i].open * (1 + slip);
