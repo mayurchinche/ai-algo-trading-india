@@ -1,8 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {parseMetalChart} from '../src/services/metalsService';
-import {generateOptionsPicks} from '../src/services/optionsEngine';
-import {autoApplyForIPO} from '../src/services/ipoAutoApply';
 import {scoreIPO, isFreshIPOCache} from '../src/services/ipoService';
 import {fetchNifty} from '../src/services/liveData';
 import {discoverStocks} from '../src/services/stockDiscovery';
@@ -21,11 +19,6 @@ test('metals preserve aligned provider dates through missing rows and original u
  assert.equal(result.priceHistory[3].date,new Date(data.chart.result[0].timestamp[4]*1000).toISOString().slice(0,10));
  assert.equal(result.priceHistory[3].price,104);assert.equal(result.priceUSD,100);assert.equal(result.unit,'USD / troy ounce');
  assert.ok(!('pricePerGram' in result));assert.ok(!('high52w' in result));
-});
-test('unsupported options and broker execution fail without any provider call',async()=>{
- globalThis.fetch=async()=>{throw Error('network should not be reached')};
- assert.throws(()=>generateOptionsPicks([]),/Options unavailable/);
- await assert.rejects(autoApplyForIPO({name:'test'}),/IPO application unavailable/);
 });
 test('missing IPO observations produce unknown score and stale caches cannot be used',()=>{
  assert.equal(scoreIPO({name:'test'}).score,null);

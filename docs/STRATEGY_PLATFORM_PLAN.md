@@ -220,15 +220,25 @@ The fit score weighs diversification, concentration, quality (always 50%) and st
 
 ### Phase 3 and 4 status
 
-- **Phase 3 (live broker execution) is not started.** It still needs the separate decision this plan requires, covering SEBI retail-algo rules (algo ID tagging, static IP, order-rate limits) and broker selection. No order path exists in the code.
-- **Phase 4 (AI layer) is not started.** It needs a chosen LLM provider and API keys; the strategy spec and its parser are the intended target for plain-English generation.
+- **Phase 3 (paper trading that behaves like live) is done; there are still no live orders.** On 2026-10-19 the scope was set to paper only.
+  - **Engine and fills:** `spec-engine-v2` keeps order records and walks 5-level depth for fills.
+  - **Charges and margin:** itemised Zerodha tariff (`shared/brokerCharges.js`) and a margin-calculator check (`server/upstoxMargin.js`).
+  - **Monitoring:** resting SL-M and LIMIT orders are checked on 1-minute candles every minute.
+  - **Records:** trade records and an append-only ledger (`20261020_spec_paper_ledger.sql`).
+  - Details are in `APP_REVAMP.md`.
+- **App revamp and validated signals:** see `APP_REVAMP.md`.
+  - Analysis, Signals and Paper trading pages.
+  - Strategy library with a validation gate; daily signal scan with automatic single-trade paper runs.
+  - Bulk/block deals, delivery and FII/DII capture.
+- **Phase 4 (AI layer) is not started.** No paid LLM provider is available. Recommended path:
+  - A deterministic plain-English → spec parser, validated by `parseStrategySpec`.
+  - Optionally, a local or free-tier model behind a provider-neutral interface.
+  - A model never supplies numbers that the parser does not validate.
 
 ### Next
 
-1. Before enabling the fundamentals job: apply the migration, verify one manual `POST /api/fundamentals`, then activate `fundamental-filings` in pg_cron.
-2. Run `npm run fundamentals:backfill -- --nifty50` against Supabase after the migration is applied. Integrated filings start with FY2025, so 3- and 5-year growth and PEG need another data source or will accrue from FY2027 onwards.
-3. Scorecard coverage: with the Upstox token, Value and Momentum score; Growth, GARP and Compounder need FY2027 filings or an older-history source.
-4. XLSX holdings import, if needed: requires choosing a spreadsheet parser dependency.
-5. Apply `20261019_spec_paper_runs.sql`, start one paper run, call `POST /api/spec-paper-cycle` manually during market hours, then activate `spec-paper-cycle` in pg_cron.
-6. Verify the option-chain endpoint with a real Upstox token (the response shape is from Upstox documentation and has not been observed live here).
-7. Decide on Phase 3 (live execution) and Phase 4 (AI layer).
+1. Apply `20261020_spec_paper_ledger.sql` and `20261021_trading_signals.sql`, run `POST /api/signals?job=validate` until every strategy has a verdict, then enable `signal-validate`, `signal-scan`, `market-day` and `spec-paper-cycle` in pg_cron. Keep `shared-paper-minute` disabled.
+2. Before enabling the fundamentals job: apply the migration, verify one manual `POST /api/fundamentals`, then activate `fundamental-filings` in pg_cron. Run `npm run fundamentals:backfill -- --nifty50` afterwards.
+3. Verify the option-chain, margin and depth responses with a real Upstox token (their shapes come from Upstox documentation and have not been observed live here).
+4. Review the forward record of the automatic signal paper runs after at least 30 closed trades per strategy before trusting any strategy with money.
+5. Retire the legacy shared-paper engine once Research portfolios no longer read its segment signals.

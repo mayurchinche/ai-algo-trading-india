@@ -407,3 +407,4 @@ body{font-size:14px;letter-spacing:-.012em}h1,h2,h3,h4,h5,h6{font-family:'Inter'
 /* Compact labelled figure used across Analysis, Signals and Paper trading. */
 .metric-tile { display:flex; flex-direction:column; gap:2px; padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:var(--card); min-width:0; }
 .metric-tile strong { font-size:15px; font-weight:600; overflow-wrap:anywhere; }
+.swot-s { border-left:3px solid var(--green); } .swot-w { border-left:3px solid var(--red); } .swot-o { border-left:3px solid var(--blue); } .swot-t { border-left:3px solid var(--amber); }

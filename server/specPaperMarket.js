@@ -39,6 +39,17 @@ export function createSpecPaperMarket({read=createUpstoxReader(),master=getTradi
    if(!keys.length)return new Map();
    return new Map(normalizeUpstoxQuotes(await read('/v3/market-quote/quotes?instrument_key='+encodeURIComponent(keys.join(','))),keys,now).map(q=>[q.symbol,q]));
   },
+  // Completed bars of one instrument over [fromMs, now), split into the request windows Upstox allows
+  // (1 month for minute intervals up to 15, a quarter for longer intraday intervals, a decade for days).
+  async history(key,timeframe,fromMs,now){
+   const [unit,n]=UNIT[timeframe],enc=encodeURIComponent(key),span=unit==='days'?3650:unit==='minutes'&&n<=15?28:88,candles=[];
+   for(let end=now-86400000;end>=fromMs;end-=(span+1)*86400000){
+    const start=Math.max(fromMs,end-span*86400000),data=await read(`/v3/historical-candle/${enc}/${unit}/${n}/${istDate(end)}/${istDate(start)}`);
+    if(!Array.isArray(data?.candles))throw new MarketDataError('INVALID_CANDLE_RESPONSE');candles.push(...data.candles);
+   }
+   if(unit!=='days'){const today=await read(`/v3/historical-candle/intraday/${enc}/${unit}/${n}`);if(!Array.isArray(today?.candles))throw new MarketDataError('INVALID_CANDLE_RESPONSE');candles.push(...today.candles);}
+   return parseCandles(candles,timeframe,now);
+  },
   // Contract for one leg at entry time: equity, nearest/next futures, or an option strike on the live chain.
   async resolveLeg(spec,leg,key,now){
    const ins=leg.instrument;
@@ -64,6 +75,7 @@ export function createSpecPaperMarket({read=createUpstoxReader(),master=getTradi
    return parseCandles([...hist.candles,...today.candles],'1m',now).filter(b=>b.time>=since);
   },
   margin,
+  optionChain:chains,
   async marketOpen(){const s=await read('/v2/market/status/NSE');if(typeof s?.status!=='string')throw new MarketDataError('MARKET_STATUS_INVALID');return s.status==='NORMAL_OPEN';},
  };
 }

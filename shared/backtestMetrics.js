@@ -26,7 +26,7 @@ export function computeMetrics({curve,trades,capital,costs,paramCount=0,mcPaths=
  const grossTotal=trades.reduce((a,t)=>a+t.grossPnl,0);
  // Monte-Carlo: resample trade P&Ls with replacement; percentiles of final return and max drawdown.
  let monteCarlo=null;
- if(pnls.length>=10){
+ if(pnls.length>=10&&mcPaths>0){
   const r=rng(seed),finals=[],dds=[];
   for(let k=0;k<mcPaths;k++){let eq=capital;const path=[capital];for(let j=0;j<pnls.length;j++){eq+=pnls[Math.floor(r()*pnls.length)];path.push(eq);}finals.push(eq/capital-1);dds.push(maxDrawdown(path));}
   finals.sort((a,b)=>a-b);dds.sort((a,b)=>a-b);

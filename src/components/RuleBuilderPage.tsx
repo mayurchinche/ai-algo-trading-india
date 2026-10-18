@@ -83,8 +83,8 @@ export function BacktestView({ result }: { result: BacktestResult }) {
 
 function PaperStart({ spec, options }: { spec: StrategySpec; options: { capital: number; costBps: number; costPerOrder: number; slippageBps: number } }) {
  const [state, setState] = useState(''); const [busy, setBusy] = useState(false);
- return <div className="border-t pt-3 space-y-1"><p className="text-sm">Run this spec forward as a paper run with the same capital and cost settings. The scheduler steps it on live read-only data; option strikes are resolved on the live chain at entry.</p>
-  <button className="btn btn-secondary" disabled={busy} onClick={() => { setBusy(true); setState(''); createRun(spec, { capital: options.capital, costBps: options.costBps, costPerOrder: options.costPerOrder, slippageBps: options.slippageBps, maxUnitsPerOrder: null }).then(() => navigateTo('Spec paper')).catch(e => setState(e instanceof Error ? e.message : 'Paper run not created')).finally(() => setBusy(false)); }}>{busy ? 'Starting…' : 'Start paper run'}</button>{state && <p className="notice text-sm">{state}</p>}</div>;
+ return <div className="border-t pt-3 space-y-1"><p className="text-sm">Run this spec forward as a paper run with the same capital. It trades like live: live order book fills, the broker’s margin check and the published broker charges; option strikes are resolved on the live chain at entry.</p>
+  <button className="btn btn-secondary" disabled={busy} onClick={() => { setBusy(true); setState(''); createRun(spec, { capital: options.capital, slippageBps: options.slippageBps, maxUnitsPerOrder: null, costModel: 'broker-tariff', requireMargin: true }).then(() => navigateTo('Paper trading')).catch(e => setState(e instanceof Error ? e.message : 'Paper run not created')).finally(() => setBusy(false)); }}>{busy ? 'Starting…' : 'Start paper run'}</button>{state && <p className="notice text-sm">{state}</p>}</div>;
 }
 
 function BacktestPanel({ spec }: { spec: StrategySpec }) {

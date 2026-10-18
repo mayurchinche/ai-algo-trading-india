@@ -93,7 +93,7 @@ test('scheduler cycle commits state with its events, respects market hours, conf
 test('trade statistics, options validation, candles and market paths',async()=>{
  const st=tradeStats([{pnl:100,gross:110,charges:10},{pnl:-50,gross:-45,charges:5},{pnl:-30,gross:-25,charges:5},{pnl:80,gross:85,charges:5}]);
  assert.equal(st.winRate,0.5);assert.equal(st.expectancy,25);assert.equal(st.profitFactor,180/80);assert.equal(st.maxDrawdown,80);assert.equal(st.charges,25);
- assert.deepEqual(validatePaperOptions({capital:5000}),{capital:5000,costBps:0,costPerOrder:0,slippageBps:0,maxUnitsPerOrder:null,costModel:'broker-tariff',requireMargin:true});
+ assert.deepEqual(validatePaperOptions({capital:5000}),{capital:5000,costBps:0,costPerOrder:0,slippageBps:0,maxUnitsPerOrder:null,costModel:'broker-tariff',requireMargin:true,singleTrade:false});
  assert.throws(()=>validatePaperOptions({...opts,extra:1}));assert.throws(()=>validatePaperOptions({...opts,maxUnitsPerOrder:0}));assert.throws(()=>validatePaperOptions({...opts,costModel:'x'}));
  const c=parseCandles([['2026-10-19T09:20:00+05:30',1,2,1,1,5],['2026-10-19T09:15:00+05:30',1,2,1,1,5],['2026-10-19T09:15:00+05:30',1,2,1,1,5],['2026-10-19T09:25:00+05:30',1,0.5,1,1,5],['2026-10-19T09:30:00+05:30',1,2,1,1,5]],'5m',Date.parse('2026-10-19T09:33:00+05:30'));
  assert.deepEqual(c.map(b=>new Date(b.time).toISOString()),['2026-10-19T03:45:00.000Z','2026-10-19T03:50:00.000Z']);

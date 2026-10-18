@@ -24,16 +24,23 @@ export async function buildScorecards(universe,{store,bars,now}){
   coverage:{companies:companies.length,withAnnualPeriod:scored.companies.filter(c=>c.basis).length,withPrice:companies.filter(c=>c.price.status==='OBSERVED').length,truncatedFilingReads:companies.filter(c=>c.fundamentals.coverage.truncated).length},
   limitations:['Banks, NBFCs and insurers use a filing format that is not parsed, so they have no scores.','Integrated NSE filings start with FY2025: 3- and 5-year growth and PEG stay unavailable until more years are stored.','Universe membership is the NSE list on its asOf date, applied to the current period only.','Price criteria need the Upstox read token; windows with a daily move above 35% are excluded as possible unadjusted corporate actions.']};
 }
-export function createScorecardsHandler({store=fundamentalsStore,bars=createDailyBarsReader(),now=Date.now}={}){
+// One cache per process, shared by the scorecards route and stock analysis.
+export function createScorecardsCache({store=fundamentalsStore,bars=createDailyBarsReader(),now=Date.now}={}){
  const cache=new Map(),inflight=new Map();
+ return id=>{
+  const hit=cache.get(id);if(hit&&now()-hit.at<CACHE_MS)return Promise.resolve(hit.data);
+  if(!inflight.has(id))inflight.set(id,buildScorecards(UNIVERSES[id],{store,bars,now}).then(data=>{cache.set(id,{at:now(),data});return data;}).finally(()=>inflight.delete(id)));
+  return inflight.get(id);
+ };
+}
+export const scorecardsCache=createScorecardsCache();
+export function createScorecardsHandler({store=fundamentalsStore,bars=createDailyBarsReader(),now=Date.now,cached=store===fundamentalsStore&&now===Date.now?scorecardsCache:createScorecardsCache({store,bars,now})}={}){
  return async(req,res)=>{
   if(!allowRequest(req,res))return;
   if(req.method!=='GET')return res.status(405).json({error:'GET required'});
   const query=req.query||{},id=query.universe;
   if(Object.keys(query).some(k=>k!=='universe')||typeof id!=='string'||!Object.hasOwn(UNIVERSES,id))return res.status(400).json({error:'universe must be one of: '+Object.keys(UNIVERSES).join(', ')});
-  const hit=cache.get(id);if(hit&&now()-hit.at<CACHE_MS)return res.status(200).json(hit.data);
-  if(!inflight.has(id))inflight.set(id,buildScorecards(UNIVERSES[id],{store,bars,now}).then(data=>{cache.set(id,{at:now(),data});return data;}).finally(()=>inflight.delete(id)));
-  try{return res.status(200).json(await inflight.get(id));}
+  try{return res.status(200).json(await cached(id));}
   catch{return res.status(503).json({error:'Fundamentals storage unavailable. Check the fundamental-filings migration and server connection. No scores were generated.'});}
  };
 }

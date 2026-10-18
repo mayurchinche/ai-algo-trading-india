@@ -30,6 +30,8 @@ export function apiUrl(localPath: string): string {
   if (localPath.startsWith('/api/research?') || localPath.startsWith('/api/premarket?')) return `${apiBase}${localPath}`;
   if (localPath.startsWith('/api/spec-paper?') || localPath === '/api/spec-paper') return `${apiBase}${localPath}`;
   if (localPath.startsWith('/api/spec-paper-cycle?') || localPath === '/api/spec-paper-cycle') return `${apiBase}${localPath}`;
+  if (localPath.startsWith('/api/signals?') || localPath === '/api/signals') return `${apiBase}${localPath}`;
+  if (localPath.startsWith('/api/stock-analysis?') || localPath === '/api/stock-analysis') return `${apiBase}${localPath}`;
   if (!IS_PROD) return localPath;
 
   // Find matching proxy prefix (longest match first)

@@ -11,3 +11,6 @@ export function downloadJson(name: string, value: unknown) {
 // Pages ask the app shell to switch tabs; the shell owns navigation state.
 export const NAVIGATE_EVENT = 'app:navigate';
 export const navigateTo = (tab: string) => window.dispatchEvent(new CustomEvent(NAVIGATE_EVENT, { detail: tab }));
+// Opens the Analysis page for one symbol.
+export const ANALYSE_EVENT = 'app:analyse';
+export const openAnalysis = (symbol: string) => window.dispatchEvent(new CustomEvent(ANALYSE_EVENT, { detail: symbol }));
