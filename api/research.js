@@ -5,11 +5,12 @@ import companyHistoryHandler from './_company-history.js';
 import reportEvidenceHandler from './_report-evidence.js';
 import portfolioHandler from './_research-portfolios.js';
 import fundamentalsHandler from './_fundamentals.js';
+import scorecardsHandler from './_scorecards.js';
 const cache=new Map(), inflight=new Map();
 // The Vercel Hobby plan allows 12 functions per deployment. vercel.json rewrites these
 // public paths to /api/research?route=<name>, and the router removes `route` before
 // calling the handler, because each handler only accepts its own query keys.
-export const researchRoutes={'company-disclosures':disclosureHandler,'company-history':companyHistoryHandler,'report-evidence':reportEvidenceHandler,'research-portfolios':portfolioHandler,'fundamentals':fundamentalsHandler};
+export const researchRoutes={'company-disclosures':disclosureHandler,'company-history':companyHistoryHandler,'report-evidence':reportEvidenceHandler,'research-portfolios':portfolioHandler,'fundamentals':fundamentalsHandler,'scorecards':scorecardsHandler};
 export function createResearchRouter(routes=researchRoutes,news=newsHandler){return async(req,res)=>{
   const {route,...query}=req.query||{};
   if(route===undefined)return news(req,res);

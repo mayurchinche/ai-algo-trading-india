@@ -80,10 +80,10 @@ test('missing positions, non-positive denominators and unusable prices leave rat
 });
 test('daily close is the latest completed bar before the asOf IST date and failures stay explicit',async()=>{
  const asOf=Date.parse('2026-06-01T05:00:00Z');let path='';
- const reader=createDailyCloseReader({read:async(p:string)=>{path=p;return {candles:[['2026-06-01T00:00:00+05:30',1,1,1,999,1,0],['2026-05-28T00:00:00+05:30',1,1,1,230,1,0],['2026-05-29T00:00:00+05:30',1,1,1,240,1,0],['bad',1,1,1,5,1,0]]};}});
+ const reader=createDailyCloseReader({read:async(p:string)=>{path=p;return {candles:[['2026-06-01T00:00:00+05:30',1,999,1,999,1,0],['2026-05-28T00:00:00+05:30',1,230,1,230,1,0],['2026-05-29T00:00:00+05:30',1,240,1,240,1,0],['bad',1,5,1,5,1,0],['2026-05-27T00:00:00+05:30',1,1,1,250,1,0]]};}});
  const close=await reader(KEY,asOf);assert.equal(close.value,240);assert.equal(close.date,'2026-05-29');assert.equal(path,'/v3/historical-candle/NSE_EQ%7CINE000A01010/days/1/2026-05-31/2026-05-18');
  const empty=await observeDailyClose(createDailyCloseReader({read:async()=>({candles:[]})}),KEY,asOf);assert.deepEqual([empty.status,empty.reason],['UNAVAILABLE','NO_RECENT_DAILY_CLOSE']);
- const conflict=await observeDailyClose(createDailyCloseReader({read:async()=>({candles:[['2026-05-29T00:00:00+05:30',1,1,1,240],['2026-05-29T00:00:00+05:30',1,1,1,241]]})}),KEY,asOf);assert.equal(conflict.reason,'AMBIGUOUS_DAILY_CLOSE');
+ const conflict=await observeDailyClose(createDailyCloseReader({read:async()=>({candles:[['2026-05-29T00:00:00+05:30',1,250,1,240],['2026-05-29T00:00:00+05:30',1,250,1,241]]})}),KEY,asOf);assert.equal(conflict.reason,'AMBIGUOUS_DAILY_CLOSE');
  const down=await observeDailyClose(async()=>{throw Error('token abc');},KEY,asOf);assert.deepEqual(down,{status:'UNAVAILABLE',instrumentKey:KEY,reason:'PRICE_SOURCE_FAILED'});
 });
 

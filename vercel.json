@@ -7,7 +7,7 @@
   ],
   "rewrites": [
     {
-      "source": "/api/:route(company-disclosures|company-history|report-evidence|research-portfolios|fundamentals)",
+      "source": "/api/:route(company-disclosures|company-history|report-evidence|research-portfolios|fundamentals|scorecards)",
       "destination": "/api/research?route=:route"
     },
     {

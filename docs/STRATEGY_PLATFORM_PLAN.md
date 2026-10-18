@@ -183,8 +183,17 @@ The fit score weighs diversification, concentration, quality (always 50%) and st
   - Dashboard: **Trend score** tab (`src/components/TrendDashboardPage.tsx`) with All / Bullish / Trend start / Trend end, sessions since signal and a price/score chart for the NIFTY 50 list of 18 Oct 2026. Every view shows the replay result; signals are not connected to paper or live orders.
   - Tests: `tests/trend-score.test.ts`, `tests/trend-dashboard.test.ts`.
 
+- **Investor-style scorecards (Phase 1, item 2)**
+  - `server/scorecards.js` (`style-scorecards-v1`): our own rules for five styles — Value, GARP, Growth, Compounder, Earnings and price momentum — each a weighted mean of criteria. Each criterion is a mid-rank percentile among companies whose latest annual period ends on the same date; no universal cutoffs (per `docs/EVIDENCE_REQUIREMENTS.md`).
+  - A criterion needs at least 10 peers with data; a style needs two-thirds of its weight ranked; the composite needs three scored styles. Every unscored item names what is missing; inputs spanning a symbol change carry `FILED_SYMBOL_CHANGED`.
+  - Price criteria (12-month return, distance below the 52-week high) use one year of Upstox daily bars. Windows with a daily move above 35% are excluded as possible unadjusted corporate actions.
+  - Route `/api/scorecards?universe=NIFTY50` (10-minute cache), **Scorecards** tab with sortable styles and a per-criterion breakdown with source filings.
+  - Live end-to-end check (18 Oct 2026, backfill into memory, no Upstox token): 39 of 50 companies have a supported annual filing; only Value is scored (38 companies), because GARP, Growth and Compounder need 3- or 5-year history and Momentum needs prices. No composite is scored yet. Scoring took 30 ms; the response is 354 KB.
+  - Tests: `tests/scorecards.test.ts`.
+
 ### Next
 
 1. Before enabling the fundamentals job: apply the migration, verify one manual `POST /api/fundamentals`, then activate `fundamental-filings` in pg_cron.
 2. Run `npm run fundamentals:backfill -- --nifty50` against Supabase after the migration is applied. Integrated filings start with FY2025, so 3- and 5-year growth and PEG need another data source or will accrue from FY2027 onwards.
-3. Investor-style scorecards (Phase 1, item 2), which depend on fundamentals coverage.
+3. Scorecard coverage: with the Upstox token, Value and Momentum score; Growth, GARP and Compounder need FY2027 filings or an older-history source.
+4. Screener with column picker and CSV export (Phase 1, item 3).

@@ -13,6 +13,8 @@ import disclosureHandler from './api/_company-disclosures.js'
 import portfolioHandler from './api/_research-portfolios.js'
 // @ts-expect-error Shared JavaScript fundamentals API.
 import fundamentalsHandler from './api/_fundamentals.js'
+// @ts-expect-error Shared JavaScript scorecards API.
+import scorecardsHandler from './api/_scorecards.js'
 // @ts-expect-error Shared JavaScript research API.
 import researchHandler from './api/research.js'
 // @ts-expect-error Shared JavaScript research history API.
@@ -34,7 +36,7 @@ export default defineConfig(({ mode }) => {
   plugins: [react(), tailwindcss(), {
     name: 'local-market-api',
     configureServer(server) {
-      for (const [route, handler] of [['/api/report-evidence', reportEvidenceHandler], ['/api/company-history', companyHistoryHandler], ['/api/company-disclosures', disclosureHandler], ['/api/research-portfolios', portfolioHandler], ['/api/fundamentals', fundamentalsHandler], ['/api/premarket', premarketHandler], ['/api/research', researchHandler], ['/api/market', marketHandler], ['/api/health', healthHandler], ['/api/paper', paperHandler], ['/api/shared-paper', sharedPaperHandler]] as const) server.middlewares.use(route, (req, res) => {
+      for (const [route, handler] of [['/api/report-evidence', reportEvidenceHandler], ['/api/company-history', companyHistoryHandler], ['/api/company-disclosures', disclosureHandler], ['/api/research-portfolios', portfolioHandler], ['/api/fundamentals', fundamentalsHandler], ['/api/scorecards', scorecardsHandler], ['/api/premarket', premarketHandler], ['/api/research', researchHandler], ['/api/market', marketHandler], ['/api/health', healthHandler], ['/api/paper', paperHandler], ['/api/shared-paper', sharedPaperHandler]] as const) server.middlewares.use(route, (req, res) => {
         const url = new URL(req.url || '/', 'http://localhost');
         const request = { headers: req.headers, method: req.method, query: Object.fromEntries(url.searchParams) };
         const response = { end() { res.end(); return response; }, setHeader: (key: string, value: string) => res.setHeader(key, value), status(code: number) { res.statusCode = code; return response; }, json(data: unknown) { res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(data)); return response; } };
