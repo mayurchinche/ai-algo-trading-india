@@ -1,7 +1,8 @@
 import {SegmentReadiness} from './components/SegmentReadiness';
 import {tradingSegments} from '../shared/tradingSegments';
 import {SegmentPaperAccount} from './components/SegmentPaperAccount';
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
+import { NAVIGATE_EVENT } from './services/specDraft';
 import { LayoutDashboard, Compass, Bell, BookOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 const AlertsPage = lazy(() => import('./components/AlertsPage').then(m => ({default:m.AlertsPage})));
@@ -23,6 +24,7 @@ const PortfolioFitPage = lazy(() => import('./components/PortfolioFitPage').then
 const ScreenerPage = lazy(() => import('./components/ScreenerPage').then(m => ({default:m.ScreenerPage})));
 const ScorecardsPage = lazy(() => import('./components/ScorecardsPage').then(m => ({default:m.ScorecardsPage})));
 const BasketsPage = lazy(() => import('./components/BasketsPage').then(m => ({default:m.BasketsPage})));
+const OptionsWizardPage = lazy(() => import('./components/OptionsWizardPage').then(m => ({default:m.OptionsWizardPage})));
 const TrendDashboardPage = lazy(() => import('./components/TrendDashboardPage').then(m => ({default:m.TrendDashboardPage})));
 import { useLiveStocks } from './hooks/useLiveStocks';
 import { useStockDiscovery, useTradingRuntime } from './hooks/useStockDiscovery';
@@ -33,9 +35,10 @@ export default function App() {
   const [segment,setSegment]=useState(tradingSegments[0]);
   const [activeTab, setActiveTab] = useState('Overview');
   const portfolioResearch=activeTab==='Portfolios';
-  const separateResearch=['IPO Tracker','Metals','Market News','Pre-market','Portfolios','Trend','Scorecards','Screener','Portfolio fit','Baskets'].includes(activeTab);
+  const separateResearch=['IPO Tracker','Metals','Market News','Pre-market','Portfolios','Trend','Scorecards','Screener','Portfolio fit','Baskets','Options wizard'].includes(activeTab);
   const [focusSignalId,setFocusSignalId]=useState<string|undefined>();
   const { nifty, lastUpdated } = useLiveStocks();
+  useEffect(() => { const go = (e: Event) => { const tab = (e as CustomEvent).detail; if (typeof tab === 'string') setActiveTab(tab); }; window.addEventListener(NAVIGATE_EVENT, go); return () => window.removeEventListener(NAVIGATE_EVENT, go); }, []);
 
   return (
     <div className="workspace-shell min-h-screen flex flex-col bg-[var(--bg)]">
@@ -73,6 +76,7 @@ export default function App() {
             {activeTab === 'IPO Tracker' && <IPOPage />}
             {activeTab === 'Metals' && <MetalsPage />}
             {activeTab === 'Trend' && <TrendDashboardPage />}
+            {activeTab === 'Options wizard' && <OptionsWizardPage />}
             {activeTab === 'Baskets' && <BasketsPage />}
             {activeTab === 'Scorecards' && <ScorecardsPage />}
             {activeTab === 'Screener' && <ScreenerPage />}
