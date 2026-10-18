@@ -26,7 +26,7 @@ const ScorecardsPage = lazy(() => import('./components/ScorecardsPage').then(m =
 const BasketsPage = lazy(() => import('./components/BasketsPage').then(m => ({default:m.BasketsPage})));
 const OptionsWizardPage = lazy(() => import('./components/OptionsWizardPage').then(m => ({default:m.OptionsWizardPage})));
 const RuleBuilderPage = lazy(() => import('./components/RuleBuilderPage').then(m => ({default:m.RuleBuilderPage})));
-const SpecPaperPage = lazy(() => import('./components/SpecPaperPage').then(m => ({default:m.SpecPaperPage})));
+const PaperTradingPage = lazy(() => import('./components/PaperTradingPage').then(m => ({default:m.PaperTradingPage})));
 const TrendDashboardPage = lazy(() => import('./components/TrendDashboardPage').then(m => ({default:m.TrendDashboardPage})));
 import { useLiveStocks } from './hooks/useLiveStocks';
 import { useStockDiscovery, useTradingRuntime } from './hooks/useStockDiscovery';
@@ -78,7 +78,7 @@ export default function App() {
             {activeTab === 'IPO Tracker' && <IPOPage />}
             {activeTab === 'Metals' && <MetalsPage />}
             {activeTab === 'Trend' && <TrendDashboardPage />}
-            {activeTab === 'Spec paper' && <SpecPaperPage />}
+            {activeTab === 'Spec paper' && <PaperTradingPage />}
             {activeTab === 'Rule builder' && <RuleBuilderPage />}
             {activeTab === 'Options wizard' && <OptionsWizardPage />}
             {activeTab === 'Baskets' && <BasketsPage />}

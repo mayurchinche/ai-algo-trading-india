@@ -1,9 +1,10 @@
 import type { StrategySpec } from './strategySpec';
 import type { Bar } from './strategyConditions';
 import type { Metrics } from './backtestMetrics';
+import type { TradeLeg } from './specEngine';
 export const BACKTEST_VERSION: string;
-export interface BacktestTrade { entryTime: number; exitTime: number; reason: string; pnl: number; grossPnl: number; mae: number; mfe: number }
-export interface BacktestOptions { capital?: number; costBps?: number; costPerOrder?: number; slippageBps?: number; lotSize?: number | null; maxUnitsPerOrder?: number | null; mcPaths?: number; seed?: number }
+export interface BacktestTrade { entryTime: number; exitTime: number; reason: string; pnl: number; grossPnl: number; charges: number; mae: number; mfe: number; legs: TradeLeg[] }
+export interface BacktestOptions { capital?: number; costModel?: 'flat' | 'broker-tariff'; costBps?: number; costPerOrder?: number; slippageBps?: number; lotSize?: number | null; maxUnitsPerOrder?: number | null; mcPaths?: number; seed?: number }
 export type BacktestResult =
  | { status: 'UNSUPPORTED_OPTION_LEGS'; legs: string[]; reason: string }
  | { status: 'LOT_SIZE_REQUIRED' | 'INSUFFICIENT_BARS' }

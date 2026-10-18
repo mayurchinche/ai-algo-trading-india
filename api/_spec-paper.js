@@ -7,10 +7,19 @@ import {authorizeScheduler,emptySchedulerBody} from '../server/schedulerAuth.js'
 const UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const unavailable='Spec paper storage unavailable. Check the spec-paper-runs migration and server connection. Nothing was saved.';
 
-// GET lists runs; POST {action:'create', id, spec, options} or {action:'stop', id}. Paper only.
+// GET lists runs or pages one run's ledger; POST {action:'create', id, spec, options} or {action:'stop', id}. Paper only.
 export function createSpecPaperHandler({store=specPaperStore,now=Date.now}={}){return async(req,res)=>{
  if(!allowRequest(req,res))return;
- if(req.method==='GET'){try{return res.status(200).json({account:'user1',runs:(await store().list()).map(summarizeRun)});}catch{return res.status(503).json({error:unavailable});}}
+ if(req.method==='GET'){
+  // ?ledger=<run id>&after=<seq>&limit=<n> pages the permanent event ledger of one run.
+  const q=req.query??{};
+  if(q.ledger!==undefined){
+   const after=Number(q.after??0),limit=Number(q.limit??500);
+   if(typeof q.ledger!=='string'||!UUID.test(q.ledger)||!Number.isInteger(after)||after<0||!Number.isInteger(limit)||limit<1||limit>1000)return res.status(400).json({error:'ledger (run id), after (>=0) and limit (1-1000) are required'});
+   try{const rows=await store().events(q.ledger,after,limit);return res.status(200).json({runId:q.ledger,events:rows,next:rows.length===limit?rows.at(-1).seq:null});}catch{return res.status(503).json({error:unavailable});}
+  }
+  try{return res.status(200).json({account:'user1',runs:(await store().list()).map(summarizeRun)});}catch{return res.status(503).json({error:unavailable});}
+ }
  if(req.method!=='POST')return res.status(405).json({error:'GET or POST required'});
  const b=req.body;
  if(!b||typeof b!=='object'||typeof b.id!=='string'||!UUID.test(b.id))return res.status(400).json({error:'A request id (UUID v4) is required.'});
@@ -25,7 +34,7 @@ export function createSpecPaperHandler({store=specPaperStore,now=Date.now}={}){r
   try{
    const db=store(),run=await db.get(b.id);if(!run)return res.status(404).json({error:'Run not found'});
    if(run.status!=='ACTIVE')return res.status(200).json({run:summarizeRun(run)});
-   const saved=await db.save(run.id,run.version,stopRunState(run,now()),'STOPPED');
+   const {state,events}=stopRunState(run,now()),saved=await db.commit(run.id,run.version,state,'STOPPED',events);
    return saved?res.status(200).json({run:summarizeRun(saved)}):res.status(409).json({error:'The run changed during a cycle. Reload and try again.'});
   }catch{return res.status(503).json({error:unavailable});}
  }

@@ -3,7 +3,7 @@ import {gunzipSync} from 'node:zlib';
 const ROOT='https://api.upstox.com';
 let masterCache,masterPending;
 export class MarketDataError extends Error {constructor(code){super(code);this.code=code;}}
-async function bounded(response,max){
+export async function bounded(response,max){
  const reader=response.body?.getReader();if(!reader)throw new MarketDataError('EMPTY_PROVIDER_RESPONSE');
  let size=0;const chunks=[];
  try{for(;;){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>max)throw new MarketDataError('PROVIDER_RESPONSE_TOO_LARGE');chunks.push(value);}}finally{await reader.cancel().catch(()=>{});}
@@ -39,7 +39,8 @@ export function normalizeUpstoxQuotes(data,keys,now){
   if(!wanted.has(q.instrument_token)||!Number.isFinite(ms)||ms>now||now-ms>120000||!Number.isFinite(responseMs)||responseMs>now||now-responseMs>120000)continue;
   const bid=q.depth?.buy?.[0],ask=q.depth?.sell?.[0];
   if(![q.last_price,bid?.price,ask?.price,bid?.quantity,ask?.quantity].every(n=>Number.isFinite(n)&&n>0)||ask.price<bid.price)continue;
-  quotes.push({symbol:q.instrument_token,price:q.last_price,bid:bid.price,ask:ask.price,bidSize:bid.quantity,askSize:ask.quantity,timestamp:new Date(ms).toISOString(),observedAt:new Date(responseMs).toISOString(),source:'UPSTOX_FULL_QUOTE_V3',spread:(ask.price-bid.price)/((ask.price+bid.price)/2)});
+  const levels=side=>(Array.isArray(q.depth?.[side])?q.depth[side]:[]).filter(l=>Number.isFinite(l?.price)&&l.price>0&&Number.isFinite(l?.quantity)&&l.quantity>0).map(l=>({price:l.price,quantity:l.quantity,orders:Number.isFinite(l.orders)?l.orders:null}));
+  quotes.push({symbol:q.instrument_token,price:q.last_price,bid:bid.price,ask:ask.price,bidSize:bid.quantity,askSize:ask.quantity,depth:{buy:levels('buy'),sell:levels('sell')},timestamp:new Date(ms).toISOString(),observedAt:new Date(responseMs).toISOString(),source:'UPSTOX_FULL_QUOTE_V3',spread:(ask.price-bid.price)/((ask.price+bid.price)/2)});
  }
  return quotes;
 }

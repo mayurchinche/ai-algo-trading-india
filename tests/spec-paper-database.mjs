@@ -6,7 +6,7 @@ const db=new PGlite();try{
  create function net.http_post(url text,headers jsonb,body jsonb,timeout_milliseconds integer) returns bigint language sql as 'insert into net.requests(url,headers,body,timeout) values(url,headers,body,timeout_milliseconds) returning id';
  create schema cron;create table cron.job(jobid bigint primary key,jobname text,schedule text,command text,active boolean);
  create function cron.schedule(text,text,text) returns bigint language sql as 'insert into cron.job values(1,$1,$2,$3,true) on conflict(jobid) do update set schedule=$2,command=$3 returning jobid';
- create function cron.alter_job(job_id bigint,active boolean) returns void language sql as 'update cron.job set active=$2 where jobid=$1';`);
+ create function cron.alter_job(job_id bigint,schedule text default null,command text default null,database text default null,username text default null,active boolean default null) returns void language sql as 'update cron.job set schedule=coalesce($2,schedule),command=coalesce($3,command),active=coalesce($6,active) where jobid=$1';`);
  const sql=await readFile('supabase/migrations/20261019_spec_paper_runs.sql','utf8');
  await db.exec(sql);assert.equal((await db.query('select active from cron.job')).rows[0].active,false);
  await db.exec('update cron.job set active=true');await db.exec(sql);assert.equal((await db.query('select active from cron.job')).rows[0].active,true);

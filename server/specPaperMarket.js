@@ -1,8 +1,10 @@
 import {createUpstoxReader,getTradingInstruments,normalizeUpstoxQuotes,MarketDataError} from './upstoxReadOnly.js';
+import {createUpstoxMarginCalculator} from './upstoxMargin.js';
 import {createOptionChainReader,OPTION_UNDERLYINGS} from './optionChain.js';
 import {selectStrike} from '../shared/optionChain.js';
 import {TIMEFRAME_MS} from '../shared/specEngine.js';
-// Read-only Upstox market data for spec paper runs: underlying bars, live quotes and contract resolution.
+// Upstox market data for spec paper runs: underlying bars, live quotes with depth, 1-minute candles of held
+// contracts, contract resolution and the broker margin calculator. Nothing here places or modifies orders.
 const UNIT={'1m':['minutes',1,20],'3m':['minutes',3,20],'5m':['minutes',5,20],'15m':['minutes',15,25],'30m':['minutes',30,25],'1h':['hours',1,90],'1d':['days',1,400]};
 const istDate=ms=>new Date(ms+19800000).toISOString().slice(0,10);
 export function parseCandles(candles,timeframe,now){
@@ -18,7 +20,7 @@ export function parseCandles(candles,timeframe,now){
  }
  return [...byTime.values()].sort((a,b)=>a.time-b.time);
 }
-export function createSpecPaperMarket({read=createUpstoxReader(),master=getTradingInstruments,chains=createOptionChainReader({read,master})}={}){
+export function createSpecPaperMarket({read=createUpstoxReader(),master=getTradingInstruments,chains=createOptionChainReader({read,master}),margin=createUpstoxMarginCalculator()}={}){
  async function underlyingKey(spec){
   if(spec.underlying.kind==='index'){const k=OPTION_UNDERLYINGS[spec.underlying.symbol];if(!k)throw new MarketDataError('UNSUPPORTED_UNDERLYING');return k;}
   const row=(await master()).find(r=>r.segment==='NSE_EQ'&&r.instrument_type==='EQ'&&r.trading_symbol===spec.underlying.symbol);
@@ -52,6 +54,16 @@ export function createSpecPaperMarket({read=createUpstoxReader(),master=getTradi
    if(!sel.contract.lotSize)throw new MarketDataError('LOT_SIZE_UNKNOWN');
    return {instrumentKey:sel.contract.instrumentKey,lotSize:sel.contract.lotSize,description:`${spec.underlying.symbol} ${chain.expiry} ${sel.strike} ${ins.optionType}`,strike:sel.strike,expiry:chain.expiry};
   },
+  // Completed 1-minute candles of one contract that start at or after `since`: today's intraday series plus
+  // earlier sessions (up to 28 days back) when a position was held overnight.
+  async minuteBars(key,since,now){
+   const enc=encodeURIComponent(key),todayStart=Date.parse(istDate(now)+'T00:00:00+05:30');
+   const today=await read(`/v3/historical-candle/intraday/${enc}/minutes/1`);
+   const hist=since<todayStart?await read(`/v3/historical-candle/${enc}/minutes/1/${istDate(now-86400000)}/${istDate(Math.max(since,now-28*86400000))}`):{candles:[]};
+   if(!Array.isArray(hist?.candles)||!Array.isArray(today?.candles))throw new MarketDataError('INVALID_CANDLE_RESPONSE');
+   return parseCandles([...hist.candles,...today.candles],'1m',now).filter(b=>b.time>=since);
+  },
+  margin,
   async marketOpen(){const s=await read('/v2/market/status/NSE');if(typeof s?.status!=='string')throw new MarketDataError('MARKET_STATUS_INVALID');return s.status==='NORMAL_OPEN';},
  };
 }
