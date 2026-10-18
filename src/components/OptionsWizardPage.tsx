@@ -4,16 +4,10 @@ import { PRESETS, INDEX_UNDERLYINGS, buildWizardSpec, resolveLegs, payoff, type 
 import type { OptionChain } from '../../shared/optionChain';
 import type { Expiry } from '../../shared/strategySpec';
 import { NIFTY50_UNIVERSE } from '../../shared/universes';
-import { apiUrl } from '../utils/apiUrl';
+import { fetchChain } from '../services/optionChain';
 import { saveSpecDraft, downloadJson, navigateTo } from '../services/specDraft';
 
 const rupees = (n: number) => n.toLocaleString('en-IN', { maximumFractionDigits: 0 });
-export async function fetchChain(underlying: string, expiry: string, signal?: AbortSignal): Promise<OptionChain> {
- const r = await fetch(apiUrl(`/api/option-chain?underlying=${encodeURIComponent(underlying)}&expiry=${expiry}`), { signal: signal ?? AbortSignal.timeout(30000) });
- const b = await r.json().catch(() => ({ error: 'Option chain service returned a page instead of JSON' }));
- if (!r.ok) throw new Error(`${b.error ?? 'Option chain unavailable'}${b.reason ? ' (' + String(b.reason).replaceAll('_', ' ').toLowerCase() + ')' : ''}`);
- return b as OptionChain;
-}
 
 export function PayoffView({ result }: { result: Payoff }) {
  if (result.status !== 'OK') return <p className="text-sm">Payoff unavailable: {result.unresolved.map(l => `${l.id} (${l.status.replaceAll('_', ' ').toLowerCase()})`).join(', ')}.</p>;

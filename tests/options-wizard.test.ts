@@ -22,7 +22,7 @@ test('every preset builds a valid spec for index and stock underlyings',()=>{
 });
 
 const now=Date.parse('2026-10-19T04:30:00Z'),spot=25000;
-const chainFor=(expiry:string,lot=75)=>{const T=yearsToExpiry(expiry,now);return normalizeOptionChain([24600,24700,24800,24900,25000,25100,25200,25300,25400].map(K=>{const s=(t:'CE'|'PE')=>{const p=bsPrice(t,{S:spot,K,T,r:0.065,q:0,sigma:0.15});return {instrument_key:`NSE_FO|${t}${K}${expiry}`,market_data:{ltp:p,bid_price:p-0.5,ask_price:p+0.5,bid_qty:1,ask_qty:1}};};return {expiry,strike_price:K,underlying_key:'NSE_INDEX|Nifty 50',underlying_spot_price:spot,call_options:s('CE'),put_options:s('PE')};}),{underlying:'NIFTY',underlyingKey:'NSE_INDEX|Nifty 50',observedAt:new Date(now).toISOString()});};
+const chainFor=(expiry:string)=>{const T=yearsToExpiry(expiry,now);return normalizeOptionChain([24600,24700,24800,24900,25000,25100,25200,25300,25400].map(K=>{const s=(t:'CE'|'PE')=>{const p=bsPrice(t,{S:spot,K,T,r:0.065,q:0,sigma:0.15});return {instrument_key:`NSE_FO|${t}${K}${expiry}`,market_data:{ltp:p,bid_price:p-0.5,ask_price:p+0.5,bid_qty:1,ask_qty:1}};};return {expiry,strike_price:K,underlying_key:'NSE_INDEX|Nifty 50',underlying_spot_price:spot,call_options:s('CE'),put_options:s('PE')};}),{underlying:'NIFTY',underlyingKey:'NSE_INDEX|Nifty 50',observedAt:new Date(now).toISOString()});};
 const withLots=(c:any,lot=75)=>({...c,strikes:c.strikes.map((s:any)=>({...s,CE:{...s.CE,lotSize:lot},PE:{...s.PE,lotSize:lot}}))});
 const week=withLots(chainFor('2026-10-27')),nextWeek=withLots(chainFor('2026-11-03'));
 test('iron condor resolves strikes and has capped profit, capped loss and two breakevens',()=>{
