@@ -168,6 +168,11 @@ The fit score weighs diversification, concentration, quality (always 50%) and st
   - Parser (`server/financialStatements.js`) now also reads profit before tax, finance costs, basic EPS (currency-per-share unit) and year-end balance-sheet positions from instant contexts.
   - **Parser fix:** live NSE integrated filings repeat the reporting scope and audit declaration for each reported period. The previous parser required a single fact and so rejected every live filing; checked against 20 filings in the 17 Oct 2026 feed, all 12 Ind AS filings now parse with every fact present. This also affects the disclosure inbox and the research-portfolio financial snapshot.
   - Banking-format filings are classified `UNSUPPORTED_FINANCIAL_FORMAT` and not stored.
+  - **Backfill** (`server/fundamentalsBackfill.js`, `npm run fundamentals:backfill -- --nifty50`, or `--dry-run`): reads NSE's per-company integrated-filing index and records the annual (quarter ending 31 March) Ind AS filings.
+    - Identity is the ISIN from NSE's constituent list. Filings under a former or mistyped symbol (TATAMOTORS for TMPV, BAJAJAUTO for BAJAJ-AUTO) are recorded with `filedSymbol`. Growth and ratios whose inputs span different filed symbols carry `FILED_SYMBOL_CHANGED`, because demergers and renames are not adjusted.
+    - Pre-integrated NSE XBRL is excluded: INFY's FY2024 file labels full-year facts with a January–March context. The parser now rejects any context whose dates contradict the filing's declared reporting period.
+    - Financial documents may be up to 16 MB (annual standalone filings with related-party schedules reach about 10 MB; a 9.8 MB filing parses in about 0.3 s with 60 MB heap). Feeds and indexes stay at 1 MB.
+    - Dry run on the NIFTY 50 (18 Oct 2026): ROCE, ROE, D/E and 1-year growth for FY2026 for 37 of 50 companies. 13 banks, NBFCs and insurers are unsupported. Two ADANIENT links return NSE error pages. LT's FY2025 filing has no Ind AS equity total, so its ROE is unavailable. 96 s, 11.6 s CPU, 353 MB peak RSS.
   - `server/fundamentalsIngest.js` ingests new XML filings from the NSE financials feed (skips stored ones, 40 s budget, per-filing outcomes). Route `/api/fundamentals`: `GET ?instrumentKey=NSE_EQ|<ISIN>` derives; scheduler `POST` ingests.
   - `server/schedulerAuth.js` now owns the scheduler Bearer check used by the premarket, paper and fundamentals schedulers.
   - Tests: `tests/fundamentals.test.ts`, `tests/fundamentals-database.mjs`.
@@ -181,5 +186,5 @@ The fit score weighs diversification, concentration, quality (always 50%) and st
 ### Next
 
 1. Before enabling the fundamentals job: apply the migration, verify one manual `POST /api/fundamentals`, then activate `fundamental-filings` in pg_cron.
-2. Growth and ratios need annual (Q4) filings. The rolling feed only holds recent filings, so values appear after the April–May results season unless history is backfilled from an archive source.
+2. Run `npm run fundamentals:backfill -- --nifty50` against Supabase after the migration is applied. Integrated filings start with FY2025, so 3- and 5-year growth and PEG need another data source or will accrue from FY2027 onwards.
 3. Investor-style scorecards (Phase 1, item 2), which depend on fundamentals coverage.

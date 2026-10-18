@@ -5,4 +5,3 @@ export const TREND_VALIDATION: {
  beatBuyAndHold: { symbols: number; of: number }; medianMaxDrawdownPct: { strategy: number; buyAndHold: number };
  recentYears: { year: number; trades: number; meanNetPct: number }[]; summary: string;
 };
-export const NIFTY50_UNIVERSE: { name: string; asOf: string; source: string; sourceSha256: string; symbols: readonly string[] };

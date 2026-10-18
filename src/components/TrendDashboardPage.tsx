@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ComposedChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { TREND_MODEL, type TrendResult } from '../../shared/trendScore';
-import { TREND_VALIDATION, NIFTY50_UNIVERSE } from '../../shared/trendValidation';
+import { TREND_VALIDATION } from '../../shared/trendValidation';
+import { NIFTY50_UNIVERSE } from '../../shared/universes';
 import { displayScore, loadTrendRows, matchesTab, sortTrendRows, type TrendRow, type TrendTab } from '../services/trendDashboard';
 
 const tabs: { id: TrendTab; label: string }[] = [{ id: 'ALL', label: 'All' }, { id: 'BULLISH', label: 'Bullish' }, { id: 'TREND_START', label: 'Trend start' }, { id: 'TREND_END', label: 'Trend end' }];

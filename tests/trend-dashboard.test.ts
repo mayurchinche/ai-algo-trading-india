@@ -2,7 +2,8 @@ import test from 'node:test';import assert from 'node:assert/strict';
 import {createElement} from 'react';import {renderToStaticMarkup} from 'react-dom/server';
 import {loadTrendRow,loadTrendRows,matchesTab,sortTrendRows,displayScore} from '../src/services/trendDashboard';
 import {TrendTable,TrendValidationNotice} from '../src/components/TrendDashboardPage';
-import {NIFTY50_UNIVERSE,TREND_VALIDATION} from '../shared/trendValidation.js';
+import {TREND_VALIDATION} from '../shared/trendValidation.js';
+import {NIFTY50_UNIVERSE} from '../shared/universes.js';
 const day=(i:number)=>new Date(Date.UTC(2024,0,1)+i*86400000).toISOString().slice(0,10);
 const history=(closes:number[])=>({dates:closes.map((_,i)=>day(i)),closes,highs:closes.map(c=>c+1),lows:closes.map(c=>c-1),volumes:closes.map(()=>1),meta:{}});
 const rise=Array.from({length:45},(_,i)=>i<40?100+Math.sin(i)*0.5:100+(i-40)*1.5);// trend start near the end

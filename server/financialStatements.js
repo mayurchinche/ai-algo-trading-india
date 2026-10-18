@@ -11,8 +11,11 @@ const unitCurrency=(unit,kind)=>{
  if(kind==='perShare'){const d=unit.divide;return unit.measure===undefined&&d&&!Array.isArray(d)&&/^iso4217:[A-Z]{3}$/.test(text(d.unitNumerator?.measure))&&text(d.unitDenominator?.measure)==='xbrli:shares'?text(d.unitNumerator.measure).split(':')[1]:null;}
  return /^iso4217:[A-Z]{3}$/.test(text(unit.measure))&&unit.divide===undefined?text(unit.measure).split(':')[1]:null;
 };
+// Annual filings include related-party schedules; NIFTY 50 filings reach about 10 MB. 16 MB bounds parser memory
+// (a 9.8 MB filing parses in about 0.3 s with 60 MB heap).
+export const MAX_DOCUMENT_BYTES=16_000_000;
 export function parseFinancialDisclosure(body,item,now){
- if(typeof body!=='string'||Buffer.byteLength(body)>1000000||/<!DOCTYPE|<!ENTITY/i.test(body)||XMLValidator.validate(body)!==true)throw Error('Invalid financial XML');
+ if(typeof body!=='string'||Buffer.byteLength(body)>MAX_DOCUMENT_BYTES||/<!DOCTYPE|<!ENTITY/i.test(body)||XMLValidator.validate(body)!==true)throw Error('Invalid financial XML');
  const root=new XMLParser({ignoreAttributes:false,removeNSPrefix:true,parseTagValue:false,trimValues:true}).parse(body).xbrl;
  if(!root)throw Error('Unsupported financial document');
  // Identity facts appear once; the reporting scope is repeated for every reported period and must agree.
@@ -63,6 +66,10 @@ export function parseFinancialDisclosure(body,item,now){
   }
   if(!used(metrics))continue;
   if(!usable(context,id)||!date(start)||!date(end)||start>end||end>latestDate){rejectedContexts.push(id||'UNKNOWN');continue;}
+  // The filing also declares each period's dates as facts. Older NSE files label full-year facts with
+  // quarter contexts, so a context whose dates disagree with its declaration is never used.
+  const declared=tag=>list(root[tag]).filter(f=>f?.['@_contextRef']===id).map(text);
+  if(declared('DateOfStartOfReportingPeriod').some(v=>v!==start)||declared('DateOfEndOfReportingPeriod').some(v=>v!==end)){rejectedContexts.push(id);continue;}
   const values=factsIn(metrics,id);
   const revenue=values.find(v=>v.key==='revenue'),profit=values.find(v=>v.key==='continuingProfit');
   const comparable=Number.isFinite(profit.value/revenue.value*100)&&revenue.value!==null&&profit.value!==null&&revenue.value>0&&revenue.currency===profit.currency;

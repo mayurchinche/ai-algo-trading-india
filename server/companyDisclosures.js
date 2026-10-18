@@ -1,4 +1,4 @@
-import {parseFinancialDisclosure} from './financialStatements.js';
+import {parseFinancialDisclosure,MAX_DOCUMENT_BYTES} from './financialStatements.js';
 import {XMLParser,XMLValidator} from 'fast-xml-parser';
 import {createHash} from 'node:crypto';
 export const DISCLOSURE_FEED='https://nsearchives.nseindia.com/content/RSS/Online_announcements.xml';
@@ -53,10 +53,11 @@ export function parseOrderDisclosure(body,item,now){
  });
  return {id:item.id,symbol,instrumentKey:'NSE_EQ|'+isin,company:name,url:item.url,publishedAt:item.publishedAt,observedAt:new Date(now).toISOString(),documentHash:sha(body),subtype,reported,status:'EXTRACTED_REQUIRES_REVIEW',note:'Issuer-reported fields only. Contract value is not revenue, profit or the total outstanding order book. No facts or trade approval were created.'};
 }
-async function readPublic(url,fetcher){
+// Bounded public NSE read (1 MB by default, no redirects, 12 s). Shared by feed, document and history readers.
+export async function readPublic(url,fetcher=fetch,maxBytes=1000000){
  const r=await fetcher(url,{redirect:'error',signal:AbortSignal.timeout(12000)});if(!r.ok)throw Error('Disclosure source unavailable');
  const reader=r.body?.getReader();if(!reader)throw Error('Empty response');const chunks=[];let bytes=0;
- try{for(;;){const {done,value}=await reader.read();if(done)break;bytes+=value.length;if(bytes>1000000)throw Error('Disclosure too large');chunks.push(value);}}finally{await reader.cancel().catch(()=>{});}
+ try{for(;;){const {done,value}=await reader.read();if(done)break;bytes+=value.length;if(bytes>maxBytes)throw Error('Disclosure too large');chunks.push(value);}}finally{await reader.cancel().catch(()=>{});}
  return Buffer.concat(chunks).toString('utf8');
 }
 export function createDisclosureReader({fetcher=fetch,clock=Date.now,kind='announcements'}={}){
@@ -66,7 +67,7 @@ export function createDisclosureReader({fetcher=fetch,clock=Date.now,kind='annou
  async function document(id){
   const current=await feed(),item=current.items.find(item=>item.id===id);if(!item||item.format!=='XML')throw Error('Document not in current XML feed');
   const hit=documents.get(id);if(hit&&clock()-Date.parse(hit.observedAt)<300000)return hit;
-  if(!inflight.has(id)){if(inflight.size>=4)throw Error('Disclosure reader busy');inflight.set(id,readPublic(item.url,fetcher).then(body=>{const result=(kind==='financials'?parseFinancialDisclosure:parseOrderDisclosure)(body,item,clock());if(documents.size>=50)documents.delete(documents.keys().next().value);documents.set(id,result);return result;}).finally(()=>inflight.delete(id)));}
+  if(!inflight.has(id)){if(inflight.size>=4)throw Error('Disclosure reader busy');inflight.set(id,readPublic(item.url,fetcher,kind==='financials'?MAX_DOCUMENT_BYTES:1000000).then(body=>{const result=(kind==='financials'?parseFinancialDisclosure:parseOrderDisclosure)(body,item,clock());if(documents.size>=50)documents.delete(documents.keys().next().value);documents.set(id,result);return result;}).finally(()=>inflight.delete(id)));}
   return inflight.get(id);
  }
  return {feed,document};

@@ -33,10 +33,12 @@ function priceInput(price,instrumentKey,asOf){
  if(Date.parse(istDate(asOf))-Date.parse(price.date)>PRICE_MAX_AGE_DAYS*DAY)return {status:'PRICE_STALE',date:price.date};
  return {status:'OBSERVED',value:price.value,currency:price.currency,date:price.date,source:price.source};
 }
+// Inputs filed under different symbols usually span a rename, merger or demerger; values are not adjusted for it.
+const symbolWarnings=inputs=>new Set(inputs.map(i=>i.source?.symbol).filter(Boolean)).size>1?['FILED_SYMBOL_CHANGED']:[];
 const AVAILABLE=new Set(['ISSUER_REPORTED','OBSERVED','CALCULATED_REQUIRES_REVIEW']);
 function ratio(key,label,formula,named,compute){
  const inputs=named.map(([name,r])=>({name,...r}));
- const base={key,label,formula,formulaVersion:RATIO_VERSION,value:null,inputs,missingInputs:[]};
+ const base={key,label,formula,formulaVersion:RATIO_VERSION,value:null,inputs,missingInputs:[],warnings:symbolWarnings(inputs)};
  const ambiguous=inputs.filter(i=>i.status==='AMBIGUOUS_REVISION').map(i=>i.name);
  if(ambiguous.length)return {...base,status:'AMBIGUOUS_REVISION',missingInputs:ambiguous};
  const missing=inputs.filter(i=>!AVAILABLE.has(i.status)).map(i=>i.name);
@@ -61,7 +63,7 @@ export function deriveFundamentals(filings,{instrumentKey,asOf,truncated=false,p
  const add=(f,pk,period,contextId,facts)=>{for(const x of facts||[]){
   if(!Number.isFinite(x.value))continue;
   const k=[f.scope,pk,x.key].join('|');if(!versions.has(k))versions.set(k,[]);
-  versions.get(k).push({value:x.value,currency:x.currency,tag:x.tag,period,source:{filingId:f.id,documentHash:f.documentHash,url:f.url,publishedAt:f.publishedAt,contextId}});
+  versions.get(k).push({value:x.value,currency:x.currency,tag:x.tag,period,source:{filingId:f.id,documentHash:f.documentHash,url:f.url,publishedAt:f.publishedAt,contextId,symbol:f.symbol}});
  }};
  for(const f of usable){
   for(const p of f.periods){
@@ -94,11 +96,11 @@ export function deriveFundamentals(filings,{instrumentKey,asOf,truncated=false,p
   else if(years>1&&current.value<=0)status='NON_POSITIVE_CURRENT';
   let valuePct=null;
   if(status==='CALCULATED_REQUIRES_REVIEW'){valuePct=years===1?(current.value/prior.value-1)*100:(Math.pow(current.value/prior.value,1/years)-1)*100;if(!Number.isFinite(valuePct)){status='UNSUPPORTED_NUMERIC_RESULT';valuePct=null;}}
-  return {...base,status,valuePct,current:current.status==='ISSUER_REPORTED'?current:null,base:prior.status==='ISSUER_REPORTED'?prior:null};
+  return {...base,status,valuePct,current:current.status==='ISSUER_REPORTED'?current:null,base:prior.status==='ISSUER_REPORTED'?prior:null,warnings:symbolWarnings([current,prior])};
  };
  const priced=priceInput(price,instrumentKey,asOf);
  const ratiosFor=(scope,latest,growth)=>{
-  if(!latest)return ['roce','roe','debtToEquity','pe','peg'].map(key=>({key,formulaVersion:RATIO_VERSION,value:null,inputs:[],missingInputs:[],status:'NO_ANNUAL_PERIOD'}));
+  if(!latest)return ['roce','roe','debtToEquity','pe','peg'].map(key=>({key,formulaVersion:RATIO_VERSION,value:null,inputs:[],missingInputs:[],warnings:[],status:'NO_ANNUAL_PERIOD'}));
   const year=latest.start+'..'+latest.end,close='@'+latest.end,open='@'+dayBefore(latest.start);
   const r=(pk,key)=>resolve(scope,pk,key);
   const roce=ratio('roce','ROCE','(profit before tax + finance costs) / (total assets − current liabilities) at year end × 100',
@@ -115,6 +117,7 @@ export function deriveFundamentals(filings,{instrumentKey,asOf,truncated=false,p
   const cagr=growth.find(g=>g.key==='totalProfit'&&g.years===3);
   const peg=ratio('peg','PEG','P/E / 3-year profit-for-period CAGR (%)',[['pe',{status:pe.status,value:pe.value}],['profitCagr3y',{status:cagr.status,value:cagr.valuePct}]],
    v=>v.profitCagr3y<=0?'NON_POSITIVE_GROWTH':v.pe/v.profitCagr3y);
+  peg.warnings=[...new Set([...pe.warnings,...cagr.warnings])];
   return [roce,roe,debtToEquity,pe,peg];
  };
  const scopes={};
@@ -126,5 +129,5 @@ export function deriveFundamentals(filings,{instrumentKey,asOf,truncated=false,p
   scopes[scope]={latestAnnualPeriod:latest&&{start:latest.start,end:latest.end},annualPeriods:periods.length,growth,ratios:ratiosFor(scope,latest,growth)};
  }
  return {policy:'fundamentals-v2',instrumentKey,asOf:new Date(asOf).toISOString(),status:usable.length?'DERIVED_REQUIRES_REVIEW':'NO_FILINGS',coverage:{filings:filings.length,used:usable.length,...excluded,truncated},price:priced,scopes,
-  note:'Issuer-reported values from stored NSE XBRL filings (Ind AS format), using the latest revision published by asOf. Growth and ratios use the latest exact annual period (365 or 366 days); quarters and half-years are never annualised and missing history is not zero. Balance-sheet inputs come from year-end positions. P/E uses the latest annual basic EPS, not trailing twelve months, and the previous trading day’s close, which may not be adjusted for splits or bonuses after that year. Banking-format filings are not supported. No valuation score or allocation approval.'};
+  note:'Issuer-reported values from stored NSE XBRL filings (Ind AS format), using the latest revision published by asOf. Growth and ratios use the latest exact annual period (365 or 366 days); quarters and half-years are never annualised and missing history is not zero. Balance-sheet inputs come from year-end positions. P/E uses the latest annual basic EPS, not trailing twelve months, and the previous trading day’s close, which may not be adjusted for splits or bonuses after that year. Banking-format filings are not supported, and older balance-sheet layouts without an Ind AS equity total are not mapped. Mergers, demergers and renames are not adjusted; FILED_SYMBOL_CHANGED marks inputs filed under different symbols. No valuation score or allocation approval.'};
 }

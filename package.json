@@ -16,7 +16,8 @@
     "check:deployment": "node scripts/check-deployment.mjs",
     "worker:paper": "node --env-file=.env.worker scripts/paper-worker.mjs",
     "build:server": "node scripts/build-shared-paper.mjs",
-    "worker:shared-paper": "npm run build:server && node --env-file=.env.worker scripts/shared-paper-worker.mjs"
+    "worker:shared-paper": "npm run build:server && node --env-file=.env.worker scripts/shared-paper-worker.mjs",
+    "fundamentals:backfill": "node --env-file=.env.worker scripts/backfill-fundamentals.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.2",
