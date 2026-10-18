@@ -16,7 +16,7 @@ const db=new PGlite();try{
  assert.deepEqual((await save({...filing,periods:[]})).rows[0].value,first,'retry by id returns the stored row');
  assert.deepEqual((await save({...filing,id:'c'.repeat(64)})).rows[0].value,first,'republished document returns the stored row');
  const other={...filing,id:'d'.repeat(64),documentHash:'e'.repeat(64)};
- for(const bad of [{...other,policy:'other'},{...other,instrumentKey:'NSE_EQ|TEST'},{...other,scope:'Group'},{...other,url:'https://example.com/x.xml'},{...other,periods:[]},{...other,periods:{}},{...other,status:'VERIFIED'}])await assert.rejects(save(bad),/Invalid fundamental filing/);
+ for(const bad of [{...other,policy:'other'},{...other,instrumentKey:'NSE_EQ|TEST'},{...other,scope:'Group'},{...other,url:'https://example.com/x.xml'},{...other,periods:[]},{...other,periods:{}},{...other,positions:{}},{...other,positions:Array(17).fill({})},{...other,status:'VERIFIED'}])await assert.rejects(save(bad),/Invalid fundamental filing/);
  for(const bad of [{...other,observedAt:'2000-01-01T00:00:00Z'},{...other,observedAt:'not a time'},{...other,publishedAt:'2099-01-01T00:00:00Z'}])await assert.rejects(save(bad),/observation time/);
  for(const role of ['anon','authenticated']){await db.exec('set role '+role);await assert.rejects(db.query('select * from fundamental_filings'));await assert.rejects(save(other));await assert.rejects(db.query('select dispatch_fundamental_ingest()'));await db.exec('reset role');}
  await db.exec('set role service_role');assert.equal((await db.query('select * from fundamental_filings')).rows.length,1);await assert.rejects(db.query("update fundamental_filings set filing='{}'"));await assert.rejects(db.query('delete from fundamental_filings'));await db.exec('reset role');

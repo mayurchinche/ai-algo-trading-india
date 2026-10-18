@@ -33,7 +33,8 @@ begin
   coalesce(p_filing->>'symbol','') !~ '^[A-Z0-9&-]{1,30}$' or coalesce(p_filing->>'instrumentKey','') !~ '^NSE_EQ\|INE[A-Z0-9]{9}$' or
   coalesce(p_filing->>'scope','') not in ('Standalone','Consolidated') or
   coalesce(p_filing->>'url','') !~ '^https://nsearchives\.nseindia\.com/corporate/' or
-  (case when jsonb_typeof(p_filing->'periods')='array' then jsonb_array_length(p_filing->'periods') between 1 and 32 else false end) is not true
+  (case when jsonb_typeof(p_filing->'periods')='array' then jsonb_array_length(p_filing->'periods') between 1 and 32 else false end) is not true or
+  (p_filing ? 'positions' and (case when jsonb_typeof(p_filing->'positions')='array' then jsonb_array_length(p_filing->'positions')<=16 else false end) is not true)
  then raise exception 'Invalid fundamental filing'; end if;
  begin published:=(p_filing->>'publishedAt')::timestamptz; observed:=(p_filing->>'observedAt')::timestamptz;
  exception when others then raise exception 'Invalid observation time'; end;

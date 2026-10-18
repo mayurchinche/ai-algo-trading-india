@@ -158,7 +158,16 @@ The fit score weighs diversification, concentration, quality (always 50%) and st
 - **Fundamentals store**
   - Migration `supabase/migrations/20261018_fundamental_filings.sql`: insert-only, server-only `fundamental_filings` table; idempotent `record_fundamental_filing` RPC (retry by filing ID or document hash returns the stored row; no backdated observations); `dispatch_fundamental_ingest` pg_cron job every 30 minutes, installed inactive.
   - `server/fundamentals.js`: `toFundamentalFiling` stores only issuer-reported facts and keeps every other parser status. `deriveFundamentals` uses the latest revision published by `asOf`, and computes 1-year change and 3/5-year CAGR for revenue, continuing profit and profit for the period from exact annual periods.
-  - ROCE, ROE, D/E, P/E and PEG are returned as `INPUT_NOT_EXTRACTED` with their formula and missing inputs. The current XBRL parser reads only three income-statement facts: no balance sheet, EPS or price.
+  - Ratios (formula version `fundamental-ratios-v2`), each listing every input with its source filing, period or year-end date:
+    - ROCE = (profit before tax + finance costs) / (total assets − current liabilities) at year end.
+    - ROE = profit for period / average of opening and closing equity.
+    - D/E = (non-current + current borrowings) / equity at year end.
+    - P/E = previous trading day's close (Upstox daily candle, at most 10 days old) / latest annual basic EPS.
+    - PEG = P/E / 3-year profit CAGR.
+    - Missing inputs, non-positive denominators, EPS or growth, and unusable prices leave a ratio unavailable with the reason.
+  - Parser (`server/financialStatements.js`) now also reads profit before tax, finance costs, basic EPS (currency-per-share unit) and year-end balance-sheet positions from instant contexts.
+  - **Parser fix:** live NSE integrated filings repeat the reporting scope and audit declaration for each reported period. The previous parser required a single fact and so rejected every live filing; checked against 20 filings in the 17 Oct 2026 feed, all 12 Ind AS filings now parse with every fact present. This also affects the disclosure inbox and the research-portfolio financial snapshot.
+  - Banking-format filings are classified `UNSUPPORTED_FINANCIAL_FORMAT` and not stored.
   - `server/fundamentalsIngest.js` ingests new XML filings from the NSE financials feed (skips stored ones, 40 s budget, per-filing outcomes). Route `/api/fundamentals`: `GET ?instrumentKey=NSE_EQ|<ISIN>` derives; scheduler `POST` ingests.
   - `server/schedulerAuth.js` now owns the scheduler Bearer check used by the premarket, paper and fundamentals schedulers.
   - Tests: `tests/fundamentals.test.ts`, `tests/fundamentals-database.mjs`.
@@ -166,5 +175,5 @@ The fit score weighs diversification, concentration, quality (always 50%) and st
 ### Next
 
 1. Before enabling the job: apply the migration, verify one manual `POST /api/fundamentals`, then activate `fundamental-filings` in pg_cron.
-2. Extend the XBRL parser with balance-sheet (instant contexts), EPS and a dated price source so ROCE, ROE, D/E, P/E and PEG can be calculated.
+2. Growth and ratios need annual (Q4) filings. The rolling feed only holds recent filings, so values appear after the April–May results season unless history is backfilled from an archive source.
 3. Trend indicator and dashboard (Phase 1, item 1).

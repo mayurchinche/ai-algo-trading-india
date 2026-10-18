@@ -14,15 +14,15 @@ export async function ingestFundamentalFilings({store,reader=financialDisclosure
   outcomes.push(...await Promise.all(pending.slice(i,i+BATCH).map(async item=>{
    let filing;
    try{const doc=await reader.document(item.id);if(doc.id!==item.id||doc.url!==item.url||doc.publishedAt!==item.publishedAt)return outcome(item,'INVALID_PROVENANCE');filing=toFundamentalFiling(doc);}
-   catch{return outcome(item,'READ_FAILED');}
+   catch(e){return outcome(item,e?.code==='UNSUPPORTED_FINANCIAL_FORMAT'?'UNSUPPORTED_FORMAT':'READ_FAILED');}
    try{const saved=await store.save(filing);return outcome(item,saved?.id===filing.id?'RECORDED':'DUPLICATE_DOCUMENT');}
    catch{return outcome(item,'STORE_FAILED');}
   })));
  }
  const count=status=>outcomes.filter(o=>o.status===status).length;
- const settled=count('RECORDED')+count('ALREADY_RECORDED')+count('DUPLICATE_DOCUMENT');
+ const settled=count('RECORDED')+count('ALREADY_RECORDED')+count('DUPLICATE_DOCUMENT')+count('UNSUPPORTED_FORMAT');
  return {policy:'fundamental-ingest-v1',status:!xml.length?'NO_STRUCTURED_FILINGS':settled===xml.length?'COMPLETE':settled?'PARTIAL':'FAILED',startedAt:new Date(started).toISOString(),completedAt:new Date(clock()).toISOString(),
   feed:{source:feed.source,receivedAt:feed.receivedAt,sourceHash:feed.sourceHash,status:feed.status,coverage:feed.coverage},
-  coverage:{xmlItems:xml.length,pdfItemsNotIngested:feed.items.length-xml.length,alreadyRecorded:count('ALREADY_RECORDED'),recorded:count('RECORDED'),duplicates:count('DUPLICATE_DOCUMENT'),deferred:count('DEFERRED'),failed:xml.length-settled-count('DEFERRED')},
-  outcomes,limitations:['Rolling exchange feed: filings that left the feed between runs are not recovered, and a truncated feed may omit filings.','PDF-only filings are not ingested.','Failed and deferred filings are retried on the next run while they remain in the feed.']};
+  coverage:{xmlItems:xml.length,pdfItemsNotIngested:feed.items.length-xml.length,alreadyRecorded:count('ALREADY_RECORDED'),recorded:count('RECORDED'),duplicates:count('DUPLICATE_DOCUMENT'),unsupportedFormat:count('UNSUPPORTED_FORMAT'),deferred:count('DEFERRED'),failed:xml.length-settled-count('DEFERRED')},
+  outcomes,limitations:['Rolling exchange feed: filings that left the feed between runs are not recovered, and a truncated feed may omit filings.','PDF-only filings are not ingested. Banking-format XBRL is identified as unsupported, not stored, and checked again on each run while in the feed.','Failed and deferred filings are retried on the next run while they remain in the feed.']};
 }

@@ -56,3 +56,30 @@ test('old observations never imply a clean audit and source text is HTML escaped
  const r=parse(xml().replace('</xbrl>',`<${auditTag} contextRef="P">&lt;script&gt;test&lt;/script&gt;</${auditTag}></xbrl>`));
  const html=renderToStaticMarkup(createElement(AuditDisclosure,{evidence:r.auditDisclosure}));assert.match(html,/&lt;script&gt;/);assert.doesNotMatch(html,/<script>/);
 });
+
+// Shape of live NSE integrated filings: scope and audit status repeat per reported period,
+// balance-sheet facts use instant contexts and EPS uses a currency-per-share unit.
+const integrated=(extra='')=>`<xbrl><context id="OneD"><entity><identifier>9</identifier></entity><period><startDate>2026-07-01</startDate><endDate>2026-09-30</endDate></period></context><context id="FourD"><entity><identifier>9</identifier></entity><period><startDate>2026-04-01</startDate><endDate>2026-09-30</endDate></period></context><context id="OneI"><entity><identifier>9</identifier></entity><period><instant>2026-09-30</instant></period></context><context id="SegI"><entity><identifier>9</identifier><segment>x</segment></entity><period><instant>2026-09-30</instant></period></context>
+<unit id="INR"><measure>iso4217:INR</measure></unit><unit id="EPS"><divide><unitNumerator><measure>iso4217:INR</measure></unitNumerator><unitDenominator><measure>xbrli:shares</measure></unitDenominator></divide></unit>
+<Symbol contextRef="OneD">TEST</Symbol><ISIN contextRef="OneD">INE000A01010</ISIN><NameOfTheCompany contextRef="OneD">Fixture</NameOfTheCompany>
+<NatureOfReportStandaloneConsolidated contextRef="OneD">Standalone</NatureOfReportStandaloneConsolidated><NatureOfReportStandaloneConsolidated contextRef="FourD">Standalone</NatureOfReportStandaloneConsolidated>
+<WhetherResultsAreAuditedOrUnaudited contextRef="OneD">Unaudited</WhetherResultsAreAuditedOrUnaudited><WhetherResultsAreAuditedOrUnaudited contextRef="FourD">Unaudited</WhetherResultsAreAuditedOrUnaudited>
+<RevenueFromOperations contextRef="OneD" unitRef="INR" decimals="-5">500</RevenueFromOperations><RevenueFromOperations contextRef="FourD" unitRef="INR" decimals="-5">900</RevenueFromOperations>
+<BasicEarningsLossPerShareFromContinuingAndDiscontinuedOperations contextRef="OneD" unitRef="EPS" decimals="2">1.25</BasicEarningsLossPerShareFromContinuingAndDiscontinuedOperations>
+<FinanceCosts contextRef="OneD" unitRef="EPS" decimals="-5">10</FinanceCosts>
+<Assets contextRef="OneI" unitRef="INR" decimals="-5">2000</Assets><Equity contextRef="OneI" unitRef="INR" decimals="-5">1000</Equity><Assets contextRef="SegI" unitRef="INR" decimals="-5">7</Assets>${extra}</xbrl>`;
+const integratedItem={...item,publishedAt:'2026-10-17T03:33:01Z'};
+test('integrated filings with repeated scope, instant balance sheet and per-share EPS parse',()=>{
+ const r=parseFinancialDisclosure(integrated(),integratedItem,Date.parse('2026-10-17T04:00:00Z'));
+ assert.equal(r.scope,'Standalone');assert.deepEqual(r.periods.map((p:any)=>p.contextId),['FourD','OneD']);
+ const q=r.periods.find((p:any)=>p.contextId==='OneD'),m=(k:string)=>q.metrics.find((x:any)=>x.key===k);
+ assert.equal(m('basicEps').value,1.25);assert.equal(m('basicEps').unit,'perShare');assert.equal(m('basicEps').currency,'INR');
+ assert.equal(m('financeCosts').status,'UNVERIFIED_CURRENCY','money facts never accept a per-share unit');
+ assert.deepEqual(r.balanceSheet.map((b:any)=>[b.instant,b.metrics.find((x:any)=>x.key==='totalAssets').value,b.metrics.find((x:any)=>x.key==='borrowingsCurrent').status]),[['2026-09-30',2000,'NOT_REPORTED']]);
+ assert.deepEqual(r.rejectedContexts,['SegI']);assert.equal(r.auditDisclosure.fields[0].value,'Unaudited');assert.equal(r.auditDisclosure.fields[0].contextId,'OneD');
+});
+test('disagreeing scopes are rejected and banking-format filings are classified as unsupported',()=>{
+ assert.throws(()=>parseFinancialDisclosure(integrated().replace('contextRef="FourD">Standalone','contextRef="FourD">Consolidated'),integratedItem,Date.parse('2026-10-17T04:00:00Z')),/reporting scope/);
+ const bank=integrated().replace(/<RevenueFromOperations[^]*?<\/RevenueFromOperations>/g,'').replace(/<BasicEarnings[^]*?<\/BasicEarningsLossPerShareFromContinuingAndDiscontinuedOperations>/,'').replace(/<FinanceCosts[^]*?<\/FinanceCosts>/,'').replace(/NameOfTheCompany/g,'NameOfBank');
+ assert.throws(()=>parseFinancialDisclosure(bank,integratedItem,Date.parse('2026-10-17T04:00:00Z')),(e:any)=>e.code==='UNSUPPORTED_FINANCIAL_FORMAT');
+});
