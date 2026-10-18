@@ -204,10 +204,31 @@ The fit score weighs diversification, concentration, quality (always 50%) and st
   - **Portfolio fit** tab. Answers are kept in the browser; the holdings file is read in the browser and never uploaded or saved.
   - Tests: `tests/portfolio-fit.test.ts`.
 
+- **Baskets (Phase 1, item 5)**
+  - `shared/basketPerformance.js`: equal-weight buy-and-hold from the first session on or after the start date, against NIFTY 50 and a compounding FD line at a user-set rate. Members without a start-date close are excluded and named; missing later closes carry forward and are counted.
+  - **Baskets** tab: screens over screener columns (missing values never pass), saved with their members and date in the browser. Returns since creation are shown first; a past-year view with today's members is labelled as hindsight.
+- **Options data (Phase 2, item 1)**
+  - `shared/optionsMath.js`: Black-Scholes-Merton price, Greeks, arbitrage bounds and bisection IV, checked against textbook values.
+  - `shared/optionChain.js` and `/api/option-chain`: the Upstox put/call chain (read-only path added to the adapter), model IV from the two-sided mid with provider Greeks kept separately, lot sizes from the instrument master, and strike selection by ATM offset, premium or delta. The chain has no per-contract timestamps; that is stated.
+- **Options Wizard (Phase 2, item 2)**: twelve standard structures generate validated specs; legs resolve on the live chain; payoff at the first expiry (later legs by Black-Scholes) with bounded or unbounded max profit and loss, breakevens and net Greeks. Futures legs are priced at spot.
+- **Rule builder (Phase 2, item 3)**: templates, indicator catalogue, nested ALL/ANY/NOT condition trees, legs with stop, target and trailing stop, strategy risk, live validation with JSON paths and JSON editing.
+- **Spec backtester (Phase 2, item 4)**
+  - `shared/specEngine.js`: one JSON-serialisable engine shared with paper runs. Completed-bar decisions fill at the next open; stops fill at the level or a worse gap; stop assumed first in ambiguous bars; trailing stop tightens by `step` for every `trigger` of favourable move; strategy max loss, target, holding limit and exit condition; edge-triggered entries with intraday re-entry after a matching exit; square-off including a missed square-off bar; child orders above a size limit; MAE and MFE.
+  - `shared/backtestMetrics.js`: CAGR, Sharpe, Sortino, Calmar, profit factor, a seeded 2,000-path Monte-Carlo, an early/late split, an A–F grade from documented deductions, and overfitting flags (few trades, profit concentration, cost sensitivity, many parameters, instability, high loss probability). The cost and slippage sliders recalculate without refetching.
+  - Option legs are refused: historical prices of expired contracts are not available. Real-data check (10 years of daily bars): the three templates run in 20–91 ms and grade C–F.
+- **Spec paper runs (Phase 2, item 5)**: migration `20261019_spec_paper_runs.sql` (versioned saves, inactive 5-minute dispatch); the scheduler steps each run once per cycle on its latest completed Upstox bar. Contracts are resolved live (option strikes on the chain), multi-leg entries are all-or-nothing, fills use the live bid or ask, and missed bars, missing quotes and unresolved contracts are recorded. **Strategy paper runs** tab; **Start paper run** in the rule builder. The existing intraday and segment paper engines are unchanged.
+
+### Phase 3 and 4 status
+
+- **Phase 3 (live broker execution) is not started.** It still needs the separate decision this plan requires, covering SEBI retail-algo rules (algo ID tagging, static IP, order-rate limits) and broker selection. No order path exists in the code.
+- **Phase 4 (AI layer) is not started.** It needs a chosen LLM provider and API keys; the strategy spec and its parser are the intended target for plain-English generation.
+
 ### Next
 
 1. Before enabling the fundamentals job: apply the migration, verify one manual `POST /api/fundamentals`, then activate `fundamental-filings` in pg_cron.
 2. Run `npm run fundamentals:backfill -- --nifty50` against Supabase after the migration is applied. Integrated filings start with FY2025, so 3- and 5-year growth and PEG need another data source or will accrue from FY2027 onwards.
 3. Scorecard coverage: with the Upstox token, Value and Momentum score; Growth, GARP and Compounder need FY2027 filings or an older-history source.
 4. XLSX holdings import, if needed: requires choosing a spreadsheet parser dependency.
-5. Baskets: saved screens with daily returns against NIFTY and an FD line (Phase 1, item 5).
+5. Apply `20261019_spec_paper_runs.sql`, start one paper run, call `POST /api/spec-paper-cycle` manually during market hours, then activate `spec-paper-cycle` in pg_cron.
+6. Verify the option-chain endpoint with a real Upstox token (the response shape is from Upstox documentation and has not been observed live here).
+7. Decide on Phase 3 (live execution) and Phase 4 (AI layer).
