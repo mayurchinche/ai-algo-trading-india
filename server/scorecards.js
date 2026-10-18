@@ -39,6 +39,8 @@ export function companyMetrics(fundamentals,price){
  const p=price?.status==='OBSERVED';
  m.return12m=p?{value:price.return12mPct,status:'OBSERVED'}:{value:null,status:price?.status??'PRICE_NOT_REQUESTED'};
  m.belowHigh=p?{value:price.belowHighPct,status:'OBSERVED'}:{value:null,status:price?.status??'PRICE_NOT_REQUESTED'};
+ // Display only: the close is not a scored criterion.
+ m.close=p?{value:price.close,status:'OBSERVED',date:price.to}:{value:null,status:price?.status??'PRICE_NOT_REQUESTED'};
  const sources=new Map();
  for(const r of basis?.ratios||[])for(const i of r.inputs||[])if(i.source?.url)sources.set(i.source.url,{url:i.source.url,publishedAt:i.source.publishedAt,symbol:i.source.symbol});
  return {basis:basis?{scope:basis.scope,period:basis.latestAnnualPeriod}:null,metrics:m,sources:[...sources.values()].sort((a,b)=>b.publishedAt.localeCompare(a.publishedAt))};

@@ -190,10 +190,16 @@ The fit score weighs diversification, concentration, quality (always 50%) and st
   - Route `/api/scorecards?universe=NIFTY50` (10-minute cache), **Scorecards** tab with sortable styles and a per-criterion breakdown with source filings.
   - Live end-to-end check (18 Oct 2026, backfill into memory, no Upstox token): 39 of 50 companies have a supported annual filing; only Value is scored (38 companies), because GARP, Growth and Compounder need 3- or 5-year history and Momentum needs prices. No composite is scored yet. Scoring took 30 ms; the response is 354 KB.
   - Tests: `tests/scorecards.test.ts`.
+- **Screener (Phase 1, item 3)**
+  - **Screener** tab (`src/components/ScreenerPage.tsx`) over the same `/api/scorecards` data: 20 columns in the four groups (price and returns, scores, fundamentals, growth), a column picker remembered in the browser, sorting with unavailable values always last, symbol/ISIN search, and CSV export of the current view.
+  - `src/services/screener.ts` owns every column's label, unit and value for both the table and the CSV. CSV blanks are unavailable values, numbers stay numeric, and text that a spreadsheet would run as a formula is prefixed with an apostrophe.
+  - Market cap is not shown: share counts are not extracted yet.
+  - Tests: `tests/screener.test.ts`.
 
 ### Next
 
 1. Before enabling the fundamentals job: apply the migration, verify one manual `POST /api/fundamentals`, then activate `fundamental-filings` in pg_cron.
 2. Run `npm run fundamentals:backfill -- --nifty50` against Supabase after the migration is applied. Integrated filings start with FY2025, so 3- and 5-year growth and PEG need another data source or will accrue from FY2027 onwards.
 3. Scorecard coverage: with the Upstox token, Value and Momentum score; Growth, GARP and Compounder need FY2027 filings or an older-history source.
-4. Screener with column picker and CSV export (Phase 1, item 3).
+4. Market cap from filed paid-up capital and face value, for the screener.
+5. Risk profile and portfolio fit (Phase 1, item 4).
