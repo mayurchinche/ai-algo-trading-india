@@ -172,8 +172,14 @@ The fit score weighs diversification, concentration, quality (always 50%) and st
   - `server/schedulerAuth.js` now owns the scheduler Bearer check used by the premarket, paper and fundamentals schedulers.
   - Tests: `tests/fundamentals.test.ts`, `tests/fundamentals-database.mjs`.
 
+- **Trend score and dashboard (Phase 1, item 1)**
+  - `shared/trendScore.js`: our own `trend-score-v1` (ZLEMA21 position and slope in ATR14 units, 0–10) with hysteresis BUY/SELL signals on completed daily bars.
+  - Replay: `research/trendReplay.js` with `scripts/research/fetch-trend-dataset.mjs` and `run-trend-replay.mjs`. It passed its pre-declared criteria on 10 years of NIFTY 50 data, but most trades lost, it trailed buy-and-hold in 49 of 50 stocks, and trades lost on average in 2025–2026. See `docs/TREND_SCORE_RESEARCH.md`.
+  - Dashboard: **Trend score** tab (`src/components/TrendDashboardPage.tsx`) with All / Bullish / Trend start / Trend end, sessions since signal and a price/score chart for the NIFTY 50 list of 18 Oct 2026. Every view shows the replay result; signals are not connected to paper or live orders.
+  - Tests: `tests/trend-score.test.ts`, `tests/trend-dashboard.test.ts`.
+
 ### Next
 
-1. Before enabling the job: apply the migration, verify one manual `POST /api/fundamentals`, then activate `fundamental-filings` in pg_cron.
+1. Before enabling the fundamentals job: apply the migration, verify one manual `POST /api/fundamentals`, then activate `fundamental-filings` in pg_cron.
 2. Growth and ratios need annual (Q4) filings. The rolling feed only holds recent filings, so values appear after the April–May results season unless history is backfilled from an archive source.
-3. Trend indicator and dashboard (Phase 1, item 1).
+3. Investor-style scorecards (Phase 1, item 2), which depend on fundamentals coverage.
