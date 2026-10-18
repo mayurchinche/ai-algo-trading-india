@@ -55,7 +55,8 @@ export function stepEngine(spec,state,series,i,quotes){
   const spec_=spec.legs.find(x=>x.id===l.id),{px}=fill(state,spec_,l.dir===1?'SELL':'BUY',price,l.units,time,reason);
   state.realized+=legPnl(l,px);l.open=false;l.exitReason=reason;l.mark=px;state.lastLegExit=reason;
  };
- const closeAll=(reason,priceOf)=>{for(const l of state.legs)if(l.open)exitLeg(l,priceOf(l),reason);};
+ // A leg without a quote exits at its last mark; that is recorded, never silent.
+ const closeAll=(reason,priceOf)=>{for(const l of state.legs)if(l.open){const px=priceOf(l);if(!quotes?.[l.id])ev('EXIT_AT_LAST_MARK',{leg:l.id,mark:l.mark});exitLeg(l,px,reason);}};
  if(state.pending?.kind==='EXIT'&&state.status==='OPEN'){
   const reason=state.pending.reason;state.pending=null;
   closeAll(reason,l=>{const q=quotes?.[l.id];return q?((l.dir===1?q.bid:q.ask)??q.open):l.mark;});
@@ -70,8 +71,10 @@ export function stepEngine(spec,state,series,i,quotes){
   const adverse=l.dir===1?q.low:q.high,favour=l.dir===1?q.high:q.low;
   const stopHit=l.stop!==null&&(l.dir===1?adverse<=l.stop:adverse>=l.stop),targetHit=l.target!==null&&(l.dir===1?favour>=l.target:favour<=l.target);
   if(stopHit&&targetHit)state.ambiguousBars++;
-  if(stopHit){exitLeg(l,l.dir===1?Math.min(q.open,l.stop):Math.max(q.open,l.stop),'STOP_LOSS');continue;}
-  if(targetHit){exitLeg(l,l.dir===1?Math.max(q.open,l.target):Math.min(q.open,l.target),'TARGET');continue;}
+  // Exits trade against the book when quoted: a long sells at the bid, a short buys at the ask.
+  const ref=l.dir===1?(q.bid??q.open):(q.ask??q.open);
+  if(stopHit){exitLeg(l,l.dir===1?Math.min(ref,l.stop):Math.max(ref,l.stop),'STOP_LOSS');continue;}
+  if(targetHit){exitLeg(l,l.dir===1?Math.max(ref,l.target):Math.min(ref,l.target),'TARGET');continue;}
   // Trailing stop: for every `trigger` of favourable move from entry, tighten the stop by `step`; applies from the next bar.
   const t=spec.legs.find(x=>x.id===l.id).trailingStop;
   if(t){const move=t.unit==='percent'?(favour/l.entry-1)*100*l.dir:(favour-l.entry)*l.dir,steps=Math.floor(move/t.trigger);
@@ -113,5 +116,13 @@ export function stepEngine(spec,state,series,i,quotes){
 // Net P&L since the run started: realised, minus all costs, plus open legs at their latest mark.
 export function markToMarket(state){
  return state.realized-state.costs+state.legs.reduce((a,l)=>a+(l.open?legPnl(l,l.mark):0),0);
+}
+// Closes every open leg at its last mark (for example when a paper run is stopped) and finalises the trade.
+export function closeAtMarks(spec,state,time,reason){
+ if(state.status!=='OPEN')return state;
+ const entry=state.entries.at(-1);
+ for(const l of state.legs)if(l.open){const leg=spec.legs.find(x=>x.id===l.id);const {px}=fill(state,leg,l.dir===1?'SELL':'BUY',l.mark,l.units,time,reason);state.realized+=legPnl(l,px);l.open=false;l.exitReason=reason;l.mark=px;}
+ state.status='FLAT';state.pending=null;entry.exitTime=time;entry.reason=reason;entry.pnl=state.realized-entry.realizedBefore-(state.costs-entry.costsBefore);
+ state.events.push({time,kind:'EXITED',reason,pnl:entry.pnl});return state;
 }
 export {computeStrategySeries};

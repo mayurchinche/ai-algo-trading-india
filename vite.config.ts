@@ -2,6 +2,10 @@
 import reportEvidenceHandler from './api/_report-evidence.js'
 // @ts-expect-error Shared JavaScript company-history API.
 import companyHistoryHandler from './api/_company-history.js'
+// @ts-expect-error Shared JavaScript spec-paper API.
+import specPaperHandler from './api/_spec-paper.js'
+// @ts-expect-error Shared JavaScript spec-paper-cycle API.
+import specPaperCycleHandler from './api/_spec-paper-cycle.js'
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -38,7 +42,7 @@ export default defineConfig(({ mode }) => {
   plugins: [react(), tailwindcss(), {
     name: 'local-market-api',
     configureServer(server) {
-      for (const [route, handler] of [['/api/report-evidence', reportEvidenceHandler], ['/api/company-history', companyHistoryHandler], ['/api/company-disclosures', disclosureHandler], ['/api/research-portfolios', portfolioHandler], ['/api/fundamentals', fundamentalsHandler], ['/api/scorecards', scorecardsHandler], ['/api/option-chain', optionChainHandler], ['/api/premarket', premarketHandler], ['/api/research', researchHandler], ['/api/market', marketHandler], ['/api/health', healthHandler], ['/api/paper', paperHandler], ['/api/shared-paper', sharedPaperHandler]] as const) server.middlewares.use(route, (req, res) => {
+      for (const [route, handler] of [['/api/report-evidence', reportEvidenceHandler], ['/api/company-history', companyHistoryHandler], ['/api/company-disclosures', disclosureHandler], ['/api/research-portfolios', portfolioHandler], ['/api/fundamentals', fundamentalsHandler], ['/api/scorecards', scorecardsHandler], ['/api/option-chain', optionChainHandler], ['/api/spec-paper', specPaperHandler], ['/api/spec-paper-cycle', specPaperCycleHandler], ['/api/premarket', premarketHandler], ['/api/research', researchHandler], ['/api/market', marketHandler], ['/api/health', healthHandler], ['/api/paper', paperHandler], ['/api/shared-paper', sharedPaperHandler]] as const) server.middlewares.use(route, (req, res) => {
         const url = new URL(req.url || '/', 'http://localhost');
         const request = { headers: req.headers, method: req.method, query: Object.fromEntries(url.searchParams) };
         const response = { end() { res.end(); return response; }, setHeader: (key: string, value: string) => res.setHeader(key, value), status(code: number) { res.statusCode = code; return response; }, json(data: unknown) { res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(data)); return response; } };

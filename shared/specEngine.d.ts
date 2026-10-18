@@ -12,3 +12,4 @@ export interface EngineState { version: string; status: 'FLAT' | 'OPEN'; legs: E
 export function createEngineState(spec: Readonly<StrategySpec>, options: EngineOptions): EngineState;
 export function stepEngine(spec: Readonly<StrategySpec>, state: EngineState, series: StrategySeries, i: number, quotes: Record<string, LegQuote | undefined> | null): EngineState;
 export function markToMarket(state: EngineState): number;
+export function closeAtMarks(spec: Readonly<StrategySpec>, state: EngineState, time: number, reason: string): EngineState;
