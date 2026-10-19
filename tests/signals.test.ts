@@ -240,3 +240,27 @@ test('gap indicators and the opening-gap board',async()=>{
  const res=response();await h({method:'GET',headers:{host:'x'},query:{}},res);assert.equal(res.code,200);assert.equal(res.body.summary.gapUp,1);assert.equal(res.body.rows.length,2);assert.equal(res.body.strategies.length,3);
  const spec=buildStrategySpec(strategyById('short-term-gap-continuation'),{symbol:'INFY'});assert.equal(segmentOfSpec(spec),'short-term');
 });
+import {observationRows,computeOutcome,accuracySummary,updateDiscoveryOutcomes} from '../server/discoveryLedger.js';
+import {createDiscoveryHandler} from '../api/_discovery.js';
+test('Discover ledger records first sightings and measures their outcomes',async()=>{
+ const at=Date.parse('2026-10-19T10:05:00+05:30'),stock=(symbol:string,score:number,ltp=18.13)=>({symbol,name:symbol,overallScore:score,ltp,quoteTime:'2026-10-19T04:34:00.000Z',signal:'BUY',scores:{},reasons:['x'],strategies:['Breakout'],trend:'UP',rsi:70,changePct:11.36,volumeRatio:5.1,prevClose:16.28,foAnalysis:{suggestedStopLoss:16,suggestedTarget:21,riskReward:1.5},eligible:false,blockedReasons:['Price below ₹50 research liquidity guard']});
+ const rows=observationRows([stock('PCJEWELLER',64),stock('TCS',42),stock('INFY',-55,1500),stock('bad sym',90)],at);
+ assert.deepEqual(rows.map(r=>r.id),['2026-10-19:PCJEWELLER:BUY','2026-10-19:INFY:SELL'],'only scores of 50 or more, valid symbols');
+ assert.equal(rows[0].seenAt,new Date(at).toISOString());assert.equal(rows[0].details.target,21);assert.deepEqual(rows[0].details.blockedReasons,['Price below ₹50 research liquidity guard']);
+ const day=(d:string,o:number,h:number,l:number,c:number)=>({time:Date.parse(d+'T00:00:00+05:30'),open:o,high:h,low:l,close:c,volume:1});
+ const row={side:'BUY',first_price:18.13,session_date:'2026-10-19',details:{stop:16,target:21}};
+ const bars=[day('2026-10-16',16,16.5,15.9,16.28),day('2026-10-19',16.3,18.5,16.2,18.2),day('2026-10-20',18.2,19,17.5,18.9),day('2026-10-21',18.9,21.5,18.5,21)];
+ const o:any=computeOutcome(row,bars,at);
+ assert.equal(o.sessionClose,0.39);assert.equal(o.d1,4.25);assert.equal(o.levels.result,'TARGET');assert.equal(o.levels.at,'2026-10-21');assert.equal(o.complete,false);assert.equal(o.sessions,2);
+ assert.equal(computeOutcome(row,bars.slice(0,1),at).status,'PENDING');
+ const s=accuracySummary([{side:'BUY',first_score:64,outcome:o},{side:'BUY',first_score:55,outcome:null},{side:'SELL',first_score:-72,outcome:{d5:-1,levels:{result:'STOP'}}}]);
+ const b60=s.find((x:any)=>x.side==='BUY'&&x.band==='60–69');assert.equal(b60.signals,1);assert.equal(b60.targetFirst,100);assert.equal(s.find((x:any)=>x.side==='SELL'&&x.band==='70+').targetFirst,0);
+ const set:any[]=[];const store={pending:async(before:string)=>{assert.equal(before,'2026-10-22');return [{id:'2026-10-19:PCJEWELLER:BUY',...row,symbol:'PCJEWELLER'},{id:'2026-10-19:NOPE:BUY',...row,symbol:'NOPE'}];},setOutcomes:async(r:any[])=>{set.push(...r);return r.length;}};
+ const u:any=await updateDiscoveryOutcomes({store,market:{history:async()=>bars},master:async()=>[{segment:'NSE_EQ',instrument_type:'EQ',trading_symbol:'PCJEWELLER',instrument_key:'NSE_EQ|INE785J01023'}],now:()=>Date.parse('2026-10-22T10:00:00+05:30')});
+ assert.equal(u.updated,1);assert.equal(u.failures,1);assert.equal(u.failureReason,'INSTRUMENT_NOT_FOUND');assert.equal(set[0].outcome.levels.result,'TARGET');
+ const h=createDiscoveryHandler({store:()=>({day:async()=>[{id:'x'}],since:async()=>[]}) as any,now:()=>at});
+ const res=response();await h({method:'GET',headers:{host:'x'},query:{}},res);assert.equal(res.code,200);assert.equal(res.body.date,'2026-10-19');assert.equal(res.body.study.stocks,475);
+ const bad=response();await h({method:'GET',headers:{host:'x'},query:{date:'yesterday'}},bad);assert.equal(bad.code,400);
+ const down=response();await createDiscoveryHandler({store:()=>{throw new Error('x');},now:()=>at})({method:'GET',headers:{host:'x'},query:{}},down);assert.equal(down.code,503);assert(down.body.study,'the study is returned even without the ledger');
+ assert.equal(backgroundJob(Date.parse('2026-10-19T10:22:00+05:30')),'outcomes');
+});

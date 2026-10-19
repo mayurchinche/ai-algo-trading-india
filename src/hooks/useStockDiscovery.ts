@@ -1,5 +1,6 @@
 import { useEffect, useSyncExternalStore } from 'react';
 import { discoverStocks, fetchQuotes, type DiscoveredStock } from '../services/stockDiscovery';
+import { fetchDiscovery } from '../services/discovery';
 import { getSignalHistory, recordSignals, updateOutcomes } from '../services/signalHistory';
 import { fetchMarketStatus, isMarketOpenCached } from '../services/marketStatus';
 import type { MarketQuote } from '../services/tradingTime';
@@ -27,6 +28,9 @@ async function runScan() {
     const observedAt = Date.now();
     if (marketOpen) recordSignals(stocks, observedAt);
 
+    // First sighting from the server ledger (recorded every minute in market hours), so the time is
+    // known even when this page was not open at that moment.
+    try { const today = await fetchDiscovery(); for (const st of stocks) { const o = today.observations.find(x => x.symbol === st.symbol && x.side === (st.overallScore >= 0 ? 'BUY' : 'SELL')); if (o) Object.assign(st, { firstSignalAt: o.first_seen_at, firstSignalPrice: Number(o.first_price), firstSignalScore: o.first_score, firstSignalSource: 'server' }); else if (st.firstSignalAt) st.firstSignalSource = 'device'; } } catch { /* ledger unavailable: device history only */ }
     publish({ stocks, marketOpen, lastScan: new Date(observedAt) });
   } catch (error) {
     publish({ marketOpen: false, error: error instanceof Error ? error.message : 'Scan failed; entries paused' });

@@ -2,6 +2,7 @@ import { formatIST } from '../services/tradingTime';
 import { useStockDiscovery } from '../hooks/useStockDiscovery';
 import type { DiscoveredStock } from '../services/stockDiscovery';
 import { useState } from 'react';
+import { ScoreAccuracy } from './ScoreAccuracy';
 
 function SignalBadge({ signal }: { signal: DiscoveredStock['signal'] }) {
   const cls = signal === 'STRONG_BUY' ? 'badge-green' : signal === 'BUY' ? 'badge-green' : signal === 'SELL' ? 'badge-red' : signal === 'STRONG_SELL' ? 'badge-red' : 'badge-amber';
@@ -54,7 +55,7 @@ function StockCard({ stock, expanded, onToggle }: { stock: DiscoveredStock; expa
         </div>
       </div>
 
-      <div className="signal-time"><p>Analysis: {formatIST(stock.generatedAt)}</p><p>First signal: {formatIST(stock.firstSignalAt)}</p><p>Quote: {formatIST(stock.quoteTime)}</p><p>{stock.eligible ? 'Research candidate · strategy unvalidated' : 'Blocked: ' + stock.blockedReasons.join('; ')}</p></div>
+      <div className="signal-time"><p>Analysis: {formatIST(stock.generatedAt)}</p><p>First signal: {stock.firstSignalAt ? `${formatIST(stock.firstSignalAt)}${stock.firstSignalPrice ? ` at ₹${stock.firstSignalPrice.toFixed(2)}` : ''}${stock.firstSignalScore !== undefined ? ` (score ${stock.firstSignalScore})` : ''}${stock.firstSignalSource === 'device' ? ' · this device' : ''}` : 'not reached score 50 in market hours today'}</p><p>Quote: {formatIST(stock.quoteTime)}</p><p>{stock.eligible ? 'Research candidate · strategy unvalidated' : 'Blocked: ' + stock.blockedReasons.join('; ')}</p></div>
       {/* Quick stats row */}
       <div className="flex items-center gap-4 mt-3 text-xs text-[var(--text-secondary)]">
         <span>RSI: <b className={stock.rsi > 70 ? 'text-[var(--red)]' : stock.rsi < 30 ? 'text-[var(--green)]' : ''}>{stock.rsi}</b></span>
@@ -185,6 +186,7 @@ export function DiscoveryPage() {
         </button>
       </div>
 
+      <ScoreAccuracy />
       <details className="card research-method"><summary>About these research signals</summary><p>Ranks a limited NSE universe using price, volume and technical indicators. Scores are unvalidated research measures, not profit probabilities. Quote freshness and eligibility are shown on every card.</p></details>
       <div className="research-filters"><label className="research-search">Search instruments<input type="search" placeholder="Symbol or company name" value={search} onChange={e=>setSearch(e.target.value)}/></label><div className="tab-bar" role="group" aria-label="Signal direction">{([{id:'all',label:`All (${stocks.length})`},{id:'buy',label:`Buy (${buyCount})`},{id:'sell',label:`Sell (${sellCount})`} ] as const).map(item=><button key={item.id} className={`tab ${filter===item.id?'active':''}`} aria-pressed={filter===item.id} onClick={()=>setFilter(item.id)}>{item.label}</button>)}</div></div>
       {!loading&&!filtered.length&&<div className="card empty-state"><h3>No matching observations</h3><p>Try another symbol or signal direction.</p></div>}

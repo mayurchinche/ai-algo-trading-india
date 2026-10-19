@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { SharedOpportunityFeed } from './SharedOpportunityFeed';
+import { WatchAlerts, ScoreAccuracy } from './ScoreAccuracy';
 import { fetchSignals, type SignalsResponse } from '../services/signals';
 import { navigateTo, openAnalysis } from '../services/specDraft';
 import { formatIST } from '../services/tradingTime';
@@ -19,6 +20,8 @@ function ValidatedAlerts() {
 export function AlertsPage({ onOpen }: { onOpen?: (id: string) => void }) {
  return <div className="space-y-4">
   <ValidatedAlerts />
+  <WatchAlerts />
+  <ScoreAccuracy />
   <section className="card"><h1>Intraday strong-signal alerts</h1><p>The server scanner checks the most active NSE stocks every minute in market hours and records a signal when its composite technical score reaches 70 of 100. A popup appears while the app is open. Popup dismissals are local to this app session. No background notifications.</p><p>The composite score is a research reference, not a validated strategy: it has not been shown to be profitable after charges.</p></section>
   <SharedOpportunityFeed onOpen={onOpen} title="Recorded strong signals" />
  </div>;

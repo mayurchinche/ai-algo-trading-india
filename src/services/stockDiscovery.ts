@@ -8,6 +8,10 @@ export { scoreStrategies } from './discoveryScoring';
 export interface DiscoveredStock {
   generatedAt: string;
   firstSignalAt?: string;
+  // Server ledger: first time this session the score reached the recorded level, with its price and score.
+  firstSignalPrice?: number;
+  firstSignalScore?: number;
+  firstSignalSource?: 'server' | 'device';
   quoteTime?: string;
   signalId?: string;
   eligible: boolean;

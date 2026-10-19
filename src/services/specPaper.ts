@@ -17,7 +17,7 @@ export interface PaperRunSummary {
  paper: { lastBarTime: number | null; lastCycleAt: string | null; cycles: number; missedBars: number; eventSeq?: number; lastOutcome: string | null };
 }
 export interface AutomationJob { at: string; status?: string; reason?: string; runs?: number; outcomes?: Record<string, number>; signals?: number; failures?: number; strategy?: string; [k: string]: unknown }
-export interface AutomationState { lastTickAt: string; lastJob: string | null; lastDurationMs: number; ticksToday: number; day: string; jobs: Partial<Record<'paper' | 'alerts' | 'marketDay' | 'dailyScan' | 'scan' | 'validate' | 'fundamentals', AutomationJob>> }
+export interface AutomationState { lastTickAt: string; lastJob: string | null; lastDurationMs: number; ticksToday: number; day: string; jobs: Partial<Record<'paper' | 'alerts' | 'marketDay' | 'dailyScan' | 'scan' | 'validate' | 'fundamentals' | 'outcomes', AutomationJob>> }
 export interface LedgerRow { seq: number; recorded_at: string; kind: string; event: PaperEvent }
 async function call<T>(init?: RequestInit, query = ''): Promise<T> {
  const r = await fetch(apiUrl('/api/spec-paper' + query), { ...init, signal: AbortSignal.timeout(30000), headers: init?.body ? { 'Content-Type': 'application/json' } : undefined });

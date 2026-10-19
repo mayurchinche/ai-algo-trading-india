@@ -36,5 +36,15 @@ const db=new PGlite();try{
  await db.exec('set role service_role');assert.equal((await db.query('select count(*)::int n from strategy_signals')).rows[0].n,1);await assert.rejects(db.query('delete from market_deals'));await db.exec('reset role');
  const mk=i=>db.query('select create_spec_paper_run($1,$2,$3,$4) v',[`cccccccc-cccc-4ccc-8ccc-${String(i).padStart(12,'0')}`,'{"schemaVersion":1}','{}','{}']);
  for(let i=0;i<100;i++)await mk(i);await assert.rejects(mk(100),/limit reached/);
- console.log('PASS trading signals SQL: inactive idempotent jobs, newest validation wins, signals once, deals/flows upsert, client access denied, 100 active paper runs');
+  const disc=await readFile('supabase/migrations/20261022_discovery_observations.sql','utf8');await db.exec(disc);await db.exec(disc);
+ const obs=(score,seenAt,price=18.13)=>({id:'2026-10-19:PCJEWELLER:BUY',sessionDate:'2026-10-19',symbol:'PCJEWELLER',side:'BUY',seenAt,score,price,quoteTime:'',details:{reasons:['x']}});
+ const recObs=rows=>db.query('select record_discovery_observations($1) n',[JSON.stringify(rows)]);
+ await recObs([obs(55,'2026-10-19T04:05:00Z')]);await recObs([obs(64,'2026-10-19T04:30:00Z',18.9)]);await recObs([obs(52,'2026-10-19T05:00:00Z',19.2)]);
+ const row=(await db.query("select first_seen_at,first_score,first_price,max_score,max_score_at,last_seen_at,seen_count from discovery_observations")).rows[0];
+ assert.equal(new Date(row.first_seen_at).toISOString(),'2026-10-19T04:05:00.000Z','the first sighting never changes');assert.equal(row.first_score,55);assert.equal(Number(row.first_price),18.13);
+ assert.equal(row.max_score,64);assert.equal(new Date(row.max_score_at).toISOString(),'2026-10-19T04:30:00.000Z');assert.equal(new Date(row.last_seen_at).toISOString(),'2026-10-19T05:00:00.000Z');assert.equal(row.seen_count,3);
+ await assert.rejects(recObs([{...obs(55,'2026-10-19T04:05:00Z'),id:'bad'}]));
+ assert.equal((await db.query('select set_discovery_outcomes($1) n',[JSON.stringify([{id:'2026-10-19:PCJEWELLER:BUY',outcome:{complete:false,d1:4.2}}])])).rows[0].n,1);
+ for(const role of ['anon','authenticated']){await db.exec('set role '+role);await assert.rejects(db.query('select * from discovery_observations'));await assert.rejects(recObs([obs(70,'2026-10-19T06:00:00Z')]));await db.exec('reset role');}
+ console.log('PASS trading signals SQL: inactive idempotent jobs, newest validation wins, signals once, deals/flows upsert, client access denied, 100 active paper runs, Discover first sightings immutable');
 }finally{await db.close();}

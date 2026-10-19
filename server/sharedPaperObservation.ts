@@ -29,5 +29,6 @@ export async function observeSharedPaper(account:any){
  const active=account.state.orders.filter((o:any)=>!['CLOSED','CANCELLED'].includes(o.status)).map((o:any)=>o.symbol);
  const symbols=[...new Set<string>([...active,...(account.state.intents||[]).filter((i:any)=>['REVIEW','WAITING','APPROVED'].includes(i.status)).map((i:any)=>i.symbol),...candidates.map(c=>c.symbol)])];
  const [quotes,gapWatch]=await Promise.all([fetchQuotes(symbols,serverMarketJSON),marketOpen&&istMinutes(now)<630?observeOpeningGaps(stocks,serverMarketJSON,now):Promise.resolve(undefined)]);
- return {marketOpen,discoveryError,scanDiagnostics,gapWatch,candidates,quotes:[...quotes].map(([symbol,q])=>({symbol,...q})),missingQuotes:symbols.filter(s=>!quotes.has(s))};
+ // Every scored stock is returned for the Discover observation ledger (it keeps those reaching its level).
+ return {discoveries:stocks,marketOpen,discoveryError,scanDiagnostics,gapWatch,candidates,quotes:[...quotes].map(([symbol,q])=>({symbol,...q})),missingQuotes:symbols.filter(s=>!quotes.has(s))};
 }

@@ -48,7 +48,7 @@ function StockCard({ stock, variant }: { stock: DiscoveredStock; variant: 'short
         </div>
       </div>
 
-      <div className="signal-time"><p>Analysis: {formatIST(stock.generatedAt)}</p><p>First signal: {formatIST(stock.firstSignalAt)}</p><p>Quote: {formatIST(stock.quoteTime)}</p><p>{stock.eligible ? 'Research candidate · strategy unvalidated' : 'Blocked: ' + stock.blockedReasons.join('; ')}</p></div>
+      <div className="signal-time"><p>Analysis: {formatIST(stock.generatedAt)}</p><p>First signal: {stock.firstSignalAt ? `${formatIST(stock.firstSignalAt)}${stock.firstSignalPrice ? ` at ₹${stock.firstSignalPrice.toFixed(2)}` : ''}${stock.firstSignalScore !== undefined ? ` (score ${stock.firstSignalScore})` : ''}${stock.firstSignalSource === 'device' ? ' · this device' : ''}` : 'not reached score 50 in market hours today'}</p><p>Quote: {formatIST(stock.quoteTime)}</p><p>{stock.eligible ? 'Research candidate · strategy unvalidated' : 'Blocked: ' + stock.blockedReasons.join('; ')}</p></div>
       {/* Price row */}
       <div className="grid grid-cols-4 gap-4 mb-3">
         <div>
