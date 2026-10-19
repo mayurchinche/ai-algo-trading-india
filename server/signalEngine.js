@@ -11,7 +11,7 @@ import {newPaperState,validatePaperOptions} from './specPaperRunner.js';
 import {readDeals,readFlows} from './marketIntel.js';
 export const SIGNAL_VERSION='library-signal-v1';
 const DAY=86400000;
-export const VALIDATION_DAYS=Object.freeze({'1d':3650,'15m':120});
+export const VALIDATION_DAYS=Object.freeze({'1d':3650,'15m':60});
 export const SCAN_DAYS=Object.freeze({'1d':420,'15m':12});
 export const VALIDATION_MAX_AGE=6*DAY;
 const code=(e,f)=>e instanceof MarketDataError?e.code:e?.code??f;
@@ -99,19 +99,24 @@ export function paperRunFor(signal,capital){
 
 // timeframes: which strategy bar sizes to scan. Daily bars are read up to the previous session (the history
 // reader excludes today), so a daily scan in the morning acts on yesterday's close in today's session.
-export async function scanSignals({market,store,paperStore,now,budgetMs=40000,autoPaper=true,capital=100000,timeframes=['1d','15m'],lookbackBars=10}){
+export async function scanSignals({market,store,paperStore,now,budgetMs=40000,autoPaper=true,capital=100000,timeframes=['1d','15m'],lookbackBars=10,wait}){
  const started=now(),validated=(await store.validations()).filter(v=>v.verdict==='VALIDATED'),out={scanned:0,signals:[],failures:[],deferred:0,paper:[]};
  const pairs=validated.map(v=>({v:v.record,s:strategyById(v.strategy_id)})).filter(p=>p.s&&timeframes.includes(p.s.timeframe));
- await mapLimit(pairs,6,async({v,s})=>{
-  if(now()-started>budgetMs){out.deferred++;return;}
-  const u=universeOf(s).find(x=>x.symbol===v.symbol);if(!u)return;
-  try{
-   const bars=await market.history(u.key,s.timeframe,started-SCAN_DAYS[s.timeframe]*DAY,started);out.scanned++;
-   const spec=buildStrategySpec(s,{symbol:u.symbol});
-   // The latest bar plus earlier bars in the lookback, so recent setups are on record (older ones expired).
-   for(let k=0;k<lookbackBars&&bars.length-k>1;k++){const b=bars.slice(0,bars.length-k),d=entryDecidedOnLastBar(spec,b);if(d)out.signals.push(signalRecord(s,spec,v,b,d,u.key));}
-  }catch(e){out.failures.push({strategy:s.id,symbol:v.symbol,reason:code(e,'SCAN_FAILED')});}
+ // One history read per instrument and bar size, shared by every strategy validated on it.
+ const groups=new Map();for(const p of pairs){const u=universeOf(p.s).find(x=>x.symbol===p.v.symbol);if(!u)continue;const k=u.key+'|'+p.s.timeframe;if(!groups.has(k))groups.set(k,{u,tf:p.s.timeframe,pairs:[]});groups.get(k).pairs.push(p);}
+ await mapLimit([...groups.values()],4,async({u,tf,pairs:list})=>{
+  if(now()-started>budgetMs){out.deferred+=list.length;return;}
+  let bars;try{bars=await withRetry(()=>market.history(u.key,tf,started-SCAN_DAYS[tf]*DAY,started),{wait});out.scanned+=list.length;}
+  catch(e){for(const {s} of list)out.failures.push({strategy:s.id,symbol:u.symbol,reason:code(e,'SCAN_FAILED')});return;}
+  for(const {v,s} of list){
+   try{
+    const spec=buildStrategySpec(s,{symbol:u.symbol});
+    // The latest bar plus earlier bars in the lookback, so recent setups are on record (older ones expired).
+    for(let k=0;k<lookbackBars&&bars.length-k>1;k++){const b=bars.slice(0,bars.length-k),d=entryDecidedOnLastBar(spec,b);if(d)out.signals.push(signalRecord(s,spec,v,b,d,u.key));}
+   }catch(e){out.failures.push({strategy:s.id,symbol:u.symbol,reason:code(e,'SCAN_FAILED')});}
+  }
  });
+ if(out.failures.length)out.failureReason=out.failures[0].reason;
  for(let i=0;i<out.signals.length;i+=400)out.recorded=(out.recorded??0)+await store.recordSignals(out.signals.slice(i,i+400));
  out.active=out.signals.filter(x=>x.validUntil>started).length;
  // Only signals still actionable are paper-traded; expired history is recorded, not traded.

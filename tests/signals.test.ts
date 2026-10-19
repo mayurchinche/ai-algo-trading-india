@@ -55,11 +55,11 @@ test('scan records validated signals once and auto-starts single-trade paper run
  const all=breakout(),bars:any[]=[];for(const b of all){bars.push(b);if(bars.length>60&&entryDecidedOnLastBar(spec,bars))break;}
  const now=bars.at(-1).time+16*3600000;// 16:00 IST on the signal day
  const recorded:any[]=[],created:any[]=[];
- const store={validations:async()=>[valRow('short-term-donchian','INFY'),valRow('swing-rsi2','TCS','REJECTED')],recordSignals:async(rows:any[])=>{recorded.push(...rows);return rows.length;}};
+ const store={validations:async()=>[valRow('short-term-donchian','INFY'),valRow('long-term-golden-trend','INFY'),valRow('swing-rsi2','TCS','REJECTED')],recordSignals:async(rows:any[])=>{recorded.push(...rows);return rows.length;}};
  const paperStore={create:async(id:string,spec:any,options:any,state:any)=>{created.push({id,spec,options,state});return {id};}};
- const market={history:async(key:string)=>{assert.equal(key,'NSE_EQ|INE009A01021');return bars;}};
+ let reads=0;const market={history:async(key:string)=>{reads++;assert.equal(key,'NSE_EQ|INE009A01021');return bars;}};
  const r:any=await scanSignals({market,store,paperStore,now:()=>now});
- assert.equal(r.scanned,1);assert.equal(r.signals.length,1,'earlier bars in the lookback had no setup');const sig=r.signals[0];assert.equal(r.active,1);
+ assert.equal(reads,1,'one read serves both strategies on INFY');assert.equal(r.scanned,2);assert.equal(r.signals.length,1,'earlier bars in the lookback had no setup');const sig=r.signals[0];assert.equal(r.active,1);
  const later:any=await scanSignals({market,store:{...store,recordSignals:async(rows:any[])=>rows.length},paperStore,now:()=>now+5*DAY});
  assert.equal(later.signals.length,1);assert.equal(later.active,0,'an older setup is recorded but no longer actionable');assert.equal(later.paper.length,0);
  assert.equal(sig.id,`short-term-donchian:INFY:${bars.at(-1).time}`);assert.equal(sig.segment,'short-term');assert.equal(sig.direction,'LONG');assert.equal(sig.validation.verdict,'VALIDATED');
@@ -173,7 +173,8 @@ test('automation tick runs paper every minute plus one due job and records a hea
  assert.equal(st2.ticksToday,2);assert.equal(st2.jobs.validate.strategy,'swing-rsi2');assert.equal(st2.jobs.dailyScan.at,st.jobs.dailyScan.at,'earlier job results are kept');
  calls.length=0;await runAutomationTick({now:()=>ist('10:08'),...jobs,validate:async()=>({status:'COMPLETED',passed:true,validated:['INFY']}),status:async()=>{}});
  assert.deepEqual(calls,['paper:25000','scan:1d+15m'],'a newly passed strategy is scanned immediately');
- calls.length=0;await runAutomationTick({now:()=>ist('10:33'),...jobs,validate:async()=>({status:'DATA_UNAVAILABLE'}),status:async()=>{}});assert.deepEqual(calls,['paper:25000','scan:1d+15m'],'safety-net daily scan every 30 minutes');
+ assert.equal(backgroundJob(ist('10:14')),'daily-scan');assert.equal(backgroundJob(ist('10:44')),'daily-scan');
+ calls.length=0;await runAutomationTick({now:()=>ist('10:44'),...jobs,status:async()=>{}});assert.deepEqual(calls,['paper:25000','scan:1d'],'safety-net daily scan every 30 minutes');
  calls.length=0;await runAutomationTick({now:()=>ist('10:08'),...jobs,validate:async()=>({status:'UP_TO_DATE'}),status:async()=>{}});assert.deepEqual(calls,['paper:25000']);
  const writes:any[]=[];const h=createAutomationHandler({now:()=>ist('10:03'),secret:()=>'s'.repeat(32),env:{},jobs,status:{read:async()=>null,write:async(d:any)=>{writes.push(d);}}});
  const ok=response();await h({method:'POST',headers:{authorization:'Bearer '+'s'.repeat(32)},body:{}},ok);assert.equal(ok.code,200);assert.equal(ok.body.job,'validate');assert.equal(writes.length,1);

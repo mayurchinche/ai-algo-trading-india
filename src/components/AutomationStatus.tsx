@@ -3,13 +3,13 @@ import { formatIST } from '../services/tradingTime';
 
 const LABELS: [keyof AutomationState['jobs'], string, string][] = [
  ['paper', 'Paper trading cycle', 'every minute in market hours'],
- ['dailyScan', 'Daily signal scan', '09:16, 09:31 and every 30 min (previous close)'],
+ ['dailyScan', 'Daily signal scan', '09:16, 09:31, then :14 and :44 each hour (previous close)'],
  ['scan', 'Intraday signal scan', 'every 15 min'],
  ['validate', 'Strategy validation', 'every 5 min until each strategy is fresh (weekly)'],
  ['marketDay', 'Bulk/block deals and FII/DII', '09:16 and 09:31'],
  ['fundamentals', 'NSE financial filings', 'every 30 min'],
 ];
-const detail = (j: AutomationJob) => [j.status && j.status.replaceAll('_', ' ').toLowerCase(), j.reason, j.strategy, j.runs !== undefined && `${j.runs} runs${j.outcomes ? ' (' + Object.entries(j.outcomes).map(([k, v]) => `${v} ${k.replaceAll('_', ' ').toLowerCase()}`).join(', ') + ')' : ''}`, j.signals !== undefined && `${j.signals} setups found (${j.active ?? 0} actionable)`, j.validatedPairs !== undefined && `${j.validatedPairs} validated pairs`, j.failures ? `${j.failures} failures` : null].filter(Boolean).join(' · ');
+const detail = (j: AutomationJob) => [j.status && j.status.replaceAll('_', ' ').toLowerCase(), j.reason, j.strategy, j.runs !== undefined && `${j.runs} runs${j.outcomes ? ' (' + Object.entries(j.outcomes).map(([k, v]) => `${v} ${k.replaceAll('_', ' ').toLowerCase()}`).join(', ') + ')' : ''}`, j.signals !== undefined && `${j.signals} setups found (${j.active ?? 0} actionable)`, j.validatedPairs !== undefined && `${j.validatedPairs} validated pairs`, j.failures ? `${j.failures} failures${j.failureReason ? ' (' + String(j.failureReason).replaceAll('_', ' ').toLowerCase() + ')' : ''}` : null].filter(Boolean).join(' · ');
 // Live view of the scheduler: when it last ran and what each automated job did.
 export function AutomationStatus({ state, now = Date.now() }: { state: AutomationState | null; now?: number }) {
  const age = state ? (now - Date.parse(state.lastTickAt)) / 60000 : null;
