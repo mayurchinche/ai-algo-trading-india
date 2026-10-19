@@ -1,7 +1,8 @@
 // Fundamentals from stored NSE XBRL filings. One owner for the stored filing shape
 // (toFundamentalFiling) and for every derived value (deriveFundamentals).
 export const FILING_POLICY='fundamental-filing-v1';
-export const PARSER_VERSION='nse-xbrl-financials-v3';
+// v4: banking-format filings, legacy annual results (expected-identity and declared-period bases).
+export const PARSER_VERSION='nse-xbrl-financials-v4';
 export const RATIO_VERSION='fundamental-ratios-v2';
 export const PRICE_MAX_AGE_DAYS=10;
 // Share counts come from the latest reported period; older counts may predate splits, bonuses or buybacks.
@@ -20,8 +21,8 @@ const split=facts=>({facts:facts.filter(m=>m.status==='ISSUER_REPORTED').map(({k
 // Keeps only issuer-reported numeric facts as values; every other parser status is retained by key.
 export function toFundamentalFiling(doc){
  if(doc?.kind!=='FINANCIALS'||!Array.isArray(doc.periods)||!doc.periods.length)throw Error('Unsupported financial document');
- return {policy:FILING_POLICY,parser:PARSER_VERSION,status:'EXTRACTED_REQUIRES_REVIEW',id:doc.id,documentHash:doc.documentHash,symbol:doc.symbol,instrumentKey:doc.instrumentKey,company:doc.company,scope:doc.scope,url:doc.url,publishedAt:doc.publishedAt,observedAt:doc.observedAt,
-  periods:doc.periods.map(p=>({contextId:p.contextId,start:p.start,end:p.end,...split(p.metrics)})),
+ return {policy:FILING_POLICY,parser:PARSER_VERSION,status:'EXTRACTED_REQUIRES_REVIEW',id:doc.id,documentHash:doc.documentHash,identityBasis:doc.identityBasis??'ISIN_FACT',format:doc.format??'INDAS',symbol:doc.symbol,instrumentKey:doc.instrumentKey,company:doc.company,scope:doc.scope,url:doc.url,publishedAt:doc.publishedAt,observedAt:doc.observedAt,
+  periods:doc.periods.map(p=>({contextId:p.contextId,start:p.start,end:p.end,...(p.periodBasis&&p.periodBasis!=='CONTEXT_DATES'?{periodBasis:p.periodBasis}:{}),...split(p.metrics)})),
   positions:(doc.balanceSheet||[]).map(b=>({contextId:b.contextId,instant:b.instant,...split(b.metrics)})),
   rejectedContexts:doc.rejectedContexts||[]};
 }
@@ -123,6 +124,32 @@ export function deriveFundamentals(filings,{instrumentKey,asOf,truncated=false,p
   peg.warnings=[...new Set([...pe.warnings,...cagr.warnings])];
   return [roce,roe,debtToEquity,pe,peg];
  };
+ // Banks: profitability, margin, efficiency, asset quality and capital ratios; industrial ratios such as ROCE and
+ // debt/equity do not apply (deposits and borrowings are the bank's business, not its leverage).
+ const bankRatiosFor=(scope,latest,growth)=>{
+  const keys=['roe','roa','nim','costToIncome','grossNpaPct','netNpaPct','cet1Ratio','pe','pb','peg'];
+  if(!latest)return keys.map(key=>({key,formulaVersion:RATIO_VERSION,value:null,inputs:[],missingInputs:[],warnings:[],status:'NO_ANNUAL_PERIOD'}));
+  const year=latest.start+'..'+latest.end,close='@'+latest.end,open='@'+dayBefore(latest.start),r=(pk,key)=>resolve(scope,pk,key);
+  const sum=(a,b)=>a.status==='ISSUER_REPORTED'&&b.status==='ISSUER_REPORTED'&&a.currency===b.currency?{...a,value:a.value+b.value,tag:a.tag+'+'+b.tag}:{status:a.status!=='ISSUER_REPORTED'?a.status:b.status};
+  const eqClose=sum(r(close,'shareCapital'),r(close,'reserves')),eqOpen=sum(r(open,'shareCapital'),r(open,'reserves'));
+  // Consolidated bank filings fill regulatory ratios with 0 when they are not reported for the group; a zero is
+  // therefore not read as a real ratio.
+  const pct=(key,label,tag)=>{const v=r(year,key);return ratio(key,label,`${tag} as reported (fraction) × 100`,[[key,v]],x=>x[key]===0?'REPORTED_AS_ZERO_NOT_USED':x[key]*100);};
+  const roe=ratio('roe','ROE','profit for period / average of opening and closing (share capital + reserves) × 100',[['totalProfit',r(year,'totalProfit')],['openingEquity',eqOpen],['closingEquity',eqClose]],
+   v=>v.openingEquity<=0||v.closingEquity<=0?'NON_POSITIVE_EQUITY':v.totalProfit/((v.openingEquity+v.closingEquity)/2)*100);
+  const roa=ratio('roa','ROA','profit for period / average of opening and closing total assets × 100',[['totalProfit',r(year,'totalProfit')],['openingAssets',r(open,'totalAssets')],['closingAssets',r(close,'totalAssets')]],
+   v=>v.openingAssets<=0||v.closingAssets<=0?'NON_POSITIVE_ASSETS':v.totalProfit/((v.openingAssets+v.closingAssets)/2)*100);
+  const nim=ratio('nim','Net interest margin (on assets)','(interest earned − interest expended) / average total assets × 100',[['interestEarned',r(year,'interestEarned')],['interestExpended',r(year,'interestExpended')],['openingAssets',r(open,'totalAssets')],['closingAssets',r(close,'totalAssets')]],
+   v=>v.openingAssets<=0||v.closingAssets<=0?'NON_POSITIVE_ASSETS':(v.interestEarned-v.interestExpended)/((v.openingAssets+v.closingAssets)/2)*100);
+  const cti=ratio('costToIncome','Cost to income','operating expenses / (total income − interest expended) × 100',[['operatingExpenses',r(year,'operatingExpenses')],['totalIncome',r(year,'revenue')],['interestExpended',r(year,'interestExpended')]],
+   v=>v.totalIncome-v.interestExpended<=0?'NON_POSITIVE_DENOMINATOR':v.operatingExpenses/(v.totalIncome-v.interestExpended)*100);
+  const pe=ratio('pe','P/E','previous close / latest annual basic EPS',[['price',priced],['basicEps',r(year,'basicEps')]],v=>v.basicEps<=0?'NON_POSITIVE_EPS':v.price/v.basicEps);
+  const shares=(()=>{const paid=r(year,'paidUpEquityCapital'),face=r(year,'faceValue');return paid.status==='ISSUER_REPORTED'&&face.status==='ISSUER_REPORTED'&&face.value>0?{status:'ISSUER_REPORTED',value:paid.value/face.value,source:paid.source}:{status:'INPUT_UNAVAILABLE'};})();
+  const pb=ratio('pb','P/B','previous close / ((share capital + reserves) at year end ÷ shares)',[['price',priced],['closingEquity',eqClose],['shares',shares]],v=>v.closingEquity<=0||v.shares<=0?'NON_POSITIVE_EQUITY':v.price/(v.closingEquity/v.shares));
+  const cagr=growth.find(g=>g.key==='totalProfit'&&g.years===3);
+  const peg=ratio('peg','PEG','P/E / 3-year profit-for-period CAGR (%)',[['pe',{status:pe.status,value:pe.value}],['profitCagr3y',{status:cagr.status,value:cagr.valuePct}]],v=>v.profitCagr3y<=0?'NON_POSITIVE_GROWTH':v.pe/v.profitCagr3y);
+  return [roe,roa,nim,cti,pct('grossNpaPct','Gross NPA','PercentageOfGrossNpa'),pct('netNpaPct','Net NPA','PercentageOfNpa'),pct('cet1Ratio','CET1 ratio','CET1Ratio'),pe,pb,peg];
+ };
  // Market cap = latest completed close × (paid-up equity capital ÷ face value), both from one reported period.
  const marketCapFor=scope=>{
   const formula='previous close × paid-up equity share capital ÷ face value per share';
@@ -146,7 +173,9 @@ export function deriveFundamentals(filings,{instrumentKey,asOf,truncated=false,p
   const periods=[...annualPeriods.values()].filter(p=>p.scope===scope).sort((a,b)=>a.end.localeCompare(b.end)||a.start.localeCompare(b.start));
   const latest=periods.at(-1)||null;
   const growth=GROWTH_KEYS.flatMap(key=>GROWTH_YEARS.map(years=>growthOf(scope,latest,key,years)));
-  scopes[scope]={latestAnnualPeriod:latest&&{start:latest.start,end:latest.end},annualPeriods:periods.length,growth,ratios:ratiosFor(scope,latest,growth),marketCap:marketCapFor(scope)};
+  // The format of the latest filing for this scope decides which ratio set applies.
+  const latestFiling=usable.filter(f=>f.scope===scope).sort((a,b)=>b.publishedAt.localeCompare(a.publishedAt))[0],format=latestFiling?.format==='BANKING'?'BANKING':'INDAS';
+  scopes[scope]={format,latestAnnualPeriod:latest&&{start:latest.start,end:latest.end},annualPeriods:periods.length,growth,ratios:format==='BANKING'?bankRatiosFor(scope,latest,growth):ratiosFor(scope,latest,growth),marketCap:marketCapFor(scope)};
  }
  return {policy:'fundamentals-v2',instrumentKey,asOf:new Date(asOf).toISOString(),status:usable.length?'DERIVED_REQUIRES_REVIEW':'NO_FILINGS',coverage:{filings:filings.length,used:usable.length,...excluded,truncated},price:priced,scopes,
   note:'Issuer-reported values from stored NSE XBRL filings (Ind AS format), using the latest revision published by asOf. Growth and ratios use the latest exact annual period (365 or 366 days); quarters and half-years are never annualised and missing history is not zero. Balance-sheet inputs come from year-end positions. Market cap uses paid-up equity capital ÷ face value from the latest reported period (up to 200 days old), which is rounded to the filing’s reported precision, may be net of treasury shares in consolidated filings, and may predate later splits, bonuses or buybacks. P/E uses the latest annual basic EPS, not trailing twelve months, and the previous trading day’s close, which may not be adjusted for splits or bonuses after that year. Banking-format filings are not supported, and older balance-sheet layouts without an Ind AS equity total are not mapped. Mergers, demergers and renames are not adjusted; FILED_SYMBOL_CHANGED marks inputs filed under different symbols. No valuation score or allocation approval.'};

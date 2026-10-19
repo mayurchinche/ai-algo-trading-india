@@ -27,7 +27,7 @@ test('parsed filings keep issuer-reported facts and explicit non-reported status
  const f=toFundamentalFiling(doc);
  assert.equal(f.instrumentKey,KEY);assert.equal(f.documentHash,doc.documentHash);assert.deepEqual(f.periods[0].facts.map((x:any)=>[x.key,x.value]),[['revenue',1000]]);
  assert.deepEqual(f.periods[0].unavailable.map((x:any)=>[x.key,x.status]),['continuingProfit','totalProfit','profitBeforeTax','financeCosts','basicEps','paidUpEquityCapital','faceValue'].map(k=>[k,'NOT_REPORTED']));
- assert.equal(f.parser,'nse-xbrl-financials-v3');assert.deepEqual(f.positions,[]);
+ assert.equal(f.parser,'nse-xbrl-financials-v4');assert.deepEqual(f.positions,[]);
  assert.throws(()=>toFundamentalFiling({kind:'ORDERS'}));
 });
 test('annual growth uses exact prior years: percent change for 1y and CAGR for 3y and 5y',()=>{

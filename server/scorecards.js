@@ -32,7 +32,10 @@ export function companyMetrics(fundamentals,price){
  const basis=basisOf(fundamentals),m={};
  const growth=(key,years)=>basis?.growth.find(g=>g.key===key&&g.years===years);
  for(const key of Object.keys(METRICS))m[key]={value:null,status:'NO_ANNUAL_PERIOD'};
- if(basis){
+ // Bank ratios measure different things (deposits are not debt; ROCE does not apply), so banks are not ranked
+ // against industrial companies; their fundamentals are shown on the stock page instead.
+ if(basis?.format==='BANKING'){for(const key of Object.keys(METRICS))m[key]={value:null,status:'BANKING_FORMAT_NOT_RANKED'};}
+ else if(basis){
   for(const r of basis.ratios)m[r.key]={value:r.value,status:r.status,warnings:r.warnings||[]};
   for(const [key,source] of [['revenueGrowth','revenue'],['profitGrowth','totalProfit']])for(const y of [1,3,5]){const g=growth(source,y);m[key+y+'y']={value:g.valuePct,status:g.status,warnings:g.warnings||[]};}
  }

@@ -16,7 +16,7 @@ export interface Analysis {
  status: 'OK'; symbol: string; name: string; instrumentKey: string; isIndex: boolean; industry: string | null; computedAt: string;
  quote: { price: number; bid: number; ask: number; spreadPct: number; timestamp: string } | { status: string; reason: string | null };
  futures: { nearest: { symbol: string; expiry: string; lotSize: number; price: N; basisPct: N }; next: { symbol: string; expiry: string } | null } | null;
- technicals: Technicals; fundamentals: { scopes?: Record<string, { latestAnnualPeriod: { start: string; end: string } | null; ratios: Ratio[]; growth: { key: string; years: number; valuePct: N; status: string }[]; marketCap?: { value: N; status: string } }> } & { status?: string };
+ technicals: Technicals; fundamentals: { scopes?: Record<string, { format?: 'BANKING' | 'INDAS'; latestAnnualPeriod: { start: string; end: string } | null; ratios: Ratio[]; growth: { key: string; years: number; valuePct: N; status: string }[]; marketCap?: { value: N; status: string } }> } & { status?: string };
  peerRanks: { metric: string; label: string; value: number; percentile: number; peers: number }[];
  scorecard: { composite: { status: string; score: N }; styles: { id: string; label: string; status: string; score: N }[] } | null;
  news: { articles: { title: string; link: string | null; source: string; publishedAt: string; tone: string }[]; summary: { status: string; counts: Record<string, number>; method: string } } | { status: string };
