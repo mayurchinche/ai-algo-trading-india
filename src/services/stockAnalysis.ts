@@ -1,6 +1,9 @@
 import { apiUrl } from '../utils/apiUrl';
 import type { Signal } from './signals';
 type N = number | null;
+import type { StyleVerdictResult } from '../../shared/styleVerdicts';
+export type StyleVerdict = StyleVerdictResult;
+export type { VerdictItem } from '../../shared/styleVerdicts';
 export interface Fact { label: string; value: number | string | null; unit: string }
 export interface SwotItem { text: string; basis: string[] }
 export interface Technicals {
@@ -18,7 +21,7 @@ export interface Analysis {
  futures: { nearest: { symbol: string; expiry: string; lotSize: number; price: N; basisPct: N }; next: { symbol: string; expiry: string } | null } | null;
  technicals: Technicals; fundamentals: { scopes?: Record<string, { format?: 'BANKING' | 'INDAS'; latestAnnualPeriod: { start: string; end: string } | null; ratios: Ratio[]; growth: { key: string; years: number; valuePct: N; status: string }[]; marketCap?: { value: N; status: string } }> } & { status?: string };
  peerRanks: { metric: string; label: string; value: number; percentile: number; peers: number }[];
- scorecard: { composite: { status: string; score: N }; styles: { id: string; label: string; status: string; score: N }[] } | null;
+ scorecard: { composite: { status: string; score: N }; styles: { id: string; label: string; status: string; score: N }[]; verdicts?: StyleVerdict[] } | null;
  news: { articles: { title: string; link: string | null; source: string; publishedAt: string; tone: string }[]; summary: { status: string; counts: Record<string, number>; method: string } } | { status: string };
  announcements: { date: string | null; time: string | null; subject: string; text: string; url: string | null }[] | { status: string; reason?: string };
  deals: { count: number; buyValue: number; sellValue: number; netValue: number; rows: { date: string; kind: string; client: string; side: string; quantity: number; price: number }[]; coverage: string } | { status: string };

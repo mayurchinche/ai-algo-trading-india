@@ -1,6 +1,8 @@
-// Holdings CSV import. Broker exports differ, so only listed header names are recognised; nothing is guessed
-// from column positions. Every skipped row is reported with its line number and reason.
-export const MAX_CSV_BYTES=1_000_000,MAX_ROWS=2000;
+// Holdings import from CSV or spreadsheet rows. Broker exports differ, so only listed header names are recognised;
+// nothing is guessed from column positions. The header is the first row (within the first HEADER_SCAN_ROWS) that
+// names a quantity and a symbol or ISIN column, because exports often start with account details. Every skipped
+// row is reported with its line (row) number and reason.
+export const MAX_CSV_BYTES=1_000_000,MAX_ROWS=2000,HEADER_SCAN_ROWS=20;
 const norm=h=>h.normalize('NFKC').toLowerCase().replace(/[^a-z0-9]/g,'');
 export const HEADER_ALIASES=Object.freeze({
  symbol:['symbol','instrument','tradingsymbol','scrip','stock','stocksymbol','scripname'],
@@ -32,14 +34,27 @@ const symbolOf=v=>{const t=String(v).trim().toUpperCase().replace(/^(NSE|BSE):/,
 export function importHoldingsCsv(text){
  if(typeof text!=='string')throw new TypeError('CSV text required');
  if(new TextEncoder().encode(text).length>MAX_CSV_BYTES)throw new Error('File is larger than 1 MB');
- const rows=parseCsv(text);if(!rows.length)throw new Error('The file has no rows');
- const header=rows[0].cells,fields=header.map(fieldOf);
+ return importHoldingsRows(parseCsv(text));
+}
+// Spreadsheet rows (arrays of cell values, first sheet row first). Numbers are read as written; dates and other
+// non-text cells become text that fails the numeric and symbol checks rather than being converted.
+export function importHoldingsSheet(sheet){
+ if(!Array.isArray(sheet))throw new TypeError('Sheet rows required');
+ const text=v=>v===null||v===undefined?'':typeof v==='number'?(Number.isFinite(v)?String(v):''):v instanceof Date?v.toISOString():String(v);
+ return importHoldingsRows(sheet.map((cells,i)=>({line:i+1,cells:Array.isArray(cells)?cells.map(text):[]})).filter(r=>r.cells.some(c=>c.trim()!=='')));
+}
+// rows: [{line, cells: string[]}] with blank rows removed.
+export function importHoldingsRows(rows){
+ if(!rows.length)throw new Error('The file has no rows');
+ const qualifies=cells=>{const f=cells.map(fieldOf);return f.includes('quantity')&&(f.includes('symbol')||f.includes('isin'));};
+ const at=rows.slice(0,HEADER_SCAN_ROWS).findIndex(r=>qualifies(r.cells));
+ if(at<0)throw new Error(`Need a header row (within the first ${HEADER_SCAN_ROWS} rows) with a quantity column and a symbol or ISIN column. Recognised names: `+Object.entries(HEADER_ALIASES).map(([f,a])=>f+' ('+a.join(', ')+')').join('; '));
+ const header=rows[at].cells,fields=header.map(fieldOf),data=rows.slice(at+1);
  const column=f=>fields.indexOf(f),dup=Object.keys(HEADER_ALIASES).filter(f=>fields.filter(x=>x===f).length>1);
  if(dup.length)throw new Error('More than one column for: '+dup.join(', '));
- if(column('quantity')<0||(column('symbol')<0&&column('isin')<0))throw new Error('Need a quantity column and a symbol or ISIN column. Recognised names: '+Object.entries(HEADER_ALIASES).map(([f,a])=>f+' ('+a.join(', ')+')').join('; '));
- if(rows.length-1>MAX_ROWS)throw new Error(`More than ${MAX_ROWS} rows`);
+ if(data.length>MAX_ROWS)throw new Error(`More than ${MAX_ROWS} rows`);
  const skipped=[],merged=new Map();
- for(const {line,cells} of rows.slice(1)){
+ for(const {line,cells} of data){
   const get=f=>column(f)<0?'':(cells[column(f)]??'').trim();
   const symbol=get('symbol')?symbolOf(get('symbol')):null,isinRaw=get('isin').toUpperCase(),isin=/^IN[A-Z0-9]{10}$/.test(isinRaw)?isinRaw:null;
   const quantity=number(get('quantity')),avg=get('averagePrice')===''?null:number(get('averagePrice'));
@@ -54,6 +69,6 @@ export function importHoldingsCsv(text){
   else merged.set(key,{symbol,isin,quantity,averagePrice:avg,lines:[line]});
  }
  const holdings=[...merged.values()];
- return {holdings,skipped,coverage:{rows:rows.length-1,imported:holdings.length,mergedRows:rows.length-1-skipped.length-holdings.length,skipped:skipped.length},
+ return {holdings,skipped,headerLine:rows[at].line,coverage:{rows:data.length,imported:holdings.length,mergedRows:data.length-skipped.length-holdings.length,skipped:skipped.length},
   columns:Object.fromEntries(Object.keys(HEADER_ALIASES).map(f=>[f,column(f)<0?null:header[column(f)]])),ignoredColumns:header.filter((_,i)=>fields[i]===null)};
 }

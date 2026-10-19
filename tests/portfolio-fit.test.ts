@@ -82,3 +82,31 @@ test('report shows check results, reasons and the binding answer',()=>{
  const html=renderToStaticMarkup(createElement(FitReport,{fit}));assert.match(html,/Outside your limits/,'a proven breach outranks unknown checks');assert.match(html,/unpriced holdings/);assert.match(html,/No usable price for ZZZ/);assert.match(html,/Unclassified/);assert.match(html,/badge-red/);
  const profile=renderToStaticMarkup(createElement(RiskProfileResult,{result:assessRiskProfile({...all(2),horizon:0})}));assert.match(profile,/Conservative/);assert.match(profile,/most cautious/);
 });
+
+// A minimal real .xlsx (inline strings) with broker-style account rows above the header and a blank row.
+const xlsx=async(rows:(string|number|null)[][])=>{
+ const {zipSync,strToU8}=await import('fflate');
+ const col=(i:number)=>String.fromCharCode(65+i);
+ const cell=(v:string|number|null,ref:string)=>v===null?'':typeof v==='number'?`<c r="${ref}"><v>${v}</v></c>`:`<c r="${ref}" t="inlineStr"><is><t>${v}</t></is></c>`;
+ const sheet=`<?xml version="1.0" encoding="UTF-8"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>${rows.map((r,i)=>r.length?`<row r="${i+1}">${r.map((v,j)=>cell(v,col(j)+(i+1))).join('')}</row>`:'').join('')}</sheetData></worksheet>`;
+ return Buffer.from(zipSync({
+  '[Content_Types].xml':strToU8('<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>'),
+  '_rels/.rels':strToU8('<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'),
+  'xl/workbook.xml':strToU8('<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Equity" sheetId="1" r:id="rId1"/></sheets></workbook>'),
+  'xl/_rels/workbook.xml.rels':strToU8('<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>'),
+  'xl/worksheets/sheet1.xml':strToU8(sheet),
+ }));
+};
+test('Excel holdings: header found below account rows, numbers kept, row numbers reported',async()=>{
+ const {readSheet}=await import('read-excel-file/node');const {importHoldingsSheet,importHoldingsRows,HEADER_SCAN_ROWS}=await import('../shared/holdingsImport.js');
+ const file=await xlsx([['Client ID','AB1234'],['Statement','Equity holdings'],[],['Symbol','ISIN','Quantity Available','Average Price'],['INFY','INE009A01021',10,1450.5],['TCS',null,'x',3200],['INFY','INE009A01021',5,1500]]);
+ const r=importHoldingsSheet(await readSheet(file));
+ assert.equal(r.headerLine,4);assert.deepEqual(r.skipped,[{line:6,reason:'INVALID_QUANTITY'}]);
+ assert.deepEqual(r.holdings.map((h:any)=>[h.symbol,h.isin,h.quantity,h.lines]),[['INFY','INE009A01021',15,[5,7]]]);
+ assert(Math.abs(r.holdings[0].averagePrice-(1450.5*10+1500*5)/15)<1e-9);
+ assert.deepEqual(r.coverage,{rows:3,imported:1,mergedRows:1,skipped:1});
+ // Dates are not read as quantities; a header beyond the scanned rows is not found.
+ assert.equal(importHoldingsSheet([['Symbol','Qty'],['INFY',new Date('2026-01-01')]]).skipped[0].reason,'INVALID_QUANTITY');
+ assert.throws(()=>importHoldingsRows([...Array.from({length:HEADER_SCAN_ROWS},(_,i)=>({line:i+1,cells:['note']})),{line:HEADER_SCAN_ROWS+1,cells:['Symbol','Qty']}]),/header row/);
+ assert.throws(()=>importHoldingsSheet('x' as any),TypeError);
+});

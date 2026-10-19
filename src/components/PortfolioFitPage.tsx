@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { QUESTIONS, assessRiskProfile, type QuestionId, type RiskAssessment } from '../../shared/riskProfile';
-import { importHoldingsCsv, HEADER_ALIASES, type HoldingsImport } from '../../shared/holdingsImport';
+import { importHoldingsCsv, importHoldingsSheet, HEADER_ALIASES, type HoldingsImport } from '../../shared/holdingsImport';
 import { assessPortfolioFit, type PortfolioFit } from '../../shared/portfolioFit';
 import { buildReference, priceHoldings, loadRiskAnswers, RISK_ANSWERS_KEY } from '../services/portfolioFit';
 import { fetchScorecards, readable } from '../services/scorecards';
 
+const MAX_XLSX_BYTES = 5_000_000;
 const rupees = (n: number) => n.toLocaleString('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
 const pct = (n: number | null) => n === null ? '—' : n.toFixed(1) + '%';
 
@@ -49,7 +50,14 @@ export function PortfolioFitPage() {
  useEffect(() => { try { localStorage.setItem(RISK_ANSWERS_KEY, JSON.stringify(answers)); } catch { /* storage unavailable */ } }, [answers]);
  async function readFile(file: File) {
   setFit(null); setImportError(''); setImported(null);
-  try { setImported(importHoldingsCsv(await file.text())); } catch (e) { setImportError(e instanceof Error ? e.message : 'File could not be read'); }
+  try {
+   // Excel workbooks are read in the browser (first sheet only); the file is never uploaded.
+   if (/\.xlsx$/i.test(file.name)) {
+    if (file.size > MAX_XLSX_BYTES) throw new Error('Excel file is larger than 5 MB');
+    const { readSheet } = await import('read-excel-file/browser');
+    setImported(importHoldingsSheet(await readSheet(file)));
+   } else setImported(importHoldingsCsv(await file.text()));
+  } catch (e) { setImportError(e instanceof Error ? e.message : 'File could not be read'); }
  }
  useEffect(() => {
   if (!imported || result.status !== 'ASSESSED' || !imported.holdings.length) { setFit(null); return; }
@@ -68,10 +76,10 @@ export function PortfolioFitPage() {
    <RiskProfileResult result={result} />
   </section>
   <section className="card space-y-3"><h3>Holdings file</h3>
-   <p className="text-sm">CSV with a header row: quantity plus symbol or ISIN; average cost is optional. Recognised column names: {Object.entries(HEADER_ALIASES).map(([f, a]) => `${f} (${a.join(', ')})`).join('; ')}. Excel files: save as CSV first.</p>
-   <input type="file" accept=".csv,text/csv" onChange={e => { const f = e.target.files?.[0]; if (f) void readFile(f); }} />
+   <p className="text-sm">CSV with a header row: quantity plus symbol or ISIN; average cost is optional. Recognised column names: {Object.entries(HEADER_ALIASES).map(([f, a]) => `${f} (${a.join(', ')})`).join('; ')}. Excel .xlsx files are read from the first sheet; account details above the header row are skipped.</p>
+   <input type="file" accept=".csv,text/csv,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" onChange={e => { const f = e.target.files?.[0]; if (f) void readFile(f); }} />
    {importError && <p role="alert" className="notice">{importError}</p>}
-   {imported && <p className="text-sm">{imported.coverage.imported} holdings from {imported.coverage.rows} rows{imported.coverage.mergedRows ? `, ${imported.coverage.mergedRows} repeated rows merged` : ''}{imported.skipped.length ? `; skipped ${imported.skipped.map(s => `line ${s.line} (${readable(s.reason)})`).join(', ')}` : ''}{imported.ignoredColumns.length ? `; ignored columns: ${imported.ignoredColumns.join(', ')}` : ''}.</p>}
+   {imported && <p className="text-sm">{imported.coverage.imported} holdings from {imported.coverage.rows} rows below the header on line {imported.headerLine}{imported.coverage.mergedRows ? `, ${imported.coverage.mergedRows} repeated rows merged` : ''}{imported.skipped.length ? `; skipped ${imported.skipped.map(s => `line ${s.line} (${readable(s.reason)})`).join(', ')}` : ''}{imported.ignoredColumns.length ? `; ignored columns: ${imported.ignoredColumns.join(', ')}` : ''}.</p>}
   </section>
   {checking && <p className="text-sm" role="status">Checking prices…</p>}
   {fit && <section className="card"><FitReport fit={fit} /></section>}

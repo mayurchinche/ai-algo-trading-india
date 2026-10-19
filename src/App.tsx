@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { LineChart, Radar, BookOpen, Building2 } from 'lucide-react';
 import { NAVIGATE_EVENT, ANALYSE_EVENT } from './services/specDraft';
 import { Header } from './components/Header';
+import { InvestingPage } from './components/InvestingPage';
+import { INVESTING_TABS } from './services/investing';
 import { SignalPopup } from './components/SignalPopup';
 import { useLiveStocks } from './hooks/useLiveStocks';
 const named = <K extends string>(load: () => Promise<Record<K, React.ComponentType<any>>>, key: K) => lazy(() => load().then(m => ({ default: m[key] })));
@@ -16,14 +18,9 @@ const PaperTradingPage = named(() => import('./components/PaperTradingPage'), 'P
 const IPOPage = named(() => import('./components/IPOPage'), 'IPOPage');
 const RuleBuilderPage = named(() => import('./components/RuleBuilderPage'), 'RuleBuilderPage');
 const OptionsWizardPage = named(() => import('./components/OptionsWizardPage'), 'OptionsWizardPage');
-const ScreenerPage = named(() => import('./components/ScreenerPage'), 'ScreenerPage');
-const ScorecardsPage = named(() => import('./components/ScorecardsPage'), 'ScorecardsPage');
-const TrendDashboardPage = named(() => import('./components/TrendDashboardPage'), 'TrendDashboardPage');
 const MarketNewsPage = named(() => import('./components/MarketNewsPage'), 'MarketNewsPage');
 const PremarketPage = named(() => import('./components/PremarketPage'), 'PremarketPage');
 const ResearchPortfolioPage = named(() => import('./components/ResearchPortfolioPage'), 'ResearchPortfolioPage');
-const PortfolioFitPage = named(() => import('./components/PortfolioFitPage'), 'PortfolioFitPage');
-const BasketsPage = named(() => import('./components/BasketsPage'), 'BasketsPage');
 const MetalsPage = named(() => import('./components/MetalsPage'), 'MetalsPage');
 
 export default function App() {
@@ -36,10 +33,13 @@ export default function App() {
   window.addEventListener(NAVIGATE_EVENT, go); window.addEventListener(ANALYSE_EVENT, analyse);
   return () => { window.removeEventListener(NAVIGATE_EVENT, go); window.removeEventListener(ANALYSE_EVENT, analyse); };
  }, []);
+ // Investing tabs share one page; each tab id stays a navigation target.
+ const investing = (tab: string) => <InvestingPage tab={tab} onTab={setActiveTab} />;
  const pages: Record<string, React.ReactNode> = {
+  ...Object.fromEntries(INVESTING_TABS.map(([t]) => [t, investing(t)])),
   'Analysis': <StockAnalysisPage symbol={symbol} onSymbol={setSymbol} />, 'Signals': <SignalsPage />, 'Opening gaps': <OpeningGapsPage />, 'Alerts': <AlertsPage />, 'Discover': <DiscoveryPage />, 'Watch ideas': <SmartPicksPage />, 'Paper trading': <PaperTradingPage />, 'IPO': <IPOPage />,
-  'Rule builder': <RuleBuilderPage />, 'Options wizard': <OptionsWizardPage />, 'Screener': <ScreenerPage />, 'Scorecards': <ScorecardsPage />, 'Trend': <TrendDashboardPage />,
-  'Market News': <MarketNewsPage segment="intraday" />, 'Pre-market': <PremarketPage />, 'Portfolios': <ResearchPortfolioPage />, 'Portfolio fit': <PortfolioFitPage />, 'Baskets': <BasketsPage />, 'Metals': <MetalsPage />,
+  'Rule builder': <RuleBuilderPage />, 'Options wizard': <OptionsWizardPage />,
+  'Market News': <MarketNewsPage segment="intraday" />, 'Pre-market': <PremarketPage />, 'Portfolios': <ResearchPortfolioPage />, 'Metals': <MetalsPage />,
  };
  return (
   <div className="workspace-shell min-h-screen flex flex-col bg-[var(--bg)]">

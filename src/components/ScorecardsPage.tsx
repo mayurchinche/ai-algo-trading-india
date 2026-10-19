@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { fetchScorecards, formatMetric, readable, scoreFor, sortScorecards, type CompanyScorecard, type Scorecards, type SortKey } from '../services/scorecards';
 import { formatIST } from '../services/tradingTime';
+import { StyleVerdicts } from './StyleVerdicts';
+import { styleVerdicts } from '../../shared/styleVerdicts';
 
 const columns: [string, string, '%' | 'x'][] = [['roce', 'ROCE', '%'], ['roe', 'ROE', '%'], ['debtToEquity', 'D/E', 'x'], ['pe', 'P/E', 'x'], ['revenueGrowth1y', 'Rev 1y', '%'], ['profitGrowth1y', 'Profit 1y', '%']];
 
@@ -26,6 +28,7 @@ export function ScorecardTable({ data, sort, onSort, selected, onSelect }: { dat
 export function ScorecardDetail({ company }: { company: CompanyScorecard }) {
  return <section className="card space-y-4">
   <h3>{company.symbol} · {company.basis ? `${company.basis.scope}, year ending ${company.basis.period.end}, ${company.peerGroup?.size} companies in peer group` : 'no supported annual filing'}</h3>
+  <StyleVerdicts verdicts={styleVerdicts(company)} />
   <div className="grid md:grid-cols-2 gap-4">{company.styles.map(s => <div key={s.id} className="border rounded-lg p-3 space-y-1">
    <p><strong>{s.label}</strong>: {s.score !== null ? Math.round(s.score) + ' / 100' : `not scored (${Math.round(s.coverage * 100)}% of weight has data${s.partialScore !== null ? `; partial ${Math.round(s.partialScore)}` : ''})`}</p>
    {s.criteria.map(c => <p className="text-sm" key={c.metric}>{c.label} ({c.weight}%, {c.direction} is better): {c.status === 'RANKED' ? `${c.value!.toFixed(2)} → percentile ${Math.round(c.percentile!)} of ${c.peers}` : c.status === 'TOO_FEW_PEERS' ? `only ${c.peers} peers have data` : readable(c.inputStatus)}</p>)}

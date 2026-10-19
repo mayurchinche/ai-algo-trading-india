@@ -1,5 +1,6 @@
 // Assembles the stock analysis for one NSE symbol (or index) from independent sources. Each section carries its
 // own status, so an unavailable source never blocks or silently fills another.
+import {styleVerdicts} from '../shared/styleVerdicts.js';
 import {technicalProfile,optionChainSummary,dealsSummary,deliverySummary,peerRanks,buildSwot,ANALYSIS_VERSION} from '../shared/stockAnalysis.js';
 import {STRATEGIES,INDEX_UNDERLYINGS,buildStrategySpec} from '../shared/strategyLibrary.js';
 import {SEGMENTS} from '../shared/tradingHorizon.js';
@@ -97,7 +98,7 @@ export async function analyzeStock(symbol,{market,master,fundamentals,scorecards
  return {status:'OK',version:ANALYSIS_VERSION,symbol,name,instrumentKey:key,isIndex:index,industry:ann.status==='OK'?ann.value[0]?.industry??null:null,computedAt:new Date(at).toISOString(),
   quote:quoteRow?{price:quoteRow.price,bid:quoteRow.bid,ask:quoteRow.ask,spreadPct:quoteRow.spread*100,timestamp:quoteRow.timestamp,depth:quoteRow.depth}:{status:quote.status==='OK'?'NO_FRESH_QUOTE':'UNAVAILABLE',reason:quote.reason??null},
   futures:fno?{nearest:{symbol:fno.nearest.trading_symbol,expiry:istDate(fno.nearest.expiry),lotSize:fno.nearest.lot_size,price:futQuote?.price??null,basisPct:futQuote&&quoteRow?(futQuote.price/quoteRow.price-1)*100:null},next:fno.next?{symbol:fno.next.trading_symbol,expiry:istDate(fno.next.expiry)}:null}:null,
-  technicals:tech,fundamentals:fundamentalsOut,peerRanks:ranks,scorecard:card?{composite:card.composite,styles:card.styles.map(s=>({id:s.id,label:s.label,status:s.status,score:s.score}))}:null,
+  technicals:tech,fundamentals:fundamentalsOut,peerRanks:ranks,scorecard:card?{composite:card.composite,styles:card.styles.map(s=>({id:s.id,label:s.label,status:s.status,score:s.score})),verdicts:styleVerdicts(card)}:null,
   news:news_.status==='OK'?{articles:news_.value.articles.slice(0,20),summary:news_.value.summary,source:news_.value.source}:news_,
   announcements:ann.status==='OK'?ann.value:ann,
   deals:dealSum?{...dealSum,rows:dealRows.slice(0,50),coverage:deals.status==='OK'?'Recorded daily since the market-day job was enabled, plus today’s published files':'Today’s published files only (storage unavailable)'}:{status:'UNAVAILABLE'},

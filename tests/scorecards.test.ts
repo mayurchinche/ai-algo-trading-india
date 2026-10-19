@@ -94,3 +94,22 @@ test('table sorts by the chosen style and shows unavailable scores and the detai
  const html=renderToStaticMarkup(createElement(ScorecardTable,{data,sort:'value'}));assert.match(html,/Composite/);assert.match(html,/2026-03-31 · cons\./);assert.match(html,/—/);
  const detail=renderToStaticMarkup(createElement(ScorecardDetail,{company:data.companies[10]}));assert.match(detail,/percentile 100 of 11/);assert.match(detail,/not scored/);
 });
+
+test('style verdicts list top-30% criteria as plus, bottom-30% as minus and unranked criteria with reasons',async()=>{
+ const {styleVerdict,styleVerdicts,verdictSentence}=await import('../shared/styleVerdicts.js');
+ const {StyleVerdicts}=await import('../src/components/StyleVerdicts');
+ const c=(metric:string,percentile:number|null,status='RANKED')=>({metric,label:metric.toUpperCase(),weight:25,value:1,percentile,status});
+ const style={id:'value',label:'Value',status:'SCORED',score:55,criteria:[c('roe',90),c('pe',12),c('roce',50),c('debtToEquity',70),c('profitGrowth5y',null,'INPUT_UNAVAILABLE')]};
+ const v=styleVerdict(style);
+ assert.deepEqual([v.fit,v.plus.map((x:any)=>x.metric),v.minus.map((x:any)=>x.metric),v.neutral,v.unavailable],['PARTIAL_FIT',['roe','debtToEquity'],['pe'],1,[{metric:'profitGrowth5y',label:'PROFITGROWTH5Y',reason:'INPUT_UNAVAILABLE'}]]);
+ assert.equal(verdictSentence(v),'Value: partial fit (55). Plus: ROE (top 10%), DEBTTOEQUITY (top 30%). Minus: PE (bottom 12%). Not ranked: PROFITGROWTH5Y.');
+ assert.equal(styleVerdict({...style,score:70}).fit,'STRONG_FIT');assert.equal(styleVerdict({...style,score:30}).fit,'WEAK_FIT');
+ const unscored=styleVerdict({...style,status:'INSUFFICIENT_INPUTS',score:null});assert.equal(unscored.fit,'NOT_SCORED');assert.equal(unscored.score,null);
+ assert.deepEqual(styleVerdicts(null),[]);
+ // End to end: verdicts read the percentiles scoreUniverse produced.
+ const universe=scoreUniverse(Array.from({length:MIN_PEERS},(_,i)=>({symbol:'S'+i,isin:'I'+i,instrumentKey:'K'+i,fundamentals:fundamentals('2026-03-31',{roe:i,roce:i,debtToEquity:i,pe:i}),price:null})));
+ const best=styleVerdicts(universe.companies[9]).find((x:any)=>x.id==='value');
+ assert.deepEqual(best.plus.map((x:any)=>x.metric),['roe','roce']);assert.deepEqual(best.minus.map((x:any)=>x.metric),['debtToEquity','pe']);
+ const html=renderToStaticMarkup(createElement(StyleVerdicts,{verdicts:[v]}));
+ assert.match(html,/Partial fit · 55/);assert.match(html,/\+ ROE · top 10%/);assert.match(html,/− PE · bottom 12%/);assert.match(html,/Not ranked: PROFITGROWTH5Y/);
+});

@@ -4,6 +4,7 @@ import { paperTradeSignal } from '../services/signals';
 import { navigateTo } from '../services/specDraft';
 import { formatIST } from '../services/tradingTime';
 import { NIFTY50_UNIVERSE } from '../../shared/universes';
+import { StyleVerdicts } from './StyleVerdicts';
 
 const n2 = (v: number | null | undefined, d = 2) => v === null || v === undefined || !Number.isFinite(v) ? '—' : v.toLocaleString('en-IN', { maximumFractionDigits: d, minimumFractionDigits: Math.min(d, 2) });
 const pc = (v: number | null | undefined, d = 2) => v === null || v === undefined || !Number.isFinite(v) ? '—' : `${v >= 0 ? '+' : ''}${v.toFixed(d)}%`;
@@ -56,6 +57,7 @@ function Fundamentals({ a }: { a: Analysis }) {
  const scopes = a.fundamentals.scopes ? Object.entries(a.fundamentals.scopes) : [];
  return <div className="space-y-4">
   {a.scorecard && <div className="grid grid-cols-2 md:grid-cols-6 gap-2"><Tile label="Composite (NIFTY 50 percentile)" value={n2(a.scorecard.composite.score, 0)} />{a.scorecard.styles.map(s => <Tile key={s.id} label={s.label} value={s.status === 'SCORED' ? n2(s.score, 0) : 'n/a'} />)}</div>}
+  {a.scorecard?.verdicts && <StyleVerdicts verdicts={a.scorecard.verdicts} />}
   {!!a.peerRanks.length && <table className="data-table text-sm"><thead><tr><th>Metric</th><th className="text-right">Value</th><th className="text-right">Percentile among {a.peerRanks[0].peers} peers</th></tr></thead><tbody>{a.peerRanks.map(r => <tr key={r.metric}><td>{r.label}</td><td className="text-right font-mono">{n2(r.value)}</td><td className="text-right font-mono">{r.percentile.toFixed(0)}</td></tr>)}</tbody></table>}
   {!scopes.length && <p>No stored NSE financial filings for this company{a.fundamentals.status ? ` (${words(a.fundamentals.status)})` : ''}.</p>}
   {scopes.map(([scope, s]) => <section key={scope} className="card space-y-2"><h4>{scope}{s.latestAnnualPeriod ? ` · year ${s.latestAnnualPeriod.start} to ${s.latestAnnualPeriod.end}` : ' · no annual period'}</h4>
