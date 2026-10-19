@@ -8,6 +8,7 @@ import {parseFinancialDisclosure,MAX_DOCUMENT_BYTES} from './financialStatements
 import {toFundamentalFiling} from './fundamentals.js';
 import {companySymbol} from './companyHistory.js';
 import {disclosureTime,readPublic} from './companyDisclosures.js';
+import {corporateActionsUrl,parseCorporateActions,relinkFormerIsin} from './isinLineage.js';
 const sha=v=>createHash('sha256').update(v).digest('hex');
 const MONTHS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 export const filingIndexUrl=symbol=>'https://www.nseindia.com/api/integrated-filing-results?index=equities&size=100&symbol='+encodeURIComponent(companySymbol(symbol));
@@ -61,21 +62,31 @@ export async function backfillFundamentalFilings({targets,store,legacy=true,read
   catch{results.push({symbol,isin:isin??null,status:'INDEX_UNAVAILABLE',index:null,outcomes:[]});await pause();continue;}
   // Earlier audited annual results need the ISIN: those files identify the company only by symbol.
   if(legacy&&isin){try{const l=parseLegacyAnnualIndex(await read(legacyIndexUrl(symbol)),symbol,clock());index.items.push(...l.items.map(i=>({...i,expected:{symbol,isin}})));index.coverage.legacy=l.coverage;}catch{index.coverage.legacy='INDEX_UNAVAILABLE';}await pause();}
+  let actions;
   const stored=new Set((await store.known(index.items.map(i=>i.id))).map(r=>r.id));
   const outcomes=index.items.filter(i=>stored.has(i.id)).map(i=>outcome(i,'ALREADY_RECORDED'));
   for(const item of index.items.filter(i=>!stored.has(i.id))){
    await pause();
-   let filing;
+   let filing,relinked=null;
    try{
     const doc=parseFinancialDisclosure(await read(item.url,MAX_DOCUMENT_BYTES),item,clock());
-    if(isin?doc.instrumentKey!=='NSE_EQ|'+isin:doc.symbol!==symbol){outcomes.push(outcome(item,'IDENTITY_MISMATCH',{filedSymbol:doc.symbol,filedInstrumentKey:doc.instrumentKey}));continue;}
     filing=toFundamentalFiling(doc);
+    if(isin?doc.instrumentKey!=='NSE_EQ|'+isin:doc.symbol!==symbol){
+     // A former ISIN of the same issuer is accepted only with NSE's record of a face-value change after the filing.
+     let reason='NO_ISIN';
+     if(isin){
+      if(actions===undefined){try{actions=parseCorporateActions(await read(corporateActionsUrl(symbol)),companySymbol(symbol),clock());}catch{actions=null;}}
+      const linked=actions?relinkFormerIsin(filing,{symbol:companySymbol(symbol),currentIsin:isin,corporateActions:actions}):{reason:'CORPORATE_ACTIONS_UNAVAILABLE'};
+      if(linked.filing){filing=linked.filing;relinked=doc.instrumentKey;}else reason=linked.reason;
+     }
+     if(!relinked){outcomes.push(outcome(item,'IDENTITY_MISMATCH',{filedSymbol:doc.symbol,filedInstrumentKey:doc.instrumentKey,lineage:reason}));continue;}
+    }
    }catch(e){
     // Pre-FY2023 annual files reference contexts they never define and carry no company identity; they are
     // recorded as unreadable rather than as a failed read.
     outcomes.push(outcome(item,e?.code==='UNSUPPORTED_FINANCIAL_FORMAT'?'UNSUPPORTED_FORMAT':item.legacy&&/identity|context/i.test(e?.message??'')?'LEGACY_UNVERIFIABLE':'READ_FAILED'));continue;
    }
-   const filed=filing.symbol!==symbol?{filedSymbol:filing.symbol}:{};
+   const filed={...(filing.symbol!==symbol?{filedSymbol:filing.symbol}:{}),...(relinked?{relinkedFrom:relinked}:{})};
    try{const saved=await store.save(filing);outcomes.push(outcome(item,saved?.id===filing.id?'RECORDED':'DUPLICATE_DOCUMENT',filed));}
    catch{outcomes.push(outcome(item,'STORE_FAILED'));}
   }

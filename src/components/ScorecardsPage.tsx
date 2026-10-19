@@ -32,7 +32,8 @@ export function ScorecardDetail({ company }: { company: CompanyScorecard }) {
   <div className="grid md:grid-cols-2 gap-4">{company.styles.map(s => <div key={s.id} className="border rounded-lg p-3 space-y-1">
    <p><strong>{s.label}</strong>: {s.score !== null ? Math.round(s.score) + ' / 100' : `not scored (${Math.round(s.coverage * 100)}% of weight has data${s.partialScore !== null ? `; partial ${Math.round(s.partialScore)}` : ''})`}</p>
    {s.criteria.map(c => <p className="text-sm" key={c.metric}>{c.label} ({c.weight}%, {c.direction} is better): {c.status === 'RANKED' ? `${c.value!.toFixed(2)} → percentile ${Math.round(c.percentile!)} of ${c.peers}` : c.status === 'TOO_FEW_PEERS' ? `only ${c.peers} peers have data` : readable(c.inputStatus)}</p>)}
-   {!!s.warnings.length && <p className="text-xs">* Inputs filed under different symbols (rename, merger or demerger); values are not adjusted.</p>}
+   {s.warnings.includes('FILED_SYMBOL_CHANGED') && <p className="text-xs">* Inputs filed under different symbols (rename, merger or demerger); values are not adjusted.</p>}
+   {s.warnings.includes('FILED_UNDER_FORMER_ISIN') && <p className="text-xs">* Some inputs come from filings under the ISIN used before a share split or consolidation; per-share figures from those filings are not used.</p>}
   </div>)}</div>
   {!!company.sources.length && <div className="text-sm space-y-1"><p className="font-semibold">Source filings</p>{company.sources.map(s => <p key={s.url}><a className="underline break-all" href={s.url} target="_blank" rel="noopener noreferrer">{s.symbol ?? company.symbol} · published {formatIST(s.publishedAt)}</a></p>)}</div>}
  </section>;

@@ -37,7 +37,8 @@ function priceInput(price,instrumentKey,asOf){
  return {status:'OBSERVED',value:price.value,currency:price.currency,date:price.date,source:price.source};
 }
 // Inputs filed under different symbols usually span a rename, merger or demerger; values are not adjusted for it.
-const symbolWarnings=inputs=>new Set(inputs.map(i=>i.source?.symbol).filter(Boolean)).size>1?['FILED_SYMBOL_CHANGED']:[];
+// Inputs from a filing under a former ISIN (before a split or consolidation) carry their own warning.
+const symbolWarnings=inputs=>[...(new Set(inputs.map(i=>i.source?.symbol).filter(Boolean)).size>1?['FILED_SYMBOL_CHANGED']:[]),...(inputs.some(i=>i.source?.formerIsin)?['FILED_UNDER_FORMER_ISIN']:[])];
 const AVAILABLE=new Set(['ISSUER_REPORTED','OBSERVED','CALCULATED_REQUIRES_REVIEW']);
 function ratio(key,label,formula,named,compute){
  const inputs=named.map(([name,r])=>({name,...r}));
@@ -66,7 +67,7 @@ export function deriveFundamentals(filings,{instrumentKey,asOf,truncated=false,p
  const add=(f,pk,period,contextId,facts)=>{for(const x of facts||[]){
   if(!Number.isFinite(x.value))continue;
   const k=[f.scope,pk,x.key].join('|');if(!versions.has(k))versions.set(k,[]);
-  versions.get(k).push({value:x.value,currency:x.currency,tag:x.tag,period,source:{filingId:f.id,documentHash:f.documentHash,url:f.url,publishedAt:f.publishedAt,contextId,symbol:f.symbol}});
+  versions.get(k).push({value:x.value,currency:x.currency,tag:x.tag,period,source:{filingId:f.id,documentHash:f.documentHash,url:f.url,publishedAt:f.publishedAt,contextId,symbol:f.symbol,...(f.lineage?{formerIsin:f.lineage.filedIsin}:{})}});
  }};
  for(const f of usable){
   for(const p of f.periods){
@@ -178,5 +179,5 @@ export function deriveFundamentals(filings,{instrumentKey,asOf,truncated=false,p
   scopes[scope]={format,latestAnnualPeriod:latest&&{start:latest.start,end:latest.end},annualPeriods:periods.length,growth,ratios:format==='BANKING'?bankRatiosFor(scope,latest,growth):ratiosFor(scope,latest,growth),marketCap:marketCapFor(scope)};
  }
  return {policy:'fundamentals-v2',instrumentKey,asOf:new Date(asOf).toISOString(),status:usable.length?'DERIVED_REQUIRES_REVIEW':'NO_FILINGS',coverage:{filings:filings.length,used:usable.length,...excluded,truncated},price:priced,scopes,
-  note:'Issuer-reported values from stored NSE XBRL filings (Ind AS format), using the latest revision published by asOf. Growth and ratios use the latest exact annual period (365 or 366 days); quarters and half-years are never annualised and missing history is not zero. Balance-sheet inputs come from year-end positions. Market cap uses paid-up equity capital ÷ face value from the latest reported period (up to 200 days old), which is rounded to the filing’s reported precision, may be net of treasury shares in consolidated filings, and may predate later splits, bonuses or buybacks. P/E uses the latest annual basic EPS, not trailing twelve months, and the previous trading day’s close, which may not be adjusted for splits or bonuses after that year. Banking-format filings are not supported, and older balance-sheet layouts without an Ind AS equity total are not mapped. Mergers, demergers and renames are not adjusted; FILED_SYMBOL_CHANGED marks inputs filed under different symbols. No valuation score or allocation approval.'};
+  note:'Issuer-reported values from stored NSE XBRL filings (Ind AS, NBFC Ind AS and banking formats), using the latest revision published by asOf. Growth and ratios use the latest exact annual period (365 or 366 days); quarters and half-years are never annualised and missing history is not zero. Balance-sheet inputs come from year-end positions. Market cap uses paid-up equity capital ÷ face value from the latest reported period (up to 200 days old), which is rounded to the filing’s reported precision, may be net of treasury shares in consolidated filings, and may predate later splits, bonuses or buybacks. P/E uses the latest annual basic EPS, not trailing twelve months, and the previous trading day’s close, which may not be adjusted for splits or bonuses after that year. Banking-format filings are not supported, and older balance-sheet layouts without an Ind AS equity total are not mapped. Mergers, demergers and renames are not adjusted; FILED_SYMBOL_CHANGED marks inputs filed under different symbols. No valuation score or allocation approval.'};
 }

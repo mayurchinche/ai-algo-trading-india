@@ -122,3 +122,45 @@ test('legacy filings need the expected symbol and ISIN, the declared full year a
  const skipped=await backfillFundamentalFilings({targets:[{symbol:'TEST',isin:'INE000D01010'}],store:memoryStore(),legacy:false,read,clock:()=>now,pause:async()=>{}});
  assert.equal(skipped.symbols[0].status,'NO_SUPPORTED_ANNUAL_FILINGS');
 });
+
+test('ISIN structure and NSE face-value changes',async()=>{
+ const {validIsin,sameIssuerEquity,parseCorporateActions}=await import('../server/isinLineage.js');
+ assert(validIsin('INE237A01028')&&validIsin('INE237A01036'));assert(!validIsin('INE237A01037'));assert(!validIsin('ine237a01036'));
+ assert(sameIssuerEquity('INE237A01028','INE237A01036'),'same issuer, equity, earlier serial');
+ assert(!sameIssuerEquity('INE237A01036','INE237A01028'),'a later serial is not a former ISIN');
+ assert(!sameIssuerEquity('INE009A01021','INE040A01034'),'different issuers');assert(!sameIssuerEquity('INE237A01036','INE237A01036'));
+ const body=JSON.stringify([{symbol:'KOTAKBANK',exDate:'14-Jan-2026',subject:'Face Value Split (Sub-Division) - From Rs 5/- Per Share To Re 1/- Per Share'},{symbol:'KOTAKBANK',exDate:'17-Jul-2026',subject:'Dividend - Rs 0.65 Per Share'},
+  {symbol:'KOTAKBANK',exDate:'01-Jan-2027',subject:'Consolidation of shares'},{symbol:'OTHER',exDate:'14-Jan-2026',subject:'Face Value Split'},{symbol:'KOTAKBANK',exDate:'bad',subject:'Face Value Split'}]);
+ assert.deepEqual(parseCorporateActions(body,'KOTAKBANK',now).actions,[{subject:'Face Value Split (Sub-Division) - From Rs 5/- Per Share To Re 1/- Per Share',exDate:'2026-01-14'}]);
+ assert.throws(()=>parseCorporateActions('{}','KOTAKBANK',now));
+});
+test('filings under a former ISIN are relinked only with a later NSE face-value change; per-share facts are dropped',async()=>{
+ const eps='<BasicEarningsLossPerShareFromContinuingAndDiscontinuedOperations contextRef="OneD" unitRef="EPS" decimals="2">12.5</BasicEarningsLossPerShareFromContinuingAndDiscontinuedOperations><unit id="EPS"><divide><unitNumerator><measure>iso4217:INR</measure></unitNumerator><unitDenominator><measure>xbrli:shares</measure></unitDenominator></divide></unit></xbrl>';
+ const docs:Record<string,string>={[x('1')]:filingXml('KOTAKBANK','INE237A01028').replace('</xbrl>',eps),[x('2')]:filingXml('KOTAKBANK','INE237A01036',120),[x('3')]:filingXml('KOTAKBANK','INE009A01021')};
+ const items=[row('1','31-MAR-2026'),row('2','31-MAR-2026','24-Apr-2026 20:47:17'),row('3','31-MAR-2026','25-Apr-2026 20:47:17')];
+ let actionReads=0;
+ const reader=(exDate:string|null)=>async(url:string)=>{
+  if(url.includes('corporateActions')){actionReads++;if(exDate===null)throw Error('blocked');return JSON.stringify([{symbol:'KOTAKBANK',exDate,subject:'Face Value Split (Sub-Division) - From Rs 5/- Per Share To Re 1/- Per Share'}]);}
+  return url.includes('corporates-financial-results')?'[]':url.includes('api')?index(items):docs[url];
+ };
+ const run=async(exDate:string|null)=>{const store=memoryStore();const r=await backfillFundamentalFilings({targets:[{symbol:'KOTAKBANK',isin:'INE237A01036'}],store,read:reader(exDate),clock:()=>now,pause:async()=>{}});return {store,outcomes:r.symbols[0].outcomes};};
+ const ok=await run('14-Jun-2026');
+ assert.deepEqual(ok.outcomes.map((o:any)=>[o.status,o.relinkedFrom??o.lineage??null]),[['RECORDED','NSE_EQ|INE237A01028'],['RECORDED',null],['IDENTITY_MISMATCH','NOT_SAME_ISSUER_EQUITY']]);
+ assert.equal(actionReads,1,'corporate actions are read once per company');
+ const relinked=ok.store.saved[0];
+ assert.equal(relinked.instrumentKey,'NSE_EQ|INE237A01036');assert.equal(relinked.identityBasis,'FORMER_ISIN_SAME_ISSUER');
+ assert.deepEqual({...relinked.lineage,corporateAction:{...relinked.lineage.corporateAction,sourceHash:'h'}},{policy:'isin-lineage-v1',filedIsin:'INE237A01028',currentIsin:'INE237A01036',
+  corporateAction:{subject:'Face Value Split (Sub-Division) - From Rs 5/- Per Share To Re 1/- Per Share',exDate:'2026-06-14',source:'https://www.nseindia.com/api/corporates-corporateActions?index=equities&symbol=KOTAKBANK',sourceHash:'h'}});
+ const year=relinked.periods[0];
+ assert(!year.facts.some((f:any)=>f.key==='basicEps'));assert.deepEqual(year.unavailable.find((u:any)=>u.key==='basicEps'),{key:'basicEps',status:'BEFORE_FACE_VALUE_CHANGE',tag:'BasicEarningsLossPerShareFromContinuingAndDiscontinuedOperations'});
+ assert(year.facts.some((f:any)=>f.key==='revenue'),'totals are kept');
+ // Inputs from the relinked filing carry the former-ISIN warning; the current filing's do not.
+ const d=deriveFundamentals(ok.store.saved,{instrumentKey:'NSE_EQ|INE237A01036',asOf:now});
+ assert.deepEqual(d.scopes.Consolidated.growth.find((g:any)=>g.key==='totalProfit'&&g.years===1)?.warnings??[],[]);
+ const only=deriveFundamentals([relinked],{instrumentKey:'NSE_EQ|INE237A01036',asOf:now}).scopes.Consolidated.ratios;
+ assert.deepEqual(only.find((r:any)=>r.key==='roe').warnings,['FILED_UNDER_FORMER_ISIN']);
+ assert.deepEqual(only.find((r:any)=>r.key==='pe').missingInputs.includes('basicEps'),true,'pre-split EPS is not used');
+ assert.equal((await run('14-Jan-2026')).outcomes[0].lineage,'NO_FACE_VALUE_CHANGE_AFTER_FILING');
+ assert.equal((await run('14-Jan-2099')).outcomes[0].lineage,'NO_FACE_VALUE_CHANGE_AFTER_FILING','future actions are not evidence');
+ assert.equal((await run(null)).outcomes[0].lineage,'CORPORATE_ACTIONS_UNAVAILABLE');
+});
