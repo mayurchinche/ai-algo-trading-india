@@ -67,8 +67,12 @@ Run `node scripts/research/validate-library.mjs <daily dir> <15m dir>` on a stor
 | Futures Supertrend long | Futures | 1,619 | 31.4% | +0.342% | 1.16 | +0.42 / +0.28 | Fail (PF < 1.2) | 0 |
 | Futures Supertrend short | Futures | 1,617 | 26.2% | −0.381% | 0.83 | +0.02 / −0.70 | Fail | 0 |
 | Bull call / bear put spreads | Options | (validated through the futures rule) | | | | | Fail | 0 |
+| Futures 20-day breakout, 25-day cap (one contract, no roll) | Futures | 2,871 | 41.8% | +0.371% | 1.15 | +0.79 / −0.06 | Fail (removed) | 0 |
+| **Futures 20-day breakout, rolled monthly** | Futures | 2,176 | 40.5% | +1.124% | 1.41 | +1.81 / +0.43 | **Pass** | 40 |
 
 What this means:
+- The futures breakout is the validated 20-day breakout rule traded through futures. Paper runs roll the position into the next contract two days before expiry (`rollLeg`); roll costs are charged in paper trading but not in the backtest, which uses the underlying price. The 25-day capped version failed, which shows the edge needs the full holding period.
+- Options stay without signals: expired option prices are unavailable, so option rules can be validated only through their direction, and those directions failed.
 - **Only the long-only trend and breakout rules on daily bars passed.** The intraday and swing rules lost money after charges, so those segments show no signals. This is the correct result, not a defect. Adding rules until something passes would overfit the history.
 - **The edge weakened in the second half** for every passing rule. Expect lower returns than the full-history average.
 - **Biases.** The universe is today’s NIFTY 50 applied to 2016 onward (survivorship bias). The decade was a rising market. Option spreads are validated only through their direction, because expired option prices are unavailable.

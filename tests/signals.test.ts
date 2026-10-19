@@ -58,10 +58,12 @@ test('scan records validated signals once and auto-starts single-trade paper run
  const store={validations:async()=>[valRow('short-term-donchian','INFY'),valRow('long-term-golden-trend','INFY'),valRow('swing-rsi2','TCS','REJECTED')],recordSignals:async(rows:any[])=>{recorded.push(...rows);return rows.length;}};
  const paperStore={create:async(id:string,spec:any,options:any,state:any)=>{created.push({id,spec,options,state});return {id};}};
  let reads=0;const market={history:async(key:string)=>{reads++;assert.equal(key,'NSE_EQ|INE009A01021');return bars;}};
- const r:any=await scanSignals({market,store,paperStore,now:()=>now});
- assert.equal(reads,1,'one read serves both strategies on INFY');assert.equal(r.scanned,2);assert.equal(r.signals.length,1,'earlier bars in the lookback had no setup');const sig=r.signals[0];assert.equal(r.active,1);
+ const boards:any[]=[];const r:any=await scanSignals({market,store,paperStore,now:()=>now,saveBoard:async(b:any)=>{boards.push(b);}});
+ assert.equal(reads,1,'one read serves both strategies on INFY');assert.deepEqual(boards.at(-1).rows.map((b:any)=>b.strategyId),[],'a fresh signal is not also listed on the board');assert.equal(r.scanned,2);assert.equal(r.signals.length,1,'earlier bars in the lookback had no setup');const sig=r.signals[0];assert.equal(r.active,1);
  const later:any=await scanSignals({market,store:{...store,recordSignals:async(rows:any[])=>rows.length},paperStore,now:()=>now+5*DAY});
- assert.equal(later.signals.length,1);assert.equal(later.active,0,'an older setup is recorded but no longer actionable');assert.equal(later.paper.length,0);
+ assert.equal(later.signals.length,1);
+ const held:any=await scanSignals({market:{history:async()=>[...bars,...breakout().slice(-5).map((b:any,i:number)=>({...b,time:bars.at(-1).time+(i+1)*DAY}))]},store:{...store,recordSignals:async(rows:any[])=>rows.length},paperStore,now:()=>now+5*DAY,saveBoard:async(b:any)=>{boards.push(b);}});
+ assert(held&&boards.at(-1).rows.some((b:any)=>b.state==='IN_POSITION'&&b.symbol==='INFY'&&b.strategyId==='short-term-donchian'),'the rule’s open position is on the board');assert.equal(later.active,0,'an older setup is recorded but no longer actionable');assert.equal(later.paper.length,0);
  assert.equal(sig.id,`short-term-donchian:INFY:${bars.at(-1).time}`);assert.equal(sig.segment,'short-term');assert.equal(sig.direction,'LONG');assert.equal(sig.validation.verdict,'VALIDATED');
  assert(sig.validUntil>sig.decidedAt);assert.equal(recorded.length,1);
  assert.equal(created.length,1);assert.equal(created[0].id,runIdFor(sig.id));assert.equal(created[0].options.singleTrade,true);assert.equal(created[0].options.signalId,sig.id);assert.equal(created[0].options.costModel,'broker-tariff');
@@ -108,7 +110,7 @@ test('validation job refreshes the stalest strategy and market-day capture parse
  const all:any=await runValidation({market:{history:async()=>{reads++;return bars;}},store:{validations:async()=>[],saveValidations:save},now:()=>now});
  assert.equal(all.timeframe,'15m');assert.equal(all.strategies,2);assert.equal(reads,50);
  reads=0;batches.length=0;const daily:any=await runValidation({market:{history:async()=>{reads++;return bars;}},store:{validations:async()=>STRATEGIES.filter(s=>s.timeframe==='15m').map(s=>row(s.id,now)),saveValidations:save},now:()=>now});
- assert.equal(daily.timeframe,'1d');assert.equal(daily.strategies,9);assert.equal(reads,52,'one read per symbol for nine strategies');assert(batches.every(n=>n<=200),'each save stays within the 200-row limit');
+ assert.equal(daily.timeframe,'1d');assert.equal(daily.strategies,STRATEGIES.filter(s=>s.timeframe==='1d').length);assert.equal(reads,52,'one read per symbol for every daily strategy');assert(batches.every(n=>n<=200),'each save stays within the 200-row limit');
  assert.equal(nseDate('16-OCT-2026'),'2026-10-16');assert.equal(nseDate('bad'),null);
  assert.deepEqual(csvRows('a,"b,c",d\n'),[['a','b,c','d']]);
  const deals=parseDeals('Date,Symbol,Security Name,Client Name,Buy/Sell,Quantity Traded,Trade Price / Wght. Avg. Price,Remarks\n16-OCT-2026,INFY,Infosys,"ABC FUND, LLP",BUY,70889,1524.91,-\n16-OCT-2026,INFY,Infosys,X,HOLD,1,1,-\nNO RECORDS,,,,,,\n','BULK');
@@ -187,4 +189,24 @@ test('automation tick runs paper every minute plus one due job and records a hea
  const no=response();await h({method:'POST',headers:{authorization:'Bearer nope'},body:{}},no);assert.equal(no.code,401);
  const off=response();await createAutomationHandler({now:()=>ist('10:03'),secret:()=>'s'.repeat(32),env:{AUTOMATION_ENABLED:'false'},jobs,status:{read:async()=>null,write:async()=>{}}})({method:'POST',headers:{authorization:'Bearer '+'s'.repeat(32)},body:{}},off);assert.equal(off.body.status,'AUTOMATION_DISABLED');
  const night=response();await createAutomationHandler({now:()=>ist('20:00'),secret:()=>'s'.repeat(32),env:{},jobs,status:{read:async()=>null,write:async()=>{}}})({method:'POST',headers:{authorization:'Bearer '+'s'.repeat(32)},body:{}},night);assert.equal(night.body.status,'OUTSIDE_AUTOMATION_WINDOW');
+});
+import {triggerLevel} from '../shared/strategyLibrary.js';
+test('futures positions roll into the next contract before expiry within the same trade',async()=>{
+ const {newPaperState}=await import('../server/specPaperRunner.js');
+ const s=strategyById('futures-breakout-long'),spec=buildStrategySpec(s,{symbol:'INFY',lots:1});
+ const r=paperRunFor({id:'futures-breakout-long:INFY:1760000000000',strategyId:'futures-breakout-long',symbol:'INFY',close:1500},100000);assert.equal(r.options.capital,300000,'futures runs get margin-sized capital');
+ const at=Date.parse('2026-10-26T10:00:00+05:30'),state:any=newPaperState(spec,r.options,at-5*DAY);
+ const oldK={instrumentKey:'NSE_FO|OCT',lotSize:400,description:'INFY FUT OCT',expiry:'2026-10-27'},newK={instrumentKey:'NSE_FO|NOV',lotSize:400,description:'INFY FUT NOV',expiry:'2026-11-24'};
+ Object.assign(state,{status:'OPEN',legs:[{id:'fut',dir:1,units:400,entry:1500,entryTime:at-5*DAY,entryCharges:20,instrument:oldK,open:true,stop:1380,target:null,trailSteps:0,mark:1520,exitPrice:null,exitTime:null,exitCharges:0,checkedTo:at-60000}],entries:[{index:0,tradeId:'T1',day:'2026-10-21',time:at-5*DAY,decidedAt:at-5*DAY,exitTime:null,reason:null,pnl:null,mae:0,mfe:0,costsBefore:0,realizedBefore:0,margin:0}],tradeSeq:1});
+ state.paper.lastBarTime=Date.parse('2026-10-23T00:00:00+05:30');state.paper.barsCheckedAt=at;
+ const q=(k:string,p:number)=>({symbol:k,price:p,bid:p-0.5,ask:p+0.5,depth:{buy:[{price:p-0.5,quantity:5000}],sell:[{price:p+0.5,quantity:5000}]},timestamp:new Date(at-1000).toISOString(),source:'T'});
+ const market={underlyingKey:async()=>'NSE_EQ|INE009A01021',nextFuture:async(_k:string,after:string)=>{assert.equal(after,'2026-10-27');return newK;},minuteBars:async()=>[],bars:async()=>[],
+  quotes:async(keys:string[])=>new Map(keys.map(k=>[k,q(k,k==='NSE_FO|OCT'?1520:1530)])),margin:async()=>({status:'OK',required:1}),resolveLeg:async()=>oldK,marketOpen:async()=>true};
+ const out:any=await cycleRun({id:r.id,status:'ACTIVE',version:0,spec,options:r.options,state},{market,now:()=>at});
+ const kinds=out.events.map((e:any)=>e.kind);assert.deepEqual(kinds.filter((k:string)=>['ORDER','ROLLED'].includes(k)),['ORDER','ORDER','ROLLED']);
+ const legs=out.state.legs;assert.equal(legs.length,2);assert.equal(legs[0].open,false);assert.equal(legs[0].exitReason,'ROLL');assert.equal(legs[1].instrument.instrumentKey,'NSE_FO|NOV');
+ const rolled=out.events.find((e:any)=>e.kind==='ROLLED');assert(Math.abs(rolled.spread-(1530.5*1.0005-1519.5*0.9995))<1e-9,'spread = new fill − old fill, after slippage');
+ assert(Math.abs(legs[1].stop-(1380+rolled.spread))<1e-9,'the stop shifts by the calendar spread paid');assert.equal(out.state.status,'OPEN','the trade stays open across the roll');
+ const far:any=await cycleRun({id:r.id,status:'ACTIVE',version:1,spec,options:r.options,state:out.state},{market,now:()=>at+60000});assert(!far.events.some((e:any)=>e.kind==='ROLLED'),'the new contract is not rolled again');
+ const up=series(300,{drift:0.002,amp:0.001}),t=triggerLevel('short-term-donchian',up);assert(t===null||t.level>=Math.max(...up.slice(-20).map(b=>b.high))-1e-9);
 });

@@ -76,6 +76,12 @@ export function createSpecPaperMarket({read=createUpstoxReader(),master=getTradi
   },
   margin,
   optionChain:chains,
+  // The first future of the same underlying that expires after `afterDate` (YYYY-MM-DD), for rollover.
+  async nextFuture(key,afterDate){
+   const row=(await master()).filter(r=>r.segment==='NSE_FO'&&r.instrument_type==='FUT'&&r.underlying_key===key&&Number.isInteger(r.lot_size)&&istDate(r.expiry)>afterDate).sort((a,b)=>a.expiry-b.expiry)[0];
+   if(!row)throw new MarketDataError('NEXT_FUTURE_NOT_FOUND');
+   return {instrumentKey:row.instrument_key,lotSize:row.lot_size,description:row.trading_symbol,expiry:istDate(row.expiry)};
+  },
   async marketOpen(){const s=await read('/v2/market/status/NSE');if(typeof s?.status!=='string')throw new MarketDataError('MARKET_STATUS_INVALID');return s.status==='NORMAL_OPEN';},
  };
 }

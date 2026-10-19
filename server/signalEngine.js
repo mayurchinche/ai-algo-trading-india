@@ -1,7 +1,7 @@
 // Library signals: validation of each library strategy on history, live scanning of validated strategy-symbol
 // pairs on completed bars, automatic single-trade paper runs for new signals, and the daily market capture.
 import {createHash} from 'node:crypto';
-import {STRATEGIES,INDEX_UNDERLYINGS,buildStrategySpec,strategyById} from '../shared/strategyLibrary.js';
+import {STRATEGIES,INDEX_UNDERLYINGS,buildStrategySpec,strategyById,triggerLevel} from '../shared/strategyLibrary.js';
 import {backtestSymbol,poolResults,validationRecord} from '../shared/strategyValidation.js';
 import {createEngineState,stepEngine,computeStrategySeries,TIMEFRAME_MS} from '../shared/specEngine.js';
 import {NIFTY50_UNIVERSE} from '../shared/universes.js';
@@ -57,15 +57,19 @@ export function staleStrategies(validations,now){
 }
 export const staleStrategy=(validations,now)=>staleStrategies(validations,now)[0]??null;
 
-// Runs the engine over completed bars exactly as a paper run would and reports an entry decided at the
-// close of the last bar. A position the simulation already holds suppresses a new signal.
-export function entryDecidedOnLastBar(spec,bars){
- if(bars.length<2)return null;
+// Runs the engine over completed bars exactly as a paper run would. Reports an entry decided at the close of
+// the last bar, and the position the rule holds after the last bar (from an earlier signal), if any.
+export function ruleState(spec,bars){
+ if(bars.length<2)return {decision:null,position:null};
  const state=createEngineState(spec,{capital:1e9}),series=computeStrategySeries(spec,bars),last=bars.length-1;
  for(let i=0;i<bars.length;i++){const b=bars[i],q={open:b.open,high:b.high,low:b.low,close:b.close};stepEngine(spec,state,series,i,Object.fromEntries(spec.legs.map(l=>[l.id,q])));}
- const close=bars[last].time+TIMEFRAME_MS[spec.timeframe];
- return state.pending?.kind==='ENTRY'&&state.pending.time===close?{barTime:bars[last].time,decidedAt:close}:null;
+ const close=bars[last].time+TIMEFRAME_MS[spec.timeframe],leg=state.legs.find(l=>l.open),entry=state.entries.at(-1);
+ return {decision:state.pending?.kind==='ENTRY'&&state.pending.time===close?{barTime:bars[last].time,decidedAt:close}:null,
+  position:state.status==='OPEN'&&leg?{since:entry.time,entryPrice:leg.entry,close:bars[last].close,changePct:(bars[last].close/leg.entry-1)*100*leg.dir,stop:leg.stop,exitPending:state.pending?.kind==='EXIT'?state.pending.reason:null}:null};
 }
+// A position the simulation already holds suppresses a new signal.
+export const entryDecidedOnLastBar=(spec,bars)=>ruleState(spec,bars).decision;
+export const NEAR_TRIGGER_PCT=3;
 const levelText=(l,dir)=>l?`${l.unit==='percent'?l.value+'%':'₹'+l.value} ${dir}`:null;
 export function signalRecord(strategy,spec,validation,bars,decision,instrumentKey){
  const b=bars.at(-1);
@@ -104,8 +108,8 @@ export function paperRunFor(signal,capital){
 
 // timeframes: which strategy bar sizes to scan. Daily bars are read up to the previous session (the history
 // reader excludes today), so a daily scan in the morning acts on yesterday's close in today's session.
-export async function scanSignals({market,store,paperStore,now,budgetMs=40000,autoPaper=true,capital=100000,timeframes=['1d','15m'],lookbackBars=10,wait}){
- const started=now(),validated=(await store.validations()).filter(v=>v.verdict==='VALIDATED'),out={scanned:0,signals:[],failures:[],deferred:0,paper:[]};
+export async function scanSignals({market,store,paperStore,now,budgetMs=40000,autoPaper=true,capital=100000,timeframes=['1d','15m'],lookbackBars=10,wait,saveBoard=null}){
+ const started=now(),validated=(await store.validations()).filter(v=>v.verdict==='VALIDATED'),out={scanned:0,signals:[],failures:[],deferred:0,paper:[],board:[]};
  const pairs=validated.map(v=>({v:v.record,s:strategyById(v.strategy_id)})).filter(p=>p.s&&timeframes.includes(p.s.timeframe));
  // One history read per instrument and bar size, shared by every strategy validated on it.
  const groups=new Map();for(const p of pairs){const u=universeOf(p.s).find(x=>x.symbol===p.v.symbol);if(!u)continue;const k=u.key+'|'+p.s.timeframe;if(!groups.has(k))groups.set(k,{u,tf:p.s.timeframe,pairs:[]});groups.get(k).pairs.push(p);}
@@ -117,11 +121,16 @@ export async function scanSignals({market,store,paperStore,now,budgetMs=40000,au
    try{
     const spec=buildStrategySpec(s,{symbol:u.symbol});
     // The latest bar plus earlier bars in the lookback, so recent setups are on record (older ones expired).
-    for(let k=0;k<lookbackBars&&bars.length-k>1;k++){const b=bars.slice(0,bars.length-k),d=entryDecidedOnLastBar(spec,b);if(d)out.signals.push(signalRecord(s,spec,v,b,d,u.key));}
+     for(let k=0;k<lookbackBars&&bars.length-k>1;k++){const b=bars.slice(0,bars.length-k),d=entryDecidedOnLastBar(spec,b);if(d)out.signals.push(signalRecord(s,spec,v,b,d,u.key));}
+    // Strategy board: where the rule stands now on this stock.
+    const now_=ruleState(spec,bars),base={strategyId:s.id,strategyName:s.name,segment:s.segment,symbol:u.symbol,barTime:bars.at(-1).time,close:bars.at(-1).close};
+    if(now_.position)out.board.push({...base,state:'IN_POSITION',...now_.position});
+    else if(!now_.decision){const t=triggerLevel(s.id,bars);if(t&&t.distancePct>=0&&t.distancePct<=NEAR_TRIGGER_PCT)out.board.push({...base,state:'NEAR_TRIGGER',trigger:t});}
    }catch(e){out.failures.push({strategy:s.id,symbol:u.symbol,reason:code(e,'SCAN_FAILED')});}
   }
  });
  if(out.failures.length)out.failureReason=out.failures[0].reason;
+ if(saveBoard&&timeframes.includes('1d'))try{await saveBoard({computedAt:new Date(started).toISOString(),rows:out.board,scanned:out.scanned,failures:out.failures.length});out.boardRows=out.board.length;}catch{out.boardRows='SAVE_FAILED';}
  for(let i=0;i<out.signals.length;i+=400)out.recorded=(out.recorded??0)+await store.recordSignals(out.signals.slice(i,i+400));
  out.active=out.signals.filter(x=>x.validUntil>started).length;
  // Only signals still actionable are paper-traded; expired history is recorded, not traded.

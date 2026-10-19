@@ -18,6 +18,7 @@ export function stepEngine(spec: Readonly<StrategySpec>, state: EngineState, ser
 export function fillPending(spec: Readonly<StrategySpec>, state: EngineState, quotes: Record<string, LegQuote | undefined> | null, ctx?: StepContext, time?: number): EngineState;
 export function monitorEngine(spec: Readonly<StrategySpec>, state: EngineState, quotes: Record<string, LegQuote | undefined> | null, ctx: StepContext & { at: number }): EngineState;
 export function unitsOf(leg: StrategySpec['legs'][number], lotSize: number | null | undefined): number;
+export function rollLeg(spec: Readonly<StrategySpec>, state: EngineState, legId: string, oldQuote: LegQuote | undefined, newQuote: LegQuote | undefined, ctx: StepContext & { at: number }): EngineState;
 export function walkBook(levels: BookLevel[] | undefined, units: number): { filled: number; remaining: number; value: number; used: BookLevel[] };
 export function fundsOf(state: EngineState): { capital: number; realized: number; charges: number; ledger: number; blocked: number; available: number; unrealized: number; equity: number };
 export function markToMarket(state: EngineState): number;

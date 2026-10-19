@@ -14,7 +14,8 @@ export interface StrategyStatus {
  pooled: { symbols: number; stats: ReturnStats; halves: { first: ReturnStats; second: ReturnStats }; passed: boolean; reasons: string[] } | null;
  symbols: { validated: { symbol: string; stats: ReturnStats | null; buyHoldPct: number | null }[]; unproven: number; rejected: number };
 }
-export interface SignalsResponse { computedAt: string; autoPaper: boolean; automation: AutomationState | null; signals: Signal[]; strategies: StrategyStatus[] }
+export interface BoardRow { strategyId: string; strategyName: string; segment: SegmentId; symbol: string; barTime: number; close: number; state: 'IN_POSITION' | 'NEAR_TRIGGER'; since?: number; entryPrice?: number; changePct?: number; stop?: number | null; exitPending?: string | null; trigger?: { level: number; distancePct: number; condition: string } }
+export interface SignalsResponse { computedAt: string; autoPaper: boolean; automation: AutomationState | null; board: { computedAt: string; rows: BoardRow[]; scanned: number; failures: number } | null; signals: Signal[]; strategies: StrategyStatus[] }
 async function call<T>(init?: RequestInit): Promise<T> {
  const r = await fetch(apiUrl('/api/signals'), { ...init, signal: AbortSignal.timeout(30000), headers: init?.body ? { 'Content-Type': 'application/json' } : undefined });
  const b = await r.json().catch(() => ({ error: 'Signals service returned a page instead of JSON' }));

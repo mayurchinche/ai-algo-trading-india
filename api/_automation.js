@@ -8,6 +8,11 @@ import {signalStore} from '../server/signalStore.js';
 import {scanSignals,runValidation,captureMarketDay} from '../server/signalEngine.js';
 import {ingestFundamentalFilings} from '../server/fundamentalsIngest.js';
 import {fundamentalsStore} from '../server/fundamentalsStore.js';
+export const appData=(id)=>({
+ read:async(db=backend())=>check(await db.from('app_data').select('data,updated_at').eq('id',id).maybeSingle())?.data??null,
+ write:async(data,db=backend())=>check(await db.from('app_data').upsert({id,data,updated_at:new Date().toISOString()})),
+});
+export const strategyBoard=appData('strategy_board');
 export const automationStatus={
  read:async(db=backend())=>check(await db.from('app_data').select('data,updated_at').eq('id',STATUS_ROW).maybeSingle())?.data??null,
  write:async(data,db=backend())=>check(await db.from('app_data').upsert({id:STATUS_ROW,data,updated_at:new Date().toISOString()})),
@@ -21,7 +26,7 @@ export function createAutomationHandler({now=Date.now,secret=()=>process.env.PAP
   const j=jobs??{
    paper:budgetMs=>runSpecPaperCycle({store:specPaperStore(),market,now,budgetMs}),
    validate:()=>runValidation({market,store:signalStore(),now}),
-   scan:timeframes=>scanSignals({market,store:signalStore(),paperStore:specPaperStore(),now,timeframes,autoPaper:env.SIGNAL_AUTO_PAPER!=='false',capital:Number(env.SIGNAL_PAPER_CAPITAL)||100000}),
+   scan:timeframes=>scanSignals({market,store:signalStore(),paperStore:specPaperStore(),now,timeframes,saveBoard:d=>strategyBoard.write(d),autoPaper:env.SIGNAL_AUTO_PAPER!=='false',capital:Number(env.SIGNAL_PAPER_CAPITAL)||100000}),
    marketDay:()=>captureMarketDay({store:signalStore()}),
    fundamentals:()=>ingestFundamentalFilings({store:fundamentalsStore(),clock:now}),
   };

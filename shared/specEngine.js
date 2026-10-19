@@ -108,7 +108,7 @@ function ops(spec,state,quotes,ctx,time){
   if(r?.target&&tradePnl>=amount(r.target))return 'STRATEGY_TARGET';
   return null;
  };
- return {o,at,ev,execute,exitLeg,exitQuoted,bookPrice,resting,markAndFinish,strategyLimit};
+ return {o,at,ev,legSpec,execute,exitLeg,exitQuoted,bookPrice,resting,markAndFinish,strategyLimit};
 }
 
 // Executes a pending entry or exit now, with the given quotes. Multi-leg entries are all-or-nothing and pass
@@ -136,6 +136,21 @@ export function fillPending(spec,state,quotes,ctx={},time=ctx.at){
  const tradeId='T'+(++state.tradeSeq);
  state.entries.push({index:entryIndex,tradeId,day,time,decidedAt:p.time,exitTime:null,reason:null,pnl:null,mae:0,mfe:0,costsBefore,realizedBefore,margin:state.blocked});
  state.dayEntries[day]=(state.dayEntries[day]||0)+1;x.ev('ENTERED',{tradeId,margin:state.blocked});
+ return state;
+}
+
+// Rolls an open future leg into a later contract at market, as a trader does before expiry: the expiring
+// contract is sold (or bought back) and the same quantity is opened in the new one within the same trade.
+// Stop and target keep their distance from price by shifting with the calendar spread actually paid.
+export function rollLeg(spec,state,legId,oldQuote,newQuote,ctx){
+ const leg=state.legs.find(l=>l.id===legId&&l.open);
+ if(state.status!=='OPEN'||!leg||!oldQuote||!newQuote?.instrument)return state;
+ const x=ops(spec,state,{[legId]:oldQuote},ctx,ctx.at),side=leg.dir===1?'BUY':'SELL';
+ x.exitLeg(leg,x.bookPrice(leg,oldQuote),'ROLL','MARKET',oldQuote);
+ const {px,charges}=x.execute({leg:x.legSpec(legId),instrument:newQuote.instrument,side,units:leg.units,quote:newQuote,price:(side==='BUY'?newQuote.ask:newQuote.bid)??newQuote.open,orderType:'MARKET',purpose:'ROLL'});
+ const shift=px-leg.exitPrice;
+ state.legs.push({id:leg.id,dir:leg.dir,units:leg.units,entry:px,entryTime:ctx.at,entryCharges:charges,instrument:newQuote.instrument,open:true,stop:leg.stop===null?null:leg.stop+shift,target:leg.target===null?null:leg.target+shift,trailSteps:leg.trailSteps,mark:px,exitPrice:null,exitTime:null,exitCharges:0});
+ x.ev('ROLLED',{leg:legId,from:leg.instrument?.instrumentKey??null,to:newQuote.instrument.instrumentKey??null,fromContract:leg.instrument?.description??null,toContract:newQuote.instrument.description??null,spread:shift});
  return state;
 }
 

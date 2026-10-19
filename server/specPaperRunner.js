@@ -1,5 +1,5 @@
 import {parseStrategySpec} from '../shared/strategySpec.js';
-import {createEngineState,stepEngine,monitorEngine,fillPending,markToMarket,closeAtMarks,computeStrategySeries,fundsOf,unitsOf,TIMEFRAME_MS,ENGINE_VERSION} from '../shared/specEngine.js';
+import {createEngineState,stepEngine,monitorEngine,fillPending,rollLeg,markToMarket,closeAtMarks,computeStrategySeries,fundsOf,unitsOf,TIMEFRAME_MS,ENGINE_VERSION} from '../shared/specEngine.js';
 import {MarketDataError} from './upstoxReadOnly.js';
 import {segmentOfSpec} from '../shared/tradingHorizon.js';
 // Forward paper runs of strategy specs on live read-only data, executed the way a live order flow would be:
@@ -48,6 +48,8 @@ const barsDue=(spec,state,at)=>{
  if(last===null||p.barsCheckedAt===null)return true;
  return spec.timeframe==='1d'?at-p.barsCheckedAt>=1800000:at>=last+2*tf;
 };
+const istDate=ms=>new Date(ms+19800000).toISOString().slice(0,10);
+const daysBetween=(a,b)=>Math.round((Date.parse(b)-Date.parse(a))/86400000);
 const errCode=(e,fallback)=>e instanceof MarketDataError?e.code:fallback;
 
 // Live leg quotes for the given contracts. With `withBars`, each quote carries the contract's completed
@@ -89,6 +91,19 @@ export async function cycleRun(run,{market,now}){
   for(const l of state.legs)if(q.quotes[l.id]?.checkedTo!==undefined)l.checkedTo=q.quotes[l.id].checkedTo;
   if(q.missing.length)state.events.push({time:at,at,kind:'QUOTE_MISSING',legs:q.missing});
   if(q.barGaps.length)state.events.push({time:at,at,kind:'MINUTE_BARS_UNAVAILABLE',legs:q.barGaps});
+ }
+ // Futures roll: an open future leg is rolled into the next contract on its last two days before expiry.
+ if(state.status==='OPEN'){
+  const today=istDate(at);
+  for(const l of state.legs.filter(l=>l.open&&l.instrument?.expiry&&spec.legs.find(x=>x.id===l.id)?.instrument.type==='future')){
+   if(daysBetween(today,l.instrument.expiry)>1)continue;
+   try{
+    const next=await market.nextFuture(await market.underlyingKey(spec),l.instrument.expiry);
+    const q=await legQuotes(market,{old:l.instrument,next},at);
+    if(q.missing.length)state.events.push({time:at,at,kind:'ROLL_DEFERRED',leg:l.id,reason:'QUOTE_MISSING'});
+    else rollLeg(spec,state,l.id,q.quotes.old,q.quotes.next,{at});
+   }catch(e){state.events.push({time:at,at,kind:'ROLL_DEFERRED',leg:l.id,reason:errCode(e,'ROLL_FAILED')});}
+  }
  }
  // 2. Decide on a newly completed strategy bar.
  if(barsDue(spec,state,at)){
