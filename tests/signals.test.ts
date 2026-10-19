@@ -82,11 +82,23 @@ test('single-trade paper runs stop after their trade, a rejected entry or an exp
 test('validation job refreshes the stalest strategy and market-day capture parses NSE files',async()=>{
  const now=Date.parse('2026-10-19T12:00:00Z');
  assert.equal(staleStrategy([],now).id,STRATEGIES[0].id);
- const fresh=STRATEGIES.map(s=>({strategy_id:s.id,computed_at:new Date(now-DAY).toISOString()}));fresh[3].computed_at=new Date(now-10*DAY).toISOString();
+ const row=(id:string,t:number,symbols=52)=>({strategy_id:id,computed_at:new Date(t).toISOString(),record:{pooled:{symbols}}});
+ const fresh=STRATEGIES.map(s=>row(s.id,now-DAY));fresh[3]=row(STRATEGIES[3].id,now-10*DAY);
  assert.equal(staleStrategy(fresh,now).id,STRATEGIES[3].id);assert.equal(staleStrategy(fresh.map(f=>({...f,computed_at:new Date(now).toISOString()})),now),null);
+ const thin=fresh.map(f=>({...f,computed_at:new Date(now).toISOString()}));thin[5]=row(STRATEGIES[5].id,now,3);
+ assert.equal(staleStrategy(thin,now).id,STRATEGIES[5].id,'a validation computed on too little data is redone');
  const saved:any[]=[];const store={validations:async()=>fresh,saveValidations:async(rows:any[])=>{saved.push(...rows);return rows.length;}};
  const bars=series(900);const v:any=await runValidation({market:{history:async()=>bars},store,now:()=>now});
- assert.equal(v.strategy,STRATEGIES[3].id);assert.equal(saved.length,50);assert(saved.every(r=>['VALIDATED','UNPROVEN','REJECTED'].includes(r.verdict)));
+ assert.equal(v.strategy,STRATEGIES[3].id);assert.equal(v.status,'COMPLETED');assert.equal(saved.length,50);assert(saved.every(r=>['VALIDATED','UNPROVEN','REJECTED'].includes(r.verdict)));
+ // Rate limits are retried; a lasting outage saves nothing instead of rejecting the strategy.
+ const limited=()=>Object.assign(new Error('UPSTOX_RATE_LIMITED'),{code:'UPSTOX_RATE_LIMITED'});
+ let calls=0;const flaky={history:async()=>{if(++calls%2)throw limited();return bars;}};saved.length=0;
+ const retried:any=await runValidation({market:flaky,store,now:()=>now,wait:async()=>{}});assert.equal(retried.status,'COMPLETED');assert.equal(saved.length,50);
+ saved.length=0;const down:any=await runValidation({market:{history:async()=>{throw limited();}},store,now:()=>now,wait:async()=>{}});
+ assert.equal(down.status,'DATA_UNAVAILABLE');assert.equal(saved.length,0,'an outage is not recorded as a rejection');assert.equal(down.results[0].reason,'UPSTOX_RATE_LIMITED');
+ // Stale strategies on the same bar size are validated together from one read of each symbol.
+ let reads=0;saved.length=0;const all:any=await runValidation({market:{history:async()=>{reads++;return bars;}},store:{validations:async()=>[],saveValidations:async(r:any[])=>{saved.push(...r);return r.length;}},now:()=>now});
+ assert.equal(all.timeframe,'15m');assert.equal(all.strategies,2);assert.equal(reads,50);
  assert.equal(nseDate('16-OCT-2026'),'2026-10-16');assert.equal(nseDate('bad'),null);
  assert.deepEqual(csvRows('a,"b,c",d\n'),[['a','b,c','d']]);
  const deals=parseDeals('Date,Symbol,Security Name,Client Name,Buy/Sell,Quantity Traded,Trade Price / Wght. Avg. Price,Remarks\n16-OCT-2026,INFY,Infosys,"ABC FUND, LLP",BUY,70889,1524.91,-\n16-OCT-2026,INFY,Infosys,X,HOLD,1,1,-\nNO RECORDS,,,,,,\n','BULK');

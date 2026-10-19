@@ -24,21 +24,38 @@ export function universeOf(strategy){
 // Research lot for validation: about ₹1 lakh notional, so per-trade returns compare across symbols.
 const researchLot=bars=>{const c=bars.map(b=>b.close).sort((a,b)=>a-b);return c.length?Math.max(1,Math.round(1e5/c[Math.floor(c.length/2)])):1;};
 
-export async function validateStrategy(strategy,{market,now}){
- const at=now(),proxy=strategy.validationProxy?strategyById(strategy.validationProxy):strategy,days=VALIDATION_DAYS[proxy.timeframe]??3650;
- const results=await mapLimit(universeOf(strategy),6,async u=>{
-  try{const bars=await market.history(u.key,proxy.timeframe,at-days*DAY,at);return {u,r:backtestSymbol(buildStrategySpec(proxy,{symbol:u.symbol}),bars,{lotSize:researchLot(bars)})};}
-  catch(e){return {u,r:{status:code(e,'HISTORY_UNAVAILABLE')}};}
- });
- const pool=poolResults(results.map(x=>x.r)),computedAt=new Date(at).toISOString();
- return {pool,records:results.map(x=>validationRecord(strategy,x.u.symbol,x.r,pool,{computedAt,dataSource:'UPSTOX_HISTORICAL_CANDLE_V3',validatedWith:proxy.id===strategy.id?null:proxy.id}))};
+// Upstox rate-limits bursts; a limited request is retried with backoff before it counts as unavailable.
+async function withRetry(fn,{tries=4,wait=ms=>new Promise(r=>setTimeout(r,ms))}={}){
+ for(let k=1;;k++){try{return await fn();}catch(e){if(k>=tries||code(e,'')!=='UPSTOX_RATE_LIMITED')throw e;await wait(1500*2**(k-1));}}
 }
-// The strategy whose validation is missing or oldest, if older than the refresh age.
-export function staleStrategy(validations,now){
- const latest=new Map();for(const v of validations){const t=Date.parse(v.computed_at);if(!latest.has(v.strategy_id)||t<latest.get(v.strategy_id))latest.set(v.strategy_id,t);}
- const order=STRATEGIES.map(s=>({s,t:latest.get(s.id)??-Infinity})).filter(x=>now-x.t>VALIDATION_MAX_AGE).sort((a,b)=>a.t-b.t);
- return order[0]?.s??null;
+// A validation is complete only when history was read for nearly the whole universe; otherwise nothing is
+// saved, because a data outage is not evidence that a strategy loses money.
+export const MIN_UNIVERSE_COVERAGE=0.95;
+// Validates every given strategy that shares one bar size, reading each instrument's history once.
+export async function validateStrategies(strategies,{market,now,wait,budgetMs=30000}){
+ const at=now(),proxies=strategies.map(s=>s.validationProxy?strategyById(s.validationProxy):s),tf=proxies[0].timeframe,days=VALIDATION_DAYS[tf]??3650;
+ if(proxies.some(p=>p.timeframe!==tf))throw new Error('Strategies must share a timeframe');
+ const universe=[...new Map(strategies.flatMap(universeOf).map(u=>[u.symbol,u])).values()];
+ // The fetch has a time budget so the whole tick fits the function limit; unread symbols count as missing.
+ const history=new Map(await mapLimit(universe,4,async u=>{if(now()-at>budgetMs)return [u.symbol,{error:'TIME_BUDGET_EXHAUSTED'}];try{return [u.symbol,{bars:await withRetry(()=>market.history(u.key,tf,at-days*DAY,at),{wait})}];}catch(e){return [u.symbol,{error:code(e,'HISTORY_UNAVAILABLE')}];}}));
+ const computedAt=new Date(at).toISOString(),out=[];
+ for(const [i,strategy] of strategies.entries()){
+  const proxy=proxies[i],members=universeOf(strategy),missing=members.filter(u=>history.get(u.symbol).error);
+  if(missing.length>members.length*(1-MIN_UNIVERSE_COVERAGE)){out.push({strategy,status:'DATA_UNAVAILABLE',missing:missing.length,of:members.length,reason:history.get(missing[0].symbol).error});continue;}
+  const results=members.map(u=>{const h=history.get(u.symbol);return {u,r:h.error?{status:h.error}:backtestSymbol(buildStrategySpec(proxy,{symbol:u.symbol}),h.bars,{lotSize:researchLot(h.bars)})};});
+  const pool=poolResults(results.map(x=>x.r));
+  out.push({strategy,status:'COMPLETED',pool,records:results.map(x=>validationRecord(strategy,x.u.symbol,x.r,pool,{computedAt,dataSource:'UPSTOX_HISTORICAL_CANDLE_V3',validatedWith:proxy.id===strategy.id?null:proxy.id}))});
+ }
+ return out;
 }
+export async function validateStrategy(strategy,deps){const [r]=await validateStrategies([strategy],deps);return r;}
+// Strategies whose validation is missing, older than the refresh age, or was computed on too little data.
+export function staleStrategies(validations,now){
+ const by=new Map();for(const v of validations){if(!by.has(v.strategy_id))by.set(v.strategy_id,[]);by.get(v.strategy_id).push(v);}
+ return STRATEGIES.map(s=>{const rows=by.get(s.id)??[],t=rows.length?Math.min(...rows.map(v=>Date.parse(v.computed_at))):-Infinity,covered=rows.length?Math.min(...rows.map(v=>v.record?.pooled?.symbols??0)):0;
+  return {s,t,stale:now-t>VALIDATION_MAX_AGE||covered<universeOf(s).length*MIN_UNIVERSE_COVERAGE};}).filter(x=>x.stale).sort((a,b)=>a.t-b.t).map(x=>x.s);
+}
+export const staleStrategy=(validations,now)=>staleStrategies(validations,now)[0]??null;
 
 // Runs the engine over completed bars exactly as a paper run would and reports an entry decided at the
 // close of the last bar. A position the simulation already holds suppresses a new signal.
@@ -101,12 +118,16 @@ export async function scanSignals({market,store,paperStore,now,budgetMs=40000,au
  }
  return {status:out.failures.length?'PARTIAL':'COMPLETED',timeframes,validatedPairs:pairs.length,...out};
 }
-export async function runValidation({market,store,now}){
- const s=staleStrategy(await store.validations(),now());
- if(!s)return {status:'UP_TO_DATE'};
- const {pool,records}=await validateStrategy(s,{market,now});
- await store.saveValidations(records);
- return {status:'COMPLETED',strategy:s.id,passed:pool.passed,trades:pool.stats.trades,validated:records.filter(r=>r.verdict==='VALIDATED').map(r=>r.symbol)};
+// Validates the stalest strategy together with every other stale strategy on the same bar size.
+export async function runValidation({market,store,now,wait}){
+ const stale=staleStrategies(await store.validations(),now());
+ if(!stale.length)return {status:'UP_TO_DATE'};
+ const tf=s=>(s.validationProxy?strategyById(s.validationProxy):s).timeframe,group=stale.filter(s=>tf(s)===tf(stale[0]));
+ const results=await validateStrategies(group,{market,now,wait}),done=results.filter(r=>r.status==='COMPLETED');
+ if(done.length)await store.saveValidations(done.flatMap(r=>r.records));
+ const validated=done.flatMap(r=>r.records.filter(x=>x.verdict==='VALIDATED').map(x=>`${r.strategy.id}:${x.symbol}`));
+ return {status:done.length===results.length?'COMPLETED':done.length?'PARTIAL':'DATA_UNAVAILABLE',timeframe:tf(stale[0]),strategy:group.map(s=>s.id).join(','),strategies:results.length,
+  passed:done.some(r=>r.pool.passed),validated,results:results.map(r=>r.status==='COMPLETED'?{id:r.strategy.id,passed:r.pool.passed,trades:r.pool.stats.trades}:{id:r.strategy.id,status:r.status,missing:r.missing,reason:r.reason})};
 }
 export async function captureMarketDay({store,fetcher=fetch}){
  const [deals,flows]=await Promise.allSettled([readDeals({fetcher}),readFlows({fetcher})]);
