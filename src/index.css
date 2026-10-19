@@ -1,5 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
+
+/* Tailwind v4 draws `border` in the text colour by default; this app's borders use the theme border colour. */
+@layer base { *, ::before, ::after, ::backdrop { border-color: var(--border, #e1e6ee); } }
 
 :root {
   /* Premium light fintech — ultra-clean, CRED/IndMoney white */
@@ -48,7 +51,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Inter', sans-serif;
   letter-spacing: -0.01em;
 }
 
@@ -81,7 +84,7 @@ h1, h2, h3, h4, h5, h6 {
   text-align: center;
   box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
-.kpi-value { font-family: 'Poppins', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
+.kpi-value { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
 .kpi-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; font-weight: 600; }
 .kpi-sub { font-size: 12px; margin-top: 4px; color: var(--text-secondary); }
 
@@ -169,7 +172,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Score circle */
 .score-circle {
   width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 700; border: 3px solid;
+  font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; border: 3px solid;
   background: var(--card);
 }
 
@@ -180,7 +183,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Section header */
 .section-header {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 18px;
   font-weight: 700;
   margin-bottom: 20px;
@@ -218,8 +221,8 @@ h1, h2, h3, h4, h5, h6 {
 .gradient-hero-green { background: linear-gradient(135deg, #ECFDF5 0%, #F0FDF4 50%, #FFFBEB 100%); }
 
 /* Number display — large financial typography */
-.number-xl { font-family: 'Poppins', sans-serif; font-size: 32px; font-weight: 700; line-height: 1.1; letter-spacing: -0.03em; }
-.number-lg { font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
+.number-xl { font-family: 'Inter', sans-serif; font-size: 32px; font-weight: 700; line-height: 1.1; letter-spacing: -0.03em; }
+.number-lg { font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
 
 /* Smooth page transitions */
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -243,7 +246,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline:3px so
 .page-title h2 { font-size:clamp(26px,3vw,38px); font-weight:600; letter-spacing:-1.2px; line-height:1.25; margin:7px 0 10px; }
 .page-title p { color:var(--text-secondary); }
 .eyebrow { font-size:10px; letter-spacing:2px; text-transform:uppercase; font-weight:700; }
-.primary-button { background:#173f35; color:white; padding:12px 20px; border-radius:10px; white-space:nowrap; }
+.primary-button { background:var(--blue); color:white; padding:12px 20px; border-radius:10px; white-space:nowrap; }
 .metric-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; }
 .metric { display:flex; flex-direction:column; gap:12px; }
 .metric span { font-size:12px; color:var(--text-secondary); }
@@ -290,7 +293,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline:3px so
   .journal-toolbar input,.journal-toolbar select { width:100%; min-width:0; }
   .mobile-nav { display:flex; position:fixed; bottom:0; inset-inline:0; z-index:60; background:#fff; border-top:1px solid var(--border); padding:8px 6px max(8px,env(safe-area-inset-bottom)); justify-content:space-around; box-shadow:0 -4px 20px #173e2910; }
   .mobile-nav button { color:var(--text-secondary); padding:8px 12px; font-size:12px; border-radius:9px; }
-  .mobile-nav button[aria-current] { color:#fff; background:#173f35; }
+  .mobile-nav button[aria-current] { color:var(--blue); background:var(--blue-bg); }
   footer { padding-bottom:90px!important; }
   .card.flex { flex-wrap:wrap; gap:12px; }
   .data-table { min-width:650px; }
@@ -300,7 +303,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline:3px so
 
 .alert-toggles { display:flex; flex-direction:column; gap:16px; }
 .alert-toggles label { display:flex; align-items:center; gap:12px; min-height:44px; }
-.alert-toggles input { width:22px; height:22px; accent-color:#173f35; }
+.alert-toggles input { width:22px; height:22px; accent-color:var(--blue); }
 @supports (padding: env(safe-area-inset-top)) { header { padding-top:env(safe-area-inset-top); } }
 
 /* Workspace design system: quiet surfaces, readable data, deliberate navigation. */
@@ -434,3 +437,34 @@ body{font-size:14px;letter-spacing:-.012em}h1,h2,h3,h4,h5,h6{font-family:'Inter'
 .meter>span{position:absolute;inset:0 auto 0 0;border-radius:999px;background:var(--blue)}
 .meter.good>span{background:var(--green)} .meter.weak>span{background:var(--amber)}
 .muted{color:var(--text-secondary)} .faint{color:var(--text-muted)}
+
+/* ---- One theme for every page ----------------------------------------------------------------------------
+   Selectors: page sections use .tab-bar (underline); filters and segment choices use pills. The legacy
+   selector classes below all render as the same pill so every page looks alike. */
+:where(input[type=checkbox],input[type=radio]){accent-color:var(--blue);width:16px;height:16px}
+.segment-selector,.paper-tabs,.news-controls{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.segment-selector button,.paper-tabs button,.news-controls button,.btn-filter{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:7px 14px;border:1px solid #dbe3ea;border-radius:999px;background:#fff;color:var(--text-secondary);font-size:13px;font-weight:600;text-align:left;box-shadow:none}
+.segment-selector button:hover,.paper-tabs button:hover,.news-controls button:hover,.btn-filter:hover{border-color:var(--blue);color:var(--blue)}
+.segment-selector button[aria-pressed="true"],.paper-tabs button[aria-pressed="true"],.news-controls button[aria-pressed="true"],
+.btn-filter-active-green,.btn-filter-active-purple,.btn-filter-active-amber,.btn-filter-active-blue{background:var(--blue-bg)!important;border-color:var(--blue)!important;color:var(--blue)!important;box-shadow:none!important;background-image:none!important}
+.segment-selector small,.paper-tabs small{display:inline;margin:0 0 0 2px;font-size:12px;font-weight:500;color:var(--text-muted)}
+.segment-selector button[aria-pressed="true"] small{color:var(--blue)}
+/* Page header: optional eyebrow, title, one-line description, actions on the right. */
+.page-title{margin-bottom:22px}
+.page-title .eyebrow{color:var(--text-muted);margin:0}
+.page-title h2{margin:4px 0 8px}
+.page-title p:not(.eyebrow){max-width:900px;line-height:1.6}
+/* Collapsible panel (e.g. automation status): one summary line, details on demand. */
+.panel-details{padding:0}.panel-details>summary{list-style:none;cursor:pointer;padding:16px 22px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.panel-details>summary::-webkit-details-marker{display:none}
+.panel-details>summary::after{content:'Show details';margin-left:auto;font-size:12px;font-weight:600;color:var(--blue)}
+.panel-details[open]>summary::after{content:'Hide details'}
+.panel-details>.panel-body{padding:0 22px 18px}
+/* Lists of links (news headlines, filings). */
+.link-list>*{padding:12px 0;border-bottom:1px solid var(--border)}.link-list>*:last-child{border-bottom:0}
+.link-list a{color:var(--text);font-weight:600;text-decoration:none}.link-list a:hover{color:var(--blue);text-decoration:underline}
+/* Section headings inside cards share one size, whatever utility classes a page used. */
+.card :is(h1.text-2xl,h2.text-xl,h2.text-2xl,h2.text-lg){font-size:18px;font-weight:600;letter-spacing:-.3px;line-height:1.35}
+.card h3.font-semibold{font-size:15px}
+/* Labels wrapping a checkbox or radio stay on one line with the control. */
+label:has(> input[type=checkbox]),label:has(> input[type=radio]){display:inline-flex;align-items:center;gap:8px}

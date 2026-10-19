@@ -40,7 +40,7 @@ function StockCard({ stock, expanded, onToggle }: { stock: DiscoveredStock; expa
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-bold text-[var(--text)]" style={{ fontFamily: 'Poppins' }}>{stock.symbol}</h3>
+              <h3 className="font-bold text-[var(--text)]">{stock.symbol}</h3>
               <SignalBadge signal={stock.signal} />
               <TrendBadge trend={stock.trend} />
             </div>
@@ -48,7 +48,7 @@ function StockCard({ stock, expanded, onToggle }: { stock: DiscoveredStock; expa
           </div>
         </div>
         <div className="text-right">
-          <div className="text-lg font-bold" style={{ fontFamily: 'Poppins' }}>₹{stock.ltp.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
+          <div className="text-lg font-bold">₹{stock.ltp.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
           <div className={`text-sm font-bold ${stock.changePct >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
             {stock.changePct >= 0 ? '+' : ''}{stock.changePct.toFixed(2)}%
           </div>
@@ -165,7 +165,7 @@ export function DiscoveryPage() {
 
   return (
     <div className="space-y-6">
-      <div className="page-title"><div><p className="eyebrow">MARKET RESEARCH</p><h2>Find your next idea.</h2><p>Explore observed signals. Review the evidence before taking risk.</p></div></div>
+      <div className="page-title"><div><p className="eyebrow">Market research</p><h2>Discover</h2><p>Stocks scored by the live scanner, with how accurate past scores turned out. Review the evidence before taking risk.</p></div></div>
       {/* Scanner status */}
       <div className="card flex items-center justify-between">
         <div className="flex items-center gap-4">

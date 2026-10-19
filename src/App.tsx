@@ -65,7 +65,7 @@ export default function App() {
    <nav className="mobile-nav" aria-label="Primary navigation">{([{ id: 'Analysis', label: 'Analysis', Icon: LineChart }, { id: 'Signals', label: 'Signals', Icon: Radar }, { id: 'Stacks', label: 'Investing', Icon: Layers }, { id: 'Paper trading', label: 'Paper', Icon: BookOpen }, { id: 'IPO', label: 'IPO', Icon: Building2 }]).map(({ id, label, Icon }) => <button key={id} aria-current={activeTab === id || (id === 'Stacks' && INVESTING_IDS.has(activeTab)) ? 'page' : undefined} onClick={() => setActiveTab(id)}><Icon size={20} /><span>{label}</span></button>)}</nav>
    <footer className="workspace-footer text-center text-[11px] text-[var(--text-muted)] py-8 mt-4 border-t border-[rgba(0,0,0,0.04)]">
     <div className="max-w-[1600px] mx-auto px-8 space-y-1">
-     <p className="font-medium text-[var(--text-secondary)]" style={{ fontFamily: 'Poppins' }}>AlgoTrader India</p>
+     <p className="font-medium text-[var(--text-secondary)]">AlgoTrader India</p>
      <p>Paper trading only • v2.0 • NSE • Not financial advice • Market data: Upstox (read-only), NSE, Google News</p>
     </div>
    </footer>

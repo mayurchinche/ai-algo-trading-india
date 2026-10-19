@@ -32,7 +32,7 @@ function StockCard({ stock, variant }: { stock: DiscoveredStock; variant: 'short
       <div className="flex items-start justify-between mb-3">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-base font-bold" style={{ fontFamily: 'Poppins' }}>{stock.symbol}</span>
+            <span className="text-base font-bold">{stock.symbol}</span>
             <SignalBadge signal={stock.signal} />
           </div>
           <div className="text-[11px] text-[var(--text-secondary)] mt-0.5">{stock.name} • {stock.exchange}</div>
@@ -88,7 +88,7 @@ function StockCard({ stock, variant }: { stock: DiscoveredStock; variant: 'short
       {variant === 'smart' && (
         <div className="p-2.5 rounded-lg bg-[rgba(245,158,11,0.06)] border border-[rgba(245,158,11,0.15)] mb-3">
           <div className="flex items-center gap-1.5 mb-1">
-            <span className="text-[10px] font-bold text-[var(--amber, #f59e0b)]">🦊 VOLUME PATTERN</span>
+            <span className="text-[10px] font-bold text-[var(--amber, #f59e0b)]">VOLUME PATTERN</span>
           </div>
           <div className="text-[11px] text-[var(--amber, #f59e0b)]">
             Volume ratio: <strong>{stock.volumeRatio.toFixed(1)}x</strong> avg • {stock.volumeRatio >= 2 ? 'High relative volume; participants unknown' : stock.volumeRatio >= 1.5 ? 'Elevated relative volume' : 'Normal flow'}
@@ -151,37 +151,24 @@ export function SmartPicksPage() {
 
 
   return (
-    <div className="space-y-6"><div className="notice">Calculated equity research from provider observations. Scores and price targets are unvalidated hypotheses, not profit probabilities. Options are unavailable until verified contract data is connected.</div>
-      {/* View toggle */}
-      <div className="card flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <button onClick={() => setView('short')} className={`btn-filter ${view === 'short' ? 'btn-filter-active-green' : 'btn-filter-inactive'}`}>
-            🚀 Short-Term ({shortTerm.length})
-          </button>
-          <button onClick={() => setView('long')} className={`btn-filter ${view === 'long' ? 'btn-filter-active-purple' : 'btn-filter-inactive'}`}>
-            💎 Long-Term ({longTerm.length})
-          </button>
-          <button onClick={() => setView('smartmoney')} className={`btn-filter ${view === 'smartmoney' ? 'btn-filter-active-amber' : 'btn-filter-inactive'}`}>
-            🦊 Volume Pattern ({smartMoney.length})
-          </button>
-          <button onClick={() => setView('options')} className={`btn-filter ${view === 'options' ? 'btn-filter-active-blue' : 'btn-filter-inactive'}`}>
-            📊 Options F&O · Unavailable
-          </button>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="text-[11px] text-[var(--text-secondary)]">
-            {lastScan ? `Last scan: ${lastScan.toLocaleTimeString('en-IN')}` : 'Scanning...'} • Provider research snapshots
-          </div>
-          <button onClick={rescan} disabled={loading} className="text-[11px] text-[var(--blue)] font-semibold hover:underline">
-            {loading ? '⏳ Scanning...' : '↻ Rescan'}
-          </button>
-        </div>
+    <div className="space-y-6">
+      <div className="page-title"><div><h2>Watch ideas</h2><p>Stocks scanned for momentum, long-term trend and volume patterns. Scores and targets are unvalidated research hypotheses.</p></div>
+        <button className="btn btn-secondary" onClick={rescan} disabled={loading}>{loading ? 'Scanning…' : 'Rescan'}</button></div>
+      <div className="notice">Calculated equity research from provider observations. Scores and price targets are unvalidated hypotheses, not profit probabilities. Options are unavailable until verified contract data is connected.</div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <nav className="segment-selector !mb-0" aria-label="Idea type">
+          <button aria-pressed={view === 'short'} onClick={() => setView('short')}>Short-term<small>{shortTerm.length}</small></button>
+          <button aria-pressed={view === 'long'} onClick={() => setView('long')}>Long-term<small>{longTerm.length}</small></button>
+          <button aria-pressed={view === 'smartmoney'} onClick={() => setView('smartmoney')}>Volume pattern<small>{smartMoney.length}</small></button>
+          <button aria-pressed={view === 'options'} onClick={() => setView('options')}>Options F&amp;O<small>unavailable</small></button>
+        </nav>
+        <span className="text-xs faint">{lastScan ? `Last scan ${lastScan.toLocaleTimeString('en-IN')}` : 'Scanning…'} · provider research snapshots</span>
       </div>
 
       {/* Error state */}
       {error && (
         <div className="card" style={{ borderLeft: '3px solid var(--red)' }}>
-          <div className="text-[12px] text-[var(--red)]">⚠ Discovery error: {error}</div>
+          <div className="text-[12px] text-[var(--red)]">Discovery error: {error}</div>
           <button onClick={rescan} className="text-[11px] text-[var(--blue)] mt-1 hover:underline">Retry</button>
         </div>
       )}
@@ -189,8 +176,8 @@ export function SmartPicksPage() {
       {/* Loading state */}
       {loading && stocks.length === 0 && (
         <div className="card text-center py-12">
-          <div className="text-2xl mb-3">🔍</div>
-          <div className="text-sm font-semibold text-[var(--text)]" style={{ fontFamily: 'Poppins' }}>Scanning NSE for Opportunities...</div>
+          
+          <div className="text-sm font-semibold text-[var(--text)]">Scanning NSE for opportunities…</div>
           <div className="text-[11px] text-[var(--text-secondary)] mt-1">Analyzing momentum, breakouts, trends & smart money flow</div>
         </div>
       )}
@@ -199,7 +186,7 @@ export function SmartPicksPage() {
       {view === 'short' && !loading && (
         <div className="space-y-6">
           <div className="section-header">
-            <span className="text-gradient-green">🚀 Momentum candidates</span>
+            <span>Momentum candidates</span>
             <span className="badge badge-green">MOMENTUM + BREAKOUT</span>
             <span className="text-[11px] text-[var(--text-secondary)] ml-auto">{shortTerm.length} stocks found</span>
           </div>
@@ -217,7 +204,7 @@ export function SmartPicksPage() {
       {view === 'long' && !loading && (
         <div className="space-y-6">
           <div className="section-header">
-            <span className="text-gradient-purple">💎 Trend candidates (SMA200)</span>
+            <span>Trend candidates (SMA200)</span>
             <span className="badge badge-purple">TREND FOLLOWING</span>
             <span className="text-[11px] text-[var(--text-secondary)] ml-auto">{longTerm.length} stocks found</span>
           </div>
@@ -235,7 +222,7 @@ export function SmartPicksPage() {
       {view === 'smartmoney' && !loading && (
         <div className="space-y-6">
           <div className="section-header">
-            <span className="text-gradient-gold">🦊 Volume Pattern Flow</span>
+            <span>Volume pattern flow</span>
             <span className="badge badge-amber">PRICE + VOLUME</span>
             <span className="text-[11px] text-[var(--text-secondary)] ml-auto">{smartMoney.length} stocks detected</span>
           </div>

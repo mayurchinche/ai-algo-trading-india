@@ -16,9 +16,11 @@ const detail = (j: AutomationJob) => [j.status && j.status.replaceAll('_', ' ').
 export function AutomationStatus({ state, now = Date.now() }: { state: AutomationState | null; now?: number }) {
  const age = state ? (now - Date.parse(state.lastTickAt)) / 60000 : null;
  const live = age !== null && age < 3;
- return <section className="card space-y-2" aria-label="Automation status">
-  <div className="flex items-center gap-2"><span className={`badge ${live ? 'badge-green' : 'badge-amber'}`}>{live ? 'Automation running' : state ? 'Automation idle' : 'Automation not started'}</span>
-   <span className="text-sm">{state ? `Last run ${formatIST(state.lastTickAt)} · ${state.ticksToday} runs on ${state.day}${live ? '' : ' · runs every minute 09:15–15:35 IST on trading days'}` : 'The scheduler has not run since this version was deployed. It runs every minute 09:15–15:35 IST on trading days.'}</span></div>
-  {state && <table className="data-table text-sm"><tbody>{LABELS.map(([k, label, when]) => { const j = state.jobs[k]; return <tr key={k}><td>{label}<br /><small className="text-[var(--text-muted)]">{when}</small></td><td>{j ? formatIST(j.at) : 'not yet'}</td><td className={j?.status === 'FAILED' ? 'text-[var(--red)]' : ''}>{j ? detail(j) || 'done' : '—'}</td></tr>; })}</tbody></table>}
- </section>;
+ const failed = state ? LABELS.filter(([k]) => state.jobs[k]?.status === 'FAILED').length : 0;
+ // One summary line; the per-job table opens on demand, and opens by itself when a job failed.
+ return <details className="card panel-details" aria-label="Automation status" open={failed > 0}>
+  <summary><span className={`badge ${failed ? 'badge-red' : live ? 'badge-green' : 'badge-amber'}`}>{failed ? `${failed} job${failed > 1 ? 's' : ''} failed` : live ? 'Automation running' : state ? 'Automation idle' : 'Automation not started'}</span>
+   <span className="text-sm muted">{state ? `Last run ${formatIST(state.lastTickAt)} · ${state.ticksToday} runs on ${state.day}${live ? '' : ' · runs every minute 09:15–15:35 IST on trading days'}` : 'The scheduler has not run since this version was deployed. It runs every minute 09:15–15:35 IST on trading days.'}</span></summary>
+  {state && <div className="panel-body overflow-x-auto"><table className="data-table text-sm"><tbody>{LABELS.map(([k, label, when]) => { const j = state.jobs[k]; return <tr key={k}><td>{label}<br /><small className="text-[var(--text-muted)]">{when}</small></td><td className="whitespace-nowrap">{j ? formatIST(j.at) : 'not yet'}</td><td className={j?.status === 'FAILED' ? 'text-[var(--red)]' : ''}>{j ? detail(j) || 'done' : '—'}</td></tr>; })}</tbody></table></div>}
+ </details>;
 }

@@ -5,13 +5,13 @@ import { fetchLiveIPOs, getLastIPOFetchError, type IPOData } from '../services/i
 
 function ScoreBadge({ score, recommendation }: { score: number | null; recommendation: string }) {
   if (score === null) return <span className="badge badge-amber">Insufficient data</span>;
-  const color = score >= 70 ? 'from-green-500 to-emerald-600' : score >= 50 ? 'from-blue-500 to-indigo-600' : score >= 35 ? 'from-amber-500 to-orange-600' : 'from-red-500 to-rose-600';
+  const tone = score >= 70 ? 'badge-green' : score >= 50 ? 'badge-blue' : score >= 35 ? 'badge-amber' : 'badge-red';
   return (
     <div className="ipo-score flex items-center gap-2">
-      <div className={`w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center text-white font-bold text-sm shadow-lg`}>
+      <div className={`badge ${tone} w-10 h-10 shrink-0 !p-0 justify-center !rounded-xl text-sm font-mono`}>
         {score}
       </div>
-      <span className={`text-xs font-bold ${score >= 70 ? 'text-[var(--green)]' : score >= 50 ? 'text-[var(--blue)]' : score >= 35 ? 'text-amber-500' : 'text-[var(--red)]'}`}>
+      <span className={`text-xs font-bold ${score >= 70 ? 'text-[var(--green)]' : score >= 50 ? 'text-[var(--blue)]' : score >= 35 ? 'text-[var(--amber)]' : 'text-[var(--red)]'}`}>
         {recommendation}
       </span>
     </div>
@@ -19,19 +19,8 @@ function ScoreBadge({ score, recommendation }: { score: number | null; recommend
 }
 
 function StatusPill({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    open: 'bg-green-100 text-green-700 border-green-200',
-    upcoming: 'bg-blue-100 text-blue-700 border-blue-200',
-    listed: 'bg-purple-100 text-purple-700 border-purple-200',
-    closed: 'bg-gray-100 text-gray-600 border-gray-200',
-    unknown: 'bg-gray-100 text-gray-600 border-gray-200',
-  };
-  const icons: Record<string, string> = { open: '🟢', upcoming: '🔵', listed: '🟣', closed: '⚪', unknown: '⚪' };
-  return (
-    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${styles[status] || styles.unknown}`}>
-      {icons[status] || '⚪'} {status}
-    </span>
-  );
+  const tone: Record<string, string> = { open: 'badge-green', upcoming: 'badge-blue', listed: 'badge-purple', closed: '', unknown: '' };
+  return <span className={`badge ${tone[status] ?? ''} uppercase !text-[10px]`}>{status}</span>;
 }
 
 export function IPOPage() {
@@ -70,66 +59,34 @@ export function IPOPage() {
 
   const filters = [
     { id: 'all', label: 'All IPOs', count: ipos.length },
-    { id: 'open', label: '🟢 Open', count: ipos.filter(i => i.status === 'open').length },
-    { id: 'upcoming', label: '🔵 Upcoming', count: ipos.filter(i => i.status === 'upcoming').length },
-    { id: 'closed', label: '🟠 Closed', count: ipos.filter(i => i.status === 'closed').length },
-    { id: 'listed', label: '🟣 Listed', count: ipos.filter(i => i.status === 'listed').length },
+    { id: 'open', label: 'Open', count: ipos.filter(i => i.status === 'open').length },
+    { id: 'upcoming', label: 'Upcoming', count: ipos.filter(i => i.status === 'upcoming').length },
+    { id: 'closed', label: 'Closed', count: ipos.filter(i => i.status === 'closed').length },
+    { id: 'listed', label: 'Listed', count: ipos.filter(i => i.status === 'listed').length },
     { id: 'mainboard', label: 'Mainboard', count: ipos.filter(i => i.board === 'mainboard').length },
     { id: 'sme', label: 'SME', count: ipos.filter(i => i.board === 'sme').length },
   ];
 
   return (
     <div className="space-y-6">
-      {/* Summary cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-5">
-        <div className="card text-center">
-          <div className="text-2xl font-bold text-[var(--green)]" style={{ fontFamily: 'Poppins' }}>{ipos.filter(i => i.status === 'open').length}</div>
-          <div className="text-[10px] text-[var(--text-muted)] uppercase">Open Now</div>
-        </div>
-        <div className="card text-center">
-          <div className="text-2xl font-bold text-[var(--blue)]" style={{ fontFamily: 'Poppins' }}>{ipos.filter(i => i.status === 'upcoming').length}</div>
-          <div className="text-[10px] text-[var(--text-muted)] uppercase">Upcoming</div>
-        </div>
-        <div className="card text-center">
-          <div className="text-2xl font-bold text-purple-600" style={{ fontFamily: 'Poppins' }}>{ipos.filter(i => i.recommendation === 'High research score').length}</div>
-          <div className="text-[10px] text-[var(--text-muted)] uppercase">High research score</div>
-        </div>
-        <div className="card text-center">
-          <div className="text-2xl font-bold text-[var(--text)]" style={{ fontFamily: 'Poppins' }}>{ipos.length}</div>
-          <div className="text-[10px] text-[var(--text-muted)] uppercase">Total Tracked</div>
-        </div>
-        <div className="card text-center">
-          <div className="text-[11px] text-[var(--text-secondary)]">
-            {lastFetch ? `Updated ${lastFetch.toLocaleTimeString('en-IN')}` : '—'}
-          </div>
-          <div className="text-[10px] text-[var(--text-muted)] uppercase">Fetch attempt time</div>
-        </div>
+      <div className="page-title"><div><h2>IPO analysis</h2><p>Mainboard and SME issues with grey-market premium, subscription and our research score. Third-party observations, not listing forecasts.</p></div>
+       <button className="btn btn-secondary" onClick={load}>Refresh</button></div>
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+       {([['Open now', ipos.filter(i => i.status === 'open').length], ['Upcoming', ipos.filter(i => i.status === 'upcoming').length], ['High research score', ipos.filter(i => i.recommendation === 'High research score').length], ['Total tracked', ipos.length]] as const).map(([label, n]) => <div key={label} className="metric-tile"><span className="text-xs muted">{label}</span><strong className="font-mono text-xl">{n}</strong></div>)}
+       <div className="metric-tile"><span className="text-xs muted">Last fetch attempt</span><strong className="text-sm">{lastFetch ? lastFetch.toLocaleTimeString('en-IN') : '—'}</strong></div>
       </div>
 
       <section className="card space-y-2"><h3>IPO research only</h3><p>GMP is an unofficial third-party observation. The score is an unvalidated ranking, not a listing-gain forecast. Verify offer documents, lot size, category and mandate deadlines with your broker.</p><p>Broker applications are unavailable: no verified execution integration is connected. This app does not collect broker PINs, tokens or TOTP secrets.</p></section>
 
       {/* Filters */}
-      <div className="flex gap-2 flex-wrap items-center">
-        {filters.map(f => (
-          <button
-            key={f.id}
-            onClick={() => setFilter(f.id as any)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-all ${
-              filter === f.id ? 'bg-blue-50 border-blue-200 text-blue-700' : 'border-[var(--border)] text-[var(--text-secondary)] hover:bg-gray-50'
-            }`}
-          >
-            {f.label} <span className="ml-1 opacity-60">({f.count})</span>
-          </button>
-        ))}
-        <button onClick={load} className="ml-auto text-[11px] text-[var(--blue)] hover:underline font-medium">
-          🔄 Refresh
-        </button>
-      </div>
+      <nav className="segment-selector" aria-label="IPO filter">
+        {filters.map(f => <button key={f.id} aria-pressed={filter === f.id} onClick={() => setFilter(f.id as typeof filter)}>{f.label}<small>{f.count}</small></button>)}
+      </nav>
 
       {/* Loading */}
       {loading && ipos.length === 0 && (
         <div className="card text-center py-12">
-          <div className="text-3xl mb-3">📋</div>
+          
           <p className="text-sm font-semibold">Fetching IPO observations from InvestorGain...</p>
           <p className="text-xs text-[var(--text-muted)] mt-1">Provider-reported GMP, subscription and ratings snapshots</p>
         </div>
@@ -163,10 +120,10 @@ export function IPOPage() {
                   {ipo.board === 'sme' && <span className="text-[9px] bg-violet-100 text-violet-700 px-1.5 py-0.5 rounded-full font-bold">SME</span>}
                 </div>
                 <div className="flex items-center gap-4 text-[11px] text-[var(--text-secondary)] flex-wrap">
-                  {ipo.open_date && <span>📅 {ipo.open_date}{ipo.close_date ? ` → ${ipo.close_date}` : ''}</span>}
-                  {ipo.price && <span>💰 ₹{ipo.price}</span>}
-                  {ipo.lot_size && <span>📦 Lot: {ipo.lot_size}</span>}
-                  {ipo.issue_size_cr && <span>📊 ₹{ipo.issue_size_cr}cr</span>}
+                  {ipo.open_date && <span>{ipo.open_date}{ipo.close_date ? ` → ${ipo.close_date}` : ''}</span>}
+                  {ipo.price && <span>₹{ipo.price}</span>}
+                  {ipo.lot_size && <span>Lot: {ipo.lot_size}</span>}
+                  {ipo.issue_size_cr && <span>₹{ipo.issue_size_cr}cr</span>}
                   {ipo.pe_ratio && <span>P/E: {ipo.pe_ratio.toFixed(1)}x</span>}
                 </div>
               </div>
@@ -187,7 +144,7 @@ export function IPOPage() {
               {ipo.subscription_total != null && (
                 <div className="flex items-center gap-1.5 flex-wrap min-w-0">
                   <span className="text-[10px] text-[var(--text-muted)]">Sub:</span>
-                  <span className="text-xs font-bold text-purple-600">{ipo.subscription_total.toFixed(2)}x</span>
+                  <span className="text-xs font-bold text-[var(--text)]">{ipo.subscription_total.toFixed(2)}x</span>
                   {ipo.subscription_qib != null && (
                     <span className="text-[10px] text-[var(--text-muted)]">
                       QIB {ipo.subscription_qib.toFixed(1)}x • NII {ipo.subscription_nii == null ? 'Unavailable' : ipo.subscription_nii.toFixed(1) + 'x'} • RII {ipo.subscription_rii == null ? 'Unavailable' : ipo.subscription_rii.toFixed(1) + 'x'}
@@ -224,7 +181,7 @@ export function IPOPage() {
                 {/* Live Subscription Breakdown */}
                 {ipo.subscription_qib != null && (
                   <div>
-                    <h4 className="text-[10px] font-bold text-[var(--text-muted)] uppercase mb-2">📊 Reported subscription snapshot</h4>
+                    <h4 className="text-[10px] font-bold text-[var(--text-muted)] uppercase mb-2">Reported subscription snapshot</h4>
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                       <div className="text-center p-3 rounded-xl bg-[var(--bg-alt)]">
                         <div className={`text-base font-bold ${(ipo.subscription_total || 0) > 1 ? 'text-[var(--green)]' : 'text-[var(--text)]'}`}>
