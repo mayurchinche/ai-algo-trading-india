@@ -16,6 +16,8 @@ export interface PaperRunSummary {
  events: PaperEvent[];
  paper: { lastBarTime: number | null; lastCycleAt: string | null; cycles: number; missedBars: number; eventSeq?: number; lastOutcome: string | null };
 }
+export interface AutomationJob { at: string; status?: string; reason?: string; runs?: number; outcomes?: Record<string, number>; signals?: number; failures?: number; strategy?: string; [k: string]: unknown }
+export interface AutomationState { lastTickAt: string; lastJob: string | null; lastDurationMs: number; ticksToday: number; day: string; jobs: Partial<Record<'paper' | 'marketDay' | 'scan' | 'validate' | 'fundamentals', AutomationJob>> }
 export interface LedgerRow { seq: number; recorded_at: string; kind: string; event: PaperEvent }
 async function call<T>(init?: RequestInit, query = ''): Promise<T> {
  const r = await fetch(apiUrl('/api/spec-paper' + query), { ...init, signal: AbortSignal.timeout(30000), headers: init?.body ? { 'Content-Type': 'application/json' } : undefined });
@@ -23,7 +25,7 @@ async function call<T>(init?: RequestInit, query = ''): Promise<T> {
  if (!r.ok) throw new Error(b.error + (Array.isArray(b.issues) ? ': ' + b.issues.map((i: { path: string; message: string }) => `${i.path} ${i.message}`).join('; ') : ''));
  return b as T;
 }
-export const listRuns = () => call<{ runs: PaperRunSummary[] }>().then(b => b.runs);
+export const listRuns = () => call<{ runs: PaperRunSummary[]; automation: AutomationState | null }>();
 export const createRun = (spec: StrategySpec, options: PaperOptions, id = crypto.randomUUID()) => call<{ run: PaperRunSummary }>({ method: 'POST', body: JSON.stringify({ action: 'create', id, spec, options }) }).then(b => b.run);
 export const stopRun = (id: string) => call<{ run: PaperRunSummary }>({ method: 'POST', body: JSON.stringify({ action: 'stop', id }) }).then(b => b.run);
 // Pages through the run's complete, permanent ledger.

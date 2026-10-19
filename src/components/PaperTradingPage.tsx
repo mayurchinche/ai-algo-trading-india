@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listRuns, stopRun, fetchLedger, ledgerCsv, type PaperRunSummary, type PaperEvent } from '../services/specPaper';
+import { listRuns, stopRun, fetchLedger, ledgerCsv, type PaperRunSummary, type PaperEvent, type AutomationState } from '../services/specPaper';
+import { AutomationStatus } from './AutomationStatus';
 import { formatIST } from '../services/tradingTime';
 import { SEGMENTS } from '../../shared/tradingHorizon';
 
@@ -53,19 +54,20 @@ export function RunDetail({ run, onStop }: { run: PaperRunSummary; onStop?: () =
  </section>;
 }
 export function PaperTradingPage() {
- const [runs, setRuns] = useState<PaperRunSummary[]>([]); const [error, setError] = useState(''); const [loading, setLoading] = useState(true); const [selected, setSelected] = useState<string>(); const [segment, setSegment] = useState('all');
- const load = useCallback(() => { setLoading(true); listRuns().then(r => { setRuns(r); setError(''); }).catch(e => setError(e instanceof Error ? e.message : 'Runs unavailable')).finally(() => setLoading(false)); }, []);
+ const [runs, setRuns] = useState<PaperRunSummary[]>([]); const [automation, setAutomation] = useState<AutomationState | null>(null); const [error, setError] = useState(''); const [loading, setLoading] = useState(true); const [selected, setSelected] = useState<string>(); const [segment, setSegment] = useState('all');
+ const load = useCallback(() => { setLoading(true); listRuns().then(r => { setRuns(r.runs); setAutomation(r.automation); setError(''); }).catch(e => setError(e instanceof Error ? e.message : 'Runs unavailable')).finally(() => setLoading(false)); }, []);
  useEffect(() => { load(); const t = setInterval(load, 30000); return () => clearInterval(t); }, [load]);
  const shown = useMemo(() => runs.filter(r => segment === 'all' || r.segment === segment), [runs, segment]);
  const detail = shown.find(r => r.id === selected) ?? shown[0];
  const totals = shown.reduce((a, r) => ({ net: a.net + r.netPnl, charges: a.charges + r.costs, trades: a.trades + r.trades, wins: a.wins + r.wins, active: a.active + (r.status === 'ACTIVE' ? 1 : 0) }), { net: 0, charges: 0, trades: 0, wins: 0, active: 0 });
  return <div className="space-y-6">
-  <div className="page-title"><div><h2>Paper trading</h2><p>Every strategy run in all segments, executed like live trading on live market data. Start runs from Signals or the Strategy lab.</p></div><button className="btn btn-secondary" disabled={loading} onClick={load}>{loading ? 'Loading…' : 'Refresh'}</button></div>
+  <div className="page-title"><div><h2>Paper trading</h2><p>Fully automated: every validated signal opens its own paper run, which enters, manages stops and targets, exits and records every order and charge without any action from you. You can also start runs from Signals or the Strategy lab.</p></div><button className="btn btn-secondary" disabled={loading} onClick={load}>{loading ? 'Loading…' : 'Refresh'}</button></div>
   <section className="notice text-sm" role="note">Paper simulation only: no order reaches a broker. Each minute the scheduler checks resting stop-loss (SL-M) and target (LIMIT) orders against the contract's 1-minute candles and the live price, squares off intraday positions on time, and executes new decisions at the live order book: market orders walk the visible 5-level depth, entries need the broker's margin quote and enough paper funds, and charges follow the published broker tariff (brokerage, STT, exchange, SEBI, stamp duty, GST, DP). Every order and trade is kept permanently in the run's ledger.</section>
+  <AutomationStatus state={automation} />
   <nav className="segment-selector" aria-label="Segment">{[{ id: 'all', label: 'All segments' }, ...SEGMENTS].map(s => <button key={s.id} aria-pressed={segment === s.id} onClick={() => { setSegment(s.id); setSelected(undefined); }}>{s.label}<small>{s.id === 'all' ? `${runs.length} runs` : `${runs.filter(r => r.segment === s.id).length} runs`}</small></button>)}</nav>
   {error && <section className="card" role="status"><p>{error}</p></section>}
   {!!shown.length && <div className="grid grid-cols-2 md:grid-cols-5 gap-2"><Stat label="Active runs" value={String(totals.active)} /><Stat label="Net P&L" value={rupees(totals.net)} className={tone(totals.net)} /><Stat label="Charges" value={rupees(totals.charges)} /><Stat label="Closed trades" value={String(totals.trades)} /><Stat label="Win rate" value={totals.trades ? pct(totals.wins / totals.trades) : '—'} /></div>}
-  {!loading && !error && !shown.length && <section className="card"><p>No paper runs in this segment yet. Open Signals and choose “Paper trade” on a signal, or start a run from the Strategy lab.</p></section>}
+  {!loading && !error && !shown.length && <section className="card"><p>No paper runs in this segment yet. Runs open automatically when a validated strategy signals; until strategies are validated and a setup appears there is nothing to trade. You can also start a run from Signals or the Strategy lab.</p></section>}
   {!!shown.length && <section className="card"><div className="overflow-x-auto"><table className="data-table"><thead><tr><th>Run</th><th>Segment</th><th>Underlying</th><th>Status</th><th>Position</th><th className="text-right">Net P&L</th><th className="text-right">Trades</th><th className="text-right">Win rate</th><th>Started</th></tr></thead>
    <tbody>{shown.map(r => <tr key={r.id} aria-selected={detail?.id === r.id} onClick={() => setSelected(r.id)} style={{ cursor: 'pointer' }}><td className="font-semibold">{r.name}</td><td>{segmentLabel(r.segment)}</td><td>{r.underlying.symbol}</td><td>{r.status.toLowerCase()}</td><td>{r.position.toLowerCase()}</td><td className={`text-right font-mono ${tone(r.netPnl)}`}>{rupees(r.netPnl)}</td><td className="text-right">{r.trades}</td><td className="text-right">{pct(r.stats.winRate)}</td><td>{formatIST(r.createdAt)}</td></tr>)}</tbody></table></div></section>}
   {detail && <RunDetail run={detail} onStop={() => stopRun(detail.id).then(r => setRuns(old => old.map(x => x.id === r.id ? r : x))).catch(e => setError(e instanceof Error ? e.message : 'Stop failed'))} />}

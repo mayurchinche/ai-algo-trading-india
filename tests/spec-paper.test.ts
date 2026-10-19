@@ -118,7 +118,7 @@ test('API validates specs and options, creates idempotently, stops with a versio
   create:async(id:string,spec:any,options:any,state:any)=>{if(!rows.has(id))rows.set(id,{id,status:'ACTIVE',version:0,spec,options,state,created_at:'c',updated_at:'u'});return rows.get(id);},
   commit:async(id:string,v:number,state:any,status:string,events:any[])=>{const r=rows.get(id);if(!r||r.version!==v)return null;Object.assign(r,{state,status,version:v+1});r.ledger=[...(r.ledger??[]),...events.map((e:any,k:number)=>({seq:(r.ledger?.length??0)+k+1,kind:e.kind,event:e}))];return r;},
   events:async(id:string,after:number,limit:number)=>(rows.get(id)?.ledger??[]).filter((e:any)=>e.seq>after).slice(0,limit)});
- const h=createSpecPaperHandler({store,now:()=>t0}),post=(body:any)=>({method:'POST',headers:{host:'x'},body});
+ const h=createSpecPaperHandler({store,now:()=>t0,automation:{read:async()=>null} as any}),post=(body:any)=>({method:'POST',headers:{host:'x'},body});
  const id='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
  const ok=response();await h(post({action:'create',id,spec:equitySpec,options:opts}),ok);assert.equal(ok.code,201);assert.equal(ok.body.run.position,'FLAT');
  const bad=response();await h(post({action:'create',id,spec:{...equitySpec,legs:[]},options:opts}),bad);assert.equal(bad.code,400);assert(bad.body.issues.length);

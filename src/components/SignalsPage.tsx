@@ -3,6 +3,7 @@ import { fetchSignals, paperTradeSignal, type SignalsResponse, type Signal, type
 import { navigateTo, openAnalysis } from '../services/specDraft';
 import { formatIST } from '../services/tradingTime';
 import { SEGMENTS } from '../../shared/tradingHorizon';
+import { AutomationStatus } from './AutomationStatus';
 
 const pct = (n: number | null | undefined, d = 2) => n === null || n === undefined || !Number.isFinite(n) ? '—' : `${n.toFixed(d)}%`;
 const num = (n: number | null | undefined, d = 2) => n === null || n === undefined ? '—' : n === Infinity ? '∞' : n.toFixed(d);
@@ -51,6 +52,7 @@ export function SignalsPage() {
  return <div className="space-y-6">
   <div className="page-title"><div><h2>Signals</h2><p>Buy and sell signals from rules that have proven profitable after broker charges on 10 years of history. Every signal can be paper-traded{data?.autoPaper ? ', and each new signal is paper-traded automatically with ₹1 lakh so its live record builds up' : ''}.</p></div><button className="btn btn-secondary" disabled={loading} onClick={load}>{loading ? 'Loading…' : 'Refresh'}</button></div>
   <section className="notice text-sm" role="note">How a strategy earns signals: each rule runs with its published, fixed parameters over the full history of every stock in its universe, filling at the next bar with slippage and the itemised broker tariff. It must make money across the whole universe (at least 100 trades, profit factor 1.2 or more, positive in both halves of the history) and on the stock itself (at least 8 trades, profit factor 1.1 or more). Signals are produced only for stocks that pass both. Past results do not guarantee future returns; news, deals and fundamentals are shown in Analysis for your own judgement but do not change a validated rule.</section>
+  <AutomationStatus state={data?.automation ?? null} />
   <nav className="segment-selector" aria-label="Segment">{[{ id: 'all', label: 'All segments' }, ...SEGMENTS].map(s => { const n = (data?.signals ?? []).filter(x => x.status === 'ACTIVE' && (s.id === 'all' || x.segment === s.id)).length; return <button key={s.id} aria-pressed={segment === s.id} onClick={() => setSegment(s.id)}>{s.label}<small>{n} active</small></button>; })}</nav>
   {error && <section className="card" role="status"><p>{error}</p></section>}
   {data && segment !== 'all' && !passed.length && <section className="card"><p className="text-sm">No {SEGMENTS.find(s => s.id === segment)?.label.toLowerCase()} strategy has passed validation{strategies.some(s => s.status === 'NOT_VALIDATED_YET') ? ' yet (validation is still running)' : ''}, so this segment produces no signals. Rules that lose money after charges are not shown as signals. See the strategy table below for the measured results.</p></section>}

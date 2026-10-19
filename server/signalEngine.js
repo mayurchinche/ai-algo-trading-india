@@ -11,11 +11,10 @@ import {newPaperState,validatePaperOptions} from './specPaperRunner.js';
 import {readDeals,readFlows} from './marketIntel.js';
 export const SIGNAL_VERSION='library-signal-v1';
 const DAY=86400000;
-export const VALIDATION_DAYS=Object.freeze({'1d':3650,'15m':180});
+export const VALIDATION_DAYS=Object.freeze({'1d':3650,'15m':120});
 export const SCAN_DAYS=Object.freeze({'1d':420,'15m':12});
 export const VALIDATION_MAX_AGE=6*DAY;
 const code=(e,f)=>e instanceof MarketDataError?e.code:e?.code??f;
-const istMinute=ms=>{const d=new Date(ms+19800000);return d.getUTCHours()*60+d.getUTCMinutes();};
 async function mapLimit(items,limit,fn){const out=new Array(items.length);let next=0;await Promise.all(Array.from({length:Math.min(limit,items.length)},async()=>{while(next<items.length){const i=next++;out[i]=await fn(items[i]);}}));return out;}
 
 export function universeOf(strategy){
@@ -73,16 +72,19 @@ export function runIdFor(signalId){const h=createHash('sha256').update('paper:'+
 // A paper run for one signal: sized to the capital, a single trade, broker tariff and margin check.
 export function paperRunFor(signal,capital){
  const strategy=strategyById(signal.strategyId);if(!strategy)throw new Error('Unknown strategy');
+ // Derivative margin for one lot can exceed a small equity allocation; futures runs get at least ₹3 lakh.
+ if(strategy.segment==='futures')capital=Math.max(capital,300000);
  const units=Math.max(1,Math.floor(capital*0.95/signal.close));
  const spec=buildStrategySpec(strategy,{symbol:signal.symbol,units,lots:1});
  const options=validatePaperOptions({capital,slippageBps:5,maxUnitsPerOrder:null,costModel:'broker-tariff',requireMargin:true,singleTrade:true,signalId:signal.id});
  return {id:runIdFor(signal.id),spec,options};
 }
 
-export async function scanSignals({market,store,paperStore,now,budgetMs=40000,autoPaper=true,capital=100000}){
- const started=now(),validated=(await store.validations()).filter(v=>v.verdict==='VALIDATED'),m=istMinute(started),out={scanned:0,signals:[],failures:[],deferred:0,paper:[]};
- const daily=m>=15*60+35||m<9*60+15;
- const pairs=validated.map(v=>({v:v.record,s:strategyById(v.strategy_id)})).filter(p=>p.s&&(p.s.timeframe!=='1d'||daily));
+// timeframes: which strategy bar sizes to scan. Daily bars are read up to the previous session (the history
+// reader excludes today), so a daily scan in the morning acts on yesterday's close in today's session.
+export async function scanSignals({market,store,paperStore,now,budgetMs=40000,autoPaper=true,capital=100000,timeframes=['1d','15m']}){
+ const started=now(),validated=(await store.validations()).filter(v=>v.verdict==='VALIDATED'),out={scanned:0,signals:[],failures:[],deferred:0,paper:[]};
+ const pairs=validated.map(v=>({v:v.record,s:strategyById(v.strategy_id)})).filter(p=>p.s&&timeframes.includes(p.s.timeframe));
  await mapLimit(pairs,6,async({v,s})=>{
   if(now()-started>budgetMs){out.deferred++;return;}
   const u=universeOf(s).find(x=>x.symbol===v.symbol);if(!u)return;
@@ -97,7 +99,7 @@ export async function scanSignals({market,store,paperStore,now,budgetMs=40000,au
   try{const r=paperRunFor(sig,capital);await paperStore.create(r.id,r.spec,r.options,newPaperState(r.spec,r.options,now()));out.paper.push({signal:sig.id,run:r.id});}
   catch(e){out.paper.push({signal:sig.id,error:e instanceof Error&&/limit/.test(e.message)?'ACTIVE_RUN_LIMIT':'PAPER_RUN_FAILED'});}
  }
- return {status:out.failures.length?'PARTIAL':'COMPLETED',dailyStrategiesScanned:daily,...out};
+ return {status:out.failures.length?'PARTIAL':'COMPLETED',timeframes,validatedPairs:pairs.length,...out};
 }
 export async function runValidation({market,store,now}){
  const s=staleStrategy(await store.validations(),now());

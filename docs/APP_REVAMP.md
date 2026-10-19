@@ -74,19 +74,30 @@ What this means:
 - **Biases.** The universe is today’s NIFTY 50 applied to 2016 onward (survivorship bias). The decade was a rising market. Option spreads are validated only through their direction, because expired option prices are unavailable.
 - **The forward test now runs automatically.** Every signal is paper-traded live with full charges, which gives an out-of-sample record. Judge the strategies on that record, not on the backtest.
 
-## 4. Operations
+## 4. Operations: fully automated
 
-1. Apply migrations in Supabase, in this order:
-   - `20261020_spec_paper_ledger.sql`: event ledger, per-minute cycle.
-   - `20261021_trading_signals.sql`: validations, signals, deals and flows, 100 active runs, jobs.
-2. Make sure `UPSTOX_ANALYTICS_TOKEN` and `PAPER_SCHEDULER_SECRET` (Vercel, and `paper_scheduler_secret` in Vault) are set.
-3. Run one job by hand, for example `curl -X POST -H "Authorization: Bearer $SECRET" https://ai-algo-trading-india.vercel.app/api/signals?job=validate`. Repeat it until every strategy is validated (one per call). Then enable the jobs:
-   ```sql
-   select cron.alter_job(jobid, active:=true) from cron.job where jobname in ('signal-validate','signal-scan','market-day','spec-paper-cycle');
-   ```
-4. Leave `shared-paper-minute` (the retired intraday engine) disabled.
+One scheduler drives everything. The existing pg_cron job `shared-paper-minute` (every minute, 09:15–15:35 IST on weekdays) calls `/api/scheduled-paper`. That endpoint now runs the **automation tick** (`server/automation.js`), not the retired intraday engine:
+
+| When (IST) | Job |
+|---|---|
+| Every minute | Paper runs: stops and targets on 1-minute candles, square-off, decisions and fills at the live book |
+| 09:16 and 09:31 | Bulk/block deals and FII/DII flows for the previous session, then the daily-strategy signal scan. Daily signals use the previous close and are paper-traded in today’s session. |
+| Every 15 minutes | Intraday-strategy signal scan |
+| Every 5 minutes | Strategy validation, one strategy per run, when one is missing or older than six days |
+| Every 30 minutes | New NSE financial filings |
+
+New signals open single-trade paper runs automatically (₹1 lakh each, at least ₹3 lakh for futures). Each run stops by itself after its trade closes, after its entry is rejected, or when its signal bar passes without an entry.
+
+Every tick writes a heartbeat to `app_data` (`scheduler_status`). The Signals and Paper trading pages show when each job last ran and what it did.
+
+Settings (Vercel environment):
+- `AUTOMATION_ENABLED=false`: pauses everything.
+- `SIGNAL_AUTO_PAPER=false`: stops automatic paper runs.
+- `SIGNAL_PAPER_CAPITAL`: capital per automatic run.
+
+The separate `spec-paper-cycle`, `signal-*` and `market-day` cron jobs from the migrations are not needed while the tick runs. Leave them inactive.
 
 ## 5. Remaining cleanup
-- The legacy shared-paper server engine (`server/paperEngine.js`, `sharedPaper*.js`, `segmentPaper*.js`, `api/shared-paper.ts`, `api/scheduled-paper.ts`) and the browser scanner services it imports (`src/services/stockDiscovery.ts`, `discoveryScoring.ts`) are still used by Research portfolios and their tests. Remove them after Portfolios moves to the signal ledger.
+- The legacy shared-paper server engine (`server/paperEngine.js`, `sharedPaper*.js`, `segmentPaper*.js`, `server/scheduledPaper.js`, `api/shared-paper.ts`); the scheduler endpoint no longer calls it and the browser scanner services it imports (`src/services/stockDiscovery.ts`, `discoveryScoring.ts`) are still used by Research portfolios and their tests. Remove them after Portfolios moves to the signal ledger.
 - `src/services/backtestEngine.ts`, `signalHistory.ts` and `foregroundAlerts.ts` are referenced only by older tests (`tests/trading.test.ts`, `tests/indicators.test.ts`).
 - No validated intraday or swing rule exists yet. New candidates must be fixed in advance from a published source, then pass the same gate. Thresholds must not be tuned after seeing results.

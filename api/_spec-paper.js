@@ -4,11 +4,12 @@ import {createSpecPaperMarket} from '../server/specPaperMarket.js';
 import {newPaperState,validatePaperOptions,stopRunState,summarizeRun,runSpecPaperCycle} from '../server/specPaperRunner.js';
 import {parseStrategySpec} from '../shared/strategySpec.js';
 import {authorizeScheduler,emptySchedulerBody} from '../server/schedulerAuth.js';
+import {automationStatus} from './_automation.js';
 const UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const unavailable='Spec paper storage unavailable. Check the spec-paper-runs migration and server connection. Nothing was saved.';
 
 // GET lists runs or pages one run's ledger; POST {action:'create', id, spec, options} or {action:'stop', id}. Paper only.
-export function createSpecPaperHandler({store=specPaperStore,now=Date.now}={}){return async(req,res)=>{
+export function createSpecPaperHandler({store=specPaperStore,now=Date.now,automation=automationStatus}={}){return async(req,res)=>{
  if(!allowRequest(req,res))return;
  if(req.method==='GET'){
   // ?ledger=<run id>&after=<seq>&limit=<n> pages the permanent event ledger of one run.
@@ -18,7 +19,7 @@ export function createSpecPaperHandler({store=specPaperStore,now=Date.now}={}){r
    if(typeof q.ledger!=='string'||!UUID.test(q.ledger)||!Number.isInteger(after)||after<0||!Number.isInteger(limit)||limit<1||limit>1000)return res.status(400).json({error:'ledger (run id), after (>=0) and limit (1-1000) are required'});
    try{const rows=await store().events(q.ledger,after,limit);return res.status(200).json({runId:q.ledger,events:rows,next:rows.length===limit?rows.at(-1).seq:null});}catch{return res.status(503).json({error:unavailable});}
   }
-  try{return res.status(200).json({account:'user1',runs:(await store().list()).map(summarizeRun)});}catch{return res.status(503).json({error:unavailable});}
+  try{const [runs,auto]=await Promise.all([store().list(),automation.read().catch(()=>null)]);return res.status(200).json({account:'user1',automation:auto,runs:runs.map(summarizeRun)});}catch{return res.status(503).json({error:unavailable});}
  }
  if(req.method!=='POST')return res.status(405).json({error:'GET or POST required'});
  const b=req.body;

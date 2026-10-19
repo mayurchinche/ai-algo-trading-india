@@ -64,7 +64,7 @@ test('scan records validated signals once and auto-starts single-trade paper run
  assert(sig.validUntil>sig.decidedAt);assert.equal(recorded.length,1);
  assert.equal(created.length,1);assert.equal(created[0].id,runIdFor(sig.id));assert.equal(created[0].options.singleTrade,true);assert.equal(created[0].options.signalId,sig.id);assert.equal(created[0].options.costModel,'broker-tariff');
  assert.equal(created[0].spec.legs[0].quantity.units,Math.floor(100000*0.95/sig.close));
- const early:any=await scanSignals({market,store,paperStore,now:()=>Date.parse('2026-10-19T11:00:00+05:30')});assert.equal(early.scanned,0,'daily strategies are scanned after the close');
+ const intradayOnly:any=await scanSignals({market,store,paperStore,now:()=>now,timeframes:['15m']});assert.equal(intradayOnly.scanned,0,'an intraday scan skips daily strategies');
  assert.match(runIdFor('x:Y:1234567890'),/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/);
  const sum=summarizeSignals([{id:sig.id,recorded_at:'r',signal:sig}],[valRow('short-term-donchian','INFY')],sig.validUntil+1);
  assert.equal(sum.signals[0].status,'EXPIRED');assert.equal(sum.strategies.find((s:any)=>s.id==='short-term-donchian').status,'PASSED');assert.equal(sum.strategies.find((s:any)=>s.id==='swing-rsi2').status,'NOT_VALIDATED_YET');
@@ -127,8 +127,8 @@ const response=()=>({code:0,body:null as any,setHeader(){},status(n:number){this
 test('signals and analysis routes validate input and protect scheduler jobs',async()=>{
  const sig={id:'long-term-golden-trend:INFY:1760000000000',strategyId:'long-term-golden-trend',symbol:'INFY',close:1500,validUntil:Date.now()+DAY};
  const created:any[]=[];const store=()=>({signals:async()=>[{id:sig.id,recorded_at:'r',signal:sig}],validations:async()=>[],signal:async(id:string)=>id===sig.id?{id,signal:sig}:null});
- const h=createSignalsHandler({store,paperStore:()=>({create:async(id:string,spec:any,options:any,state:any)=>{created.push(id);return {id,status:'ACTIVE',version:0,spec,options,state,created_at:'c',updated_at:'u'};}}),secret:()=>'s'.repeat(32),env:{}});
- const g=response();await h({method:'GET',headers:{host:'x'},query:{}},g);assert.equal(g.code,200);assert.equal(g.body.signals.length,1);assert.equal(g.body.autoPaper,true);
+ const h=createSignalsHandler({automation:{read:async()=>({lastTickAt:'t'})} as any,store,paperStore:()=>({create:async(id:string,spec:any,options:any,state:any)=>{created.push(id);return {id,status:'ACTIVE',version:0,spec,options,state,created_at:'c',updated_at:'u'};}}),secret:()=>'s'.repeat(32),env:{}});
+ const g=response();await h({method:'GET',headers:{host:'x'},query:{}},g);assert.equal(g.code,200);assert.equal(g.body.signals.length,1);assert.equal(g.body.automation.lastTickAt,'t');assert.equal(g.body.autoPaper,true);
  const p=response();await h({method:'POST',headers:{host:'x'},query:{},body:{action:'paper',signalId:sig.id,capital:50000}},p);assert.equal(p.code,201);assert.equal(created[0],runIdFor(sig.id));assert.equal(p.body.run.segment,'long-term');
  const bad=response();await h({method:'POST',headers:{host:'x'},query:{},body:{action:'paper',signalId:sig.id,capital:5}},bad);assert.equal(bad.code,400);
  const nf=response();await h({method:'POST',headers:{host:'x'},query:{},body:{action:'paper',signalId:'nope:X:1234567890',capital:5000}},nf);assert.equal(nf.code,404);
@@ -138,4 +138,25 @@ test('signals and analysis routes validate input and protect scheduler jobs',asy
  const a1=response();await ah({method:'GET',headers:{host:'x'},query:{symbol:'bad symbol!'}},a1);assert.equal(a1.code,400);
  const a2=response();await ah({method:'GET',headers:{host:'x'},query:{symbol:'INFY'}},a2);assert.equal(a2.code,503);
  assert.equal(typeof researchRoutes['signals'],'function');assert.equal(typeof researchRoutes['stock-analysis'],'function');
+});
+import {backgroundJob,runAutomationTick,mergeStatus,inAutomationWindow} from '../server/automation.js';
+import {createAutomationHandler} from '../api/_automation.js';
+test('automation tick runs paper every minute plus one due job and records a heartbeat',async()=>{
+ const ist=(hm:string)=>Date.parse(`2026-10-19T${hm}:00+05:30`);
+ assert.equal(backgroundJob(ist('09:16')),'daily');assert.equal(backgroundJob(ist('09:31')),'daily');assert.equal(backgroundJob(ist('10:01')),'intraday-scan');
+ assert.equal(backgroundJob(ist('10:03')),'validate');assert.equal(backgroundJob(ist('10:37')),'fundamentals');assert.equal(backgroundJob(ist('10:04')),null);
+ assert.equal(inAutomationWindow(ist('09:14')),false);assert.equal(inAutomationWindow(ist('15:35')),true);assert.equal(inAutomationWindow(Date.parse('2026-10-18T10:00:00+05:30')),false,'Sunday');
+ const calls:string[]=[];const jobs={paper:async(b:number)=>{calls.push('paper:'+b);return {status:'COMPLETED',runs:[{outcome:'MONITORED'},{outcome:'TRADE_COMPLETED'}]};},
+  scan:async(tf:string[])=>{calls.push('scan:'+tf.join('+'));return {status:'COMPLETED',signals:[{}],failures:[],validatedPairs:62};},marketDay:async()=>{calls.push('day');throw Object.assign(new Error('x'),{code:'NSE_UNAVAILABLE'});},
+  validate:async()=>{calls.push('validate');return {status:'COMPLETED',strategy:'swing-rsi2'};},fundamentals:async()=>{calls.push('fund');return {status:'COMPLETED'};}};
+ let saved:any=null;const t:any=await runAutomationTick({now:()=>ist('09:16'),...jobs,status:async(x:any)=>{saved=x;}});
+ assert.deepEqual(calls,['paper:25000','day','scan:1d+15m']);assert.equal(t.marketDay.status,'FAILED');assert.equal(t.marketDay.reason,'NSE_UNAVAILABLE','one failing job does not stop the others');assert.equal(saved,t);
+ const st=mergeStatus(null,t);assert.equal(st.jobs.paper.runs,2);assert.deepEqual(st.jobs.paper.outcomes,{MONITORED:1,TRADE_COMPLETED:1});assert.equal(st.jobs.scan.signals,1);assert.equal(st.jobs.scan.validatedPairs,62);assert.equal(st.ticksToday,1);assert.equal(st.day,'2026-10-19');
+ const t2:any=await runAutomationTick({now:()=>ist('10:03'),...jobs,status:async()=>{}});const st2=mergeStatus(st,t2);
+ assert.equal(st2.ticksToday,2);assert.equal(st2.jobs.validate.strategy,'swing-rsi2');assert.equal(st2.jobs.scan.at,st.jobs.scan.at,'earlier job results are kept');
+ const writes:any[]=[];const h=createAutomationHandler({now:()=>ist('10:03'),secret:()=>'s'.repeat(32),env:{},jobs,status:{read:async()=>null,write:async(d:any)=>{writes.push(d);}}});
+ const ok=response();await h({method:'POST',headers:{authorization:'Bearer '+'s'.repeat(32)},body:{}},ok);assert.equal(ok.code,200);assert.equal(ok.body.job,'validate');assert.equal(writes.length,1);
+ const no=response();await h({method:'POST',headers:{authorization:'Bearer nope'},body:{}},no);assert.equal(no.code,401);
+ const off=response();await createAutomationHandler({now:()=>ist('10:03'),secret:()=>'s'.repeat(32),env:{AUTOMATION_ENABLED:'false'},jobs,status:{read:async()=>null,write:async()=>{}}})({method:'POST',headers:{authorization:'Bearer '+'s'.repeat(32)},body:{}},off);assert.equal(off.body.status,'AUTOMATION_DISABLED');
+ const night=response();await createAutomationHandler({now:()=>ist('20:00'),secret:()=>'s'.repeat(32),env:{},jobs,status:{read:async()=>null,write:async()=>{}}})({method:'POST',headers:{authorization:'Bearer '+'s'.repeat(32)},body:{}},night);assert.equal(night.body.status,'OUTSIDE_AUTOMATION_WINDOW');
 });

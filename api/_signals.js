@@ -5,11 +5,12 @@ import {createSpecPaperMarket} from '../server/specPaperMarket.js';
 import {scanSignals,runValidation,captureMarketDay,summarizeSignals,paperRunFor} from '../server/signalEngine.js';
 import {newPaperState,summarizeRun} from '../server/specPaperRunner.js';
 import {authorizeScheduler,emptySchedulerBody} from '../server/schedulerAuth.js';
+import {automationStatus} from './_automation.js';
 const unavailable='Signal storage unavailable. Check the trading-signals migration and server connection.';
 const JOBS=['validate','scan','market-day'];
 // GET: recent signals and per-strategy validation. POST ?job=…: scheduler jobs (Bearer secret).
 // POST {action:'paper', signalId, capital}: starts a single-trade paper run for one signal.
-export function createSignalsHandler({store=signalStore,paperStore=specPaperStore,market=createSpecPaperMarket(),now=Date.now,secret=()=>process.env.PAPER_SCHEDULER_SECRET,fetcher=fetch,env=process.env}={}){return async(req,res)=>{
+export function createSignalsHandler({automation=automationStatus,store=signalStore,paperStore=specPaperStore,market=createSpecPaperMarket(),now=Date.now,secret=()=>process.env.PAPER_SCHEDULER_SECRET,fetcher=fetch,env=process.env}={}){return async(req,res)=>{
  const q=req.query??{};
  if(req.method==='POST'&&q.job!==undefined){
   if(!authorizeScheduler(req,res,secret()))return;
@@ -22,7 +23,7 @@ export function createSignalsHandler({store=signalStore,paperStore=specPaperStor
  if(!allowRequest(req,res))return;
  if(req.method==='GET'){
   if(Object.keys(q).length)return res.status(400).json({error:'No query parameters are accepted'});
-  try{const db=store(),[rows,validations]=await Promise.all([db.signals(200),db.validations()]);return res.status(200).json({computedAt:new Date(now()).toISOString(),autoPaper:env.SIGNAL_AUTO_PAPER!=='false',...summarizeSignals(rows,validations,now())});}
+  try{const db=store(),[rows,validations,auto]=await Promise.all([db.signals(200),db.validations(),automation.read().catch(()=>null)]);return res.status(200).json({computedAt:new Date(now()).toISOString(),autoPaper:env.SIGNAL_AUTO_PAPER!=='false',automation:auto,...summarizeSignals(rows,validations,now())});}
   catch{return res.status(503).json({error:unavailable});}
  }
  if(req.method!=='POST')return res.status(405).json({error:'GET or POST required'});

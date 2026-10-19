@@ -136,7 +136,7 @@ export async function runSpecPaperCycle({store,market,now=Date.now,budgetMs=4500
  const started=now();
  let isOpen;try{isOpen=await market.marketOpen();}catch(e){return {status:'MARKET_STATUS_UNAVAILABLE',reason:errCode(e,'MARKET_STATUS_FAILED'),runs:[]};}
  if(!isOpen)return {status:'MARKET_CLOSED',runs:[]};
- const runs=(await store.list()).filter(r=>r.status==='ACTIVE'),results=[];
+ const runs=(await (store.active?store.active():store.list())).filter(r=>r.status==='ACTIVE'),results=[];
  for(const run of runs){
   if(now()-started>budgetMs){results.push({id:run.id,outcome:'DEFERRED'});continue;}
   try{

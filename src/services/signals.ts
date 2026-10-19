@@ -1,6 +1,6 @@
 import type { SegmentId } from '../../shared/tradingHorizon';
 import { apiUrl } from '../utils/apiUrl';
-import type { PaperRunSummary } from './specPaper';
+import type { PaperRunSummary, AutomationState } from './specPaper';
 export interface ReturnStats { trades: number; winRate: number | null; expectancyPct: number | null; avgWinPct: number | null; avgLossPct: number | null; profitFactor: number | null; compoundedReturnPct: number; maxDrawdownPct: number }
 export interface Signal {
  id: string; strategyId: string; strategyName: string; segment: SegmentId; symbol: string; instrumentKey: string; timeframe: string; barTime: number; decidedAt: number; validUntil: number; close: number; direction: string;
@@ -14,7 +14,7 @@ export interface StrategyStatus {
  pooled: { symbols: number; stats: ReturnStats; halves: { first: ReturnStats; second: ReturnStats }; passed: boolean; reasons: string[] } | null;
  symbols: { validated: { symbol: string; stats: ReturnStats | null; buyHoldPct: number | null }[]; unproven: number; rejected: number };
 }
-export interface SignalsResponse { computedAt: string; autoPaper: boolean; signals: Signal[]; strategies: StrategyStatus[] }
+export interface SignalsResponse { computedAt: string; autoPaper: boolean; automation: AutomationState | null; signals: Signal[]; strategies: StrategyStatus[] }
 async function call<T>(init?: RequestInit): Promise<T> {
  const r = await fetch(apiUrl('/api/signals'), { ...init, signal: AbortSignal.timeout(30000), headers: init?.body ? { 'Content-Type': 'application/json' } : undefined });
  const b = await r.json().catch(() => ({ error: 'Signals service returned a page instead of JSON' }));
