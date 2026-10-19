@@ -6,9 +6,10 @@ Revamp done on 2026-10-19. The app had grown to 21 tabs, four paper-trading UIs 
 
 | Before | Problem | Now |
 |---|---|---|
-| Overview, AI Discovery, Smart Picks, old Stock Analysis | Same browser scan of about 40 Yahoo screener names, scored by an unvalidated composite (no score ever reached the 70 threshold; see `FIVE_MINUTE_RESEARCH.md`). The browser re-ran it every 60 s on every tab. | Removed. Replaced by **Analysis** (any NSE stock) and **Signals** (validated rules). |
-| Signals, Alerts, signal popup | One feed component shown three times; no push alerts were wired. | Removed. **Signals** page with validation evidence. |
+| Overview, old Stock Analysis | Same browser scan of about 40 Yahoo screener names, scored by an unvalidated composite (no score ever reached the 70 threshold; see `FIVE_MINUTE_RESEARCH.md`). The browser re-ran it every 60 s on every tab. | Removed. Replaced by **Analysis** (any NSE stock) and **Signals** (validated rules). |
+| Signals, Alerts, signal popup | One feed component shown three times; no push alerts were wired. | **Alerts** restored on request (2026-10-19): validated strategy alerts plus the intraday strong-signal feed and popup; the scheduler runs the alert scanner every minute again (needs `SHARED_PAPER_ENABLED=true`). |
 | Trades (shared intraday account), segment selector + segment accounts, device journal | Four UIs, three ledgers; zero closed orders in production on 26 Sep 2026 (`PERFORMANCE_EVALUATION.md`). | Retired from the UI. **Paper trading** shows every run in every segment from one ledger. The server-side shared-paper engine and its `shared-paper-minute` cron job still exist; leave that job paused. |
+| AI Discovery, Smart Picks | Same browser scan. | **Discover** and **Watch ideas** restored on request (2026-10-19) under Ideas; the browser scan now runs only while one of these pages is open. |
 | Spec paper | Fills only at cycle times; no charges detail; events trimmed. | **Paper trading**: trades like live (below), permanent ledger. |
 | Backtest page (`backtestEngine.ts`) | Second backtester with fixed rules. | Page removed. The Strategy lab (rule builder) backtests with the shared engine. `backtestEngine.ts` is still imported by older tests only. |
 | Rule builder, Options wizard, Screener, Scorecards, Trend | Useful tools | Kept under **Strategy tools**. |

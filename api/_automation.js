@@ -8,6 +8,10 @@ import {signalStore} from '../server/signalStore.js';
 import {scanSignals,runValidation,captureMarketDay} from '../server/signalEngine.js';
 import {ingestFundamentalFilings} from '../server/fundamentalsIngest.js';
 import {fundamentalsStore} from '../server/fundamentalsStore.js';
+import {runSharedPaperCycle} from '../server/sharedPaperCycle.js';
+import {sharedStore} from '../server/sharedPaper.js';
+// Bundled at build time (npm run build:server) from the shared browser scanner.
+import {observeSharedPaper} from '../server/sharedPaperObservation.bundle.mjs';
 export const appData=(id)=>({
  read:async(db=backend())=>check(await db.from('app_data').select('data,updated_at').eq('id',id).maybeSingle())?.data??null,
  write:async(data,db=backend())=>check(await db.from('app_data').upsert({id,data,updated_at:new Date().toISOString()})),
@@ -25,13 +29,15 @@ export function createAutomationHandler({now=Date.now,secret=()=>process.env.PAP
   if(!inAutomationWindow(now()))return res.status(200).json({status:'OUTSIDE_AUTOMATION_WINDOW'});
   const j=jobs??{
    paper:budgetMs=>runSpecPaperCycle({store:specPaperStore(),market,now,budgetMs}),
+   // Alerts feed: the intraday strong-signal scanner and its paper decisions (SHARED_PAPER_ENABLED=true).
+   alerts:env.SHARED_PAPER_ENABLED==='true'?()=>runSharedPaperCycle({db:sharedStore('intraday'),observe:observeSharedPaper,now,source:'scheduler'}):null,
    validate:()=>runValidation({market,store:signalStore(),now}),
    scan:timeframes=>scanSignals({market,store:signalStore(),paperStore:specPaperStore(),now,timeframes,saveBoard:d=>strategyBoard.write(d),autoPaper:env.SIGNAL_AUTO_PAPER!=='false',capital:Number(env.SIGNAL_PAPER_CAPITAL)||100000}),
    marketDay:()=>captureMarketDay({store:signalStore()}),
    fundamentals:()=>ingestFundamentalFilings({store:fundamentalsStore(),clock:now}),
   };
   const tick=await runAutomationTick({now,...j,status:async t=>status.write(mergeStatus(await status.read().catch(()=>null),t))});
-  const failed=['paper','marketDay','dailyScan','scan','validate','fundamentals'].some(k=>tick[k]?.status==='FAILED');
+  const failed=['paper','alerts','marketDay','dailyScan','scan','validate','fundamentals'].some(k=>tick[k]?.status==='FAILED');
   return res.status(failed?207:200).json(tick);
  };
 }

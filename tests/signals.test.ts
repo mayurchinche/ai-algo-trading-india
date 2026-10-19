@@ -182,7 +182,8 @@ test('automation tick runs paper every minute plus one due job and records a hea
  const calls:string[]=[];const jobs={paper:async(b:number)=>{calls.push('paper:'+b);return {status:'COMPLETED',runs:[{outcome:'MONITORED'},{outcome:'TRADE_COMPLETED'}]};},
   scan:async(tf:string[])=>{calls.push('scan:'+tf.join('+'));return {status:'COMPLETED',signals:[{}],failures:[],validatedPairs:62};},marketDay:async()=>{calls.push('day');throw Object.assign(new Error('x'),{code:'NSE_UNAVAILABLE'});},
   validate:async()=>{calls.push('validate');return {status:'COMPLETED',strategy:'swing-rsi2'};},fundamentals:async()=>{calls.push('fund');return {status:'COMPLETED'};}};
- let saved:any=null;const t:any=await runAutomationTick({now:()=>ist('09:16'),...jobs,status:async(x:any)=>{saved=x;}});
+ let saved:any=null;const t:any=await runAutomationTick({now:()=>ist('09:16'),...jobs,alerts:async()=>{calls.push('alerts');return {status:'COMPLETED',scan:{status:'COMPLETED'}};},status:async(x:any)=>{saved=x;}});
+ assert(calls.includes('alerts'),'the alert scanner runs every tick');calls.splice(calls.indexOf('alerts'),1);assert.equal(mergeStatus(null,t).jobs.alerts.status,'COMPLETED');
  assert.deepEqual(calls,['paper:25000','day','scan:1d+15m']);assert.equal(t.dailyScan.signals.length,1);assert.equal(t.marketDay.status,'FAILED');assert.equal(t.marketDay.reason,'NSE_UNAVAILABLE','one failing job does not stop the others');assert.equal(saved,t);
  const st=mergeStatus(null,t);assert.equal(st.jobs.paper.runs,2);assert.deepEqual(st.jobs.paper.outcomes,{MONITORED:1,TRADE_COMPLETED:1});assert.equal(st.jobs.dailyScan.signals,1);assert.equal(st.jobs.dailyScan.validatedPairs,62);assert.equal(st.ticksToday,1);assert.equal(st.day,'2026-10-19');
  const t2:any=await runAutomationTick({now:()=>ist('10:08'),...jobs,status:async()=>{}});const st2=mergeStatus(st,t2);

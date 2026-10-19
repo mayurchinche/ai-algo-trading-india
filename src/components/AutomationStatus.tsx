@@ -3,6 +3,7 @@ import { formatIST } from '../services/tradingTime';
 
 const LABELS: [keyof AutomationState['jobs'], string, string][] = [
  ['paper', 'Paper trading cycle', 'every minute in market hours'],
+ ['alerts', 'Alert scanner (strong intraday signals)', 'every minute in market hours'],
  ['dailyScan', 'Daily signal scan', '09:16, 09:31, then :14 and :44 each hour (previous close)'],
  ['scan', 'Intraday signal scan', 'every 15 min'],
  ['validate', 'Strategy validation', 'every 5 min until each strategy is fresh (weekly)'],

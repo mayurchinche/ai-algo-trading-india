@@ -3,11 +3,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { LineChart, Radar, BookOpen, Building2 } from 'lucide-react';
 import { NAVIGATE_EVENT, ANALYSE_EVENT } from './services/specDraft';
 import { Header } from './components/Header';
+import { SignalPopup } from './components/SignalPopup';
 import { useLiveStocks } from './hooks/useLiveStocks';
 const named = <K extends string>(load: () => Promise<Record<K, React.ComponentType<any>>>, key: K) => lazy(() => load().then(m => ({ default: m[key] })));
 const StockAnalysisPage = named(() => import('./components/StockAnalysisPage'), 'StockAnalysisPage');
 const SignalsPage = named(() => import('./components/SignalsPage'), 'SignalsPage');
 const OpeningGapsPage = named(() => import('./components/OpeningGapsPage'), 'OpeningGapsPage');
+const AlertsPage = named(() => import('./components/AlertsPage'), 'AlertsPage');
+const DiscoveryPage = named(() => import('./components/DiscoveryPage'), 'DiscoveryPage');
+const SmartPicksPage = named(() => import('./components/SmartPicksPage'), 'SmartPicksPage');
 const PaperTradingPage = named(() => import('./components/PaperTradingPage'), 'PaperTradingPage');
 const IPOPage = named(() => import('./components/IPOPage'), 'IPOPage');
 const RuleBuilderPage = named(() => import('./components/RuleBuilderPage'), 'RuleBuilderPage');
@@ -33,13 +37,14 @@ export default function App() {
   return () => { window.removeEventListener(NAVIGATE_EVENT, go); window.removeEventListener(ANALYSE_EVENT, analyse); };
  }, []);
  const pages: Record<string, React.ReactNode> = {
-  'Analysis': <StockAnalysisPage symbol={symbol} onSymbol={setSymbol} />, 'Signals': <SignalsPage />, 'Opening gaps': <OpeningGapsPage />, 'Paper trading': <PaperTradingPage />, 'IPO': <IPOPage />,
+  'Analysis': <StockAnalysisPage symbol={symbol} onSymbol={setSymbol} />, 'Signals': <SignalsPage />, 'Opening gaps': <OpeningGapsPage />, 'Alerts': <AlertsPage />, 'Discover': <DiscoveryPage />, 'Watch ideas': <SmartPicksPage />, 'Paper trading': <PaperTradingPage />, 'IPO': <IPOPage />,
   'Rule builder': <RuleBuilderPage />, 'Options wizard': <OptionsWizardPage />, 'Screener': <ScreenerPage />, 'Scorecards': <ScorecardsPage />, 'Trend': <TrendDashboardPage />,
   'Market News': <MarketNewsPage segment="intraday" />, 'Pre-market': <PremarketPage />, 'Portfolios': <ResearchPortfolioPage />, 'Portfolio fit': <PortfolioFitPage />, 'Baskets': <BasketsPage />, 'Metals': <MetalsPage />,
  };
  return (
   <div className="workspace-shell min-h-screen flex flex-col bg-[var(--bg)]">
    <a href="#main-content" className="skip-link">Skip to main content</a>
+   <SignalPopup onView={() => setActiveTab('Alerts')} />
    <Header activeTab={activeTab} onTabChange={setActiveTab} nifty={nifty} lastUpdated={lastUpdated} />
    <main id="main-content" className="app-main" tabIndex={-1}>
     <Suspense fallback={<div className="card workspace-loading" role="status"><span className="loading-line" /><span className="loading-line short" /><p>Opening workspace…</p></div>}><AnimatePresence mode="wait">

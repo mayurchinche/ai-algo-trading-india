@@ -1,7 +1,8 @@
 // Automation tick: the one pg_cron job (`shared-paper-minute`, every minute 09:15–15:35 IST on weekdays)
 // calls /api/scheduled-paper, which runs this. Each tick runs the paper-trading cycle, then at most one
 // background job chosen by IST minute, and records a heartbeat so the app can show what ran and when.
-//   every minute       paper runs: resting stops/targets, square-off, decisions and fills
+//   every minute       paper runs: resting stops/targets, square-off, decisions and fills; and the alert
+//                      scanner that records strong intraday signals for the Alerts feed
 //   09:16 and 09:31    market day (bulk/block deals, FII/DII) and the daily-strategy signal scan
 //   every 30 minutes   daily-strategy scan again at :14 and :44 (safety net; signals are recorded once)
 //   every 15 minutes   intraday-strategy signal scan
@@ -26,9 +27,10 @@ export function backgroundJob(now){
 const failure=e=>({status:'FAILED',reason:e?.code??(e instanceof Error?e.message.slice(0,120):'UNEXPECTED_ERROR')});
 async function attempt(fn){try{return await fn();}catch(e){return failure(e);}}
 
-export async function runAutomationTick({now=Date.now,paper,validate,scan,marketDay,fundamentals,status}){
+export async function runAutomationTick({now=Date.now,paper,alerts=null,validate,scan,marketDay,fundamentals,status}){
  const started=now(),job=backgroundJob(started),out={version:AUTOMATION_VERSION,at:new Date(started).toISOString(),job};
- out.paper=await attempt(()=>paper(25000));
+ // The paper cycle and the alert scanner (intraday strong-signal feed) run side by side.
+ [out.paper,out.alerts]=await Promise.all([attempt(()=>paper(25000)),alerts?attempt(alerts):undefined]);
  if(job==='daily-scan')out.dailyScan=await attempt(()=>scan(['1d']));
  else if(job==='daily'){out.marketDay=await attempt(marketDay);out.dailyScan=await attempt(()=>scan(['1d','15m']));}
  else if(job==='intraday-scan')out.scan=await attempt(()=>scan(['15m']));
@@ -46,6 +48,6 @@ export async function runAutomationTick({now=Date.now,paper,validate,scan,market
 export function mergeStatus(previous,tick){
  const jobs={...(previous?.jobs??{})},summary=r=>r&&{status:r.status,...Object.fromEntries(Object.entries(r).filter(([k,v])=>k!=='status'&&(typeof v!=='object'||v===null)).slice(0,8)),
   ...(Array.isArray(r.runs)?{runs:r.runs.length,outcomes:r.runs.reduce((m,x)=>(m[x.outcome]=(m[x.outcome]||0)+1,m),{})}:{}),...(Array.isArray(r.signals)?{signals:r.signals.length}:{}),...(Array.isArray(r.failures)?{failures:r.failures.length}:{})};
- for(const k of ['paper','marketDay','dailyScan','scan','validate','fundamentals'])if(tick[k])jobs[k]={at:tick.at,...summary(tick[k])};
+ for(const k of ['paper','alerts','marketDay','dailyScan','scan','validate','fundamentals'])if(tick[k])jobs[k]={at:tick.at,...summary(tick[k])};
  return {version:AUTOMATION_VERSION,lastTickAt:tick.at,lastJob:tick.job,lastDurationMs:tick.durationMs,ticksToday:previous?.day===istDay(tick.at)?(previous.ticksToday??0)+1:1,day:istDay(tick.at),jobs};
 }
