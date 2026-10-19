@@ -26,7 +26,7 @@ export function createAutomationHandler({now=Date.now,secret=()=>process.env.PAP
    fundamentals:()=>ingestFundamentalFilings({store:fundamentalsStore(),clock:now}),
   };
   const tick=await runAutomationTick({now,...j,status:async t=>status.write(mergeStatus(await status.read().catch(()=>null),t))});
-  const failed=['paper','marketDay','scan','validate','fundamentals'].some(k=>tick[k]?.status==='FAILED');
+  const failed=['paper','marketDay','dailyScan','scan','validate','fundamentals'].some(k=>tick[k]?.status==='FAILED');
   return res.status(failed?207:200).json(tick);
  };
 }

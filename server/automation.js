@@ -2,7 +2,8 @@
 // calls /api/scheduled-paper, which runs this. Each tick runs the paper-trading cycle, then at most one
 // background job chosen by IST minute, and records a heartbeat so the app can show what ran and when.
 //   every minute       paper runs: resting stops/targets, square-off, decisions and fills
-//   09:16 and 09:31    market day (bulk/block deals, FII/DII) and the daily-strategy signal scan
+//   09:16 and 09:31    market day (bulk/block deals, FII/DII) and the daily-strategy signal scan (repeated
+//                      every 30 minutes as a safety net)
 //   every 15 minutes   intraday-strategy signal scan
 //   every 5 minutes    strategy validation, when a strategy is missing or older than six days (a pass
 //                      triggers an immediate signal scan)
@@ -27,12 +28,13 @@ async function attempt(fn){try{return await fn();}catch(e){return failure(e);}}
 export async function runAutomationTick({now=Date.now,paper,validate,scan,marketDay,fundamentals,status}){
  const started=now(),job=backgroundJob(started),out={version:AUTOMATION_VERSION,at:new Date(started).toISOString(),job};
  out.paper=await attempt(()=>paper(25000));
- if(job==='daily'){out.marketDay=await attempt(marketDay);out.scan=await attempt(()=>scan(['1d','15m']));}
+ if(job==='daily'){out.marketDay=await attempt(marketDay);out.dailyScan=await attempt(()=>scan(['1d','15m']));}
  else if(job==='intraday-scan')out.scan=await attempt(()=>scan(['15m']));
  else if(job==='validate'){
   out.validate=await attempt(validate);
-  // A newly passed strategy is scanned at once, so its current signals are not held until the next morning.
-  if(out.validate?.passed&&out.validate.validated?.length)out.scan=await attempt(()=>scan(['1d','15m']));
+  // A newly passed strategy is scanned at once, so its current signals are not held until the next morning;
+  // otherwise the daily scan repeats every 30 minutes as a safety net for a missed 09:16 tick (it is idempotent).
+  if((out.validate?.passed&&out.validate.validated?.length)||(out.validate?.status==='UP_TO_DATE'&&istMinute(started)%30===3))out.dailyScan=await attempt(()=>scan(['1d','15m']));
  }
  else if(job==='fundamentals')out.fundamentals=await attempt(fundamentals);
  out.durationMs=now()-started;
@@ -43,6 +45,6 @@ export async function runAutomationTick({now=Date.now,paper,validate,scan,market
 export function mergeStatus(previous,tick){
  const jobs={...(previous?.jobs??{})},summary=r=>r&&{status:r.status,...Object.fromEntries(Object.entries(r).filter(([k,v])=>k!=='status'&&(typeof v!=='object'||v===null)).slice(0,8)),
   ...(Array.isArray(r.runs)?{runs:r.runs.length,outcomes:r.runs.reduce((m,x)=>(m[x.outcome]=(m[x.outcome]||0)+1,m),{})}:{}),...(Array.isArray(r.signals)?{signals:r.signals.length}:{}),...(Array.isArray(r.failures)?{failures:r.failures.length}:{})};
- for(const k of ['paper','marketDay','scan','validate','fundamentals'])if(tick[k])jobs[k]={at:tick.at,...summary(tick[k])};
+ for(const k of ['paper','marketDay','dailyScan','scan','validate','fundamentals'])if(tick[k])jobs[k]={at:tick.at,...summary(tick[k])};
  return {version:AUTOMATION_VERSION,lastTickAt:tick.at,lastJob:tick.job,lastDurationMs:tick.durationMs,ticksToday:previous?.day===istDay(tick.at)?(previous.ticksToday??0)+1:1,day:istDay(tick.at),jobs};
 }

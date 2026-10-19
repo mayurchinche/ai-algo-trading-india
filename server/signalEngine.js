@@ -99,7 +99,7 @@ export function paperRunFor(signal,capital){
 
 // timeframes: which strategy bar sizes to scan. Daily bars are read up to the previous session (the history
 // reader excludes today), so a daily scan in the morning acts on yesterday's close in today's session.
-export async function scanSignals({market,store,paperStore,now,budgetMs=40000,autoPaper=true,capital=100000,timeframes=['1d','15m']}){
+export async function scanSignals({market,store,paperStore,now,budgetMs=40000,autoPaper=true,capital=100000,timeframes=['1d','15m'],lookbackBars=10}){
  const started=now(),validated=(await store.validations()).filter(v=>v.verdict==='VALIDATED'),out={scanned:0,signals:[],failures:[],deferred:0,paper:[]};
  const pairs=validated.map(v=>({v:v.record,s:strategyById(v.strategy_id)})).filter(p=>p.s&&timeframes.includes(p.s.timeframe));
  await mapLimit(pairs,6,async({v,s})=>{
@@ -107,12 +107,15 @@ export async function scanSignals({market,store,paperStore,now,budgetMs=40000,au
   const u=universeOf(s).find(x=>x.symbol===v.symbol);if(!u)return;
   try{
    const bars=await market.history(u.key,s.timeframe,started-SCAN_DAYS[s.timeframe]*DAY,started);out.scanned++;
-   const spec=buildStrategySpec(s,{symbol:u.symbol}),d=entryDecidedOnLastBar(spec,bars);
-   if(d)out.signals.push(signalRecord(s,spec,v,bars,d,u.key));
+   const spec=buildStrategySpec(s,{symbol:u.symbol});
+   // The latest bar plus earlier bars in the lookback, so recent setups are on record (older ones expired).
+   for(let k=0;k<lookbackBars&&bars.length-k>1;k++){const b=bars.slice(0,bars.length-k),d=entryDecidedOnLastBar(spec,b);if(d)out.signals.push(signalRecord(s,spec,v,b,d,u.key));}
   }catch(e){out.failures.push({strategy:s.id,symbol:v.symbol,reason:code(e,'SCAN_FAILED')});}
  });
- if(out.signals.length)out.recorded=await store.recordSignals(out.signals);
- if(autoPaper)for(const sig of out.signals){
+ for(let i=0;i<out.signals.length;i+=400)out.recorded=(out.recorded??0)+await store.recordSignals(out.signals.slice(i,i+400));
+ out.active=out.signals.filter(x=>x.validUntil>started).length;
+ // Only signals still actionable are paper-traded; expired history is recorded, not traded.
+ if(autoPaper)for(const sig of out.signals.filter(x=>x.validUntil>started)){
   try{const r=paperRunFor(sig,capital);await paperStore.create(r.id,r.spec,r.options,newPaperState(r.spec,r.options,now()));out.paper.push({signal:sig.id,run:r.id});}
   catch(e){out.paper.push({signal:sig.id,error:e instanceof Error&&/limit/.test(e.message)?'ACTIVE_RUN_LIMIT':'PAPER_RUN_FAILED'});}
  }
