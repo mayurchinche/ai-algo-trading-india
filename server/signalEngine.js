@@ -68,7 +68,7 @@ export function entryDecidedOnLastBar(spec,bars){
 }
 const levelText=(l,dir)=>l?`${l.unit==='percent'?l.value+'%':'₹'+l.value} ${dir}`:null;
 export function signalRecord(strategy,spec,validation,bars,decision,instrumentKey){
- const b=bars.at(-1),daily=spec.timeframe==='1d';
+ const b=bars.at(-1);
  const legs=spec.legs.map(l=>({id:l.id,side:l.side,instrument:l.instrument,quantity:l.quantity,stopLoss:l.stopLoss??null,target:l.target??null,trailingStop:l.trailingStop??null,
   levels:l.instrument.type==='option'?null:{stop:l.stopLoss?.unit==='percent'?b.close*(1-(l.side==='BUY'?1:-1)*l.stopLoss.value/100):null,target:l.target?.unit==='percent'?b.close*(1+(l.side==='BUY'?1:-1)*l.target.value/100):null}}));
  // A daily signal is acted on in the next session; an intraday one within the next bar.
