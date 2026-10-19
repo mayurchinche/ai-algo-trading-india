@@ -3,11 +3,9 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } f
 import { basketPerformance, type BasketPerformance } from '../../shared/basketPerformance';
 import { SCREENER_COLUMNS, formatCell } from '../services/screener';
 import { fetchScorecards, type Scorecards } from '../services/scorecards';
-import { applyScreen, istDate, loadBaskets, loadCloses, saveBaskets, validateScreen, MAX_BASKETS, MAX_FILTERS, type Basket, type Screen } from '../services/baskets';
+import { applyScreen, istDate, loadBaskets, loadCloses, saveBaskets, validateScreen, MAX_BASKETS, MAX_FILTERS, BENCHMARK, yearAgo, type Basket, type Screen } from '../services/baskets';
 
-const BENCHMARK = '^NSEI';
 const pct = (n: number) => (n >= 0 ? '+' : '') + n.toFixed(2) + '%';
-const yearAgo = () => istDate(Date.now() - 365 * 86400000);
 
 export function PerformanceView({ perf, label }: { perf: BasketPerformance; label: string }) {
  if (perf.status === 'NO_BENCHMARK_DATA') return <p className="text-sm">NIFTY 50 history unavailable; no comparison made.</p>;
@@ -38,6 +36,7 @@ function BasketDetail({ basket, onDelete }: { basket: Basket; onDelete: () => vo
  return <section className="card space-y-4">
   <div className="page-title"><div><h3>{basket.name}</h3><p>Created {new Date(basket.createdAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST · {basket.members.length} members · FD rate {basket.fdRatePct}% a year (assumed)</p></div><button className="btn btn-secondary" onClick={onDelete}>Delete</button></div>
   <p className="text-sm">Members: {basket.members.map(m => m.symbol).join(', ')}</p>
+  {basket.origin && <p className="text-sm">Chosen by the stack rule ({basket.origin.version}): {basket.origin.rule}</p>}
   {loading && <p className="text-sm" role="status">Loading daily closes…</p>}
   {state && <><PerformanceView perf={state.forward} label="Since created" />
    <details><summary className="text-sm">Past year with today's members (hindsight)</summary><p className="notice text-sm">These members were chosen using today's data, so this past return was not achievable and overstates what the screen would have delivered.</p><PerformanceView perf={state.hindsight} label="Hindsight, last 12 months" /></details></>}

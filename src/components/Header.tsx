@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { type LucideIcon, Activity, LineChart, Radar, BookOpen, Building2, Gem, ShieldCheck, ArrowUpRight, TrendingUp, ClipboardList, ListFilter, Scale, ShoppingBasket, Wand2, Blocks, Newspaper, Sunrise, Briefcase, ArrowUpDown, Bell, Compass, Sparkles, MessageSquareText } from 'lucide-react';
+import { type LucideIcon, Activity, LineChart, Radar, BookOpen, Building2, Gem, ShieldCheck, ArrowUpRight, TrendingUp, ClipboardList, ListFilter, Scale, ShoppingBasket, Wand2, Blocks, Newspaper, Sunrise, Briefcase, ArrowUpDown, Bell, Compass, Sparkles, MessageSquareText, Layers } from 'lucide-react';
 import type { LiveStock } from '../services/liveData';
 import { formatIST } from '../services/tradingTime';
 import { fetchMarketStatus } from '../services/marketStatus';
@@ -7,7 +7,7 @@ interface HeaderProps {activeTab:string;onTabChange:(tab:string)=>void;nifty:Liv
 const sections: {label:string;items:[string,string,LucideIcon][]}[]=[
  {label:'TRADE',items:[['Analysis','Stock analysis',LineChart],['Signals','Signals',Radar],['Alerts','Alerts',Bell],['Opening gaps','Opening gaps',ArrowUpDown],['Paper trading','Paper trading',BookOpen],['IPO','IPO analysis',Building2]]},
  {label:'IDEAS',items:[['Discover','Discover',Compass],['Watch ideas','Watch ideas',Sparkles]]},
- {label:'INVESTING',items:[['Assistant','Assistant',MessageSquareText],['Scorecards','Scorecards',ClipboardList],['Screener','Screener',ListFilter],['Trend','Trend score',TrendingUp],['Baskets','Baskets',ShoppingBasket],['Portfolio fit','Portfolio fit',Scale]]},
+ {label:'INVESTING',items:[['Stacks','Stacks',Layers],['Assistant','Assistant',MessageSquareText],['Scorecards','Scorecards',ClipboardList],['Screener','Screener',ListFilter],['Trend','Trend score',TrendingUp],['Baskets','Baskets',ShoppingBasket],['Portfolio fit','Portfolio fit',Scale]]},
  {label:'STRATEGY TOOLS',items:[['Rule builder','Strategy lab',Blocks],['Options wizard','Options wizard',Wand2]]},
  {label:'MORE',items:[['Market News','Market news',Newspaper],['Pre-market','Pre-market',Sunrise],['Portfolios','Portfolios',Briefcase],['Metals','Metals',Gem]]},
 ];

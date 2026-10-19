@@ -7,7 +7,9 @@ export const BASKETS_KEY = 'baskets_v1';
 export const MAX_BASKETS = 20, MAX_FILTERS = 8, MAX_MEMBERS = 30;
 export interface ScreenFilter { column: string; op: 'gte' | 'lte'; value: number }
 export interface Screen { filters: ScreenFilter[]; sortBy: string; limit: number }
-export interface Basket { id: string; name: string; createdAt: string; universe: string; screen: Screen; members: { symbol: string; isin: string }[]; fdRatePct: number }
+// How members were chosen: a screen, or a themed stack's rule as it stood when the basket was saved.
+export interface BasketOrigin { kind: 'stack'; id: string; version: string; rule: string }
+export interface Basket { id: string; name: string; createdAt: string; universe: string; screen: Screen | null; origin?: BasketOrigin; members: { symbol: string; isin: string }[]; fdRatePct: number }
 
 const columnIds = new Set(SCREENER_COLUMNS.map(c => c.id));
 const columnOf = (id: string) => SCREENER_COLUMNS.find(c => c.id === id)!;
@@ -33,6 +35,11 @@ function validateBasket(b: unknown): Basket | null {
   if (typeof x.id !== 'string' || typeof x.name !== 'string' || !x.name.trim() || x.name.length > 60 || !Number.isFinite(Date.parse(x.createdAt))) return null;
   if (!Array.isArray(x.members) || !x.members.length || x.members.length > MAX_MEMBERS || x.members.some(m => typeof m?.symbol !== 'string' || typeof m?.isin !== 'string')) return null;
   if (!(x.fdRatePct >= 0 && x.fdRatePct <= 20)) return null;
+  if (x.screen === null) {
+   const o = x.origin;
+   if (!o || o.kind !== 'stack' || typeof o.id !== 'string' || typeof o.version !== 'string' || typeof o.rule !== 'string' || o.rule.length > 500) return null;
+   return { ...x, screen: null, origin: { kind: 'stack', id: o.id, version: o.version, rule: o.rule } };
+  }
   return { ...x, screen: validateScreen(x.screen) };
  } catch { return null; }
 }
@@ -42,10 +49,18 @@ export function loadBaskets(storage: Pick<Storage, 'getItem'> = localStorage): B
 }
 export function saveBaskets(baskets: Basket[], storage: Pick<Storage, 'setItem'> = localStorage) { storage.setItem(BASKETS_KEY, JSON.stringify(baskets.slice(0, MAX_BASKETS))); }
 export const istDate = (ms: number) => new Date(ms + 19800000).toISOString().slice(0, 10);
+export const BENCHMARK = '^NSEI';
+export const yearAgo = (now = Date.now()) => istDate(now - 365 * 86400000);
 
 type History = Awaited<ReturnType<typeof fetchHistorical>>;
 export async function loadCloses(symbols: string[], fetch: (yahooSymbol: string) => Promise<History> = s => fetchHistorical(s)) {
  const closes = new Map<string, DailyCloses>();let next = 0;
  await Promise.all(Array.from({ length: Math.min(5, symbols.length) }, async () => { while (next < symbols.length) { const s = symbols[next++]; try { const h = await fetch(s.startsWith('^') ? s : s + '.NS'); if (h?.dates.length) closes.set(s, { dates: h.dates, closes: h.closes }); } catch { /* missing history is reported by basketPerformance */ } } }));
  return closes;
+}
+
+// A basket from a themed stack: today's members, tracked forward from now like any basket.
+export function basketFromStack(stack: { id: string; title: string; rule: string; members: { symbol: string; isin: string }[] }, version: string, universe: string, now = Date.now(), fdRatePct = 7): Basket {
+ if (!stack.members.length) throw new Error('This stack has no members today.');
+ return { id: crypto.randomUUID(), name: stack.title.slice(0, 60), createdAt: new Date(now).toISOString(), universe, screen: null, origin: { kind: 'stack', id: stack.id, version, rule: stack.rule }, members: stack.members.slice(0, MAX_MEMBERS).map(m => ({ symbol: m.symbol, isin: m.isin })), fdRatePct };
 }

@@ -230,7 +230,7 @@ The fit score weighs diversification, concentration, quality (always 50%) and st
   - Analysis, Signals and Paper trading pages.
   - Strategy library with a validation gate; daily signal scan with automatic single-trade paper runs.
   - Bulk/block deals, delivery and FII/DII capture.
-- **Investing section (19 Oct):** SuperInvesting-style research built from our own rules: per-style plus/minus verdicts, a rule-based research assistant with an example library (own wording), screener, trend, baskets and portfolio fit (CSV and Excel) on one page; bank and NBFC filings; older annual results. Details in `APP_REVAMP.md`.
+- **Investing section (19 Oct):** SuperInvesting-style research built from our own rules: a themed Stacks feed (our own themes and design; their site was not reverse engineered or copied), per-style plus/minus verdicts, a rule-based research assistant with an example library (own wording), screener, trend, baskets and portfolio fit (CSV and Excel) on one page; bank and NBFC filings; older annual results. Details in `APP_REVAMP.md`.
 - **Phase 4 (AI layer) is not started.** No paid LLM provider is available. The Investing assistant is rule-based, not a model. Recommended path:
   - A deterministic plain-English → spec parser, validated by `parseStrategySpec`.
   - Optionally, a local or free-tier model behind a provider-neutral interface.

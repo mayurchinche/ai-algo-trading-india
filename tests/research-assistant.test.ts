@@ -74,7 +74,7 @@ test('Investing page shows its tabs and the assistant examples',async()=>{
  const {AnswerView}=await import('../src/components/AssistantPanel');
  const html=renderToStaticMarkup(createElement(InvestingPage,{tab:'Nope',onTab:()=>{}}));
  for(const [,label] of INVESTING_TABS)assert(html.includes(`>${label}</button>`),label);
- assert.match(html,/aria-current="page"[^>]*>Assistant</);
+ assert.match(html,/aria-current="page"[^>]*>Stacks</);
  const {answerPlan}=await import('../src/services/assistant');
  const plan=ask('Compare TCS and INFY'),view=renderToStaticMarkup(createElement(AnswerView,{plan,answer:answerPlan(plan,await scored(),universe),onTab:()=>{}}));
  assert.match(view,/Understood: Companies: TCS, INFY/);assert.match(view,/TCS: plus and minus by style/);assert.match(view,/<th class="text-right">P\/E<\/th>/);
