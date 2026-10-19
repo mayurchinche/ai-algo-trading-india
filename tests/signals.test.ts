@@ -169,7 +169,7 @@ test('automation tick runs paper every minute plus one due job and records a hea
  let saved:any=null;const t:any=await runAutomationTick({now:()=>ist('09:16'),...jobs,status:async(x:any)=>{saved=x;}});
  assert.deepEqual(calls,['paper:25000','day','scan:1d+15m']);assert.equal(t.dailyScan.signals.length,1);assert.equal(t.marketDay.status,'FAILED');assert.equal(t.marketDay.reason,'NSE_UNAVAILABLE','one failing job does not stop the others');assert.equal(saved,t);
  const st=mergeStatus(null,t);assert.equal(st.jobs.paper.runs,2);assert.deepEqual(st.jobs.paper.outcomes,{MONITORED:1,TRADE_COMPLETED:1});assert.equal(st.jobs.dailyScan.signals,1);assert.equal(st.jobs.dailyScan.validatedPairs,62);assert.equal(st.ticksToday,1);assert.equal(st.day,'2026-10-19');
- const t2:any=await runAutomationTick({now:()=>ist('10:03'),...jobs,status:async()=>{}});const st2=mergeStatus(st,t2);
+ const t2:any=await runAutomationTick({now:()=>ist('10:08'),...jobs,status:async()=>{}});const st2=mergeStatus(st,t2);
  assert.equal(st2.ticksToday,2);assert.equal(st2.jobs.validate.strategy,'swing-rsi2');assert.equal(st2.jobs.dailyScan.at,st.jobs.dailyScan.at,'earlier job results are kept');
  calls.length=0;await runAutomationTick({now:()=>ist('10:08'),...jobs,validate:async()=>({status:'COMPLETED',passed:true,validated:['INFY']}),status:async()=>{}});
  assert.deepEqual(calls,['paper:25000','scan:1d+15m'],'a newly passed strategy is scanned immediately');
