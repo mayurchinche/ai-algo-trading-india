@@ -10,6 +10,8 @@ import specPaperCycleHandler from './api/_spec-paper-cycle.js'
 import signalsHandler from './api/_signals.js'
 // @ts-expect-error Shared JavaScript stock-analysis API.
 import stockAnalysisHandler from './api/_stock-analysis.js'
+// @ts-expect-error Shared JavaScript opening-gaps API.
+import openingGapsHandler from './api/_opening-gaps.js'
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -46,7 +48,7 @@ export default defineConfig(({ mode }) => {
   plugins: [react(), tailwindcss(), {
     name: 'local-market-api',
     configureServer(server) {
-      for (const [route, handler] of [['/api/report-evidence', reportEvidenceHandler], ['/api/company-history', companyHistoryHandler], ['/api/company-disclosures', disclosureHandler], ['/api/research-portfolios', portfolioHandler], ['/api/fundamentals', fundamentalsHandler], ['/api/scorecards', scorecardsHandler], ['/api/option-chain', optionChainHandler], ['/api/spec-paper', specPaperHandler], ['/api/spec-paper-cycle', specPaperCycleHandler], ['/api/signals', signalsHandler], ['/api/stock-analysis', stockAnalysisHandler], ['/api/premarket', premarketHandler], ['/api/research', researchHandler], ['/api/market', marketHandler], ['/api/health', healthHandler], ['/api/paper', paperHandler], ['/api/shared-paper', sharedPaperHandler]] as const) server.middlewares.use(route, (req, res) => {
+      for (const [route, handler] of [['/api/report-evidence', reportEvidenceHandler], ['/api/company-history', companyHistoryHandler], ['/api/company-disclosures', disclosureHandler], ['/api/research-portfolios', portfolioHandler], ['/api/fundamentals', fundamentalsHandler], ['/api/scorecards', scorecardsHandler], ['/api/option-chain', optionChainHandler], ['/api/spec-paper', specPaperHandler], ['/api/spec-paper-cycle', specPaperCycleHandler], ['/api/signals', signalsHandler], ['/api/stock-analysis', stockAnalysisHandler], ['/api/opening-gaps', openingGapsHandler], ['/api/premarket', premarketHandler], ['/api/research', researchHandler], ['/api/market', marketHandler], ['/api/health', healthHandler], ['/api/paper', paperHandler], ['/api/shared-paper', sharedPaperHandler]] as const) server.middlewares.use(route, (req, res) => {
         const url = new URL(req.url || '/', 'http://localhost');
         const request = { headers: req.headers, method: req.method, query: Object.fromEntries(url.searchParams) };
         const response = { end() { res.end(); return response; }, setHeader: (key: string, value: string) => res.setHeader(key, value), status(code: number) { res.statusCode = code; return response; }, json(data: unknown) { res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(data)); return response; } };

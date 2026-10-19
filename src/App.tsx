@@ -7,6 +7,7 @@ import { useLiveStocks } from './hooks/useLiveStocks';
 const named = <K extends string>(load: () => Promise<Record<K, React.ComponentType<any>>>, key: K) => lazy(() => load().then(m => ({ default: m[key] })));
 const StockAnalysisPage = named(() => import('./components/StockAnalysisPage'), 'StockAnalysisPage');
 const SignalsPage = named(() => import('./components/SignalsPage'), 'SignalsPage');
+const OpeningGapsPage = named(() => import('./components/OpeningGapsPage'), 'OpeningGapsPage');
 const PaperTradingPage = named(() => import('./components/PaperTradingPage'), 'PaperTradingPage');
 const IPOPage = named(() => import('./components/IPOPage'), 'IPOPage');
 const RuleBuilderPage = named(() => import('./components/RuleBuilderPage'), 'RuleBuilderPage');
@@ -32,7 +33,7 @@ export default function App() {
   return () => { window.removeEventListener(NAVIGATE_EVENT, go); window.removeEventListener(ANALYSE_EVENT, analyse); };
  }, []);
  const pages: Record<string, React.ReactNode> = {
-  'Analysis': <StockAnalysisPage symbol={symbol} onSymbol={setSymbol} />, 'Signals': <SignalsPage />, 'Paper trading': <PaperTradingPage />, 'IPO': <IPOPage />,
+  'Analysis': <StockAnalysisPage symbol={symbol} onSymbol={setSymbol} />, 'Signals': <SignalsPage />, 'Opening gaps': <OpeningGapsPage />, 'Paper trading': <PaperTradingPage />, 'IPO': <IPOPage />,
   'Rule builder': <RuleBuilderPage />, 'Options wizard': <OptionsWizardPage />, 'Screener': <ScreenerPage />, 'Scorecards': <ScorecardsPage />, 'Trend': <TrendDashboardPage />,
   'Market News': <MarketNewsPage segment="intraday" />, 'Pre-market': <PremarketPage />, 'Portfolios': <ResearchPortfolioPage />, 'Portfolio fit': <PortfolioFitPage />, 'Baskets': <BasketsPage />, 'Metals': <MetalsPage />,
  };

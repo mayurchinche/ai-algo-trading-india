@@ -203,14 +203,27 @@ export function openingRange(open,high,low,close,sessions,bars){
  const n=sameLength(open,high,low,close);
  if(!Array.isArray(sessions)||sessions.length!==n) fail('sessions must be an array matching the bars');
  if(!Number.isInteger(bars)||bars<1) fail('bars must be a positive integer');
- const out={high:empty(n),low:empty(n),open:empty(n),close:empty(n),prevClose:empty(n)};
+ const out={high:empty(n),low:empty(n),open:empty(n),close:empty(n),prevClose:empty(n),gapPct:empty(n)};
  let start=0,hi=-Infinity,lo=Infinity,prev=NaN;
  for(let i=0;i<n;i++){
   if(i>0&&sessions[i]!==sessions[i-1]){prev=close[i-1];start=i;hi=-Infinity;lo=Infinity;}
   const k=i-start;
   if(k<bars){hi=Math.max(hi,high[i]);lo=Math.min(lo,low[i]);}
-  if(k>=bars-1){out.high[i]=hi;out.low[i]=lo;out.open[i]=open[start];out.close[i]=close[start+bars-1];out.prevClose[i]=prev;}
+  if(k>=bars-1){out.high[i]=hi;out.low[i]=lo;out.open[i]=open[start];out.close[i]=close[start+bars-1];out.prevClose[i]=prev;out.gapPct[i]=prev>0?(open[start]/prev-1)*100:NaN;}
  }
+ return out;
+}
+// Gap of each bar's open from the previous bar's close, in percent (daily bars: the overnight gap).
+export function gapPercent(open,close){
+ finiteSeries(open,'open'); finiteSeries(close,'close');
+ const n=sameLength(open,close),out=empty(n);
+ for(let i=1;i<n;i++)if(close[i-1]>0)out[i]=(open[i]/close[i-1]-1)*100;
+ return out;
+}
+// Each bar's volume relative to the average volume of the `length` bars before it.
+export function volumeRatio(volume,length){
+ finiteSeries(volume,'volume');const n=volume.length,out=empty(n);let sum=0;
+ for(let i=0;i<n;i++){if(i>=length&&sum>0)out[i]=volume[i]/(sum/length);sum+=volume[i];if(i>=length)sum-=volume[i-length];}
  return out;
 }
 // True on the bar where a moves from <= b to > b (crossover) or from >= b to < b (crossunder).

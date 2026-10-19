@@ -20,7 +20,9 @@ const UA='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KH
 
 // Latest NSE corporate announcements for a symbol (newest first).
 export async function readAnnouncements(symbol,{fetcher=fetch,limit=15}={}){
- const r=await fetcher('https://www.nseindia.com/api/corporate-announcements?index=equities&symbol='+encodeURIComponent(symbol),{headers:{'User-Agent':UA,Accept:'application/json'},redirect:'error',signal:AbortSignal.timeout(12000)});
+ const d=ms=>{const x=new Date(ms+19800000).toISOString().slice(0,10);return `${x.slice(8,10)}-${x.slice(5,7)}-${x.slice(0,4)}`;},now=Date.now();
+ // The last 90 days only: the unfiltered history of a large company is several megabytes.
+ const r=await fetcher('https://www.nseindia.com/api/corporate-announcements?index=equities&symbol='+encodeURIComponent(symbol)+`&from_date=${d(now-90*86400000)}&to_date=${d(now)}`,{headers:{'User-Agent':UA,Accept:'application/json'},redirect:'error',signal:AbortSignal.timeout(12000)});
  if(!r.ok)throw Object.assign(new Error('announcements'),{code:'NSE_UNAVAILABLE'});
  const body=Buffer.from(await r.arrayBuffer());if(body.length>8e6)throw Object.assign(new Error('large'),{code:'NSE_RESPONSE_TOO_LARGE'});
  const rows=JSON.parse(body.toString('utf8'));if(!Array.isArray(rows))throw Object.assign(new Error('format'),{code:'ANNOUNCEMENTS_FORMAT_CHANGED'});

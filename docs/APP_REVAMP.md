@@ -48,6 +48,17 @@ Every run in every segment is executed the way a live order flow would be. No or
 - **Charges**: Zerodha’s published tariff, itemised (brokerage, STT, exchange, SEBI, stamp, GST, DP).
 - **Record**: orders, trades with legs, entry and exit times and prices, gross P&L, charges, net P&L, MAE and MFE, kept in an append-only ledger (`spec_paper_events`) committed with the state. The page shows funds, performance (win rate, expectancy, profit factor, drawdown), positions, closed trades with per-leg detail, orders and rejected entries, and exports the full ledger as CSV or JSON.
 
+### Opening gaps (`/api/opening-gaps`)
+NSE pre-open data for F&O stocks (09:00–09:08 IST). It covers every stock whose indicative open (IEP) is 1% or more from the previous close. For each one:
+- **Pre-open orders:** the buy/sell imbalance.
+- **Catalyst:** exchange announcements since the previous session.
+- **52-week-high position.**
+- **Peer score:** the NIFTY 50 scorecard composite.
+- **Validated rules:** whether one is in a position, near a trigger or validated on that stock.
+- **After 09:15:** whether the gap is extending, holding or filled, from the Upstox quote.
+
+The validated gap rule is the daily gap-up continuation. A gap day that holds on high volume produces a next-session signal, which is paper-traded automatically. The intraday gap rules trade only once they pass validation.
+
 ### IPO
 Unchanged.
 
@@ -63,6 +74,9 @@ Run `node scripts/research/validate-library.mjs <daily dir> <15m dir>` on a stor
 | Opening range breakout short (15m) | Intraday | 1,423 | 43.6% | −0.108% | 0.71 | −0.19 / −0.01 | Fail | 0 |
 | Intraday momentum long (15m) | Intraday | 1,292 | 21.9% | −0.184% | 0.22 | −0.17 / −0.19 | Fail | 0 |
 | Intraday momentum short (15m) | Intraday | 1,644 | 21.3% | −0.196% | 0.20 | −0.19 / −0.20 | Fail | 0 |
+| Gap-and-go (15m) | Intraday | 55 | 43.6% | −0.146% | 0.67 | −0.15 / −0.15 | Fail | 0 |
+| Gap-up fade (15m) | Intraday | 42 | 54.8% | +0.133% | 1.48 | +0.05 / +0.29 | Too few trades (unproven) | 0 |
+| **Gap-up continuation (daily)** | Short term | 320 | 41.6% | +1.381% | 1.53 | +1.95 / +0.92 | **Pass** | 9 |
 | RSI(2) pullback | Swing | 3,210 | 60.4% | +0.008% | 1.01 | +0.16 / −0.11 | Fail | 0 |
 | EMA trend pullback | Swing | 676 | 46.0% | −0.303% | 0.83 | −0.27 / −0.33 | Fail | 0 |
 | 20-day breakout (Turtle) | Short term | 2,077 | 39.6% | +1.007% | 1.35 | +1.68 / +0.33 | **Pass** | 36 |

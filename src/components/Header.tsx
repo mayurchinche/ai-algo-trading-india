@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { type LucideIcon, Activity, LineChart, Radar, BookOpen, Building2, Gem, ShieldCheck, ArrowUpRight, TrendingUp, ClipboardList, ListFilter, Scale, ShoppingBasket, Wand2, Blocks, Newspaper, Sunrise, Briefcase } from 'lucide-react';
+import { type LucideIcon, Activity, LineChart, Radar, BookOpen, Building2, Gem, ShieldCheck, ArrowUpRight, TrendingUp, ClipboardList, ListFilter, Scale, ShoppingBasket, Wand2, Blocks, Newspaper, Sunrise, Briefcase, ArrowUpDown } from 'lucide-react';
 import type { LiveStock } from '../services/liveData';
 import { formatIST } from '../services/tradingTime';
 import { fetchMarketStatus } from '../services/marketStatus';
 interface HeaderProps {activeTab:string;onTabChange:(tab:string)=>void;nifty:LiveStock|null;lastUpdated:Date|null}
 const sections: {label:string;items:[string,string,LucideIcon][]}[]=[
- {label:'TRADE',items:[['Analysis','Stock analysis',LineChart],['Signals','Signals',Radar],['Paper trading','Paper trading',BookOpen],['IPO','IPO analysis',Building2]]},
+ {label:'TRADE',items:[['Analysis','Stock analysis',LineChart],['Signals','Signals',Radar],['Opening gaps','Opening gaps',ArrowUpDown],['Paper trading','Paper trading',BookOpen],['IPO','IPO analysis',Building2]]},
  {label:'STRATEGY TOOLS',items:[['Rule builder','Strategy lab',Blocks],['Options wizard','Options wizard',Wand2],['Screener','Screener',ListFilter],['Scorecards','Scorecards',ClipboardList],['Trend','Trend score',TrendingUp]]},
  {label:'MORE',items:[['Market News','Market news',Newspaper],['Pre-market','Pre-market',Sunrise],['Portfolios','Portfolios',Briefcase],['Portfolio fit','Portfolio fit',Scale],['Baskets','Baskets',ShoppingBasket],['Metals','Metals',Gem]]},
 ];

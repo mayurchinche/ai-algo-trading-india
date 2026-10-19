@@ -40,7 +40,7 @@ export function normalizeUpstoxQuotes(data,keys,now){
   const bid=q.depth?.buy?.[0],ask=q.depth?.sell?.[0];
   if(![q.last_price,bid?.price,ask?.price,bid?.quantity,ask?.quantity].every(n=>Number.isFinite(n)&&n>0)||ask.price<bid.price)continue;
   const levels=side=>(Array.isArray(q.depth?.[side])?q.depth[side]:[]).filter(l=>Number.isFinite(l?.price)&&l.price>0&&Number.isFinite(l?.quantity)&&l.quantity>0).map(l=>({price:l.price,quantity:l.quantity,orders:Number.isFinite(l.orders)?l.orders:null}));
-  quotes.push({symbol:q.instrument_token,price:q.last_price,bid:bid.price,ask:ask.price,bidSize:bid.quantity,askSize:ask.quantity,depth:{buy:levels('buy'),sell:levels('sell')},timestamp:new Date(ms).toISOString(),observedAt:new Date(responseMs).toISOString(),source:'UPSTOX_FULL_QUOTE_V3',spread:(ask.price-bid.price)/((ask.price+bid.price)/2)});
+  quotes.push({symbol:q.instrument_token,price:q.last_price,bid:bid.price,ask:ask.price,bidSize:bid.quantity,askSize:ask.quantity,depth:{buy:levels('buy'),sell:levels('sell')},open:Number.isFinite(q.ohlc?.open)&&q.ohlc.open>0?q.ohlc.open:null,dayHigh:Number.isFinite(q.ohlc?.high)?q.ohlc.high:null,dayLow:Number.isFinite(q.ohlc?.low)?q.ohlc.low:null,volume:Number.isFinite(q.volume)?q.volume:null,timestamp:new Date(ms).toISOString(),observedAt:new Date(responseMs).toISOString(),source:'UPSTOX_FULL_QUOTE_V3',spread:(ask.price-bid.price)/((ask.price+bid.price)/2)});
  }
  return quotes;
 }

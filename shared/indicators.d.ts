@@ -20,4 +20,6 @@ export function vwap(high: Series, low: Series, close: Series, volume: Series, s
 export function crossover(a: Series, b: Series | number): boolean[];
 export function crossunder(a: Series, b: Series | number): boolean[];
 
-export function openingRange(open: Series, high: Series, low: Series, close: Series, sessions: string[], bars: number): { high: number[]; low: number[]; open: number[]; close: number[]; prevClose: number[] };
+export function openingRange(open: Series, high: Series, low: Series, close: Series, sessions: string[], bars: number): { high: number[]; low: number[]; open: number[]; close: number[]; prevClose: number[]; gapPct: number[] };
+export function gapPercent(open: Series, close: Series): number[];
+export function volumeRatio(volume: Series, length: number): number[];

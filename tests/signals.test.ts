@@ -157,13 +157,13 @@ test('stock analysis: technicals, option chain, SWOT with cited facts, and the a
 });
 const response=()=>({code:0,body:null as any,setHeader(){},status(n:number){this.code=n;return this;},json(b:any){this.body=b;return this;},end(){return this;}});
 test('signals and analysis routes validate input and protect scheduler jobs',async()=>{
- const sig={id:'long-term-golden-trend:INFY:1760000000000',strategyId:'long-term-golden-trend',symbol:'INFY',close:1500,timeframe:'1d',decidedAt:Date.now()};
+ const day=Date.parse('2026-10-20T00:00:00+05:30'),sig={id:'long-term-golden-trend:INFY:1760000000000',strategyId:'long-term-golden-trend',symbol:'INFY',close:1500,timeframe:'1d',decidedAt:day};
  const created:any[]=[];const store=()=>({signals:async()=>[{id:sig.id,recorded_at:'r',signal:sig}],validations:async()=>[],signal:async(id:string)=>id===sig.id?{id,signal:sig}:null});
- const h=createSignalsHandler({automation:{read:async()=>({lastTickAt:'t'})} as any,store,paperStore:()=>({create:async(id:string,spec:any,options:any,state:any)=>{created.push(id);return {id,status:'ACTIVE',version:0,spec,options,state,created_at:'c',updated_at:'u'};}}),secret:()=>'s'.repeat(32),env:{}});
+ const h=createSignalsHandler({automation:{read:async()=>({lastTickAt:'t'})} as any,store,paperStore:()=>({create:async(id:string,spec:any,options:any,state:any)=>{created.push(id);return {id,status:'ACTIVE',version:0,spec,options,state,created_at:'c',updated_at:'u'};}}),secret:()=>'s'.repeat(32),env:{},now:()=>day+10*3600000});
  const g=response();await h({method:'GET',headers:{host:'x'},query:{}},g);assert.equal(g.code,200);assert.equal(g.body.signals.length,1);assert.equal(g.body.automation.lastTickAt,'t');assert.equal(g.body.autoPaper,true);
  const p=response();await h({method:'POST',headers:{host:'x'},query:{},body:{action:'paper',signalId:sig.id,capital:50000}},p);assert.equal(p.code,201);assert.equal(created[0],runIdFor(sig.id));assert.equal(p.body.run.segment,'long-term');
  const bad=response();await h({method:'POST',headers:{host:'x'},query:{},body:{action:'paper',signalId:sig.id,capital:5}},bad);assert.equal(bad.code,400);
- const old=response();const hOld=createSignalsHandler({automation:{read:async()=>null} as any,store,paperStore:()=>({create:async()=>{throw new Error('no');}}),secret:()=>'s'.repeat(32),env:{},now:()=>Date.now()+10*DAY});await hOld({method:'POST',headers:{host:'x'},query:{},body:{action:'paper',signalId:sig.id,capital:50000}},old);assert.equal(old.code,409);
+ const old=response();const hOld=createSignalsHandler({automation:{read:async()=>null} as any,store,paperStore:()=>({create:async()=>{throw new Error('no');}}),secret:()=>'s'.repeat(32),env:{},now:()=>day+10*DAY});await hOld({method:'POST',headers:{host:'x'},query:{},body:{action:'paper',signalId:sig.id,capital:50000}},old);assert.equal(old.code,409);
  const nf=response();await h({method:'POST',headers:{host:'x'},query:{},body:{action:'paper',signalId:'nope:X:1234567890',capital:5000}},nf);assert.equal(nf.code,404);
  const unauth=response();await h({method:'POST',headers:{authorization:'Bearer x'},query:{job:'scan'},body:{}},unauth);assert.equal(unauth.code,401);
  const badJob=response();await h({method:'POST',headers:{authorization:'Bearer '+'s'.repeat(32)},query:{job:'drop'},body:{}},badJob);assert.equal(badJob.code,400);
@@ -217,4 +217,25 @@ test('futures positions roll into the next contract before expiry within the sam
  assert(Math.abs(legs[1].stop-(1380+rolled.spread))<1e-9,'the stop shifts by the calendar spread paid');assert.equal(out.state.status,'OPEN','the trade stays open across the roll');
  const far:any=await cycleRun({id:r.id,status:'ACTIVE',version:1,spec,options:r.options,state:out.state},{market,now:()=>at+60000});assert(!far.events.some((e:any)=>e.kind==='ROLLED'),'the new contract is not rolled again');
  const up=series(300,{drift:0.002,amp:0.001}),t=triggerLevel('short-term-donchian',up);assert(t===null||t.level>=Math.max(...up.slice(-20).map(b=>b.high))-1e-9);
+});
+import {gapPercent,volumeRatio} from '../shared/indicators.js';
+import {parsePreOpen,buildGapBoard,readRecentAnnouncements} from '../server/openingGaps.js';
+import {createOpeningGapsHandler} from '../api/_opening-gaps.js';
+test('gap indicators and the opening-gap board',async()=>{
+ assert.deepEqual(gapPercent([10,11,9.9],[10,10,11]).map(v=>Number.isNaN(v)?null:Math.round(v*100)/100),[null,10,-1]);
+ assert.deepEqual(volumeRatio([1,1,1,4],3).map(v=>Number.isNaN(v)?null:v),[null,null,null,4],'compared with the bars before it only');
+ const po={data:[{metadata:{symbol:'PNB',previousClose:116.3,iep:120.87,pChange:3.93,finalQuantity:1011483,totalTurnover:1,yearHigh:135.15,yearLow:98.5},detail:{preOpenMarket:{totalBuyQuantity:1333404,totalSellQuantity:658031,lastUpdateTime:'19-Oct-2026 09:09:18'}}},
+  {metadata:{symbol:'TCS',previousClose:3000,iep:2955,pChange:-1.5,yearHigh:3500},detail:{preOpenMarket:{totalBuyQuantity:1,totalSellQuantity:3}}},{metadata:{symbol:'INFY',previousClose:1500,iep:1503,pChange:0.2},detail:{}},{metadata:{symbol:'bad name',previousClose:1,iep:1,pChange:9}}]};
+ const rows=parsePreOpen(po);assert.equal(rows.length,3);assert(Math.abs(rows[0].imbalance-(1333404-658031)/(1333404+658031))<1e-12);
+ assert.throws(()=>parsePreOpen({msg:'x'}),/format/);
+ const board=buildGapBoard(rows,{quotes:new Map([['PNB',{price:119,open:121}],['TCS',{price:3001,open:2950}]]),board:[{symbol:'PNB',strategyId:'short-term-donchian',strategyName:'20-day breakout',state:'NEAR_TRIGGER',trigger:{level:122,distancePct:1}}],
+  validations:[{symbol:'PNB',strategy_id:'short-term-gap-continuation',verdict:'VALIDATED'}],announcements:new Map([['PNB',[{subject:'Outcome of Board Meeting'}]]])});
+ assert.deepEqual(board.map((r:any)=>[r.symbol,r.direction,r.status]),[['PNB','UP','HOLDING'],['TCS','DOWN','FILLED']],'INFY within 1% is left out; ordered by gap size');
+ assert.equal(board[0].catalyst[0].subject,'Outcome of Board Meeting');assert.deepEqual(board[0].validated,['short-term-gap-continuation']);assert.equal(board[0].rules[0].state,'NEAR_TRIGGER');
+ assert.equal(buildGapBoard(rows)[0].status,'PRE_OPEN');
+ const urls:string[]=[];await readRecentAnnouncements(Date.parse('2026-10-19T09:20:00+05:30'),{fetcher:(async(u:string)=>{urls.push(u);return new Response('[{"symbol":"PNB","an_dt":"17-Oct-2026 18:00:00","desc":"Results"}]');}) as any});
+ assert.match(urls[0],/from_date=16-10-2026&to_date=19-10-2026$/,'Monday looks back to Friday');
+ const h=createOpeningGapsHandler({fetcher:(async(u:string)=>new Response(u.includes('pre-open')?JSON.stringify(po):'[]')) as any,signals:()=>({validations:async()=>[]}) as any,board:{read:async()=>null} as any,scorecards:async()=>null,master:async()=>[],now:()=>Date.parse('2026-10-19T20:00:00+05:30')});
+ const res=response();await h({method:'GET',headers:{host:'x'},query:{}},res);assert.equal(res.code,200);assert.equal(res.body.summary.gapUp,1);assert.equal(res.body.rows.length,2);assert.equal(res.body.strategies.length,3);
+ const spec=buildStrategySpec(strategyById('short-term-gap-continuation'),{symbol:'INFY'});assert.equal(segmentOfSpec(spec),'short-term');
 });

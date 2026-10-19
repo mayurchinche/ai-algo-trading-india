@@ -7,7 +7,7 @@
   ],
   "rewrites": [
     {
-      "source": "/api/:route(company-disclosures|company-history|report-evidence|research-portfolios|fundamentals|scorecards|option-chain|spec-paper|spec-paper-cycle|signals|stock-analysis)",
+      "source": "/api/:route(company-disclosures|company-history|report-evidence|research-portfolios|fundamentals|scorecards|option-chain|spec-paper|spec-paper-cycle|signals|stock-analysis|opening-gaps)",
       "destination": "/api/research?route=:route"
     },
     {

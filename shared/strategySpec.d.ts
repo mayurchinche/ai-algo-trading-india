@@ -4,7 +4,7 @@ export type Expiry = 'current-week' | 'next-week' | 'current-month' | 'next-mont
 export type PriceField = 'open' | 'high' | 'low' | 'close' | 'volume';
 export type Source = PriceField | 'hl2' | 'hlc3';
 export type Comparator = 'gt' | 'gte' | 'lt' | 'lte' | 'crosses-above' | 'crosses-below';
-export type IndicatorType = 'sma' | 'ema' | 'zlema' | 'rsi' | 'highest' | 'lowest' | 'atr' | 'macd' | 'bollinger' | 'supertrend' | 'donchian' | 'vwap' | 'opening_range';
+export type IndicatorType = 'sma' | 'ema' | 'zlema' | 'rsi' | 'highest' | 'lowest' | 'atr' | 'macd' | 'bollinger' | 'supertrend' | 'donchian' | 'vwap' | 'opening_range' | 'gap' | 'volume_ratio';
 
 export const TIMEFRAMES: readonly Timeframe[];
 export const EXPIRIES: readonly Expiry[];
