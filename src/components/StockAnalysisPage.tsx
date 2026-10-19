@@ -119,7 +119,7 @@ export function StockAnalysisPage({ symbol, onSymbol }: { symbol?: string; onSym
    <input list="analysis-symbols" value={input} onChange={e => setInput(e.target.value.toUpperCase())} placeholder="NSE symbol, e.g. INFY" aria-label="NSE symbol" style={{ minWidth: 220 }} /><datalist id="analysis-symbols">{SYMBOLS.map(s => <option key={s} value={s} />)}</datalist>
    <button className="btn btn-primary" type="submit" disabled={loading}>{loading ? 'Analysing…' : 'Analyse'}</button>
   </form>
-  {!symbol && <section className="card"><p className="text-sm">Choose a stock. NIFTY 50: </p><div className="flex flex-wrap gap-1">{SYMBOLS.map(s => <button key={s} className="btn btn-secondary" onClick={() => onSymbol(s)}>{s}</button>)}</div></section>}
+  {!symbol && <section className="card space-y-4"><div><h3>NIFTY 50</h3><p className="text-sm muted">Pick a company, or type any NSE symbol above.</p></div><div className="flex flex-wrap gap-2">{SYMBOLS.map(s => <button key={s} className="chip" onClick={() => onSymbol(s)}>{s}</button>)}</div></section>}
   {error && <section className="card" role="status"><p>{error}</p></section>}
   {loading && <div className="card workspace-loading" role="status"><span className="loading-line" /><span className="loading-line short" /><p>Collecting prices, filings, news and deals…</p></div>}
   {data && !loading && <>

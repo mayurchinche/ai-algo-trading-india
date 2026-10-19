@@ -44,7 +44,7 @@ function check(c,cond){
  const shown=value===null?'':fmt(value,UNITS[cond.metric]??(cond.metric==='score:composite'?'':'x'));
  const where=percentile===null?'':`better than ${Math.round(percentile)}% of peers`;
  // Filing warnings (e.g. inputs spanning a rename, demerger or ISIN change) travel with the reason.
- return {ok,percentile,why:{metric:cond.metric,label:LABELS[cond.metric]??cond.metric,value,percentile,text:[shown,where].filter(Boolean).join(' · '),warnings:c.metrics?.[cond.metric]?.warnings??[]}};
+ return {ok,percentile,why:{metric:cond.metric,label:LABELS[cond.metric]??cond.metric,value,percentile,text:[shown,where].filter(Boolean).join(' · '),display:shown,warnings:c.metrics?.[cond.metric]?.warnings??[]}};
 }
 
 // scorecards: the /api/scorecards result; universe: [{symbol, industry}] for sector labels.

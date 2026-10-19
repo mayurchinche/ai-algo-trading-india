@@ -59,7 +59,8 @@ test('a stack saves as a basket that records its rule and survives reload',()=>{
 test('stack card shows the rule, members and why they qualify',()=>{
  const stack=byId(buildStacks(scorecards(),universe),'quality-compounders');
  const html=renderToStaticMarkup(createElement(StackCard,{stack,onSave:()=>{}}));
- assert.match(html,/Quality compounders/);assert.match(html,/Rule: ROCE better than 70% of peers/);
- assert.match(html,/>LT<\/button>/);assert.match(html,/ROCE: 21\.0% · better than 100% of peers/);
- assert.match(html,/\* inputs span a symbol change/);assert.match(html,/Save as basket/);
+ assert.match(html,/Quality compounders/);assert.match(html,/Rule<\/span> · ROCE better than 70% of peers/);
+ assert.match(html,/>LT<\/button>/);assert.match(html,/>ROCE<\/span><span[^>]*>21\.0%<\/span>/);assert.match(html,/beats 100%<span class="hidden sm:inline"> of peers/);
+ assert.match(html,/class="meter mt-1 good"[^>]*><span style="width:100%"/);
+ assert.match(html,/Filing note/);assert.match(html,/inputs span a symbol change/);assert.match(html,/Save as basket/);
 });

@@ -14,7 +14,7 @@ export function ScreenerTable({ data, columnIds, sort, onSort, search = '', supp
   <thead><tr><th>Symbol</th><th>Year end</th>{columns.map(c => <th key={c.id} className="text-right">{header(c.id, c.label)}</th>)}</tr></thead>
   <tbody>{rows.map(c => <tr key={c.symbol}>
    <td className="font-semibold">{c.symbol}</td>
-   <td>{c.basis ? `${c.basis.period.end} · ${c.basis.scope === 'Consolidated' ? 'cons.' : 'stand.'}` : <span className="text-[var(--text-muted)]">No supported filing</span>}</td>
+   <td className="whitespace-nowrap">{c.basis ? `${c.basis.period.end} · ${c.basis.scope === 'Consolidated' ? 'cons.' : 'stand.'}` : <span className="text-[var(--text-muted)]">No supported filing</span>}</td>
    {columns.map(col => { const v = col.value(c); return <td key={col.id} className="text-right font-mono" title={v === null ? readable(col.status(c)) : undefined}>{formatCell(v, col.unit)}</td>; })}
   </tr>)}</tbody>
  </table></div>;

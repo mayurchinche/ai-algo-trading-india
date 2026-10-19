@@ -54,12 +54,12 @@ export function AssistantPanel({ onTab }: { onTab: (tab: string) => void }) {
  return <section className="space-y-4">
   <form className="flex gap-2" onSubmit={e => { e.preventDefault(); void run(question); }}>
    <input className="flex-1" aria-label="Ask a research question" placeholder="e.g. Banks with ROE above 15, or Compare TCS and INFY" value={question} onChange={e => setQuestion(e.target.value)} maxLength={500} />
-   <button type="submit" className="btn-primary">Ask</button>
+   <button type="submit" className="btn-primary px-6">Ask</button>
   </form>
   {error && <p role="alert">{error}</p>}
   {result && <div className="card"><AnswerView plan={result.plan} answer={result.answer} onTab={onTab} /></div>}
-  <div className="grid md:grid-cols-2 gap-3">{PROMPT_LIBRARY.map(g => <div key={g.group} className="card space-y-1"><h4>{g.group}</h4>
-   {g.prompts.map(p => <button key={p} className="block text-left underline text-sm" onClick={() => void run(p)}>{p}</button>)}</div>)}</div>
-  <p className="text-xs opacity-70">Answers come from fixed rules over NIFTY 50 scorecards, signals and gaps in this app. No AI model is used. Research only, not investment advice.</p>
+  <div className="grid md:grid-cols-2 gap-4">{PROMPT_LIBRARY.map(g => <div key={g.group} className="card space-y-3"><h4>{g.group}</h4>
+   <div className="flex flex-wrap gap-2">{g.prompts.map(p => <button key={p} className="chip chip-muted" onClick={() => void run(p)}>{p}</button>)}</div></div>)}</div>
+  <p className="text-xs faint">Answers come from fixed rules over NIFTY 50 scorecards, signals and gaps in this app. No AI model is used. Research only, not investment advice.</p>
  </section>;
 }

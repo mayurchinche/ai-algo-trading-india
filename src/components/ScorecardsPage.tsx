@@ -18,7 +18,7 @@ export function ScorecardTable({ data, sort, onSort, selected, onSelect }: { dat
   <thead><tr><th>Symbol</th><th>Year end</th>{columns.map(([, l]) => <th key={l} className="text-right">{l}</th>)}{data.styles.map(s => head(s.id, s.label))}{head('composite', 'Composite')}</tr></thead>
   <tbody>{sortScorecards(data.companies, sort).map(c => <tr key={c.symbol} aria-selected={selected === c.symbol} onClick={() => onSelect?.(c.symbol)} style={{ cursor: onSelect ? 'pointer' : undefined }}>
    <td className="font-semibold">{c.symbol}</td>
-   <td>{c.basis ? `${c.basis.period.end} · ${c.basis.scope === 'Consolidated' ? 'cons.' : 'stand.'}` : <span className="text-[var(--text-muted)]">No supported annual filing</span>}</td>
+   <td className="whitespace-nowrap">{c.basis ? `${c.basis.period.end} · ${c.basis.scope === 'Consolidated' ? 'cons.' : 'stand.'}` : <span className="text-[var(--text-muted)]">No supported annual filing</span>}</td>
    {columns.map(([key, l, unit]) => <td key={l} className="text-right font-mono" title={c.metrics[key]?.value === null ? readable(c.metrics[key]?.status ?? 'unavailable') : undefined}>{formatMetric(c.metrics[key], unit)}</td>)}
    {data.styles.map(s => <ScoreCell key={s.id} company={c} id={s.id} />)}<ScoreCell company={c} id="composite" />
   </tr>)}</tbody>

@@ -79,3 +79,12 @@ test('Investing page shows its tabs and the assistant examples',async()=>{
  const plan=ask('Compare TCS and INFY'),view=renderToStaticMarkup(createElement(AnswerView,{plan,answer:answerPlan(plan,await scored(),universe),onTab:()=>{}}));
  assert.match(view,/Understood: Companies: TCS, INFY/);assert.match(view,/TCS: plus and minus by style/);assert.match(view,/<th class="text-right">P\/E<\/th>/);
 });
+test('pages round-trip through the URL hash; unknown pages and bad symbols are ignored',async()=>{
+ const {routeHash,parseRoute}=await import('../src/services/route');
+ const tabs=['Analysis','Stacks','Portfolio fit','Opening gaps'];
+ assert.equal(routeHash('Portfolio fit'),'#/portfolio-fit');assert.deepEqual(parseRoute('#/portfolio-fit',tabs),{tab:'Portfolio fit',symbol:undefined});
+ assert.equal(routeHash('Analysis','M&M'),'#/analysis/M%26M');assert.deepEqual(parseRoute('#/analysis/M%26M',tabs),{tab:'Analysis',symbol:'M&M'});
+ assert.equal(routeHash('Stacks','INFY'),'#/stacks');
+ assert.equal(parseRoute('#/nope',tabs),null);assert.equal(parseRoute('',tabs),null);
+ assert.deepEqual(parseRoute('#/analysis/%E0%A4',tabs),{tab:'Analysis',symbol:undefined});assert.deepEqual(parseRoute('#/analysis/a%20b',tabs),{tab:'Analysis',symbol:undefined});
+});
