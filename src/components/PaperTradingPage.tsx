@@ -9,6 +9,7 @@ const when = (ms: number | null | undefined) => ms === null || ms === undefined 
 const pct = (n: number | null) => n === null ? '—' : (n * 100).toFixed(1) + '%';
 const words = (s: string | null | undefined) => (s ?? '—').replaceAll('_', ' ').toLowerCase();
 const tone = (n: number) => n > 0 ? 'text-[var(--green)]' : n < 0 ? 'text-[var(--red)]' : '';
+const OUTCOME: Record<string, string> = { SIGNAL_EXPIRED: 'The setup no longer held on the latest completed bar, so no trade was taken.', ENTRY_REJECTED: 'The entry failed a pre-trade check (depth, margin or funds); see Rejected entries.', TRADE_COMPLETED: 'The single trade for this signal closed.', STOPPED: 'Stopped by you.' };
 const segmentLabel = (id: string | null) => SEGMENTS.find(s => s.id === id)?.label ?? 'Unclassified';
 
 function download(name: string, body: string, type: string) {
@@ -50,6 +51,7 @@ export function RunDetail({ run, onStop }: { run: PaperRunSummary; onStop?: () =
     ...(open === key ? [<tr key={key + 'd'}><td colSpan={8}><ul className="text-xs">{t.legs.map(l => <li key={l.leg}>{l.side} {l.units} × {l.contract ?? l.leg}: entry {l.entryPrice.toFixed(2)} at {when(l.entryTime)} → exit {l.exitPrice.toFixed(2)} at {when(l.exitTime)} ({words(l.exitReason)}) · gross {rupees(l.gross)} · charges {rupees(l.charges)}</li>)}</ul></td></tr>] : [])]; })}</tbody></table></div> : <p className="text-sm">No closed trades yet.</p>}</div>
   <div><h4>Recent orders</h4><OrdersTable orders={orders} /></div>
   {!!rejected.length && <div><h4>Rejected entries</h4><ul className="text-sm">{[...rejected].reverse().map((e, i) => <li key={i}>{when(e.at ?? e.time)} · {words(e.reason as string)}{e.required ? ` · margin ${rupees(e.required as number)} vs available ${rupees(e.available as number)}` : ''}</li>)}</ul></div>}
+  {run.paper.lastOutcome && OUTCOME[run.paper.lastOutcome] && <p className="text-sm">{OUTCOME[run.paper.lastOutcome]}</p>}
   <p className="text-xs">Cycles {run.paper.cycles} · last cycle {run.paper.lastCycleAt ? formatIST(run.paper.lastCycleAt) : 'none yet'} · last strategy bar {when(run.paper.lastBarTime)} · {run.paper.eventSeq ?? 0} ledger events{run.paper.missedBars ? ` · ${run.paper.missedBars} bars passed between cycles without a decision` : ''}</p>
  </section>;
 }
@@ -68,8 +70,8 @@ export function PaperTradingPage() {
   {error && <section className="card" role="status"><p>{error}</p></section>}
   {!!shown.length && <div className="grid grid-cols-2 md:grid-cols-5 gap-2"><Stat label="Active runs" value={String(totals.active)} /><Stat label="Net P&L" value={rupees(totals.net)} className={tone(totals.net)} /><Stat label="Charges" value={rupees(totals.charges)} /><Stat label="Closed trades" value={String(totals.trades)} /><Stat label="Win rate" value={totals.trades ? pct(totals.wins / totals.trades) : '—'} /></div>}
   {!loading && !error && !shown.length && <section className="card"><p>No paper runs in this segment yet. Runs open automatically when a validated strategy signals; until strategies are validated and a setup appears there is nothing to trade. You can also start a run from Signals or the Strategy lab.</p></section>}
-  {!!shown.length && <section className="card"><div className="overflow-x-auto"><table className="data-table"><thead><tr><th>Run</th><th>Segment</th><th>Underlying</th><th>Status</th><th>Position</th><th className="text-right">Net P&L</th><th className="text-right">Trades</th><th className="text-right">Win rate</th><th>Started</th></tr></thead>
-   <tbody>{shown.map(r => <tr key={r.id} aria-selected={detail?.id === r.id} onClick={() => setSelected(r.id)} style={{ cursor: 'pointer' }}><td className="font-semibold">{r.name}</td><td>{segmentLabel(r.segment)}</td><td>{r.underlying.symbol}</td><td>{r.status.toLowerCase()}</td><td>{r.position.toLowerCase()}</td><td className={`text-right font-mono ${tone(r.netPnl)}`}>{rupees(r.netPnl)}</td><td className="text-right">{r.trades}</td><td className="text-right">{pct(r.stats.winRate)}</td><td>{formatIST(r.createdAt)}</td></tr>)}</tbody></table></div></section>}
+  {!!shown.length && <section className="card"><div className="overflow-x-auto"><table className="data-table"><thead><tr><th>Run</th><th>Segment</th><th>Underlying</th><th>Status</th><th>Position</th><th>Last outcome</th><th className="text-right">Net P&L</th><th className="text-right">Trades</th><th className="text-right">Win rate</th><th>Started</th></tr></thead>
+   <tbody>{shown.map(r => <tr key={r.id} aria-selected={detail?.id === r.id} onClick={() => setSelected(r.id)} style={{ cursor: 'pointer' }}><td className="font-semibold">{r.name}</td><td>{segmentLabel(r.segment)}</td><td>{r.underlying.symbol}</td><td>{r.status.toLowerCase()}</td><td>{r.position.toLowerCase()}</td><td title={OUTCOME[r.paper.lastOutcome ?? ''] ?? ''}>{words(r.paper.lastOutcome)}</td><td className={`text-right font-mono ${tone(r.netPnl)}`}>{rupees(r.netPnl)}</td><td className="text-right">{r.trades}</td><td className="text-right">{pct(r.stats.winRate)}</td><td>{formatIST(r.createdAt)}</td></tr>)}</tbody></table></div></section>}
   {detail && <RunDetail run={detail} onStop={() => stopRun(detail.id).then(r => setRuns(old => old.map(x => x.id === r.id ? r : x))).catch(e => setError(e instanceof Error ? e.message : 'Stop failed'))} />}
  </div>;
 }

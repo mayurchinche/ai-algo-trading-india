@@ -72,17 +72,22 @@ export function signalRecord(strategy,spec,validation,bars,decision,instrumentKe
  const legs=spec.legs.map(l=>({id:l.id,side:l.side,instrument:l.instrument,quantity:l.quantity,stopLoss:l.stopLoss??null,target:l.target??null,trailingStop:l.trailingStop??null,
   levels:l.instrument.type==='option'?null:{stop:l.stopLoss?.unit==='percent'?b.close*(1-(l.side==='BUY'?1:-1)*l.stopLoss.value/100):null,target:l.target?.unit==='percent'?b.close*(1+(l.side==='BUY'?1:-1)*l.target.value/100):null}}));
  // A daily signal is acted on in the next session; an intraday one within the next bar.
- const validUntil=daily?decidedAtNextSessionClose(decision.decidedAt):decision.decidedAt+TIMEFRAME_MS[spec.timeframe];
+ const validUntil=validUntilOf({timeframe:spec.timeframe,decidedAt:decision.decidedAt});
  return {id:`${strategy.id}:${validation.symbol}:${decision.barTime}`,version:SIGNAL_VERSION,strategyId:strategy.id,strategyName:strategy.name,segment:strategy.segment,symbol:validation.symbol,instrumentKey,
   timeframe:spec.timeframe,barTime:decision.barTime,decidedAt:decision.decidedAt,validUntil,close:b.close,direction:spec.legs[0].side==='SELL'?'SHORT':(spec.legs.some(l=>l.instrument.optionType==='PE'&&l.side==='BUY')?'BEARISH':'LONG'),
   rule:strategy.rule,reference:strategy.reference,legs,maxHoldingDays:spec.risk?.maxHoldingDays??null,summary:[...legs.flatMap(l=>[levelText(l.stopLoss,'stop'),levelText(l.target,'target')]).filter(Boolean)].join(', ')||null,
   validation:{verdict:validation.verdict,computedAt:validation.computedAt,validatedWith:validation.validatedWith,onSymbol:validation.onSymbol,pooled:{symbols:validation.pooled.symbols,stats:validation.pooled.stats,halves:validation.pooled.halves}}};
 }
-function decidedAtNextSessionClose(ms){
- let d=new Date(ms+19800000);d=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()+1));
+// A daily decision is made at the end of its bar's day (midnight IST) and is acted on in the first weekday
+// session on or after that date. Exchange holidays are not known here; a run started on a holiday simply
+// waits, and its first stepped bar decides whether the setup still holds.
+export function decidedAtNextSessionClose(ms){
+ let d=new Date(Date.parse(new Date(ms+19800000).toISOString().slice(0,10)+'T00:00:00Z'));
  while([0,6].includes(d.getUTCDay()))d=new Date(d.getTime()+DAY);
  return Date.parse(d.toISOString().slice(0,10)+'T15:30:00+05:30');
 }
+// Validity is derived from the decision time on read, so stored signals use the current rule.
+export const validUntilOf=sig=>sig.timeframe==='1d'?decidedAtNextSessionClose(sig.decidedAt):sig.decidedAt+TIMEFRAME_MS[sig.timeframe];
 
 // Deterministic UUID v4-shaped id from a signal id, so a retried auto-paper creation is idempotent.
 export function runIdFor(signalId){const h=createHash('sha256').update('paper:'+signalId).digest('hex');return `${h.slice(0,8)}-${h.slice(8,12)}-4${h.slice(13,16)}-${((parseInt(h[16],16)&3)|8).toString(16)}${h.slice(17,20)}-${h.slice(20,32)}`;}
@@ -145,7 +150,7 @@ export async function captureMarketDay({store,fetcher=fetch}){
 }
 // Signals list for the UI: recent signals with their state, and the validation table per strategy.
 export function summarizeSignals(rows,validations,now){
- const signals=rows.map(r=>({...r.signal,recordedAt:r.recorded_at,status:now>r.signal.validUntil?'EXPIRED':'ACTIVE',paperRunId:runIdFor(r.signal.id)}));
+ const signals=rows.map(r=>{const validUntil=validUntilOf(r.signal);return {...r.signal,validUntil,recordedAt:r.recorded_at,status:now>validUntil?'EXPIRED':'ACTIVE',paperRunId:runIdFor(r.signal.id)};});
  const strategies=STRATEGIES.map(s=>{
   const v=validations.filter(x=>x.strategy_id===s.id),any=v[0]?.record;
   return {id:s.id,segment:s.segment,name:s.name,timeframe:s.timeframe,rule:s.rule,reference:s.reference,universe:s.universe,validatedWith:s.validationProxy??null,

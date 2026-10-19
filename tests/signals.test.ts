@@ -3,7 +3,7 @@ import {createElement} from 'react';import {renderToStaticMarkup} from 'react-do
 import {STRATEGIES,buildStrategySpec,strategyById} from '../shared/strategyLibrary.js';
 import {segmentOfSpec} from '../shared/tradingHorizon.js';
 import {backtestSymbol,poolResults,symbolVerdict,returnStats,validationRecord,CRITERIA} from '../shared/strategyValidation.js';
-import {entryDecidedOnLastBar,scanSignals,runValidation,staleStrategy,paperRunFor,runIdFor,summarizeSignals,captureMarketDay} from '../server/signalEngine.js';
+import {decidedAtNextSessionClose,entryDecidedOnLastBar,scanSignals,runValidation,staleStrategy,paperRunFor,runIdFor,summarizeSignals,captureMarketDay} from '../server/signalEngine.js';
 import {parseDeals,parseFlows,parseDelivery,csvRows,nseDate,createDeliveryReader} from '../server/marketIntel.js';
 import {technicalProfile,optionChainSummary,buildSwot,dealsSummary} from '../shared/stockAnalysis.js';
 import {analyzeStock,strategyStates} from '../server/stockAnalysis.js';
@@ -71,6 +71,11 @@ test('scan records validated signals once and auto-starts single-trade paper run
  const sum=summarizeSignals([{id:sig.id,recorded_at:'r',signal:sig}],[valRow('short-term-donchian','INFY')],sig.validUntil+1);
  assert.equal(sum.signals[0].status,'EXPIRED');assert.equal(sum.strategies.find((s:any)=>s.id==='short-term-donchian').status,'PASSED');assert.equal(sum.strategies.find((s:any)=>s.id==='swing-rsi2').status,'NOT_VALIDATED_YET');
  const html=renderToStaticMarkup(createElement(SignalsPage));assert.match(html,/Signals/);
+});
+test('a daily signal is valid for the first session on or after its decision date',()=>{
+ const thu=Date.parse('2026-10-16T00:00:00+05:30'),sat=Date.parse('2026-10-17T00:00:00+05:30');
+ assert.equal(new Date(decidedAtNextSessionClose(thu)).toISOString(),'2026-10-16T10:00:00.000Z','Thursday close → Friday session');
+ assert.equal(new Date(decidedAtNextSessionClose(sat)).toISOString(),'2026-10-19T10:00:00.000Z','Friday close → Monday session');
 });
 test('single-trade paper runs stop after their trade, a rejected entry or an expired signal',async()=>{
  const sig={id:'long-term-golden-trend:INFY:1760000000000',strategyId:'long-term-golden-trend',symbol:'INFY',close:1500};
@@ -142,12 +147,13 @@ test('stock analysis: technicals, option chain, SWOT with cited facts, and the a
 });
 const response=()=>({code:0,body:null as any,setHeader(){},status(n:number){this.code=n;return this;},json(b:any){this.body=b;return this;},end(){return this;}});
 test('signals and analysis routes validate input and protect scheduler jobs',async()=>{
- const sig={id:'long-term-golden-trend:INFY:1760000000000',strategyId:'long-term-golden-trend',symbol:'INFY',close:1500,validUntil:Date.now()+DAY};
+ const sig={id:'long-term-golden-trend:INFY:1760000000000',strategyId:'long-term-golden-trend',symbol:'INFY',close:1500,timeframe:'1d',decidedAt:Date.now()};
  const created:any[]=[];const store=()=>({signals:async()=>[{id:sig.id,recorded_at:'r',signal:sig}],validations:async()=>[],signal:async(id:string)=>id===sig.id?{id,signal:sig}:null});
  const h=createSignalsHandler({automation:{read:async()=>({lastTickAt:'t'})} as any,store,paperStore:()=>({create:async(id:string,spec:any,options:any,state:any)=>{created.push(id);return {id,status:'ACTIVE',version:0,spec,options,state,created_at:'c',updated_at:'u'};}}),secret:()=>'s'.repeat(32),env:{}});
  const g=response();await h({method:'GET',headers:{host:'x'},query:{}},g);assert.equal(g.code,200);assert.equal(g.body.signals.length,1);assert.equal(g.body.automation.lastTickAt,'t');assert.equal(g.body.autoPaper,true);
  const p=response();await h({method:'POST',headers:{host:'x'},query:{},body:{action:'paper',signalId:sig.id,capital:50000}},p);assert.equal(p.code,201);assert.equal(created[0],runIdFor(sig.id));assert.equal(p.body.run.segment,'long-term');
  const bad=response();await h({method:'POST',headers:{host:'x'},query:{},body:{action:'paper',signalId:sig.id,capital:5}},bad);assert.equal(bad.code,400);
+ const old=response();const hOld=createSignalsHandler({automation:{read:async()=>null} as any,store,paperStore:()=>({create:async()=>{throw new Error('no');}}),secret:()=>'s'.repeat(32),env:{},now:()=>Date.now()+10*DAY});await hOld({method:'POST',headers:{host:'x'},query:{},body:{action:'paper',signalId:sig.id,capital:50000}},old);assert.equal(old.code,409);
  const nf=response();await h({method:'POST',headers:{host:'x'},query:{},body:{action:'paper',signalId:'nope:X:1234567890',capital:5000}},nf);assert.equal(nf.code,404);
  const unauth=response();await h({method:'POST',headers:{authorization:'Bearer x'},query:{job:'scan'},body:{}},unauth);assert.equal(unauth.code,401);
  const badJob=response();await h({method:'POST',headers:{authorization:'Bearer '+'s'.repeat(32)},query:{job:'drop'},body:{}},badJob);assert.equal(badJob.code,400);

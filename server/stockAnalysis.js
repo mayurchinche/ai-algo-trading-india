@@ -10,6 +10,7 @@ import {fetchNews} from './marketNews.js';
 import {OPTION_UNDERLYINGS} from './optionChain.js';
 import {MarketDataError} from './upstoxReadOnly.js';
 import {nseDate,DEALS_URLS,parseDeals} from './marketIntel.js';
+import {validUntilOf} from './signalEngine.js';
 const DAY=86400000;
 const istDate=ms=>new Date(ms+19800000).toISOString().slice(0,10);
 const reason=e=>e instanceof MarketDataError?e.code:e?.code??'SOURCE_UNAVAILABLE';
@@ -82,7 +83,7 @@ export async function analyzeStock(symbol,{market,master,fundamentals,scorecards
  const fundamentalsOut=fund.status==='OK'?deriveFundamentals(fund.value.map(r=>r.filing),{instrumentKey:key,asOf:at,price:close,truncated:fund.value.length>=FUNDAMENTAL_READ_LIMIT}):fund;
  const card=cards.status==='OK'?cards.value.companies?.find(c=>c.symbol===symbol)??null:null,ranks=peerRanks(card);
  const myValidations=validations.status==='OK'?validations.value.filter(v=>v.symbol===symbol).map(v=>v.record):[];
- const mySignals=recent.status==='OK'?recent.value.filter(r=>r.signal.symbol===symbol).map(r=>({...r.signal,status:at>r.signal.validUntil?'EXPIRED':'ACTIVE'})):[];
+ const mySignals=recent.status==='OK'?recent.value.filter(r=>r.signal.symbol===symbol).map(r=>{const validUntil=validUntilOf(r.signal);return {...r.signal,validUntil,status:at>validUntil?'EXPIRED':'ACTIVE'};}):[];
  const dealRows=[...(deals.status==='OK'?deals.value.map(d=>({date:d.trade_date,kind:d.kind,client:d.client,side:d.side,quantity:Number(d.quantity),price:Number(d.price)})):[]),
   ...(live.status==='OK'?live.value.filter(d=>!(deals.value??[]).some(s=>s.trade_date===d.date&&s.client===d.client&&Number(s.quantity)===d.quantity)).map(({symbol:_s,...d})=>d):[])];
  const dealSum=deals.status==='OK'||live.status==='OK'?dealsSummary(dealRows):null;

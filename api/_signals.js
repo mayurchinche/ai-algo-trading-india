@@ -2,7 +2,7 @@ import {allowRequest} from '../server/pushBackend.js';
 import {signalStore} from '../server/signalStore.js';
 import {specPaperStore} from '../server/specPaperStore.js';
 import {createSpecPaperMarket} from '../server/specPaperMarket.js';
-import {scanSignals,runValidation,captureMarketDay,summarizeSignals,paperRunFor} from '../server/signalEngine.js';
+import {scanSignals,runValidation,captureMarketDay,summarizeSignals,paperRunFor,validUntilOf} from '../server/signalEngine.js';
 import {newPaperState,summarizeRun} from '../server/specPaperRunner.js';
 import {authorizeScheduler,emptySchedulerBody} from '../server/schedulerAuth.js';
 import {automationStatus} from './_automation.js';
@@ -31,6 +31,7 @@ export function createSignalsHandler({automation=automationStatus,store=signalSt
  if(!b||b.action!=='paper'||typeof b.signalId!=='string'||Object.keys(b).some(k=>!['action','signalId','capital'].includes(k))||!(typeof b.capital==='number'&&b.capital>=1000&&b.capital<=1e8))return res.status(400).json({error:"Send {action:'paper', signalId, capital (₹1,000 to ₹10 crore)}"});
  try{
   const row=await store().signal(b.signalId);if(!row)return res.status(404).json({error:'Signal not found'});
+  if(now()>validUntilOf(row.signal))return res.status(409).json({error:'This signal has expired: its setup was for an earlier session.'});
   const r=paperRunFor(row.signal,b.capital),saved=await paperStore().create(r.id,r.spec,r.options,newPaperState(r.spec,r.options,now()));
   return res.status(201).json({run:summarizeRun(saved)});
  }catch(e){return res.status(503).json({error:e instanceof Error&&/limit/.test(e.message)?'Active paper run limit reached (100).':unavailable});}
