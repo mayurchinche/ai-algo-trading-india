@@ -22,6 +22,14 @@ const series=(n:number,{drift=0.001,amp=0.03,seed=1}={})=>{let p=100,s=seed;cons
 
 // 80 quiet sessions, then a steady rise that breaks the 20-day high above a rising 50-day average.
 const breakout=()=>{const b=series(80,{drift:0,amp:0.002});let p=b.at(-1).close;for(let i=0;i<40;i++){p*=1.01;b.push({time:nextBday(b.at(-1).time),open:p/1.01,high:p*1.002,low:p/1.012,close:p,volume:1});}return b;};
+import {openingRange} from '../shared/indicators.js';
+test('opening range is defined only once the range has formed, per session',()=>{
+ const s=['d1','d1','d1','d2','d2','d2'],o=[10,11,12,20,21,22],h=[11,13,12.5,21,23,22.5],l=[9,10.5,11,19,20,21],c=[10.5,12,12,20.5,22,22];
+ const r=openingRange(o,h,l,c,s,2);
+ assert(Number.isNaN(r.high[0])&&Number.isNaN(r.high[3]),'not visible before the range completes');
+ assert.deepEqual([r.high[1],r.low[1],r.close[1],r.open[1]],[13,9,12,10]);assert.equal(r.high[2],13,'later bars keep the range');
+ assert.deepEqual([r.high[4],r.low[4],r.open[4],r.prevClose[4]],[23,19,20,12]);assert(Number.isNaN(r.prevClose[1]),'no previous session for the first day');
+});
 test('every library strategy builds a valid spec in its declared segment',()=>{
  for(const s of STRATEGIES){const spec=buildStrategySpec(s,{symbol:s.universe==='fno'?'NIFTY':'INFY',units:10,lots:1});assert.equal(segmentOfSpec(spec),s.segment,s.id);assert(s.rule&&s.reference,s.id);}
  assert.equal(segmentOfSpec(buildStrategySpec(strategyById('futures-supertrend-long'),{symbol:'INFY'})),'futures');
@@ -108,7 +116,7 @@ test('validation job refreshes the stalest strategy and market-day capture parse
  // Stale strategies on the same bar size are validated together from one read of each symbol.
  let reads=0;saved.length=0;const batches:number[]=[];const save=async(r:any[])=>{batches.push(r.length);saved.push(...r);return r.length;};
  const all:any=await runValidation({market:{history:async()=>{reads++;return bars;}},store:{validations:async()=>[],saveValidations:save},now:()=>now});
- assert.equal(all.timeframe,'15m');assert.equal(all.strategies,2);assert.equal(reads,50);
+ assert.equal(all.timeframe,'15m');assert.equal(all.strategies,STRATEGIES.filter(s=>s.timeframe==='15m').length);assert.equal(reads,50);
  reads=0;batches.length=0;const daily:any=await runValidation({market:{history:async()=>{reads++;return bars;}},store:{validations:async()=>STRATEGIES.filter(s=>s.timeframe==='15m').map(s=>row(s.id,now)),saveValidations:save},now:()=>now});
  assert.equal(daily.timeframe,'1d');assert.equal(daily.strategies,STRATEGIES.filter(s=>s.timeframe==='1d').length);assert.equal(reads,52,'one read per symbol for every daily strategy');assert(batches.every(n=>n<=200),'each save stays within the 200-row limit');
  assert.equal(nseDate('16-OCT-2026'),'2026-10-16');assert.equal(nseDate('bad'),null);

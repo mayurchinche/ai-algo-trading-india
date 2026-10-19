@@ -23,6 +23,7 @@ export const INDICATOR_TYPES = Object.freeze({
  supertrend:{params:{length:[1,200],multiplier:[0.1,20,'number']},source:false,outputs:['line','direction']},
  donchian:{params:{length:[1,500]},source:false,outputs:['middle','upper','lower']},
  vwap:{params:{},source:false,outputs:['value'],intradayOnly:true},
+ opening_range:{params:{bars:[1,24]},source:false,outputs:['high','low','open','close','prevClose'],intradayOnly:true},
 });
 
 const ID=/^[a-z][a-z0-9_]{0,31}$/, SYMBOL=/^[A-Z0-9&-]{1,30}$/, CLOCK=/^([01]\d|2[0-3]):[0-5]\d$/;

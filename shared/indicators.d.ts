@@ -19,3 +19,5 @@ export function supertrend(high: Series, low: Series, close: Series, length?: nu
 export function vwap(high: Series, low: Series, close: Series, volume: Series, sessions?: readonly unknown[]): Series;
 export function crossover(a: Series, b: Series | number): boolean[];
 export function crossunder(a: Series, b: Series | number): boolean[];
+
+export function openingRange(open: Series, high: Series, low: Series, close: Series, sessions: string[], bars: number): { high: number[]; low: number[]; open: number[]; close: number[]; prevClose: number[] };

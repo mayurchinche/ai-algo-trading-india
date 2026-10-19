@@ -59,6 +59,10 @@ Run `node scripts/research/validate-library.mjs <daily dir> <15m dir>` on a stor
 |---|---|---|---|---|---|---|---|---|
 | VWAP trend breakout (15m) | Intraday | 1,835 | 32.5% | −0.235% | 0.44 | −0.21 / −0.26 | Fail | 0 |
 | Supertrend flip (15m) | Intraday | 829 | 33.9% | −0.205% | 0.53 | −0.18 / −0.23 | Fail | 0 |
+| Opening range breakout long (15m) | Intraday | 1,181 | 34.0% | −0.269% | 0.45 | −0.26 / −0.27 | Fail | 0 |
+| Opening range breakout short (15m) | Intraday | 1,423 | 43.6% | −0.108% | 0.71 | −0.19 / −0.01 | Fail | 0 |
+| Intraday momentum long (15m) | Intraday | 1,292 | 21.9% | −0.184% | 0.22 | −0.17 / −0.19 | Fail | 0 |
+| Intraday momentum short (15m) | Intraday | 1,644 | 21.3% | −0.196% | 0.20 | −0.19 / −0.20 | Fail | 0 |
 | RSI(2) pullback | Swing | 3,210 | 60.4% | +0.008% | 1.01 | +0.16 / −0.11 | Fail | 0 |
 | EMA trend pullback | Swing | 676 | 46.0% | −0.303% | 0.83 | −0.27 / −0.33 | Fail | 0 |
 | 20-day breakout (Turtle) | Short term | 2,077 | 39.6% | +1.007% | 1.35 | +1.68 / +0.33 | **Pass** | 36 |
@@ -71,6 +75,16 @@ Run `node scripts/research/validate-library.mjs <daily dir> <15m dir>` on a stor
 | **Futures 20-day breakout, rolled monthly** | Futures | 2,176 | 40.5% | +1.124% | 1.41 | +1.81 / +0.43 | **Pass** | 40 |
 
 What this means:
+- **Intraday, cost split (60 days of 15-minute bars).** Every intraday trade pays about 0.083% in charges (brokerage, STT, exchange, stamp, GST) plus 0.1% assumed slippage (5 bps a side). Before slippage, the average trade was:
+
+  | Rule | Average trade before slippage |
+  |---|---|
+  | ORB short | +0.075% |
+  | Intraday momentum | about 0% |
+  | ORB long | −0.09% |
+  | VWAP breakout | −0.06% |
+
+  None covers the charges alone, so the intraday failures come from a lack of edge, not from the cost model. The intraday rules (opening range breakout and intraday momentum, from Crabel 1990, Zarattini et al. 2023 and Gao et al. 2018) were added with fixed parameters chosen before testing.
 - The futures breakout is the validated 20-day breakout rule traded through futures. Paper runs roll the position into the next contract two days before expiry (`rollLeg`); roll costs are charged in paper trading but not in the backtest, which uses the underlying price. The 25-day capped version failed, which shows the edge needs the full holding period.
 - Options stay without signals: expired option prices are unavailable, so option rules can be validated only through their direction, and those directions failed.
 - **Only the long-only trend and breakout rules on daily bars passed.** The intraday and swing rules lost money after charges, so those segments show no signals. This is the correct result, not a defect. Adding rules until something passes would overfit the history.

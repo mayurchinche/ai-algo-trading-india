@@ -195,6 +195,24 @@ export function vwap(high,low,close,volume,sessions){
  return out;
 }
 
+// Opening range of each session: high, low and close over its first `bars` bars, the session open and the
+// previous session's last close. Values exist only from the bar that completes the range onward, so a
+// condition can never see the range before it has finished forming.
+export function openingRange(open,high,low,close,sessions,bars){
+ finiteSeries(open,'open'); finiteSeries(high,'high'); finiteSeries(low,'low'); finiteSeries(close,'close');
+ const n=sameLength(open,high,low,close);
+ if(!Array.isArray(sessions)||sessions.length!==n) fail('sessions must be an array matching the bars');
+ if(!Number.isInteger(bars)||bars<1) fail('bars must be a positive integer');
+ const out={high:empty(n),low:empty(n),open:empty(n),close:empty(n),prevClose:empty(n)};
+ let start=0,hi=-Infinity,lo=Infinity,prev=NaN;
+ for(let i=0;i<n;i++){
+  if(i>0&&sessions[i]!==sessions[i-1]){prev=close[i-1];start=i;hi=-Infinity;lo=Infinity;}
+  const k=i-start;
+  if(k<bars){hi=Math.max(hi,high[i]);lo=Math.min(lo,low[i]);}
+  if(k>=bars-1){out.high[i]=hi;out.low[i]=lo;out.open[i]=open[start];out.close[i]=close[start+bars-1];out.prevClose[i]=prev;}
+ }
+ return out;
+}
 // True on the bar where a moves from <= b to > b (crossover) or from >= b to < b (crossunder).
 // `b` may be a series or a constant level. Bars with an undefined side are false.
 function levels(a,b){
