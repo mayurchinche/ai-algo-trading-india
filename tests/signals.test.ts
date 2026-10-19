@@ -154,6 +154,8 @@ test('automation tick runs paper every minute plus one due job and records a hea
  const st=mergeStatus(null,t);assert.equal(st.jobs.paper.runs,2);assert.deepEqual(st.jobs.paper.outcomes,{MONITORED:1,TRADE_COMPLETED:1});assert.equal(st.jobs.scan.signals,1);assert.equal(st.jobs.scan.validatedPairs,62);assert.equal(st.ticksToday,1);assert.equal(st.day,'2026-10-19');
  const t2:any=await runAutomationTick({now:()=>ist('10:03'),...jobs,status:async()=>{}});const st2=mergeStatus(st,t2);
  assert.equal(st2.ticksToday,2);assert.equal(st2.jobs.validate.strategy,'swing-rsi2');assert.equal(st2.jobs.scan.at,st.jobs.scan.at,'earlier job results are kept');
+ calls.length=0;await runAutomationTick({now:()=>ist('10:08'),...jobs,validate:async()=>({status:'COMPLETED',passed:true,validated:['INFY']}),status:async()=>{}});
+ assert.deepEqual(calls,['paper:25000','scan:1d+15m'],'a newly passed strategy is scanned immediately');
  const writes:any[]=[];const h=createAutomationHandler({now:()=>ist('10:03'),secret:()=>'s'.repeat(32),env:{},jobs,status:{read:async()=>null,write:async(d:any)=>{writes.push(d);}}});
  const ok=response();await h({method:'POST',headers:{authorization:'Bearer '+'s'.repeat(32)},body:{}},ok);assert.equal(ok.code,200);assert.equal(ok.body.job,'validate');assert.equal(writes.length,1);
  const no=response();await h({method:'POST',headers:{authorization:'Bearer nope'},body:{}},no);assert.equal(no.code,401);

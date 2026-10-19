@@ -4,7 +4,8 @@
 //   every minute       paper runs: resting stops/targets, square-off, decisions and fills
 //   09:16 and 09:31    market day (bulk/block deals, FII/DII) and the daily-strategy signal scan
 //   every 15 minutes   intraday-strategy signal scan
-//   every 5 minutes    strategy validation, when a strategy is missing or older than six days
+//   every 5 minutes    strategy validation, when a strategy is missing or older than six days (a pass
+//                      triggers an immediate signal scan)
 //   every 30 minutes   new NSE financial filings
 export const AUTOMATION_VERSION='automation-tick-v1';
 export const STATUS_ROW='scheduler_status';
@@ -28,7 +29,11 @@ export async function runAutomationTick({now=Date.now,paper,validate,scan,market
  out.paper=await attempt(()=>paper(25000));
  if(job==='daily'){out.marketDay=await attempt(marketDay);out.scan=await attempt(()=>scan(['1d','15m']));}
  else if(job==='intraday-scan')out.scan=await attempt(()=>scan(['15m']));
- else if(job==='validate')out.validate=await attempt(validate);
+ else if(job==='validate'){
+  out.validate=await attempt(validate);
+  // A newly passed strategy is scanned at once, so its current signals are not held until the next morning.
+  if(out.validate?.passed&&out.validate.validated?.length)out.scan=await attempt(()=>scan(['1d','15m']));
+ }
  else if(job==='fundamentals')out.fundamentals=await attempt(fundamentals);
  out.durationMs=now()-started;
  await attempt(()=>status(out));
