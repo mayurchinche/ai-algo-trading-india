@@ -97,8 +97,11 @@ test('validation job refreshes the stalest strategy and market-day capture parse
  saved.length=0;const down:any=await runValidation({market:{history:async()=>{throw limited();}},store,now:()=>now,wait:async()=>{}});
  assert.equal(down.status,'DATA_UNAVAILABLE');assert.equal(saved.length,0,'an outage is not recorded as a rejection');assert.equal(down.results[0].reason,'UPSTOX_RATE_LIMITED');
  // Stale strategies on the same bar size are validated together from one read of each symbol.
- let reads=0;saved.length=0;const all:any=await runValidation({market:{history:async()=>{reads++;return bars;}},store:{validations:async()=>[],saveValidations:async(r:any[])=>{saved.push(...r);return r.length;}},now:()=>now});
+ let reads=0;saved.length=0;const batches:number[]=[];const save=async(r:any[])=>{batches.push(r.length);saved.push(...r);return r.length;};
+ const all:any=await runValidation({market:{history:async()=>{reads++;return bars;}},store:{validations:async()=>[],saveValidations:save},now:()=>now});
  assert.equal(all.timeframe,'15m');assert.equal(all.strategies,2);assert.equal(reads,50);
+ reads=0;batches.length=0;const daily:any=await runValidation({market:{history:async()=>{reads++;return bars;}},store:{validations:async()=>STRATEGIES.filter(s=>s.timeframe==='15m').map(s=>row(s.id,now)),saveValidations:save},now:()=>now});
+ assert.equal(daily.timeframe,'1d');assert.equal(daily.strategies,9);assert.equal(reads,52,'one read per symbol for nine strategies');assert(batches.every(n=>n<=200),'each save stays within the 200-row limit');
  assert.equal(nseDate('16-OCT-2026'),'2026-10-16');assert.equal(nseDate('bad'),null);
  assert.deepEqual(csvRows('a,"b,c",d\n'),[['a','b,c','d']]);
  const deals=parseDeals('Date,Symbol,Security Name,Client Name,Buy/Sell,Quantity Traded,Trade Price / Wght. Avg. Price,Remarks\n16-OCT-2026,INFY,Infosys,"ABC FUND, LLP",BUY,70889,1524.91,-\n16-OCT-2026,INFY,Infosys,X,HOLD,1,1,-\nNO RECORDS,,,,,,\n','BULK');

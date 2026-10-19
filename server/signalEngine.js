@@ -124,7 +124,8 @@ export async function runValidation({market,store,now,wait}){
  if(!stale.length)return {status:'UP_TO_DATE'};
  const tf=s=>(s.validationProxy?strategyById(s.validationProxy):s).timeframe,group=stale.filter(s=>tf(s)===tf(stale[0]));
  const results=await validateStrategies(group,{market,now,wait}),done=results.filter(r=>r.status==='COMPLETED');
- if(done.length)await store.saveValidations(done.flatMap(r=>r.records));
+ // One call per strategy: the save function accepts at most 200 rows per call.
+ for(const r of done)await store.saveValidations(r.records);
  const validated=done.flatMap(r=>r.records.filter(x=>x.verdict==='VALIDATED').map(x=>`${r.strategy.id}:${x.symbol}`));
  return {status:done.length===results.length?'COMPLETED':done.length?'PARTIAL':'DATA_UNAVAILABLE',timeframe:tf(stale[0]),strategy:group.map(s=>s.id).join(','),strategies:results.length,
   passed:done.some(r=>r.pool.passed),validated,results:results.map(r=>r.status==='COMPLETED'?{id:r.strategy.id,passed:r.pool.passed,trades:r.pool.stats.trades}:{id:r.strategy.id,status:r.status,missing:r.missing,reason:r.reason})};
