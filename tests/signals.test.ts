@@ -173,7 +173,7 @@ test('automation tick runs paper every minute plus one due job and records a hea
  assert.equal(st2.ticksToday,2);assert.equal(st2.jobs.validate.strategy,'swing-rsi2');assert.equal(st2.jobs.dailyScan.at,st.jobs.dailyScan.at,'earlier job results are kept');
  calls.length=0;await runAutomationTick({now:()=>ist('10:08'),...jobs,validate:async()=>({status:'COMPLETED',passed:true,validated:['INFY']}),status:async()=>{}});
  assert.deepEqual(calls,['paper:25000','scan:1d+15m'],'a newly passed strategy is scanned immediately');
- calls.length=0;await runAutomationTick({now:()=>ist('10:33'),...jobs,validate:async()=>({status:'UP_TO_DATE'}),status:async()=>{}});assert.deepEqual(calls,['paper:25000','scan:1d+15m'],'safety-net daily scan every 30 minutes');
+ calls.length=0;await runAutomationTick({now:()=>ist('10:33'),...jobs,validate:async()=>({status:'DATA_UNAVAILABLE'}),status:async()=>{}});assert.deepEqual(calls,['paper:25000','scan:1d+15m'],'safety-net daily scan every 30 minutes');
  calls.length=0;await runAutomationTick({now:()=>ist('10:08'),...jobs,validate:async()=>({status:'UP_TO_DATE'}),status:async()=>{}});assert.deepEqual(calls,['paper:25000']);
  const writes:any[]=[];const h=createAutomationHandler({now:()=>ist('10:03'),secret:()=>'s'.repeat(32),env:{},jobs,status:{read:async()=>null,write:async(d:any)=>{writes.push(d);}}});
  const ok=response();await h({method:'POST',headers:{authorization:'Bearer '+'s'.repeat(32)},body:{}},ok);assert.equal(ok.code,200);assert.equal(ok.body.job,'validate');assert.equal(writes.length,1);

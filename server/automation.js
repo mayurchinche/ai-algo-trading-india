@@ -34,7 +34,7 @@ export async function runAutomationTick({now=Date.now,paper,validate,scan,market
   out.validate=await attempt(validate);
   // A newly passed strategy is scanned at once, so its current signals are not held until the next morning;
   // otherwise the daily scan repeats every 30 minutes as a safety net for a missed 09:16 tick (it is idempotent).
-  if((out.validate?.passed&&out.validate.validated?.length)||(out.validate?.status==='UP_TO_DATE'&&istMinute(started)%30===3))out.dailyScan=await attempt(()=>scan(['1d','15m']));
+  if((out.validate?.passed&&out.validate.validated?.length)||istMinute(started)%30===3)out.dailyScan=await attempt(()=>scan(['1d','15m']));
  }
  else if(job==='fundamentals')out.fundamentals=await attempt(fundamentals);
  out.durationMs=now()-started;
