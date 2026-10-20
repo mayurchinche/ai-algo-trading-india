@@ -86,6 +86,9 @@ test('a daily signal is valid for the first session on or after its decision dat
  const thu=Date.parse('2026-10-16T00:00:00+05:30'),sat=Date.parse('2026-10-17T00:00:00+05:30');
  assert.equal(new Date(decidedAtNextSessionClose(thu)).toISOString(),'2026-10-16T10:00:00.000Z','Thursday close → Friday session');
  assert.equal(new Date(decidedAtNextSessionClose(sat)).toISOString(),'2026-10-19T10:00:00.000Z','Friday close → Monday session');
+ // 20 Oct 2026 (Dussehra) and 10 Nov 2026 (Diwali Balipratipada) are NSE holidays.
+ assert.equal(new Date(decidedAtNextSessionClose(Date.parse('2026-10-20T00:00:00+05:30'))).toISOString(),'2026-10-21T10:00:00.000Z','Monday close before Dussehra → Wednesday session');
+ assert.equal(new Date(decidedAtNextSessionClose(Date.parse('2026-11-10T00:00:00+05:30'))).toISOString(),'2026-11-11T10:00:00.000Z','Monday close before a Tuesday holiday → Wednesday session');
 });
 test('single-trade paper runs stop after their trade, a rejected entry or an expired signal',async()=>{
  const sig={id:'long-term-golden-trend:INFY:1760000000000',strategyId:'long-term-golden-trend',symbol:'INFY',close:1500};
@@ -236,6 +239,8 @@ test('gap indicators and the opening-gap board',async()=>{
  assert.equal(buildGapBoard(rows)[0].status,'PRE_OPEN');
  const urls:string[]=[];await readRecentAnnouncements(Date.parse('2026-10-19T09:20:00+05:30'),{fetcher:(async(u:string)=>{urls.push(u);return new Response('[{"symbol":"PNB","an_dt":"17-Oct-2026 18:00:00","desc":"Results"}]');}) as any});
  assert.match(urls[0],/from_date=16-10-2026&to_date=19-10-2026$/,'Monday looks back to Friday');
+ await readRecentAnnouncements(Date.parse('2026-10-21T09:05:00+05:30'),{fetcher:(async(u:string)=>{urls.push(u);return new Response('[]');}) as any});
+ assert.match(urls[1],/from_date=19-10-2026&to_date=21-10-2026$/,'the session after Dussehra looks back past the holiday to Monday');
  const h=createOpeningGapsHandler({fetcher:(async(u:string)=>new Response(u.includes('pre-open')?JSON.stringify(po):'[]')) as any,signals:()=>({validations:async()=>[]}) as any,board:{read:async()=>null} as any,scorecards:async()=>null,master:async()=>[],now:()=>Date.parse('2026-10-19T20:00:00+05:30')});
  const res=response();await h({method:'GET',headers:{host:'x'},query:{}},res);assert.equal(res.code,200);assert.equal(res.body.summary.gapUp,1);assert.equal(res.body.rows.length,2);assert.equal(res.body.strategies.length,3);
  const spec=buildStrategySpec(strategyById('short-term-gap-continuation'),{symbol:'INFY'});assert.equal(segmentOfSpec(spec),'short-term');

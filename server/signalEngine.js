@@ -5,6 +5,7 @@ import {STRATEGIES,INDEX_UNDERLYINGS,buildStrategySpec,strategyById,triggerLevel
 import {backtestSymbol,poolResults,validationRecord} from '../shared/strategyValidation.js';
 import {createEngineState,stepEngine,computeStrategySeries,TIMEFRAME_MS} from '../shared/specEngine.js';
 import {NIFTY50_UNIVERSE} from '../shared/universes.js';
+import {nextNseTradingDay} from '../shared/nseCalendar.js';
 import {OPTION_UNDERLYINGS} from './optionChain.js';
 import {MarketDataError} from './upstoxReadOnly.js';
 import {newPaperState,validatePaperOptions} from './specPaperRunner.js';
@@ -82,13 +83,10 @@ export function signalRecord(strategy,spec,validation,bars,decision,instrumentKe
   rule:strategy.rule,reference:strategy.reference,legs,maxHoldingDays:spec.risk?.maxHoldingDays??null,summary:[...legs.flatMap(l=>[levelText(l.stopLoss,'stop'),levelText(l.target,'target')]).filter(Boolean)].join(', ')||null,
   validation:{verdict:validation.verdict,computedAt:validation.computedAt,validatedWith:validation.validatedWith,onSymbol:validation.onSymbol,pooled:{symbols:validation.pooled.symbols,stats:validation.pooled.stats,halves:validation.pooled.halves}}};
 }
-// A daily decision is made at the end of its bar's day (midnight IST) and is acted on in the first weekday
-// session on or after that date. Exchange holidays are not known here; a run started on a holiday simply
-// waits, and its first stepped bar decides whether the setup still holds.
+// A daily decision is made at the end of its bar's day (midnight IST) and is acted on in the first NSE
+// trading session on or after that date (weekends and listed exchange holidays are skipped).
 export function decidedAtNextSessionClose(ms){
- let d=new Date(Date.parse(new Date(ms+19800000).toISOString().slice(0,10)+'T00:00:00Z'));
- while([0,6].includes(d.getUTCDay()))d=new Date(d.getTime()+DAY);
- return Date.parse(d.toISOString().slice(0,10)+'T15:30:00+05:30');
+ return Date.parse(nextNseTradingDay(new Date(ms+19800000).toISOString().slice(0,10))+'T15:30:00+05:30');
 }
 // Validity is derived from the decision time on read, so stored signals use the current rule.
 export const validUntilOf=sig=>sig.timeframe==='1d'?decidedAtNextSessionClose(sig.decidedAt):sig.decidedAt+TIMEFRAME_MS[sig.timeframe];

@@ -2,6 +2,7 @@
 // trader checks: catalyst (exchange announcements since the previous session), technical position, peer
 // rank, where validated rules stand, and after 09:15 whether the gap is holding or filling.
 import {nseDate} from './marketIntel.js';
+import {previousNseTradingDay} from '../shared/nseCalendar.js';
 export const GAPS_VERSION='opening-gaps-v1';
 export const PREOPEN_URL='https://www.nseindia.com/api/market-data-pre-open?key=FO';
 const UA='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36';
@@ -22,9 +23,10 @@ export function parsePreOpen(body){
 }
 export const readPreOpen=async({fetcher=fetch}={})=>parsePreOpen(await json(fetcher,PREOPEN_URL,5e6));
 const ddmmyyyy=ms=>{const d=new Date(ms+19800000).toISOString().slice(0,10);return `${d.slice(8,10)}-${d.slice(5,7)}-${d.slice(0,4)}`;};
-// Exchange announcements for all companies since the previous weekday: the usual source of an overnight gap.
+// Exchange announcements for all companies since the previous trading session (weekends and exchange holidays
+// skipped): the usual source of an overnight gap.
 export async function readRecentAnnouncements(now,{fetcher=fetch}={}){
- let from=now-86400000;while([0,6].includes(new Date(from+19800000).getUTCDay()))from-=86400000;
+ const from=Date.parse(previousNseTradingDay(new Date(now+19800000).toISOString().slice(0,10))+'T00:00:00+05:30');
  const rows=await json(fetcher,`https://www.nseindia.com/api/corporate-announcements?index=equities&from_date=${ddmmyyyy(from)}&to_date=${ddmmyyyy(now)}`,8e6);
  if(!Array.isArray(rows))throw Object.assign(new Error('format'),{code:'ANNOUNCEMENTS_FORMAT_CHANGED'});
  const by=new Map();for(const a of rows){if(typeof a.symbol!=='string')continue;if(!by.has(a.symbol))by.set(a.symbol,[]);const l=by.get(a.symbol);if(l.length<3)l.push({time:a.an_dt??null,date:nseDate(String(a.an_dt??'').slice(0,11)),subject:String(a.desc??''),text:String(a.attchmntText??'').slice(0,240),url:typeof a.attchmntFile==='string'&&a.attchmntFile.startsWith('https://nsearchives.nseindia.com/')?a.attchmntFile:null});}
