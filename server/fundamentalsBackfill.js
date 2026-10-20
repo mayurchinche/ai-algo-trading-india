@@ -15,17 +15,23 @@ export const filingIndexUrl=symbol=>'https://www.nseindia.com/api/integrated-fil
 const quarterEnd=v=>{const m=/^(\d{2})-([A-Z]{3})-(\d{4})$/.exec(v||'');if(!m||!MONTHS.includes(m[2]))return null;const d=`${m[3]}-${String(MONTHS.indexOf(m[2])+1).padStart(2,'0')}-${m[1]}`;return new Date(d).toISOString().slice(0,10)===d?d:null;};
 const xbrlUrl=v=>{try{const u=new URL(v);return u.protocol==='https:'&&u.hostname==='nsearchives.nseindia.com'&&!u.port&&!u.username&&!u.password&&!u.search&&!u.hash&&/^\/corporate\/xbrl\/INTEGRATED_FILING_(?:INDAS|BANKING|NBFC_INDAS)_[A-Za-z0-9_]+\.xml$/.test(u.pathname)?u.href:null;}catch{return null;}};
 
-// Selects financial-result filings (Ind AS, NBFC Ind AS, banking) for quarters ending 31 March: the filings that
-// carry a full April–March year and its year-end balance sheet. Governance and insurance filings are counted, not used.
+// Selects financial-result filings (Ind AS, NBFC Ind AS, banking) for quarters ending 31 March, which carry a full
+// April–March year and its year-end balance sheet, plus the quarters after the latest such year end, whose
+// paid-up capital and face value keep the share count (market cap) current. Earlier quarters are counted, not
+// used, as are governance and insurance filings.
 export function parseFilingIndex(body,symbol,now){
  companySymbol(symbol);
  const parsed=JSON.parse(body);if(!parsed||!Array.isArray(parsed.data))throw Error('Invalid filing index');
- const counts={received:parsed.data.length,otherFilingTypes:0,notFinancialYearEnd:0,rejected:0};const seen=new Set(),items=[];
+ const counts={received:parsed.data.length,otherFilingTypes:0,notFinancialYearEnd:0,rejected:0};const seen=new Set(),valid=[],items=[];
  for(const row of parsed.data){
   if(typeof row?.xbrl!=='string'||!/INTEGRATED_FILING_(?:INDAS|BANKING|NBFC_INDAS)_/.test(row.xbrl)){counts.otherFilingTypes++;continue;}
   const url=xbrlUrl(row.xbrl),publishedAt=disclosureTime(row.broadcast_Date),qe=quarterEnd(row.qe_Date);
   if(!url||!publishedAt||Date.parse(publishedAt)>now||!qe||row.symbol!==undefined&&row.symbol!==symbol){counts.rejected++;continue;}
-  if(!qe.endsWith('-03-31')){counts.notFinancialYearEnd++;continue;}
+  valid.push({row,url,publishedAt,qe});
+ }
+ const latestYearEnd=valid.map(v=>v.qe).filter(qe=>qe.endsWith('-03-31')).sort().at(-1);
+ for(const {row,url,publishedAt,qe} of valid){
+  if(!qe.endsWith('-03-31')&&!(latestYearEnd&&qe>latestYearEnd)){counts.notFinancialYearEnd++;continue;}
   const id=sha(url+'|'+publishedAt);if(seen.has(id))continue;seen.add(id);
   items.push({id,url,publishedAt,quarterEnd:qe,scope:typeof row.consolidated==='string'?row.consolidated:null});
  }
@@ -95,7 +101,7 @@ export async function backfillFundamentalFilings({targets,store,legacy=true,read
   await pause();
  }
  const all=results.flatMap(r=>r.outcomes),count=s=>all.filter(o=>o.status===s).length;
- return {policy:'fundamental-backfill-v1',selection:'INTEGRATED_FILING_INDAS_NBFC_BANKING_QUARTER_ENDING_31_MARCH',symbols:results,
+ return {policy:'fundamental-backfill-v1',selection:'INTEGRATED_FILING_INDAS_NBFC_BANKING_QUARTER_ENDING_31_MARCH_AND_LATER_QUARTERS',symbols:results,
   coverage:{symbols:targets.length,indexUnavailable:results.filter(r=>r.status==='INDEX_UNAVAILABLE').length,recorded:count('RECORDED'),alreadyRecorded:count('ALREADY_RECORDED'),duplicates:count('DUPLICATE_DOCUMENT'),unsupportedFormat:count('UNSUPPORTED_FORMAT'),failed:count('READ_FAILED')+count('STORE_FAILED')+count('IDENTITY_MISMATCH')},
   limitations:['Integrated filings start with the quarter ended 31 Dec 2024; earlier audited annual results (FY2019–FY2024) are added when the ISIN is known, identified by symbol.','Older NSE XBRL contexts can contradict the declared reporting period.','Companies whose financial year does not end on 31 March are not backfilled.','The company index is NSE-provided and observed now; publication times come from it, while each stored filing records when this app read it.']};
 }

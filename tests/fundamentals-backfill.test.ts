@@ -12,7 +12,13 @@ test('index selects Ind AS filings for quarters ending 31 March and counts every
  // The bare banking row is a selectable filing type, rejected for its missing dates; only governance is another type.
  assert.deepEqual(r.coverage,{received:7,otherFilingTypes:1,notFinancialYearEnd:1,rejected:4,selected:1,totalCount:12,truncated:true});
  assert.equal(filingIndexUrl('M&M'),'https://www.nseindia.com/api/integrated-filing-results?index=equities&size=100&symbol=M%26M');
- assert.throws(()=>parseFilingIndex('{"rows":[]}','INFY',now));assert.throws(()=>filingIndexUrl('../x'));
+  assert.throws(()=>parseFilingIndex('{"rows":[]}','INFY',now));assert.throws(()=>filingIndexUrl('../x'));
+});
+test('index also selects quarters after the latest 31 March year end, for a current share count',()=>{
+ const r=parseFilingIndex(index([row('1','31-MAR-2026'),row('2','30-JUN-2026','24-Jul-2026 19:00:00'),row('3','31-DEC-2025','14-Jan-2026 20:38:27'),row('4','30-SEP-2026','16-Oct-2026 19:00:00')]),'INFY',now);
+ assert.deepEqual(r.items.map((i:any)=>i.quarterEnd),['2026-03-31','2026-06-30','2026-09-30']);
+ assert.equal(r.coverage.notFinancialYearEnd,1,'the quarter before the year end is not used');
+ assert.deepEqual(parseFilingIndex(index([row('2','30-JUN-2026','24-Jul-2026 19:00:00')]),'INFY',now).items,[],'no year end in the index: no quarter is selected');
 });
 // A minimal integrated filing as produced by NSE, with an annual period and its year-end balance sheet.
 const filingXml=(symbol:string,isin:string,profit=100)=>`<xbrl><context id="OneD"><entity><identifier>1</identifier></entity><period><startDate>2025-04-01</startDate><endDate>2026-03-31</endDate></period></context><context id="OneI"><entity><identifier>1</identifier></entity><period><instant>2026-03-31</instant></period></context><unit id="INR"><measure>iso4217:INR</measure></unit><Symbol contextRef="OneD">${symbol}</Symbol><ISIN contextRef="OneD">${isin}</ISIN><NameOfTheCompany contextRef="OneD">Fixture</NameOfTheCompany><NatureOfReportStandaloneConsolidated contextRef="OneD">Consolidated</NatureOfReportStandaloneConsolidated><RevenueFromOperations contextRef="OneD" unitRef="INR" decimals="-5">1000</RevenueFromOperations><ProfitLossForPeriod contextRef="OneD" unitRef="INR" decimals="-5">${profit}</ProfitLossForPeriod><Equity contextRef="OneI" unitRef="INR" decimals="-5">500</Equity></xbrl>`;
