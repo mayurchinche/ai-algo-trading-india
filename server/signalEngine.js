@@ -43,11 +43,17 @@ export async function validateStrategies(strategies,{market,now,wait,budgetMs=30
  for(const [i,strategy] of strategies.entries()){
   const proxy=proxies[i],members=universeOf(strategy),missing=members.filter(u=>history.get(u.symbol).error);
   if(missing.length>members.length*(1-MIN_UNIVERSE_COVERAGE)){out.push({strategy,status:'DATA_UNAVAILABLE',missing:missing.length,of:members.length,reason:history.get(missing[0].symbol).error});continue;}
-  const results=members.map(u=>{const h=history.get(u.symbol);return {u,r:h.error?{status:h.error}:backtestSymbol(buildStrategySpec(proxy,{symbol:u.symbol}),h.bars,{lotSize:researchLot(h.bars)})};});
+  const results=members.map(u=>{const h=history.get(u.symbol);return {u,r:h.error?{status:h.error}:backtestSymbol(validationSpec(strategy,proxy,u.symbol),h.bars,{lotSize:researchLot(h.bars)})};});
   const pool=poolResults(results.map(x=>x.r));
   out.push({strategy,status:'COMPLETED',pool,records:results.map(x=>validationRecord(strategy,x.u.symbol,x.r,pool,{computedAt,dataSource:'UPSTOX_HISTORICAL_CANDLE_V3',validatedWith:proxy.id===strategy.id?null:proxy.id}))});
  }
  return out;
+}
+// The spec a strategy is validated with: its own, or its proxy's (option strategies, whose expired premiums are
+// unavailable) with the strategy's own holding limit, so the validated timing matches what is traded.
+export function validationSpec(strategy,proxy,symbol){
+ const spec=buildStrategySpec(proxy,{symbol});
+ return strategy.validationHoldingDays?{...spec,risk:{...spec.risk,maxHoldingDays:strategy.validationHoldingDays}}:spec;
 }
 export async function validateStrategy(strategy,deps){const [r]=await validateStrategies([strategy],deps);return r;}
 // Strategies whose validation is missing, older than the refresh age, or was computed on too little data.

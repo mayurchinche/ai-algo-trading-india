@@ -111,7 +111,7 @@ const RAW=[
    indicators:[ind('st','supertrend',{length:10,multiplier:3})],entry:cmp(I('st','direction'),side==='BUY'?'crosses-above':'crosses-below',V(0)),exit:cmp(I('st','direction'),side==='BUY'?'crosses-below':'crosses-above',V(0)),
    legs:[{id:'fut',side,instrument:{type:'future',expiry:'current-month'},quantity:{lots},stopLoss:pct(3)}],risk:{maxHoldingDays:30}})})),
  ...['CE','PE'].map(type=>({id:'options-trend-'+(type==='CE'?'bull-call':'bear-put')+'-spread',segment:'options',name:`${type==='CE'?'Bull call':'Bear put'} spread on trend turn`,universe:'fno',timeframe:'1d',
-  validationProxy:'futures-supertrend-'+(type==='CE'?'long':'short'),
+  validationProxy:'futures-supertrend-'+(type==='CE'?'long':'short'),validationHoldingDays:10,
   rule:`When the daily Supertrend(10,3) turns ${type==='CE'?'up':'down'}, buy the ATM ${type} and sell the ${type} two strikes ${type==='CE'?'higher':'lower'} (current-month, defined risk); exit when the trend flips or after 10 days, or at 50% of the capital at risk.`,
   reference:'Vertical debit spread (defined-risk directional position), entry timed by Supertrend (10, 3).',
   build:({symbol,lots})=>({schemaVersion:1,name:`${type==='CE'?'Bull call':'Bear put'} spread ${symbol}`,mode:'positional',underlying:{symbol,exchange:'NSE',kind:INDEX_UNDERLYINGS.includes(symbol)?'index':'equity'},timeframe:'1d',schedule:DAY,
@@ -128,13 +128,42 @@ const RAW=[
    indicators:[ind('dc20','donchian',{length:20}),ind('dc10','donchian',{length:10}),ind('sma50','sma',{length:50},'close')],
    entry:{all:[cmp(P('close'),'crosses-above',I('dc20','upper',1)),cmp(P('close'),'gt',I('sma50'))]},exit:cmp(P('close'),'crosses-below',I('dc10','lower',1)),
    legs:[{id:'fut',side:'BUY',instrument:{type:'future',expiry:'current-month'},quantity:{lots},stopLoss:pct(8)}],risk:{maxHoldingDays:60}})},
+ // Added 2026-10-20 with parameters fixed before testing: the published Turtle and moving-average rules on
+ // the short side and through futures, and defined-risk option spreads timed by the 20-day breakout rules.
+ {id:'futures-breakdown-short',segment:'futures',name:'Futures 20-day breakdown short (rolled)',universe:'fno',timeframe:'1d',
+  rule:'Sell the current-month future on a close below the prior 20-day low while below the 50-day SMA; cover on a close above the prior 10-day high or after 60 days; 8% stop. The position is rolled to the next contract before expiry.',
+  reference:'Turtle System 1 short entry and exit (Curtis Faith, “Way of the Turtle”, 2007), applied to stock and index futures with monthly rollover.',
+  build:({symbol,lots})=>({schemaVersion:1,name:'Futures breakdown short '+symbol,mode:'positional',underlying:{symbol,exchange:'NSE',kind:INDEX_UNDERLYINGS.includes(symbol)?'index':'equity'},timeframe:'1d',schedule:DAY,
+   indicators:[ind('dc20','donchian',{length:20}),ind('dc10','donchian',{length:10}),ind('sma50','sma',{length:50},'close')],
+   entry:{all:[cmp(P('close'),'crosses-below',I('dc20','lower',1)),cmp(P('close'),'lt',I('sma50'))]},exit:cmp(P('close'),'crosses-above',I('dc10','upper',1)),
+   legs:[{id:'fut',side:'SELL',instrument:{type:'future',expiry:'current-month'},quantity:{lots},stopLoss:pct(8)}],risk:{maxHoldingDays:60}})},
+ {id:'futures-golden-trend-long',segment:'futures',name:'Futures 200-day trend (rolled)',universe:'fno',timeframe:'1d',
+  rule:'Buy the current-month future when the close crosses above the 200-day SMA while the 50-day SMA is above the 200-day SMA; sell on a close below the 200-day SMA; 20% disaster stop. The position is rolled to the next contract before expiry.',
+  reference:'Moving-average timing studied in Mebane Faber, “A Quantitative Approach to Tactical Asset Allocation” (2007), applied to stock and index futures with monthly rollover.',
+  build:({symbol,lots})=>({schemaVersion:1,name:'Futures 200-day trend '+symbol,mode:'positional',underlying:{symbol,exchange:'NSE',kind:INDEX_UNDERLYINGS.includes(symbol)?'index':'equity'},timeframe:'1d',schedule:DAY,
+   indicators:[ind('sma50','sma',{length:50},'close'),ind('sma200','sma',{length:200},'close')],
+   entry:{all:[cmp(P('close'),'crosses-above',I('sma200')),cmp(I('sma50'),'gt',I('sma200'))]},exit:cmp(P('close'),'crosses-below',I('sma200')),
+   legs:[{id:'fut',side:'BUY',instrument:{type:'future',expiry:'current-month'},quantity:{lots},stopLoss:pct(20)}]})},
+ // Option spreads: expired option prices are not available, so the timing rule is validated on the underlying
+ // with the spread's own exit rule and 20-day holding limit (validationHoldingDays). Next-month contracts keep
+ // roughly 20 or more sessions to expiry at entry.
+ ...['CE','PE'].map(type=>{const bull=type==='CE';return {id:'options-breakout-'+(bull?'bull-call':'bear-put')+'-spread',segment:'options',name:`${bull?'Bull call':'Bear put'} spread on a 20-day ${bull?'breakout':'breakdown'}`,universe:'fno',timeframe:'1d',
+  validationProxy:bull?'futures-breakout-long':'futures-breakdown-short',validationHoldingDays:20,
+  rule:`On a close ${bull?'above the prior 20-day high while above':'below the prior 20-day low while below'} the 50-day SMA, buy the next-month ATM ${type} and sell the ${type} two strikes ${bull?'higher':'lower'} (defined risk); exit on a close ${bull?'below the prior 10-day low':'above the prior 10-day high'} or after 20 days.`,
+  reference:`Vertical debit spread (defined-risk directional position), entry and exit timed by Turtle System 1 ${bull?'breakout':'breakdown'} rules (Curtis Faith, “Way of the Turtle”, 2007).`,
+  build:({symbol,lots})=>({schemaVersion:1,name:`${bull?'Bull call':'Bear put'} spread ${symbol}`,mode:'positional',underlying:{symbol,exchange:'NSE',kind:INDEX_UNDERLYINGS.includes(symbol)?'index':'equity'},timeframe:'1d',schedule:DAY,
+   indicators:[ind('dc20','donchian',{length:20}),ind('dc10','donchian',{length:10}),ind('sma50','sma',{length:50},'close')],
+   entry:{all:[cmp(P('close'),bull?'crosses-above':'crosses-below',I('dc20',bull?'upper':'lower',1)),cmp(P('close'),bull?'gt':'lt',I('sma50'))]},exit:cmp(P('close'),bull?'crosses-below':'crosses-above',I('dc10',bull?'lower':'upper',1)),
+   legs:[{id:'long_opt',side:'BUY',instrument:{type:'option',optionType:type,expiry:'next-month',strike:{mode:'atm-offset',steps:0}},quantity:{lots}},{id:'short_opt',side:'SELL',instrument:{type:'option',optionType:type,expiry:'next-month',strike:{mode:'atm-offset',steps:bull?2:-2}},quantity:{lots}}],
+   risk:{maxHoldingDays:20}})};}),
+
 ];
 // Distance from the last close to the price that would trigger each breakout-style entry, for "near a trigger"
 // watchlists. Returns null when the rule has no single price level (for example a pending moving-average cross).
-const BREAKOUT_LEVEL={'short-term-donchian':{high:20,above:'sma50'},'futures-breakout-long':{high:20,above:'sma50'},'long-term-52w-high':{high:250}};
+const BREAKOUT_LEVEL={'short-term-donchian':{high:20,above:'sma50'},'futures-breakout-long':{high:20,above:'sma50'},'options-breakout-bull-call-spread':{high:20,above:'sma50'},'long-term-52w-high':{high:250}};
 export function triggerLevel(strategyId,bars){
  const cfg=BREAKOUT_LEVEL[strategyId],c=bars.at(-1)?.close;
- if(strategyId==='long-term-golden-trend'){
+ if(strategyId==='long-term-golden-trend'||strategyId==='futures-golden-trend-long'){
   if(bars.length<200)return null;const avg=n=>bars.slice(-n).reduce((a,b)=>a+b.close,0)/n,s50=avg(50),s200=avg(200);
   return s50>s200&&c<s200?{level:s200,distancePct:(s200/c-1)*100,condition:'close above the 200-day average (50-day is above it)'}:null;
  }

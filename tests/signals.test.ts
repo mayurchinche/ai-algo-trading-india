@@ -3,7 +3,7 @@ import {createElement} from 'react';import {renderToStaticMarkup} from 'react-do
 import {STRATEGIES,buildStrategySpec,strategyById} from '../shared/strategyLibrary.js';
 import {segmentOfSpec} from '../shared/tradingHorizon.js';
 import {backtestSymbol,poolResults,symbolVerdict,returnStats,validationRecord,CRITERIA} from '../shared/strategyValidation.js';
-import {decidedAtNextSessionClose,entryDecidedOnLastBar,scanSignals,runValidation,staleStrategy,paperRunFor,runIdFor,summarizeSignals,captureMarketDay} from '../server/signalEngine.js';
+import {validationSpec,decidedAtNextSessionClose,entryDecidedOnLastBar,scanSignals,runValidation,staleStrategy,paperRunFor,runIdFor,summarizeSignals,captureMarketDay} from '../server/signalEngine.js';
 import {parseDeals,parseFlows,parseDelivery,csvRows,nseDate,createDeliveryReader} from '../server/marketIntel.js';
 import {technicalProfile,optionChainSummary,buildSwot,dealsSummary} from '../shared/stockAnalysis.js';
 import {analyzeStock,strategyStates} from '../server/stockAnalysis.js';
@@ -81,6 +81,14 @@ test('scan records validated signals once and auto-starts single-trade paper run
  const sum=summarizeSignals([{id:sig.id,recorded_at:'r',signal:sig}],[valRow('short-term-donchian','INFY')],sig.validUntil+1);
  assert.equal(sum.signals[0].status,'EXPIRED');assert.equal(sum.strategies.find((s:any)=>s.id==='short-term-donchian').status,'PASSED');assert.equal(sum.strategies.find((s:any)=>s.id==='swing-rsi2').status,'NOT_VALIDATED_YET');
  const html=renderToStaticMarkup(createElement(SignalsPage));assert.match(html,/Signals/);
+});
+test('option spreads are validated on their proxy rule with the spread\'s own holding limit',()=>{
+ for(const s of STRATEGIES.filter(x=>['futures','options'].includes(x.segment)))for(const symbol of ['INFY','NIFTY'])assert.equal(segmentOfSpec(buildStrategySpec(s,{symbol})),s.segment,s.id);
+ const spread=strategyById('options-breakout-bull-call-spread')!,proxy=strategyById(spread.validationProxy)!;
+ const v=validationSpec(spread,proxy,'INFY');
+ assert.equal(v.legs[0].instrument.type,'future');assert.equal(v.risk?.maxHoldingDays,20);assert.equal(buildStrategySpec(proxy,{symbol:'INFY'}).risk?.maxHoldingDays,60,'the proxy rule itself is unchanged');
+ assert.equal(buildStrategySpec(spread,{symbol:'INFY'}).risk?.maxHoldingDays,20);
+ assert.equal(validationSpec(proxy,proxy,'INFY').risk?.maxHoldingDays,60);
 });
 test('a daily signal is valid for the first session on or after its decision date',()=>{
  const thu=Date.parse('2026-10-16T00:00:00+05:30'),sat=Date.parse('2026-10-17T00:00:00+05:30');
