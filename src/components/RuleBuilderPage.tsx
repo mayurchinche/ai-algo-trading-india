@@ -135,7 +135,7 @@ export function RuleBuilderPage() {
  const indicators = Array.isArray(draft.indicators) ? draft.indicators : [];
  return <div className="space-y-6">
   <div className="page-title"><div><h2>Rule builder</h2><p>Build a strategy as conditions over the indicator catalogue, validate it, and backtest it on completed bars. Drafts stay in this browser.</p></div>
-   <div className="flex flex-wrap gap-2"><select className="btn btn-secondary" value="" onChange={e => e.target.value && setDraft(structuredClone(TEMPLATES[e.target.value]))}><option value="">Start from template…</option>{Object.keys(TEMPLATES).map(t => <option key={t}>{t}</option>)}</select><button className="btn btn-secondary" onClick={() => downloadJson('strategy-spec.json', draft)}>Download JSON</button></div></div>
+   <div className="flex flex-wrap gap-2 md:shrink-0"><select className="btn btn-secondary" value="" onChange={e => e.target.value && setDraft(structuredClone(TEMPLATES[e.target.value]))}><option value="">Start from template…</option>{Object.keys(TEMPLATES).map(t => <option key={t}>{t}</option>)}</select><button className="btn btn-secondary" onClick={() => downloadJson('strategy-spec.json', draft)}>Download JSON</button></div></div>
   <section className="notice text-sm" role="note">Research and paper simulation only; nothing here places broker orders.</section>
   <section className="card grid gap-4"><h3>Strategy</h3><div className="field-grid">
    <Field label="Name"><input value={draft.name ?? ''} onChange={e => set({ name: e.target.value })} /></Field>
