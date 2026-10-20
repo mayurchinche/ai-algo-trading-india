@@ -7,27 +7,56 @@ import { AutomationStatus } from './AutomationStatus';
 
 const pct = (n: number | null | undefined, d = 2) => n === null || n === undefined || !Number.isFinite(n) ? '—' : `${n.toFixed(d)}%`;
 const num = (n: number | null | undefined, d = 2) => n === null || n === undefined ? '—' : n === Infinity ? '∞' : n.toFixed(d);
-const when = (ms: number) => formatIST(new Date(ms).toISOString());
 const STATUS: Record<StrategyStatus['status'], string> = { PASSED: 'Validated', FAILED: 'Failed validation', INSUFFICIENT_EVIDENCE: 'Not enough trades yet', NOT_VALIDATED_YET: 'Validation pending' };
 
 function StatLine({ s, label }: { s: ReturnStats; label: string }) {
  return <p className="text-xs">{label}: {s.trades} trades · win rate {s.winRate === null ? '—' : (s.winRate * 100).toFixed(1) + '%'} · average trade {pct(s.expectancyPct)} after charges · profit factor {num(s.profitFactor)} · worst drawdown {pct(s.maxDrawdownPct, 1)}</p>;
 }
+const rupees = (n: number) => '₹' + n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const signedPct = (n: number | null | undefined, d = 2) => n === null || n === undefined || !Number.isFinite(n) ? '—' : `${n > 0 ? '+' : ''}${n.toFixed(d)}%`;
+// A daily bar starts at midnight IST, so its date is the session; an intraday bar is named by its closing time.
+const istDay = (ms: number) => new Date(ms).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' });
+const istShort = (ms: number) => new Date(ms).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Kolkata' });
+const barLabel = (s: Signal) => s.timeframe === '1d' ? `close of ${istDay(s.barTime)}` : `${s.timeframe} bar closing ${istShort(s.decidedAt)} IST`;
+function Level({ label, value, close }: { label: string; value: number | null | undefined; close: number }) {
+ return <div><dt>{label}</dt><dd>{value === null || value === undefined ? '—' : rupees(value)}{value !== null && value !== undefined && <small>{signedPct((value / close - 1) * 100, 1)} from close</small>}</dd></div>;
+}
 function SignalCard({ s }: { s: Signal }) {
  const [capital, setCapital] = useState(100000); const [state, setState] = useState(''); const [busy, setBusy] = useState(false);
- const v = s.validation, on = 'stats' in v.onSymbol ? v.onSymbol : null, leg = s.legs[0];
- return <article className="card space-y-2">
-  <div className="page-title"><div><h3>{s.symbol} · {s.direction.toLowerCase()} · {s.strategyName}</h3><p>{SEGMENTS.find(x => x.id === s.segment)?.label} · decided at the close of {when(s.barTime)} at ₹{s.close.toFixed(2)} · {s.status === 'ACTIVE' ? `valid until ${when(s.validUntil)}` : 'expired'}</p></div>
-   <span className={`badge ${s.status === 'ACTIVE' ? 'badge-green' : ''}`}>{s.status === 'ACTIVE' ? 'Active' : 'Expired'}</span></div>
-  <p className="text-sm"><strong>Rule:</strong> {s.rule}</p>
-  {leg?.levels && (leg.levels.stop !== null || leg.levels.target !== null) && <p className="text-sm">Reference levels from the signal close: {leg.levels.stop !== null && <>stop ₹{leg.levels.stop.toFixed(2)}</>}{leg.levels.stop !== null && leg.levels.target !== null && ' · '}{leg.levels.target !== null && <>target ₹{leg.levels.target.toFixed(2)}</>}{s.maxHoldingDays ? ` · exit after ${s.maxHoldingDays} days at most` : ''}. Paper runs set levels from the actual fill.</p>}
-  {on && <StatLine s={on.stats} label={`History on ${s.symbol} (${new Date(on.period.from).getFullYear()}–${new Date(on.period.to).getFullYear()}); buy-and-hold ${pct(on.buyHoldPct, 1)}, in market ${(on.timeInMarket * 100).toFixed(0)}% of the time`} />}
-  <StatLine s={v.pooled.stats} label={`Across ${v.pooled.symbols} symbols`} />
-  {v.validatedWith && <p className="text-xs">Validated through its underlying rule ({v.validatedWith}); option premiums for expired contracts are not available.</p>}
-  <details><summary className="text-xs">Source of the rule</summary><p className="text-xs">{s.reference}</p></details>
-  <div className="flex flex-wrap gap-2 items-center">
+ const v = s.validation, on = 'stats' in v.onSymbol ? v.onSymbol : null, leg = s.legs[0], active = s.status === 'ACTIVE';
+ const long = s.direction === 'LONG', st = on?.stats;
+ return <article className="card data-card">
+  <div className="data-card-head">
+   <div><div className="data-card-title"><strong>{s.symbol}</strong><span className={`badge ${long ? 'badge-green' : 'badge-red'}`}>{s.direction === 'BEARISH' ? 'Bearish' : long ? 'Long' : 'Short'}</span><span className="badge badge-neutral">{SEGMENTS.find(x => x.id === s.segment)?.label}</span></div>
+    <p className="data-card-sub">{s.strategyName} · signal on the {barLabel(s)}</p></div>
+   <span className={`badge ${active ? 'badge-green' : 'badge-neutral'}`}>{active ? `Active until ${istShort(s.validUntil)}` : 'Expired'}</span>
+  </div>
+  <dl className="fact-grid">
+   <div><dt>Signal close</dt><dd>{rupees(s.close)}</dd></div>
+   <Level label="Stop" value={leg?.levels?.stop} close={s.close} />
+   <Level label="Target" value={leg?.levels?.target} close={s.close} />
+   <div><dt>Holding</dt><dd>{s.maxHoldingDays ? `≤ ${s.maxHoldingDays} days` : 'Until exit rule'}</dd></div>
+  </dl>
+  {st && on && <div className="grid gap-2">
+   <p className="section-label">Track record on {s.symbol} · {new Date(on.period.from).getFullYear()}–{new Date(on.period.to).getFullYear()} · after charges</p>
+   <dl className="fact-grid cols-5 plain">
+    <div><dt>Trades</dt><dd>{st.trades}</dd></div>
+    <div><dt>Win rate</dt><dd>{st.winRate === null ? '—' : (st.winRate * 100).toFixed(1) + '%'}</dd></div>
+    <div><dt>Avg trade</dt><dd className={(st.expectancyPct ?? 0) >= 0 ? 'positive' : 'negative'}>{signedPct(st.expectancyPct)}</dd></div>
+    <div><dt>Profit factor</dt><dd>{num(st.profitFactor)}</dd></div>
+    <div><dt>Worst drawdown</dt><dd>{pct(st.maxDrawdownPct, 1)}</dd></div>
+   </dl>
+   <p className="caption">In the market {(on.timeInMarket * 100).toFixed(0)}% of the time; buy-and-hold over the same years {signedPct(on.buyHoldPct, 1)}. Levels are from the signal close; paper runs set them from the actual fill.</p>
+  </div>}
+  <details className="card-disclosure"><summary>Rule, universe results and source</summary><div>
+   <p><strong>Rule:</strong> {s.rule}</p>
+   <StatLine s={v.pooled.stats} label={`Across ${v.pooled.symbols} symbols`} />
+   {v.validatedWith && <p>Validated through its underlying rule ({v.validatedWith}); option premiums for expired contracts are not available.</p>}
+   <p>{s.reference}</p>
+  </div></details>
+  <div className="card-actions">
    <button className="btn btn-secondary" onClick={() => openAnalysis(s.symbol)}>Analyse {s.symbol}</button>
-   {s.status === 'ACTIVE' && <><label className="text-sm">Capital ₹ <input type="number" min={1000} step={1000} value={capital} onChange={e => setCapital(Number(e.target.value))} style={{ width: 110 }} /></label>
+   {active && <><label>Capital ₹<input type="number" min={1000} step={1000} value={capital} onChange={e => setCapital(Number(e.target.value))} /></label>
     <button className="btn btn-primary" disabled={busy} onClick={() => { setBusy(true); setState(''); paperTradeSignal(s.id, capital).then(() => navigateTo('Paper trading')).catch(e => setState(e instanceof Error ? e.message : 'Paper run not started')).finally(() => setBusy(false)); }}>{busy ? 'Starting…' : 'Paper trade'}</button></>}
    {state && <span className="text-sm" role="status">{state}</span>}
   </div>
@@ -60,7 +89,7 @@ export function SignalsPage() {
  const load = useCallback(() => { setLoading(true); fetchSignals().then(d => { setData(d); setError(''); }).catch(e => setError(e instanceof Error ? e.message : 'Signals unavailable')).finally(() => setLoading(false)); }, []);
  useEffect(() => { load(); const t = setInterval(load, 60000); return () => clearInterval(t); }, [load]);
  const inSeg = <T extends { segment: string }>(x: T) => segment === 'all' || x.segment === segment;
- const signals = (data?.signals ?? []).filter(inSeg).filter(s => showExpired || s.status === 'ACTIVE');
+ const signals = (data?.signals ?? []).filter(inSeg).filter(s => showExpired || s.status === 'ACTIVE').sort((a, b) => Number(b.status === 'ACTIVE') - Number(a.status === 'ACTIVE'));
  const strategies = (data?.strategies ?? []).filter(inSeg), passed = strategies.filter(s => s.status === 'PASSED');
  return <div className="space-y-6">
   <div className="page-title"><div><h2>Signals</h2><p>Buy and sell signals from rules that have proven profitable after broker charges on 10 years of history. Every signal can be paper-traded{data?.autoPaper ? ', and each new signal is paper-traded automatically with ₹1 lakh so its live record builds up' : ''}.</p></div><button className="btn btn-secondary" disabled={loading} onClick={load}>{loading ? 'Loading…' : 'Refresh'}</button></div>
@@ -71,7 +100,7 @@ export function SignalsPage() {
   {data && segment !== 'all' && !passed.length && <section className="card"><p className="text-sm">No {SEGMENTS.find(s => s.id === segment)?.label.toLowerCase()} strategy has passed validation{strategies.some(s => s.status === 'NOT_VALIDATED_YET') ? ' yet (validation is still running)' : ''}, so this segment produces no signals: {strategies.filter(s => s.pooled).map(s => `${s.name} averaged ${pct(s.pooled!.stats.expectancyPct)} per trade after charges over ${s.pooled!.stats.trades} trades`).join('; ') || 'validation is still running'}. Publishing these as buy signals would knowingly lose money.{segment === 'options' ? ' Option strategies cannot be validated directly because prices of expired option contracts are not available; for leveraged exposure use the Futures segment, whose breakout rule is validated.' : ''}</p></section>}
   <div className="flex items-center gap-3"><h3>{showExpired ? 'Signals, last 10 sessions' : 'Active signals'} ({signals.length})</h3><label className="text-sm inline-flex items-center gap-2 whitespace-nowrap"><input type="checkbox" checked={showExpired} onChange={e => setShowExpired(e.target.checked)} /> include expired</label></div>
   {data && !signals.length && <p className="text-sm">No {showExpired ? '' : 'active '}signals{segment === 'all' ? '' : ' in this segment'}. Daily rules are checked on the previous session’s close at 09:16 IST (and again every 30 minutes); a signal is actionable for that session only.</p>}
-  <div className="grid gap-4">{signals.map(s => <SignalCard key={s.id} s={s} />)}</div>
+  <div className="card-grid">{signals.map(s => <SignalCard key={s.id} s={s} />)}</div>
   {data?.board && <Board rows={data.board.rows.filter(inSeg)} computedAt={data.board.computedAt} />}
   <section className="card space-y-2"><h3>Strategy validation</h3><p className="text-sm">Results after charges, pooled across each strategy’s universe. Click a row for the rule, its source and the gate checks.</p>
    <div className="overflow-x-auto"><table className="data-table"><thead><tr><th>Strategy</th><th>Bars</th><th>Status</th><th className="text-right">Trades</th><th className="text-right">Win rate</th><th className="text-right">Avg trade</th><th className="text-right">Profit factor</th><th className="text-right">Validated stocks</th><th>Computed</th></tr></thead>
