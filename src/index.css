@@ -542,3 +542,15 @@ label:has(> input[type=checkbox]),label:has(> input[type=radio]){display:inline-
 .range-field input[type=range]{width:100%;accent-color:var(--blue)}
 @media(max-width:900px){.field-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.field-grid{grid-template-columns:1fr}.field-row>.field{flex:1 1 120px}.field-row .w-xs,.field-row .w-sm,.field-row .w-md{width:auto}}
+
+/* TradingView widgets: the iframe fills a padded card. */
+.tv-card{padding:8px!important;overflow:hidden}.tv-frame{width:100%}
+/* Strategy coverage (Signals): segments side by side, each rule a disclosure row. */
+.coverage-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:16px;align-items:start}
+.coverage-seg{display:grid;gap:10px;padding:14px;border:1px solid var(--border);border-radius:12px;background:#fbfcfe}
+.rule-item-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.rule-item{border:1px solid var(--border);border-radius:10px;background:#fff}
+.rule-item>summary{list-style:none;cursor:pointer;padding:10px 12px;display:grid;gap:6px}
+.rule-item>summary::-webkit-details-marker{display:none}
+.rule-item[open]>summary{border-bottom:1px solid var(--border)}
+.rule-item-body{padding:10px 12px;display:grid;gap:8px;font-size:12.5px;line-height:1.6;color:var(--text-secondary)}

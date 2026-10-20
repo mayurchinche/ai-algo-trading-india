@@ -62,14 +62,32 @@ function SignalCard({ s }: { s: Signal }) {
   </div>
  </article>;
 }
-function StrategyRow({ s }: { s: StrategyStatus }) {
- const [open, setOpen] = useState(false);
- return <><tr onClick={() => setOpen(!open)} style={{ cursor: 'pointer' }} aria-expanded={open}>
-  <td className="font-semibold">{s.name}</td><td>{s.timeframe}</td><td>{STATUS[s.status]}</td><td className="text-right">{s.pooled?.stats.trades ?? '—'}</td><td className="text-right">{s.pooled ? (s.pooled.stats.winRate! * 100).toFixed(1) + '%' : '—'}</td><td className="text-right">{pct(s.pooled?.stats.expectancyPct)}</td><td className="text-right">{num(s.pooled?.stats.profitFactor)}</td><td className="text-right">{s.symbols.validated.length}</td><td>{s.computedAt ? formatIST(s.computedAt) : '—'}</td></tr>
-  {open && <tr><td colSpan={9} className="text-sm space-y-1"><p><strong>Rule:</strong> {s.rule}</p><p className="text-xs">{s.reference}</p>
-   {s.pooled && <><StatLine s={s.pooled.halves.first} label="First half of history" /><StatLine s={s.pooled.halves.second} label="Second half of history" />{!!s.pooled.reasons.length && <ul className="text-xs">{s.pooled.reasons.map(r => <li key={r}>Gate: {r}</li>)}</ul>}</>}
-   {!!s.symbols.validated.length && <p className="text-xs">Validated symbols: {s.symbols.validated.map(v => `${v.symbol} (${pct(v.stats?.expectancyPct)}/trade)`).join(', ')}</p>}
-   <p className="text-xs">{s.symbols.unproven} symbols with too few trades · {s.symbols.rejected} rejected</p></td></tr>}</>;
+const STATUS_BADGE: Record<StrategyStatus['status'], string> = { PASSED: 'badge-green', FAILED: 'badge-red', INSUFFICIENT_EVIDENCE: 'badge-amber', NOT_VALIDATED_YET: 'badge-neutral' };
+// One library rule: its validation status and pooled results; the rule, source and gate checks on demand.
+function StrategyItem({ s, proxyName }: { s: StrategyStatus; proxyName: (id: string) => string }) {
+ const p = s.pooled?.stats, n = s.symbols.validated.length;
+ return <details className="rule-item">
+  <summary>
+   <div className="rule-item-head"><strong>{s.name}</strong><span className={`badge ${STATUS_BADGE[s.status]}`}>{s.status === 'PASSED' ? `Validated · ${n} ${n === 1 ? 'stock' : 'stocks'}` : STATUS[s.status]}</span></div>
+   <div className="inline-facts">{p ? <><span>Trades <b>{p.trades}</b></span><span>Win rate <b>{p.winRate === null ? '—' : (p.winRate * 100).toFixed(1) + '%'}</b></span><span>Avg trade <b className={(p.expectancyPct ?? 0) >= 0 ? 'positive' : 'negative'}>{signedPct(p.expectancyPct)}</b></span><span>Profit factor <b>{num(p.profitFactor)}</b></span></> : <span>Validation runs automatically in market hours.</span>}<span className="faint">{s.timeframe} bars{s.validatedWith ? ` · timing validated on the ${proxyName(s.validatedWith)} rule` : ''}</span></div>
+  </summary>
+  <div className="rule-item-body">
+   <p><strong>Rule:</strong> {s.rule}</p><p className="caption">{s.reference}</p>
+   {s.pooled && <><StatLine s={s.pooled.halves.first} label="First half of history" /><StatLine s={s.pooled.halves.second} label="Second half of history" />{!!s.pooled.reasons.length && <ul className="bullet-list">{s.pooled.reasons.map(r => <li key={r}>Gate: {r}</li>)}</ul>}</>}
+   {!!n && <p className="text-xs">Validated stocks: {s.symbols.validated.map(v => `${v.symbol} (${pct(v.stats?.expectancyPct)}/trade)`).join(', ')}</p>}
+   <p className="text-xs">{s.symbols.unproven} with too few trades · {s.symbols.rejected} rejected{s.computedAt ? ` · computed ${formatIST(s.computedAt)}` : ''}</p>
+  </div>
+ </details>;
+}
+// Every rule in the library grouped by trading segment, so coverage (and its gaps) is visible at a glance.
+function StrategyCoverage({ strategies, all }: { strategies: StrategyStatus[]; all: StrategyStatus[] }) {
+ const groups = SEGMENTS.map(seg => ({ seg, rules: strategies.filter(s => s.segment === seg.id) })).filter(g => g.rules.length);
+ return <section className="card grid gap-4">
+  <div><h3>Strategy coverage</h3><p className="text-sm muted">Every rule in the library by segment, with results after charges pooled across its universe. Only validated rules produce signals; open a rule for its source and gate checks.</p></div>
+  <div className="coverage-grid">{groups.map(({ seg, rules }) => { const passed = rules.filter(r => r.status === 'PASSED').length;
+   return <div key={seg.id} className="coverage-seg"><div className="rule-item-head"><h4>{seg.label}</h4><span className={`badge ${passed ? 'badge-green' : 'badge-neutral'}`}>{passed} of {rules.length} validated</span></div>
+    <div className="grid gap-2">{rules.map(r => <StrategyItem key={r.id} s={r} proxyName={id => all.find(x => x.id === id)?.name ?? id} />)}</div></div>; })}</div>
+ </section>;
 }
 function Board({ rows, computedAt }: { rows: BoardRow[]; computedAt: string }) {
  const held = rows.filter(r => r.state === 'IN_POSITION').sort((a, b) => (b.since ?? 0) - (a.since ?? 0)), near = rows.filter(r => r.state === 'NEAR_TRIGGER').sort((a, b) => a.trigger!.distancePct - b.trigger!.distancePct);
@@ -95,15 +113,13 @@ export function SignalsPage() {
   <div className="page-title"><div><h2>Signals</h2><p>Buy and sell signals from rules that have proven profitable after broker charges on 10 years of history. Every signal can be paper-traded{data?.autoPaper ? ', and each new signal is paper-traded automatically with ₹1 lakh so its live record builds up' : ''}.</p></div><button className="btn btn-secondary" disabled={loading} onClick={load}>{loading ? 'Loading…' : 'Refresh'}</button></div>
   <section className="notice text-sm" role="note">How a strategy earns signals: each rule runs with its published, fixed parameters over the full history of every stock in its universe, filling at the next bar with slippage and the itemised broker tariff. It must make money across the whole universe (at least 100 trades, profit factor 1.2 or more, positive in both halves of the history) and on the stock itself (at least 8 trades, profit factor 1.1 or more). Signals are produced only for stocks that pass both. Past results do not guarantee future returns; news, deals and fundamentals are shown in Analysis for your own judgement but do not change a validated rule.</section>
   <AutomationStatus state={data?.automation ?? null} />
-  <nav className="segment-selector" aria-label="Segment">{[{ id: 'all', label: 'All segments' }, ...SEGMENTS].map(s => { const n = (data?.signals ?? []).filter(x => x.status === 'ACTIVE' && (s.id === 'all' || x.segment === s.id)).length; return <button key={s.id} aria-pressed={segment === s.id} onClick={() => setSegment(s.id)}>{s.label}<small>{n} active · {(data?.board?.rows ?? []).filter(x => x.state === 'IN_POSITION' && (s.id === 'all' || x.segment === s.id)).length} held</small></button>; })}</nav>
+  <nav className="segment-selector" aria-label="Segment">{[{ id: 'all', label: 'All segments' }, ...SEGMENTS].map(s => { const n = (data?.signals ?? []).filter(x => x.status === 'ACTIVE' && (s.id === 'all' || x.segment === s.id)).length; const rules = (data?.strategies ?? []).filter(x => s.id === 'all' || x.segment === s.id); return <button key={s.id} aria-pressed={segment === s.id} onClick={() => setSegment(s.id)}>{s.label}<small>{n} active · {(data?.board?.rows ?? []).filter(x => x.state === 'IN_POSITION' && (s.id === 'all' || x.segment === s.id)).length} held · {rules.filter(x => x.status === 'PASSED').length}/{rules.length} rules</small></button>; })}</nav>
   {error && <section className="card" role="status"><p>{error}</p></section>}
   {data && segment !== 'all' && !passed.length && <section className="card"><p className="text-sm">No {SEGMENTS.find(s => s.id === segment)?.label.toLowerCase()} strategy has passed validation{strategies.some(s => s.status === 'NOT_VALIDATED_YET') ? ' yet (validation is still running)' : ''}, so this segment produces no signals: {strategies.filter(s => s.pooled).map(s => `${s.name} averaged ${pct(s.pooled!.stats.expectancyPct)} per trade after charges over ${s.pooled!.stats.trades} trades`).join('; ') || 'validation is still running'}. Publishing these as buy signals would knowingly lose money.{segment === 'options' ? ' Option strategies cannot be validated directly because prices of expired option contracts are not available; for leveraged exposure use the Futures segment, whose breakout rule is validated.' : ''}</p></section>}
   <div className="flex items-center gap-3"><h3>{showExpired ? 'Signals, last 10 sessions' : 'Active signals'} ({signals.length})</h3><label className="text-sm inline-flex items-center gap-2 whitespace-nowrap"><input type="checkbox" checked={showExpired} onChange={e => setShowExpired(e.target.checked)} /> include expired</label></div>
   {data && !signals.length && <p className="text-sm">No {showExpired ? '' : 'active '}signals{segment === 'all' ? '' : ' in this segment'}. Daily rules are checked on the previous session’s close at 09:16 IST (and again every 30 minutes); a signal is actionable for that session only.</p>}
   <div className="card-grid">{signals.map(s => <SignalCard key={s.id} s={s} />)}</div>
   {data?.board && <Board rows={data.board.rows.filter(inSeg)} computedAt={data.board.computedAt} />}
-  <section className="card space-y-2"><h3>Strategy validation</h3><p className="text-sm">Results after charges, pooled across each strategy’s universe. Click a row for the rule, its source and the gate checks.</p>
-   <div className="overflow-x-auto"><table className="data-table"><thead><tr><th>Strategy</th><th>Bars</th><th>Status</th><th className="text-right">Trades</th><th className="text-right">Win rate</th><th className="text-right">Avg trade</th><th className="text-right">Profit factor</th><th className="text-right">Validated stocks</th><th>Computed</th></tr></thead>
-    <tbody>{strategies.map(s => <StrategyRow key={s.id} s={s} />)}</tbody></table></div></section>
+  <StrategyCoverage strategies={strategies} all={data?.strategies ?? []} />
  </div>;
 }

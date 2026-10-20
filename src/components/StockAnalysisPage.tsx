@@ -5,6 +5,7 @@ import { navigateTo } from '../services/specDraft';
 import { formatIST } from '../services/tradingTime';
 import { NIFTY50_UNIVERSE } from '../../shared/universes';
 import { StyleVerdicts } from './StyleVerdicts';
+import { TradingViewPanel } from './TradingViewPanel';
 
 const n2 = (v: number | null | undefined, d = 2) => v === null || v === undefined || !Number.isFinite(v) ? '—' : v.toLocaleString('en-IN', { maximumFractionDigits: d, minimumFractionDigits: Math.min(d, 2) });
 const pc = (v: number | null | undefined, d = 2) => v === null || v === undefined || !Number.isFinite(v) ? '—' : `${v >= 0 ? '+' : ''}${v.toFixed(d)}%`;
@@ -13,7 +14,7 @@ const words = (s: string) => s.replaceAll('_', ' ').toLowerCase();
 const tone = (v: number | null | undefined) => v === null || v === undefined ? '' : v > 0 ? 'text-[var(--green)]' : v < 0 ? 'text-[var(--red)]' : '';
 const has = <T extends object>(x: T | { status: string }, key: keyof T): x is T => typeof x === 'object' && x !== null && key in x;
 const SYMBOLS = [...NIFTY50_UNIVERSE.symbols, 'NIFTY', 'BANKNIFTY'];
-const TABS = ['Overview', 'Technicals', 'Fundamentals', 'News & filings', 'Deals & flows', 'Derivatives', 'Strategies'] as const;
+const TABS = ['Overview', 'Technicals', 'Fundamentals', 'News & filings', 'Deals & flows', 'Derivatives', 'Strategies', 'TradingView'] as const;
 
 function Tile({ label, value, className = '' }: { label: string; value: string; className?: string }) {
  return <div className="metric-tile"><span className="text-xs text-[var(--text-muted)]">{label}</span><strong className={`font-mono ${className}`}>{value}</strong></div>;
@@ -127,7 +128,7 @@ export function StockAnalysisPage({ symbol, onSymbol }: { symbol?: string; onSym
     <div className="text-right">{q && 'price' in q ? <><strong className="text-2xl font-mono">₹{n2(q.price)}</strong><p className="text-xs">bid {n2(q.bid)} · ask {n2(q.ask)} · spread {n2(q.spreadPct, 3)}% · {formatIST(q.timestamp)}</p></> : t?.status === 'OK' ? <><strong className="text-2xl font-mono">₹{n2(t.close)}</strong><p className="text-xs">last close {t.asOf} · {pc(t.change1dPct)}</p></> : null}</div></div>
     <div className="flex gap-2 flex-wrap">{data.signals.filter(s => s.status === 'ACTIVE').map(s => <span key={s.id} className="badge badge-green">Signal: {s.strategyName}</span>)}</div></section>
    <nav className="tab-bar" aria-label="Analysis sections">{TABS.map(x => <button key={x} className={`tab${tab === x ? ' active' : ''}`} aria-current={tab === x ? 'page' : undefined} onClick={() => setTab(x)}>{x}</button>)}</nav>
-   {tab === 'Overview' && <Overview a={data} />}{tab === 'Technicals' && <Technicals a={data} />}{tab === 'Fundamentals' && <Fundamentals a={data} />}{tab === 'News & filings' && <NewsFilings a={data} />}{tab === 'Deals & flows' && <DealsFlows a={data} />}{tab === 'Derivatives' && <Derivatives a={data} />}{tab === 'Strategies' && <Strategies a={data} />}
+   {tab === 'TradingView' && <TradingViewPanel symbol={data.symbol} isIndex={!!data.isIndex} />}{tab === 'Overview' && <Overview a={data} />}{tab === 'Technicals' && <Technicals a={data} />}{tab === 'Fundamentals' && <Fundamentals a={data} />}{tab === 'News & filings' && <NewsFilings a={data} />}{tab === 'Deals & flows' && <DealsFlows a={data} />}{tab === 'Derivatives' && <Derivatives a={data} />}{tab === 'Strategies' && <Strategies a={data} />}
    <details className="text-xs"><summary>Sources and limitations</summary><ul>{data.limitations.map(l => <li key={l}>{l}</li>)}</ul></details>
   </>}
  </div>;
