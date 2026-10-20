@@ -1,6 +1,16 @@
 # Android test builds
 
-## Latest: v1.8.1 — scan evidence in "Why are there no new trades?"
+## Latest: v2.1.0 — strategy coverage, TradingView panel and the redesigned app
+
+[Android v2.1.0 APK](./algotrader-strategy-coverage-v2.1.0.apk?raw=true)
+
+VersionCode 11, footer v2.1; same signing certificate as v1.8.1. Install as an update without clearing app data. Built from commit c96412f plus the version bump. Includes everything shipped on the web since v1.8.1: the Analysis, Signals, Paper trading, Discover, Investing and Stacks sections, one theme across every page, and the redesigned Signals, Watch ideas, Metals and Strategy lab layouts. New in this build: Signals shows strategy coverage by segment (validated rules out of the total, with each rule's results after charges), the futures and option rules added on 20 October (validated by production at the next market session), and a TradingView tab in Stock analysis with TradingView's official widgets (BSE listing, end-of-day data; the live NSE chart opens on TradingView). These views use the deployed Vercel API.
+
+406 tests, the database suites, lint, TypeScript/mobile build, Capacitor sync and assembleDebug passed on 20 October 2026. Verified: APK package/version, API URL, signing certificate, v2.1 footer and the new Signals and TradingView code in the bundled web assets. Physical-device installation is unverified.
+
+SHA-256: `f71b1287fe26e10176091865bf101c1c83aea44493be93c982488fc8225dc22c`
+
+## Previous: v1.8.1 — scan evidence in "Why are there no new trades?"
 
 [Android v1.8.1 APK](./algotrader-scan-evidence-v1.8.1.apk?raw=true)
 

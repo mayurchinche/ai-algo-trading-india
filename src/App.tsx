@@ -66,7 +66,7 @@ export default function App() {
    <footer className="workspace-footer text-center text-[11px] text-[var(--text-muted)] py-8 mt-4 border-t border-[rgba(0,0,0,0.04)]">
     <div className="max-w-[1600px] mx-auto px-8 space-y-1">
      <p className="font-medium text-[var(--text-secondary)]">AlgoTrader India</p>
-     <p>Paper trading only • v2.0 • NSE • Not financial advice • Market data: Upstox (read-only), NSE, Google News</p>
+     <p>Paper trading only • v2.1 • NSE • Not financial advice • Market data: Upstox (read-only), NSE, Google News</p>
     </div>
    </footer>
   </div>
