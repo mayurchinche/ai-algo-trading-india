@@ -1,6 +1,8 @@
 import {authorizeScheduler,emptySchedulerBody} from '../server/schedulerAuth.js';
 import {backend,check} from '../server/pushBackend.js';
-import {runAutomationTick,inAutomationWindow,mergeStatus,STATUS_ROW} from '../server/automation.js';
+import {runAutomationTick,inAutomationWindow,mergeStatus,STATUS_ROW,JOBS} from '../server/automation.js';
+import {runAggressiveCycle} from '../server/aggressiveBook.js';
+import {aggressiveStore} from '../server/aggressiveStore.js';
 import {runSpecPaperCycle} from '../server/specPaperRunner.js';
 import {specPaperStore} from '../server/specPaperStore.js';
 import {createSpecPaperMarket} from '../server/specPaperMarket.js';
@@ -29,12 +31,16 @@ export function createAutomationHandler({now=Date.now,secret=()=>process.env.PAP
   if(!emptySchedulerBody(req.body))return res.status(400).json({error:'Scheduler payload must be empty'});
   if(env.AUTOMATION_ENABLED==='false')return res.status(200).json({status:'AUTOMATION_DISABLED'});
   if(!inAutomationWindow(now()))return res.status(200).json({status:'OUTSIDE_AUTOMATION_WINDOW'});
+  // The alert scanner's observation of this minute, reused by the aggressive book (null if the scan did not run).
+  let observation=null;
   const j=jobs??{
    paper:budgetMs=>runSpecPaperCycle({store:specPaperStore(),market,now,budgetMs}),
    // Alerts feed: the intraday strong-signal scanner and its paper decisions (SHARED_PAPER_ENABLED=true).
    // The scan also records first sightings of Discover scores >= 50 for live accuracy tracking.
-   alerts:env.SHARED_PAPER_ENABLED==='true'?async()=>{let recorded=null;const observe=async(acct,t)=>{const o=await observeSharedPaper(acct,t);if(o.marketOpen)try{recorded=await discoveryStore().record(observationRows(o.discoveries,now()));}catch{recorded='SAVE_FAILED';}return o;};
+   alerts:env.SHARED_PAPER_ENABLED==='true'?async()=>{let recorded=null;const observe=async(acct,t)=>{const o=await observeSharedPaper(acct,t);observation=o;if(o.marketOpen)try{recorded=await discoveryStore().record(observationRows(o.discoveries,now()));}catch{recorded='SAVE_FAILED';}return o;};
     const r=await runSharedPaperCycle({db:sharedStore('intraday'),observe,now,source:'scheduler'});return {...r,discoveriesRecorded:recorded};}:null,
+   // AGGRESSIVE_BOOK_ENABLED=false pauses the experimental book without touching the validated one.
+   aggressive:env.AGGRESSIVE_BOOK_ENABLED==='false'?null:async()=>runAggressiveCycle({store:aggressiveStore(),market,master:getTradingInstruments,observation,board:await strategyBoard.read().catch(()=>null),now}),
    outcomes:()=>updateDiscoveryOutcomes({store:discoveryStore(),market,master:getTradingInstruments,now}),
    validate:()=>runValidation({market,store:signalStore(),now}),
    scan:timeframes=>scanSignals({market,store:signalStore(),paperStore:specPaperStore(),now,timeframes,saveBoard:d=>strategyBoard.write(d),autoPaper:env.SIGNAL_AUTO_PAPER!=='false',capital:Number(env.SIGNAL_PAPER_CAPITAL)||100000}),
@@ -42,7 +48,7 @@ export function createAutomationHandler({now=Date.now,secret=()=>process.env.PAP
    fundamentals:()=>ingestFundamentalFilings({store:fundamentalsStore(),clock:now}),
   };
   const tick=await runAutomationTick({now,...j,status:async t=>status.write(mergeStatus(await status.read().catch(()=>null),t))});
-  const failed=['paper','alerts','marketDay','dailyScan','scan','validate','fundamentals','outcomes'].some(k=>tick[k]?.status==='FAILED');
+  const failed=JOBS.some(k=>tick[k]?.status==='FAILED');
   return res.status(failed?207:200).json(tick);
  };
 }
