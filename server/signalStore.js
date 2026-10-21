@@ -1,6 +1,6 @@
-import {backend,check} from './pushBackend.js';
+import {backend,check,readAll} from './pushBackend.js';
 export function signalStore(db=backend()){return {
- validations:async()=>check(await db.from('strategy_validations').select('strategy_id,symbol,verdict,computed_at,record').limit(2000)),
+ validations:()=>readAll(()=>db.from('strategy_validations').select('strategy_id,symbol,verdict,computed_at,record').order('strategy_id').order('symbol')),
  saveValidations:async rows=>check(await db.rpc('save_strategy_validations',{p_rows:rows})),
  signals:async(limit=200)=>check(await db.from('strategy_signals').select('id,recorded_at,signal').order('recorded_at',{ascending:false}).limit(limit)),
  signal:async id=>check(await db.from('strategy_signals').select('id,recorded_at,signal').eq('id',id).maybeSingle()),

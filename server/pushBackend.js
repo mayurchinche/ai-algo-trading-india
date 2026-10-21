@@ -25,3 +25,15 @@ export async function signedInUser(req) {
   return error ? null : data.user;
 }
 export function check(result) { if (result.error) throw new Error('Database operation failed'); return result.data; }
+// Supabase returns at most 1,000 rows per request, so a longer read is paged in a stable order. A read that
+// would exceed `max` fails rather than returning a silently truncated list.
+export const PAGE_ROWS=1000;
+export async function readAll(query,{max=20000}={}){
+  const rows=[];
+  for(let from=0;;from+=PAGE_ROWS){
+    const page=check(await query().range(from,from+PAGE_ROWS-1));
+    rows.push(...page);
+    if(page.length<PAGE_ROWS)return rows;
+    if(rows.length>=max)throw new Error('Read exceeds the row limit');
+  }
+}

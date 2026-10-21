@@ -12,6 +12,7 @@ import {createStockAnalysisHandler} from '../api/_stock-analysis.js';
 import {cycleRun} from '../server/specPaperRunner.js';
 import {researchRoutes} from '../api/research.js';
 import {SignalsPage} from '../src/components/SignalsPage';
+import {signalStore} from '../server/signalStore.js';
 
 const DAY=86400000,d0=Date.parse('2016-01-04T00:00:00+05:30');
 // Trading days only (Monday to Friday), as exchange data has no weekend bars.
@@ -276,4 +277,13 @@ test('Discover ledger records first sightings and measures their outcomes',async
  const bad=response();await h({method:'GET',headers:{host:'x'},query:{date:'yesterday'}},bad);assert.equal(bad.code,400);
  const down=response();await createDiscoveryHandler({store:()=>{throw new Error('x');},now:()=>at})({method:'GET',headers:{host:'x'},query:{}},down);assert.equal(down.code,503);assert(down.body.study,'the study is returned even without the ledger');
  assert.equal(backgroundJob(Date.parse('2026-10-19T10:22:00+05:30')),'outcomes');
+});
+
+test('validations are read in full past the database\'s 1,000-row response cap',async()=>{
+ const table=Array.from({length:1168},(_,i)=>({strategy_id:'s'+Math.floor(i/52),symbol:'X'+i,verdict:'VALIDATED',computed_at:'t',record:{}}));
+ const ranges:number[][]=[];
+ // Mimics PostgREST: each request returns at most 1,000 rows of the requested range.
+ const q:any={select:()=>q,order:()=>q,range:(a:number,b:number)=>{ranges.push([a,b]);return Promise.resolve({data:table.slice(a,Math.min(b+1,a+1000)),error:null});}};
+ const rows=await signalStore({from:()=>q} as any).validations();
+ assert.equal(rows.length,1168);assert.deepEqual(ranges,[[0,999],[1000,1999]]);
 });

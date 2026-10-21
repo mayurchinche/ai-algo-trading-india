@@ -1,6 +1,6 @@
 // Discover observation ledger: the first time each stock reaches the recorded score level in a session, and
 // its outcome afterwards, so the score's accuracy is measured from the moment a signal was visible.
-import {backend,check} from './pushBackend.js';
+import {backend,check,readAll} from './pushBackend.js';
 import {MarketDataError} from './upstoxReadOnly.js';
 export const LEDGER_VERSION='discovery-ledger-v1';
 export const RECORD_MIN_SCORE=50;
@@ -38,7 +38,7 @@ export function computeOutcome(row,bars,now){
 export function discoveryStore(db=backend()){return {
  record:async rows=>rows.length?check(await db.rpc('record_discovery_observations',{p_rows:rows})):0,
  day:async date=>check(await db.from('discovery_observations').select('id,session_date,symbol,side,first_seen_at,first_score,first_price,first_quote_time,details,max_score,max_score_at,last_seen_at,seen_count,outcome').eq('session_date',date).order('first_seen_at',{ascending:true}).limit(500)),
- since:async date=>check(await db.from('discovery_observations').select('symbol,side,session_date,first_score,max_score,outcome').gte('session_date',date).limit(5000)),
+ since:date=>readAll(()=>db.from('discovery_observations').select('symbol,side,session_date,first_score,max_score,outcome').gte('session_date',date).order('id')),
  pending:async(before,limit=300)=>check(await db.from('discovery_observations').select('id,session_date,symbol,side,first_price,details,outcome').lt('session_date',before).or('outcome.is.null,outcome->>complete.neq.true').order('session_date',{ascending:true}).limit(limit)),
  setOutcomes:async rows=>rows.length?check(await db.rpc('set_discovery_outcomes',{p_rows:rows})):0,
 };}
