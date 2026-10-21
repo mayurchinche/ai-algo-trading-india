@@ -554,3 +554,20 @@ label:has(> input[type=checkbox]),label:has(> input[type=radio]){display:inline-
 .rule-item>summary::-webkit-details-marker{display:none}
 .rule-item[open]>summary{border-bottom:1px solid var(--border)}
 .rule-item-body{padding:10px 12px;display:grid;gap:8px;font-size:12.5px;line-height:1.6;color:var(--text-secondary)}
+/* Today: summary tiles, the opportunity list beside the books. */
+.today-tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.today-tiles dt{font-size:11.5px;color:var(--text-secondary)}.today-tiles dd{margin:2px 0;font-size:22px;font-weight:650;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.today-tiles small{font-size:11.5px;color:var(--text-muted);line-height:1.4}
+.today-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;align-items:start}
+.today-list{display:grid;gap:8px}
+.today-row{display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%;text-align:left;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:#fff;min-height:auto}
+.today-row:hover{border-color:#c9d4f2;background:#fbfcff}
+.today-row-main{display:grid;gap:4px;min-width:0}
+.today-row-title{font-size:12.5px;color:var(--text);overflow-wrap:anywhere}
+.today-row-status{font-size:12px;color:var(--text-secondary)}
+.today-figure{text-align:right;font-size:17px;font-weight:650;font-variant-numeric:tabular-nums;white-space:nowrap}
+.today-figure small{display:block;font-size:10.5px;font-weight:500;color:var(--text-muted)}
+.book-pos{padding:10px 12px;border:1px solid var(--border);border-radius:10px;display:grid;gap:6px}
+@media(max-width:1100px){.today-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}.today-layout{grid-template-columns:1fr}}
+@media(max-width:600px){.today-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.today-row{align-items:flex-start}}
+@media(max-width:600px){.deals-table .hide-sm{display:none}.deals-table{min-width:0!important}.deals-table td,.deals-table th{padding:10px 8px}}

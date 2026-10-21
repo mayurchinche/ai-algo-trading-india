@@ -1,6 +1,10 @@
 import {backend,check,readAll} from './pushBackend.js';
 export function signalStore(db=backend()){return {
  validations:()=>readAll(()=>db.from('strategy_validations').select('strategy_id,symbol,verdict,computed_at,record').order('strategy_id').order('symbol')),
+ // Verdicts only (no records), for counts and lookups.
+ verdicts:()=>readAll(()=>db.from('strategy_validations').select('strategy_id,symbol,verdict').order('strategy_id').order('symbol')),
+ // Bulk and block deals of the latest recorded trading date.
+ latestDeals:async()=>{const d=check(await db.from('market_deals').select('trade_date').order('trade_date',{ascending:false}).limit(1))[0]?.trade_date;return d?check(await db.from('market_deals').select('trade_date,kind,symbol,client,side,quantity,price').eq('trade_date',d).limit(1000)):[];},
  saveValidations:async rows=>check(await db.rpc('save_strategy_validations',{p_rows:rows})),
  signals:async(limit=200)=>check(await db.from('strategy_signals').select('id,recorded_at,signal').order('recorded_at',{ascending:false}).limit(limit)),
  signal:async id=>check(await db.from('strategy_signals').select('id,recorded_at,signal').eq('id',id).maybeSingle()),

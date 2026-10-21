@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LineChart, Radar, BookOpen, Building2, Layers } from 'lucide-react';
+import { Gauge, LineChart, Radar, BookOpen, Layers } from 'lucide-react';
 import { NAVIGATE_EVENT, ANALYSE_EVENT } from './services/specDraft';
 import { Header } from './components/Header';
 import { InvestingPage } from './components/InvestingPage';
@@ -9,6 +9,7 @@ import { parseRoute, routeHash } from './services/route';
 import { SignalPopup } from './components/SignalPopup';
 import { useLiveStocks } from './hooks/useLiveStocks';
 const named = <K extends string>(load: () => Promise<Record<K, React.ComponentType<any>>>, key: K) => lazy(() => load().then(m => ({ default: m[key] })));
+const TodayPage = named(() => import('./components/TodayPage'), 'TodayPage');
 const StockAnalysisPage = named(() => import('./components/StockAnalysisPage'), 'StockAnalysisPage');
 const SignalsPage = named(() => import('./components/SignalsPage'), 'SignalsPage');
 const OpeningGapsPage = named(() => import('./components/OpeningGapsPage'), 'OpeningGapsPage');
@@ -26,11 +27,11 @@ const MetalsPage = named(() => import('./components/MetalsPage'), 'MetalsPage');
 
 const INVESTING_IDS = new Set(INVESTING_TABS.map(([id]) => id));
 // Every key of `pages` below; a page missing here still works but cannot be opened from a link.
-const PAGE_IDS = [...INVESTING_IDS, 'Analysis', 'Signals', 'Opening gaps', 'Alerts', 'Discover', 'Watch ideas', 'Paper trading', 'IPO', 'Rule builder', 'Options wizard', 'Market News', 'Pre-market', 'Portfolios', 'Metals'];
+const PAGE_IDS = [...INVESTING_IDS, 'Today', 'Analysis', 'Signals', 'Opening gaps', 'Alerts', 'Discover', 'Watch ideas', 'Paper trading', 'IPO', 'Rule builder', 'Options wizard', 'Market News', 'Pre-market', 'Portfolios', 'Metals'];
 
 export default function App() {
  const initial = parseRoute(window.location.hash, PAGE_IDS);
- const [activeTab, setActiveTab] = useState(initial?.tab ?? 'Analysis');
+ const [activeTab, setActiveTab] = useState(initial?.tab ?? 'Today');
  const [symbol, setSymbol] = useState<string | undefined>(initial?.symbol);
  const { nifty, lastUpdated } = useLiveStocks();
  useEffect(() => {
@@ -46,7 +47,7 @@ export default function App() {
  const investing = (tab: string) => <InvestingPage tab={tab} onTab={setActiveTab} />;
  const pages: Record<string, React.ReactNode> = {
   ...Object.fromEntries(INVESTING_TABS.map(([t]) => [t, investing(t)])),
-  'Analysis': <StockAnalysisPage symbol={symbol} onSymbol={setSymbol} />, 'Signals': <SignalsPage />, 'Opening gaps': <OpeningGapsPage />, 'Alerts': <AlertsPage />, 'Discover': <DiscoveryPage />, 'Watch ideas': <SmartPicksPage />, 'Paper trading': <PaperTradingPage />, 'IPO': <IPOPage />,
+  'Today': <TodayPage />, 'Analysis': <StockAnalysisPage symbol={symbol} onSymbol={setSymbol} />, 'Signals': <SignalsPage />, 'Opening gaps': <OpeningGapsPage />, 'Alerts': <AlertsPage />, 'Discover': <DiscoveryPage />, 'Watch ideas': <SmartPicksPage />, 'Paper trading': <PaperTradingPage />, 'IPO': <IPOPage />,
   'Rule builder': <RuleBuilderPage />, 'Options wizard': <OptionsWizardPage />,
   'Market News': <MarketNewsPage segment="intraday" />, 'Pre-market': <PremarketPage />, 'Portfolios': <ResearchPortfolioPage />, 'Metals': <MetalsPage />,
  };
@@ -58,11 +59,11 @@ export default function App() {
    <main id="main-content" className="app-main" tabIndex={-1}>
     <Suspense fallback={<div className="card workspace-loading" role="status"><span className="loading-line" /><span className="loading-line short" /><p>Opening workspace…</p></div>}><AnimatePresence mode="wait">
      <motion.div key={INVESTING_IDS.has(activeTab) ? 'Investing' : activeTab} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25, ease: 'easeOut' }} className="space-y-6">
-      {pages[activeTab] ?? pages.Analysis}
+      {pages[activeTab] ?? pages.Today}
      </motion.div>
     </AnimatePresence></Suspense>
    </main>
-   <nav className="mobile-nav" aria-label="Primary navigation">{([{ id: 'Analysis', label: 'Analysis', Icon: LineChart }, { id: 'Signals', label: 'Signals', Icon: Radar }, { id: 'Stacks', label: 'Investing', Icon: Layers }, { id: 'Paper trading', label: 'Paper', Icon: BookOpen }, { id: 'IPO', label: 'IPO', Icon: Building2 }]).map(({ id, label, Icon }) => <button key={id} aria-current={activeTab === id || (id === 'Stacks' && INVESTING_IDS.has(activeTab)) ? 'page' : undefined} onClick={() => setActiveTab(id)}><Icon size={20} /><span>{label}</span></button>)}</nav>
+   <nav className="mobile-nav" aria-label="Primary navigation">{([{ id: 'Today', label: 'Today', Icon: Gauge }, { id: 'Analysis', label: 'Analysis', Icon: LineChart }, { id: 'Signals', label: 'Signals', Icon: Radar }, { id: 'Stacks', label: 'Investing', Icon: Layers }, { id: 'Paper trading', label: 'Paper', Icon: BookOpen }]).map(({ id, label, Icon }) => <button key={id} aria-current={activeTab === id || (id === 'Stacks' && INVESTING_IDS.has(activeTab)) ? 'page' : undefined} onClick={() => setActiveTab(id)}><Icon size={20} /><span>{label}</span></button>)}</nav>
    <footer className="workspace-footer text-center text-[11px] text-[var(--text-muted)] py-8 mt-4 border-t border-[rgba(0,0,0,0.04)]">
     <div className="max-w-[1600px] mx-auto px-8 space-y-1">
      <p className="font-medium text-[var(--text-secondary)]">AlgoTrader India</p>
