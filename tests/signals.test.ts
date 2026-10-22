@@ -148,6 +148,8 @@ test('stock analysis: technicals, option chain, SWOT with cited facts, and the a
  const bars=series(520);const t:any=technicalProfile(bars);
  assert.equal(t.status,'OK');assert(Math.abs(t.close-bars.at(-1).close)<1e-9);assert(t.movingAverages.sma200>0);assert(t.levels.r1>t.levels.s1);assert(t.range.high52w>=t.close);
  assert.equal(technicalProfile(bars.slice(0,10)).status,'INSUFFICIENT_HISTORY');
+ assert(t.rating.value>=-1&&t.rating.value<=1);assert.equal(t.rating.value,(t.rating.ma+t.rating.oscillators)/2);assert(['Strong buy','Buy','Neutral','Sell','Strong sell'].includes(t.rating.band));
+ assert.equal(technicalProfile(bars.slice(0,120)).rating,null,'no rating without 200 bars');
  const chain={expiry:'2026-10-27',spot:100,atmStrike:100,strikeStep:5,observedAt:'o',strikes:[90,95,100,105,110].map(k=>({strike:k,CE:{oi:k>=100?k*10:10,iv:0.2,lotSize:50},PE:{oi:k<=100?(200-k)*10:10,iv:0.22,lotSize:50}}))};
  const cs:any=optionChainSummary(chain);assert(cs.putCallOiRatio>0);assert.equal(cs.callOiWall[0].strike,110);assert.equal(cs.putOiWall[0].strike,90);assert.equal(cs.lotSize,50);assert(cs.maxPain>=90&&cs.maxPain<=110);
  const ds=dealsSummary([{side:'BUY',quantity:10,price:100},{side:'SELL',quantity:5,price:100}] as any);assert.equal(ds.netValue,500);

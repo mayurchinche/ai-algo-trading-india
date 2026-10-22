@@ -1,6 +1,6 @@
 // Stock analysis built from observed facts only. Every derived statement (technical state, SWOT item,
 // segment view) cites the fact ids it rests on; missing inputs stay missing instead of becoming neutral.
-import {sma,ema,rsi,macd,atr,bollinger,supertrend,donchian} from './indicators.js';
+import {sma,ema,rsi,macd,atr,bollinger,supertrend,donchian,technicalRating} from './indicators.js';
 import {computeTrendScore} from './trendScore.js';
 export const ANALYSIS_VERSION='stock-analysis-v1';
 const last=a=>{for(let i=a.length-1;i>=0;i--)if(Number.isFinite(a[i]))return a[i];return null;};
@@ -9,6 +9,7 @@ const pctChange=(c,k)=>c.length>k&&c[c.length-1-k]>0?(c.at(-1)/c[c.length-1-k]-1
 const sd=v=>{const m=v.reduce((a,b)=>a+b,0)/v.length;return Math.sqrt(v.reduce((a,b)=>a+(b-m)**2,0)/(v.length-1));};
 const istDate=ms=>new Date(ms+19800000).toISOString().slice(0,10);
 
+export const ratingBand=x=>x>0.5?'Strong buy':x>0.1?'Buy':x>=-0.1?'Neutral':x>=-0.5?'Sell':'Strong sell';
 // bars: completed daily bars, oldest first.
 export function technicalProfile(bars){
  if(bars.length<30)return {status:'INSUFFICIENT_HISTORY',bars:bars.length};
@@ -21,6 +22,8 @@ export function technicalProfile(bars){
  const avgVol20=v.slice(-21,-1).reduce((x,y)=>x+y,0)/Math.max(1,v.slice(-21,-1).length);
  const gaps=bars.slice(-61).slice(1).map((b,i)=>Math.abs(b.open/bars.slice(-61)[i].close-1)*100),ranges=bars.slice(-20).map(b=>(b.high-b.low)/b.close*100);
  const lb=bars.at(-1),P=(lb.high+lb.low+lb.close)/3;
+ // Technical rating on the last bar (TradingView's bands); null without 200 bars or volume.
+ let rating=null;try{const tr=technicalRating(h,l,c,v),x=at(tr.rating,0);if(x!==null)rating={value:x,ma:at(tr.maRating,0),oscillators:at(tr.oscRating,0),band:ratingBand(x)};}catch{rating=null;}
  let trend=null;try{trend=computeTrendScore({dates:bars.map(b=>istDate(b.time)),close:c,high:h,low:l}).latest;}catch{trend=null;}
  const s200now=last(s200),s200ago=at(s200,20);
  return {status:'OK',asOf:istDate(lb.time),close,change1dPct:pctChange(c,1),returnsPct:{'1w':pctChange(c,5),'1m':pctChange(c,21),'3m':pctChange(c,63),'6m':pctChange(c,126),'1y':pctChange(c,250)},
@@ -31,7 +34,7 @@ export function technicalProfile(bars){
   range:{high52w:hi52,low52w:lo52,belowHighPct:(1-close/hi52)*100,aboveLowPct:(close/lo52-1)*100},
   levels:{pivot:P,r1:2*P-lb.low,s1:2*P-lb.high,resistance20d:at(d20.upper,1),support20d:at(d20.lower,1),resistance55d:at(d55.upper,1),support55d:at(d55.lower,1)},
   volume:{last:v.at(-1),avg20:avgVol20,ratio:avgVol20>0?v.at(-1)/avgVol20:null},
-  trendScore:trend};
+  trendScore:trend,rating};
 }
 // Option chain summary: put-call ratio of open interest, max pain, ATM IV and the strikes with most OI.
 export function optionChainSummary(chain){

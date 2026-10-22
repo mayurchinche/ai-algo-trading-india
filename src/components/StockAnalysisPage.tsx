@@ -43,6 +43,7 @@ function Technicals({ a }: { a: Analysis }) {
  if (t.status !== 'OK') return <p>Price history unavailable{t.reason ? ` (${words(t.reason)})` : ''}.</p>;
  return <div className="space-y-4">
   <div className="grid grid-cols-2 md:grid-cols-5 gap-2">{(['1w', '1m', '3m', '6m', '1y'] as const).map(k => <Tile key={k} label={`Return ${k}`} value={pc(t.returnsPct[k])} className={tone(t.returnsPct[k])} />)}</div>
+  {t.rating && <div className="grid grid-cols-3 gap-2"><Tile label="Technical rating" value={`${t.rating.band} (${t.rating.value > 0 ? '+' : ''}${n2(t.rating.value)})`} className={tone(t.rating.value)} /><Tile label="Moving averages" value={`${t.rating.ma > 0 ? '+' : ''}${n2(t.rating.ma)}`} className={tone(t.rating.ma)} /><Tile label="Oscillators" value={`${t.rating.oscillators > 0 ? '+' : ''}${n2(t.rating.oscillators)}`} className={tone(t.rating.oscillators)} /></div>}
   <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
    <Tile label="SMA 20 / 50" value={`${n2(t.movingAverages.sma20)} / ${n2(t.movingAverages.sma50)}`} /><Tile label="SMA 200" value={`${n2(t.movingAverages.sma200)} ${t.movingAverages.sma200Rising === null ? '' : t.movingAverages.sma200Rising ? '↑' : '↓'}`} /><Tile label="RSI 14" value={n2(t.momentum.rsi14, 1)} /><Tile label="MACD / signal" value={`${n2(t.momentum.macd)} / ${n2(t.momentum.macdSignal)}`} />
    <Tile label="ATR 14" value={`${n2(t.volatility.atr14)} (${n2(t.volatility.atrPct)}%)`} /><Tile label="Volatility 20d (annualised)" value={`${n2(t.volatility.annualised20dPct, 1)}%`} /><Tile label="Vol. percentile of 1y" value={t.volatility.percentileOf1y === null ? '—' : `${t.volatility.percentileOf1y.toFixed(0)}`} /><Tile label="Supertrend" value={`${n2(t.bands.supertrend)} ${t.bands.supertrendDirection === 1 ? 'up' : t.bands.supertrendDirection === -1 ? 'down' : ''}`} />
@@ -50,7 +51,7 @@ function Technicals({ a }: { a: Analysis }) {
    <Tile label="Pivot / R1 / S1" value={`${n2(t.levels.pivot)} / ${n2(t.levels.r1)} / ${n2(t.levels.s1)}`} /><Tile label="20-day support / resistance" value={`${n2(t.levels.support20d)} / ${n2(t.levels.resistance20d)}`} /><Tile label="55-day support / resistance" value={`${n2(t.levels.support55d)} / ${n2(t.levels.resistance55d)}`} /><Tile label="Volume vs 20-day avg" value={`${n2(t.volume.ratio)}×`} />
    <Tile label="Avg daily range" value={`${n2(t.volatility.avgDailyRangePct)}%`} /><Tile label="Avg opening gap" value={`${n2(t.volatility.avgOpeningGapPct)}%`} />
   </div>
-  <p className="text-xs">Completed daily bars up to {t.asOf}. Levels are arithmetic reference points, not predictions.</p>
+  <p className="text-xs">Completed daily bars up to {t.asOf}. Levels are arithmetic reference points, not predictions. The technical rating averages 15 moving-average and 11 oscillator votes the way TradingView’s Technical Ratings do (from −1 strong sell to +1 strong buy), computed here from daily bars; trading on it waits for the “Technical rating strong buy” rule to pass validation.</p>
  </div>;
 }
 function Fundamentals({ a }: { a: Analysis }) {

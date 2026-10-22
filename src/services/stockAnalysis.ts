@@ -12,7 +12,7 @@ export interface Technicals {
  volatility: { atr14: N; atrPct: N; annualised20dPct: N; percentileOf1y: N; avgDailyRangePct: number; avgOpeningGapPct: N };
  bands: { bollingerUpper: N; bollingerLower: N; percentB: N; supertrend: N; supertrendDirection: N }; range: { high52w: number; low52w: number; belowHighPct: number; aboveLowPct: number };
  levels: { pivot: number; r1: number; s1: number; resistance20d: N; support20d: N; resistance55d: N; support55d: N }; volume: { last: number; avg20: number; ratio: N };
- trendScore: { status: string; score?: number; zone?: string; inTrend?: boolean } | null; reason?: string;
+ trendScore: { status: string; score?: number; zone?: string; inTrend?: boolean } | null; rating?: { value: number; ma: number; oscillators: number; band: string } | null; reason?: string;
 }
 export interface Ratio { key: string; label?: string; value: N; status: string; formula?: string }
 export interface Analysis {
