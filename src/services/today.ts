@@ -1,7 +1,10 @@
 import { apiUrl } from '../utils/apiUrl';
 import type { AutomationState } from './specPaper';
 export type ItemKind = 'VALIDATED' | 'AGGRESSIVE_OPEN' | 'OVERNIGHT' | 'WATCHING' | 'NEAR_TRIGGER' | 'WAITING' | 'BLOCKED' | 'SKIPPED' | 'DISCOVER';
-export interface TodayItem { kind: ItemKind; symbol: string; side: 'BUY' | 'SELL'; segment?: string; ruleId?: string; setup?: string; title: string; why?: string; status: string; price?: number | null; pnl?: number | null; pnlPct?: number | null; stop?: number; target?: number; distancePct?: number; score?: number | null; until?: string; firstSeenAt?: string; firstPrice?: number }
+export interface SmartFlag { kind: 'PROMOTER_BUYING' | 'PROMOTER_SELLING' | 'INVESTOR_BUYING' | 'INVESTOR_SELLING' | 'PLEDGED'; text: string }
+export interface SmartRow { symbol: string; company: string; promoterNetPct: number; promoterBuys: number; promoterSells: number; outsiderNetPct: number; outsiders: string[]; otherFilings: number; lastAt: string | null; lastSource?: string | null; pledgedPct: number | null; pledgePeriod?: string | null }
+export interface SmartMoney { at: string; since: string; failures: { source: string; reason: string }[]; promoterBuying: SmartRow[]; promoterSelling: SmartRow[]; investorBuying: SmartRow[]; pledged: SmartRow[] }
+export interface TodayItem { smartMoney?: SmartFlag[]; kind: ItemKind; symbol: string; side: 'BUY' | 'SELL'; segment?: string; ruleId?: string; setup?: string; title: string; why?: string; status: string; price?: number | null; pnl?: number | null; pnlPct?: number | null; stop?: number; target?: number; distancePct?: number; score?: number | null; until?: string; firstSeenAt?: string; firstPrice?: number }
 export interface BookPosition { exitOn?: string; contract?: string; id: string; setup: string; symbol: string; side: 'BUY' | 'SELL'; product: string; qty: number; entryPrice: number; entryAt: string; stop: number; target: number | null; mark: number | null; why: string; exitBy: string | null; openPnl: number | null; openPct: number | null }
 export interface ClosedTrade extends BookPosition { exitPrice: number; exitAt: string; exitReason: string; gross: number; charges: number; net: number; netPct: number }
 export interface SetupStats { id: string; label: string; trades: number; wins: number; net: number; winRate: number | null; profitFactor: number | null }
@@ -19,6 +22,7 @@ export interface TodayResponse {
  computedAt: string; items: TodayItem[]; book: BookSummary | null; unavailable: string[]; automation: AutomationState | null;
  coverage: { id: string; label: string; rules: number; validated: number; stocks: number }[];
  held: { symbol: string; strategyName: string; changePct?: number }[];
+ smartMoney: SmartMoney | null;
  deals: { date: string | null; roundTrips: number; rows: { kind: string; symbol: string; client: string; side: 'BUY' | 'SELL'; quantity: number; price: number | null; value: number; gross: number }[] };
 }
 export async function fetchToday(): Promise<TodayResponse> {

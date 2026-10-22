@@ -16,11 +16,13 @@ import {sharedStore} from '../server/sharedPaper.js';
 import {observeSharedPaper} from '../server/sharedPaperObservation.bundle.mjs';
 import {discoveryStore,observationRows,updateDiscoveryOutcomes} from '../server/discoveryLedger.js';
 import {getTradingInstruments} from '../server/upstoxReadOnly.js';
+import {readSmartMoney,SMART_MONEY_ROW} from '../server/smartMoney.js';
 export const appData=(id)=>({
  read:async(db=backend())=>check(await db.from('app_data').select('data,updated_at').eq('id',id).maybeSingle())?.data??null,
  write:async(data,db=backend())=>check(await db.from('app_data').upsert({id,data,updated_at:new Date().toISOString()})),
 });
 export const strategyBoard=appData('strategy_board');
+export const smartMoneyStore=appData(SMART_MONEY_ROW);
 export const automationStatus={
  read:async(db=backend())=>check(await db.from('app_data').select('data,updated_at').eq('id',STATUS_ROW).maybeSingle())?.data??null,
  write:async(data,db=backend())=>check(await db.from('app_data').upsert({id:STATUS_ROW,data,updated_at:new Date().toISOString()})),
@@ -46,6 +48,8 @@ export function createAutomationHandler({now=Date.now,secret=()=>process.env.PAP
    scan:timeframes=>scanSignals({market,store:signalStore(),paperStore:specPaperStore(),now,timeframes,saveBoard:d=>strategyBoard.write(d),autoPaper:env.SIGNAL_AUTO_PAPER!=='false',capital:Number(env.SIGNAL_PAPER_CAPITAL)||100000}),
    marketDay:()=>captureMarketDay({store:signalStore()}),
    fundamentals:()=>ingestFundamentalFilings({store:fundamentalsStore(),clock:now}),
+   // Public takeover and pledge disclosures, summarised per stock for the Today board.
+   smartMoney:async()=>{const s=await readSmartMoney({now});await smartMoneyStore.write(s);return {status:s.failures.length?'PARTIAL':'SAVED',takeovers:s.takeovers??null,pledges:s.pledges??null,failures:s.failures};},
   };
   const tick=await runAutomationTick({now,...j,status:async t=>status.write(mergeStatus(await status.read().catch(()=>null),t))});
   const failed=JOBS.some(k=>tick[k]?.status==='FAILED');

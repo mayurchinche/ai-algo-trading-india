@@ -11,6 +11,7 @@ const LABELS: [keyof AutomationState['jobs'], string, string][] = [
  ['marketDay', 'Bulk/block deals and FII/DII', '09:16 and 09:31'],
  ['fundamentals', 'NSE financial filings', 'every 30 min'],
  ['outcomes', 'Discover accuracy tracking', 'every 30 min'],
+ ['smartMoney', 'Smart money (takeover filings, pledges)', 'every 30 min'],
 ];
 const detail = (j: AutomationJob) => [j.status && j.status.replaceAll('_', ' ').toLowerCase(), j.reason, j.strategy, j.runs !== undefined && `${j.runs} runs${j.outcomes ? ' (' + Object.entries(j.outcomes).map(([k, v]) => `${v} ${k.replaceAll('_', ' ').toLowerCase()}`).join(', ') + ')' : ''}`, j.signals !== undefined && `${j.signals} setups found (${j.active ?? 0} actionable)`, j.validatedPairs !== undefined && `${j.validatedPairs} validated pairs`, j.discoveriesRecorded !== undefined && j.discoveriesRecorded !== null && `${j.discoveriesRecorded} Discover sightings recorded`, j.updated !== undefined && `${j.updated} outcomes updated`, j.candidates !== undefined && `${j.candidates} candidates · ${j.open ?? 0} open · ${j.entries ?? 0} entries · ${j.exits ?? 0} exits`, j.failures ? `${j.failures} failures${j.failureReason ? ' (' + String(j.failureReason).replaceAll('_', ' ').toLowerCase() + ')' : ''}` : null].filter(Boolean).join(' · ');
 // Live view of the scheduler: when it last ran and what each automated job did.

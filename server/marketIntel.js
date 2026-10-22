@@ -8,7 +8,7 @@ const UA='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KH
 const MONTHS={JAN:'01',FEB:'02',MAR:'03',APR:'04',MAY:'05',JUN:'06',JUL:'07',AUG:'08',SEP:'09',OCT:'10',NOV:'11',DEC:'12'};
 // 16-OCT-2026 / 16-Oct-2026 → 2026-10-16
 export const nseDate=s=>{const m=/^(\d{2})-([A-Za-z]{3})-(\d{4})$/.exec(String(s).trim());return m&&MONTHS[m[2].toUpperCase()]?`${m[3]}-${MONTHS[m[2].toUpperCase()]}-${m[1]}`:null;};
-async function text(fetcher,url,max){
+export async function nseText(fetcher,url,max){
  const r=await fetcher(url,{headers:{'User-Agent':UA,Accept:'*/*'},redirect:'error',signal:AbortSignal.timeout(12000)});
  if(!r.ok)throw Object.assign(new Error('NSE_HTTP_'+r.status),{code:r.status===404?'NOT_PUBLISHED':'NSE_UNAVAILABLE'});
  const b=Buffer.from(await r.arrayBuffer());if(b.length>max)throw Object.assign(new Error('too large'),{code:'NSE_RESPONSE_TOO_LARGE'});
@@ -29,14 +29,14 @@ export function parseDeals(body,kind){
   .filter(d=>d.date&&/^[A-Z0-9&-]{1,30}$/.test(d.symbol)&&d.client&&d.client.length<=200&&['BUY','SELL'].includes(d.side)&&Number.isInteger(d.quantity)&&d.quantity>0&&d.price>0);
 }
 export async function readDeals({fetcher=fetch}={}){
- const out=[];for(const [kind,url] of Object.entries(DEALS_URLS))out.push(...parseDeals(await text(fetcher,url,5e6),kind));
+ const out=[];for(const [kind,url] of Object.entries(DEALS_URLS))out.push(...parseDeals(await nseText(fetcher,url,5e6),kind));
  return out;
 }
 export function parseFlows(body){
  const rows=JSON.parse(body);if(!Array.isArray(rows))throw Object.assign(new Error('flows'),{code:'FLOWS_FORMAT_CHANGED'});
  return rows.map(r=>({date:nseDate(r.date),category:r.category,buy:Number(r.buyValue),sell:Number(r.sellValue),net:Number(r.netValue)})).filter(f=>f.date&&['FII/FPI','DII'].includes(f.category)&&[f.buy,f.sell,f.net].every(Number.isFinite));
 }
-export const readFlows=async({fetcher=fetch}={})=>parseFlows(await text(fetcher,FLOWS_URL,100000));
+export const readFlows=async({fetcher=fetch}={})=>parseFlows(await nseText(fetcher,FLOWS_URL,100000));
 // Delivery for one symbol (EQ series) from one day's full bhavcopy.
 export function parseDelivery(body,symbol){
  const [header,...rows]=csvRows(body),h=header.map(x=>x.trim()),i=n=>h.indexOf(n);
@@ -47,7 +47,7 @@ export function parseDelivery(body,symbol){
 // Day files are shared by every symbol, so they are cached for the process lifetime (each is ~400 KB).
 export function createDeliveryReader({fetcher=fetch,maxDays=10}={}){
  const cache=new Map();
- const day=date=>{if(!cache.has(date)){if(cache.size>=30)cache.delete(cache.keys().next().value);cache.set(date,text(fetcher,bhavcopyUrl(date),3e6).catch(e=>{cache.delete(date);throw e;}));}return cache.get(date);};
+ const day=date=>{if(!cache.has(date)){if(cache.size>=30)cache.delete(cache.keys().next().value);cache.set(date,nseText(fetcher,bhavcopyUrl(date),3e6).catch(e=>{cache.delete(date);throw e;}));}return cache.get(date);};
  return async(symbol,now)=>{
   const out=[];let missing=0;
   for(let k=1;k<=21&&out.length<maxDays;k++){

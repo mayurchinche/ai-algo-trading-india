@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { fetchToday, type TodayResponse, type TodayItem, type ItemKind, type Overnight } from '../services/today';
+import { fetchToday, type TodayResponse, type TodayItem, type ItemKind, type Overnight, type SmartMoney, type SmartRow } from '../services/today';
 import { openAnalysis, navigateTo } from '../services/specDraft';
 import { formatIST } from '../services/tradingTime';
 
@@ -41,9 +41,31 @@ function Row({ i }: { i: TodayItem }) {
    <span className="data-card-title"><strong>{i.symbol}</strong><span className={`badge ${i.side === 'BUY' ? 'badge-green' : 'badge-red'}`}>{i.side === 'BUY' ? 'Long' : 'Short'}</span><span className={`badge ${badge}`}>{label}</span></span>
    <span className="today-row-title">{i.title}{i.why ? <span className="faint"> · {i.why}</span> : null}</span>
    <span className="today-row-status">{i.status}{i.until ? ` · valid until ${formatIST(i.until)}` : ''}{i.firstSeenAt ? ` · first seen ${time(i.firstSeenAt)} at ₹${i.firstPrice}` : ''}</span>
+   {!!i.smartMoney?.length && <span className="today-row-flags">{i.smartMoney.map(f => <span key={f.kind} className={f.kind.endsWith('BUYING') ? 'positive' : 'negative'}>{f.text}</span>)}</span>}
   </span>
   <Figure i={i} />
  </button>;
+}
+
+// Public takeover-rule filings (open-market trades by promoters and investors holding 5% or more) and pledged
+// promoter shares. Filings follow the trades by days; shown as context, not as a trade rule.
+function SmartMoneyPanel({ s }: { s: SmartMoney }) {
+ const list = (title: string, rows: SmartRow[], value: (r: SmartRow) => string, note: (r: SmartRow) => string) => <div className="grid gap-1 content-start">
+  <p className="section-label">{title}</p>
+  {rows.length ? rows.slice(0, 8).map(r => <button key={r.symbol} className="smart-row" onClick={() => openAnalysis(r.symbol)}><span><strong>{r.symbol}</strong> <span className="faint">{note(r)}</span></span><b>{value(r)}</b></button>)
+   : <p className="text-sm muted">None filed.</p>}
+ </div>;
+ const pct = (n: number) => `${n > 0 ? '+' : ''}${n}%`;
+ return <section className="card grid gap-3">
+  <div><h3>Smart money: promoter and investor filings</h3><p className="caption">Open-market buying and selling disclosed under SEBI’s takeover rules since {s.since} (promoters, and investors holding 5% or more), netted per stock as a share of the company, and promoter shares pledged in the latest shareholding filing. Filings arrive days after the trades and are context, not a validated trade rule. Updated {formatIST(s.at)}.</p></div>
+  {!!s.failures.length && <p className="card-note warn">Not available: {s.failures.map(f => `${f.source} (${f.reason.replaceAll('_', ' ').toLowerCase()})`).join(', ')}.</p>}
+  <div className="smart-grid">
+   {list('Promoters buying', s.promoterBuying, r => pct(r.promoterNetPct), r => `${r.promoterBuys} filing${r.promoterBuys === 1 ? '' : 's'}`)}
+   {list('Promoters selling', s.promoterSelling, r => pct(r.promoterNetPct), r => `${r.promoterSells} filing${r.promoterSells === 1 ? '' : 's'}`)}
+   {list('Investors buying', s.investorBuying, r => pct(r.outsiderNetPct), r => r.outsiders.join(', '))}
+   {list('Most pledged', s.pledged, r => `${r.pledgedPct}%`, () => 'of promoter shares')}
+  </div>
+ </section>;
 }
 
 export function TodayPage() {
@@ -98,6 +120,7 @@ export function TodayPage() {
     </section>
    </div>
   </div>}
+  {data?.smartMoney && <SmartMoneyPanel s={data.smartMoney} />}
   {!!data?.deals.rows.length && <section className="card grid gap-3">
    <div><h3>Smart money: net bulk and block deals</h3><p className="caption">NSE disclosures for {data.deals.date}: each client’s deals in a stock netted, largest net positions first. {data.deals.roundTrips} clients that bought and sold about the same amount the same day (usually market makers) are left out. Public filings published after the session; who traded is as reported to the exchange.</p></div>
    <div className="overflow-x-auto"><table className="data-table text-sm deals-table"><thead><tr><th>Stock</th><th className="hide-sm">Deal</th><th>Client</th><th>Net</th><th className="text-right hide-sm">Net quantity</th><th className="text-right hide-sm">Avg price</th><th className="text-right">Net value</th></tr></thead>

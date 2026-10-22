@@ -9,7 +9,8 @@
 //   every 15 minutes   intraday-strategy signal scan
 //   every 5 minutes    strategy validation, when a strategy is missing or older than six days (a pass
 //                      triggers an immediate signal scan)
-//   every 30 minutes   new NSE financial filings (:07/:37) and Discover outcome tracking (:22/:52)
+//   every 30 minutes   new NSE financial filings (:07/:37), Discover outcome tracking (:22/:52) and the
+//                      smart-money disclosures: takeover filings and promoter pledges (:27/:57)
 export const AUTOMATION_VERSION='automation-tick-v1';
 export const STATUS_ROW='scheduler_status';
 const istDay=iso=>new Date(Date.parse(iso)+19800000).toISOString().slice(0,10);
@@ -24,12 +25,13 @@ export function backgroundJob(now){
  if(m%5===3)return 'validate';
  if(m%30===7)return 'fundamentals';
  if(m%30===22)return 'outcomes';
+ if(m%30===27)return 'smart-money';
  return null;
 }
 const failure=e=>({status:'FAILED',reason:e?.code??(e instanceof Error?e.message.slice(0,120):'UNEXPECTED_ERROR')});
 async function attempt(fn){try{return await fn();}catch(e){return failure(e);}}
 
-export async function runAutomationTick({now=Date.now,paper,alerts=null,aggressive=null,validate,scan,marketDay,fundamentals,outcomes=null,status}){
+export async function runAutomationTick({now=Date.now,paper,alerts=null,aggressive=null,validate,scan,marketDay,fundamentals,outcomes=null,smartMoney=null,status}){
  const started=now(),job=backgroundJob(started),out={version:AUTOMATION_VERSION,at:new Date(started).toISOString(),job};
  // The paper cycle and the alert scanner (intraday strong-signal feed) run side by side.
  [out.paper,out.alerts]=await Promise.all([attempt(()=>paper(25000)),alerts?attempt(alerts):undefined]);
@@ -45,12 +47,13 @@ export async function runAutomationTick({now=Date.now,paper,alerts=null,aggressi
  }
  else if(job==='fundamentals')out.fundamentals=await attempt(fundamentals);
  else if(job==='outcomes'&&outcomes)out.outcomes=await attempt(outcomes);
+ else if(job==='smart-money'&&smartMoney)out.smartMoney=await attempt(smartMoney);
  out.durationMs=now()-started;
  await attempt(()=>status(out));
  return out;
 }
 // Compact per-job summary kept in app_data so the UI can show the latest run of each job.
-export const JOBS=Object.freeze(['paper','alerts','aggressive','marketDay','dailyScan','scan','validate','fundamentals','outcomes']);
+export const JOBS=Object.freeze(['paper','alerts','aggressive','marketDay','dailyScan','scan','validate','fundamentals','outcomes','smartMoney']);
 export function mergeStatus(previous,tick){
  const jobs={...(previous?.jobs??{})},summary=r=>r&&{status:r.status,...Object.fromEntries(Object.entries(r).filter(([k,v])=>k!=='status'&&(typeof v!=='object'||v===null)).slice(0,8)),
   ...(Array.isArray(r.runs)?{runs:r.runs.length,outcomes:r.runs.reduce((m,x)=>(m[x.outcome]=(m[x.outcome]||0)+1,m),{})}:{}),...(Array.isArray(r.signals)?{signals:r.signals.length}:{}),...(Array.isArray(r.failures)?{failures:r.failures.length}:{})};
