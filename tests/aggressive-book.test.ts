@@ -87,7 +87,7 @@ test('smart-money deals are netted per client and same-day round trips are left 
  assert.deepEqual(r.rows.map(x=>[x.client,x.side,x.quantity,x.value]),[['Fund','BUY',400,40000],['Seller','SELL',300,27000]]);assert.equal(r.roundTrips,1);
 });
 
-const lv=(o:any={})=>({key:'NSE_EQ|S',prevClose:100,avgVolume20:1e6,high20:104,...o});
+const lv=(o:any={})=>({key:'NSE_EQ|S',prevClose:100,avgVolume20:1e6,avgTurnover20:1e9,high20:104,...o});
 const fq=(price:number,o:any={})=>({price,bid:price-0.05,ask:price+0.05,open:100,dayHigh:price,dayLow:99,volume:2.5e6,...o});
 test('overnight scan: up 3% on 2x volume, or a top-of-range close at a new 20-day high on 2x volume with NIFTY up',()=>{
  const levels={niftyPrevClose:20000,rows:{A:lv({key:'a'}),B:lv({key:'b'}),C:lv({key:'c'}),D:lv({key:'d'})}};
@@ -112,12 +112,16 @@ test('overnight gap: one futures lot bought 15:15-15:25, held overnight without 
  ({state}=stepBook(state,{now:at('09:16','2026-10-22'),quotes:new Map([['NSE_FO|A',q(1006)]]),keyOf,marketOpen:true}));
  const c=state.closed[0];assert.equal(c.exitReason,'NEXT_OPEN');assert.equal(c.exitPrice,1005.45,'bid ₹1,005.95 less 5 bps');assert(c.net>0&&c.net<c.gross,'futures charges reduce the gap gain');
 });
-test('the cycle loads daily levels once and scans the NIFTY 50 from 10:00',async()=>{
+test('the cycle loads daily levels once and scans the stocks with futures from 10:00, liquid ones only',async()=>{
  let saved:any=null,histories=0;const store={read:async()=>({data:newBook(0),updated_at:'t'}),save:async(d:any)=>{saved=d;return 'saved';},create:async()=>'saved'};
- const bars=Array.from({length:25},(_,i)=>({time:i,open:100,high:101,low:99,close:100,volume:1e6}));
- const market={history:async()=>{histories++;return bars;},quotes:async(keys:string[])=>new Map(keys.map(k=>[k,fq(104)])),indexPrice:async()=>20100,nextFuture:async()=>({instrumentKey:'F',lotSize:100,description:'F'})};
- const master=async()=>[{segment:'NSE_EQ',instrument_type:'EQ',trading_symbol:'INFY',instrument_key:'NSE_EQ|INFY'},{segment:'NSE_EQ',instrument_type:'EQ',trading_symbol:'TCS',instrument_key:'NSE_EQ|TCS'}];
+ const bars=Array.from({length:25},(_,i)=>({time:i,open:100,high:101,low:99,close:100,volume:1e7}));
+ const small=bars.map(b=>({...b,volume:1e5}));
+ const market={history:async(k:string)=>{histories++;return k==='NSE_EQ|SMALL'?small:bars;},quotes:async(keys:string[])=>new Map(keys.map(k=>[k,fq(104,{volume:2.5e7})])),indexPrice:async()=>20100,nextFuture:async()=>({instrumentKey:'F',lotSize:100,description:'F'})};
+ const eq=(s:string)=>({segment:'NSE_EQ',instrument_type:'EQ',trading_symbol:s,instrument_key:'NSE_EQ|'+s}),fut=(s:string,e:number)=>({segment:'NSE_FO',instrument_type:'FUT',underlying_type:'EQUITY',underlying_symbol:s,expiry:e});
+ // INFY and TCS have futures (two expiries each); SMALL has futures but trades ₹10 crore a day; NOFUT has none.
+ const master=async()=>[eq('INFY'),eq('TCS'),eq('SMALL'),eq('NOFUT'),fut('INFY',1),fut('INFY',2),fut('TCS',1),fut('SMALL',1)];
  const r=await runAggressiveCycle({store,market,master,observation:{marketOpen:true,discoveries:[]},now:()=>at('10:30')});
- assert.equal(saved.levels.rows.INFY.prevClose,100);assert.equal(saved.overnight.qualifying,2);assert.equal(r.overnightQualifying,2);assert.equal(histories,3,'NIFTY plus the two listed stocks');
+ assert.equal(saved.levels.rows.INFY.prevClose,100);assert.equal(saved.overnight.qualifying,2);assert.equal(r.overnightQualifying,2);assert.equal(histories,4,'NIFTY plus the three futures stocks');
+ assert.equal(saved.levels.rows.SMALL.avgTurnover20,1e7);assert.equal(saved.overnight.scanned,2,'below ₹50 crore turnover is not scanned');assert.equal(saved.levels.rows.NOFUT,undefined);
  assert.equal(saved.days['2026-10-21'].rejections['Entry window N:N–N:N'],2,'reasons are counted per session');
 });

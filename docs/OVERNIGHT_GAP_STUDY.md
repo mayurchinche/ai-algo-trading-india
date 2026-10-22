@@ -28,6 +28,25 @@ Findings:
 
 The aggressive book trades the two bold rows as "Overnight gap" (policy `aggressive-v2`).
 
+### Out of sample: the other stocks with futures (23 Oct 2026)
+
+`node research/overnightGapStudy.mjs fno` runs the same rules, unchanged, on the 163 stocks that have futures
+today but are outside the NIFTY 50 (344,111 stock-days). Today's list leaves out stocks that have since left the
+futures segment, which flatters every row; the excess over each year's all-days baseline corrects for that.
+
+| Today's condition | Stock-days | Avg gap | Gap up | Net, futures | Halves (gap) |
+|---|---|---|---|---|---|
+| Any day | 344,111 | +0.202% | 62.6% | +0.036% | 0.196 / 0.206 |
+| Top 10% + new 20-day high + 2× volume + NIFTY up | 1,004 | +0.785% | 72.0% | +0.619% | 1.044 / 0.667 |
+| Up >3% on 2× volume | 10,772 | +0.541% | 69.9% | +0.375% | 0.563 / 0.529 |
+| The book's rule (either of the two) | 10,830 | +0.540% | 70.0% | +0.374% | 0.562 / 0.528 |
+
+Robustness (5% trimmed means): the rule's gap exceeds the same year's all-days gap in 10 of 10 years
+(+0.283% overall, against +0.170% and 8 of 10 years on the NIFTY 50), and stays +0.444% on stocks with 20-day
+average turnover of ₹50 crore or more. 2026 is the weakest year in both groups (excess +0.055% outside the
+NIFTY 50). Policy `aggressive-v3` therefore scans every stock with futures and that turnover, with the rule,
+stop and sizing unchanged. Midcap futures spreads can exceed the 5 bps slippage assumed.
+
 ## Intraday: entries at levels known before the session
 
 Stop entry at the level, 1% stop, 2% target, exit at the last hourly bar (15:15).

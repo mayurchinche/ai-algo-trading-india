@@ -5,21 +5,24 @@
 //   aggressive-v1 (21–22 Oct 2026, no trades): gap-and-go, early breakout, Discover momentum.
 //   aggressive-v2: gap-and-go removed (measured losing; its opening-candle feed was unavailable on the server);
 //                  overnight gap added (futures, entered 15:15–15:25, exited at the next open).
+//   aggressive-v3: the overnight scan covers every stock with futures (about 210, was the NIFTY 50) with 20-day
+//                  average turnover of ₹50 crore or more; the rule itself is unchanged. Tested out of sample on the
+//                  163 futures stocks outside the NIFTY 50: +0.54% average gap, positive excess in 10 of 10 years.
 import {orderCharges} from '../shared/brokerCharges.js';
 import {isNseTradingDay,nextNseTradingDay} from '../shared/nseCalendar.js';
-import {NIFTY50_UNIVERSE} from '../shared/universes.js';
 export const AGGRESSIVE_POLICY=Object.freeze({
- id:'aggressive-v2',capitalPerTrade:25000,maxOpen:5,dailyLossStop:10000,slippageBps:5,
+ id:'aggressive-v3',capitalPerTrade:25000,maxOpen:5,dailyLossStop:10000,slippageBps:5,
  // Intraday setups (MIS): squared off at 15:15.
  intraday:Object.freeze({minScore:60,minPrice:10,minTurnover:2e7,maxMovePct:12,stopPct:1.5,targetPct:3,from:560,until:870,squareOff:915}),
  // Early breakout of a validated daily rule (CNC): bought when the live price crosses the rule's trigger level.
  swing:Object.freeze({stopPct:5,targetPct:10,maxSessions:10,from:570,until:915}),
  // Overnight gap (stock futures, one lot): a strong close predicts a small gap up next morning. The edge measured
- // over 10 years (+0.32% average gap) is below delivery charges (0.38%) but above futures charges (0.17%).
- overnight:Object.freeze({from:915,until:925,maxPositions:3,maxNotional:1500000,disasterStopPct:5,minDayRetPct:3,minVolumeRatio:2,minCloseLocation:0.9,watchFrom:600}),
+ // over 10 years (+0.32% average gap on the NIFTY 50, +0.54% on other futures stocks) is above futures charges
+ // (0.17%); with delivery charges (0.38%) the NIFTY 50 edge is gone. Stocks need ₹50 crore 20-day average turnover.
+ overnight:Object.freeze({from:915,until:925,maxPositions:3,maxNotional:1500000,disasterStopPct:5,minDayRetPct:3,minVolumeRatio:2,minCloseLocation:0.9,minTurnover20:5e8,watchFrom:600}),
 });
 export const SETUPS=Object.freeze({
- 'overnight-gap':{label:'Overnight gap',product:'futures',rule:'Before the close, buy one lot of the stock future when the stock is up more than 3% on at least twice its 20-day average volume, or closes in the top 10% of its range at a new 20-day high on twice the volume with NIFTY up; sell at the next session’s open. Measured on 10 years of NIFTY 50: average gap +0.32%, about 0.15% after futures charges.'},
+ 'overnight-gap':{label:'Overnight gap',product:'futures',rule:'Before the close, buy one lot of the stock future when the stock is up more than 3% on at least twice its 20-day average volume, or closes in the top 10% of its range at a new 20-day high on twice the volume with NIFTY up; sell at the next session’s open. Scans every stock with futures and ₹50 crore average daily turnover. Measured over 10 years: average gap +0.32% on the NIFTY 50 and +0.54% on the other futures stocks (out of sample), about 0.15% and 0.37% after futures charges.'},
  'breakout-early':{label:'Early breakout',product:'equity-delivery',rule:'The live price crosses the trigger level of a validated daily breakout rule before the close confirms it.'},
  'discover-momentum':{label:'Discover momentum',product:'equity-intraday',rule:'Discover score of 60 or more (either direction) with a matching signal, on a liquid stock without a circuit-sized move. The 10-year Discover study found next-day intraday trading on the score lost after charges; this setup measures live behaviour.'},
 });
@@ -32,14 +35,15 @@ export function newBook(now){return {version:'aggressive-book-v1',policy:AGGRESS
 const dayAfter=d=>nextNseTradingDay(new Date(Date.parse(d+'T00:00:00Z')+DAY).toISOString().slice(0,10));
 function sessionsAfter(date,n){let d=date;for(let i=0;i<n;i++)d=dayAfter(d);return d;}
 
-// Overnight-gap scan of the NIFTY 50 on live quotes. levels: per symbol {prevClose, avgVolume20, high20};
+// Overnight-gap scan of the stocks with futures on live quotes. levels: per symbol {prevClose, avgVolume20,
+// avgTurnover20, high20}; stocks below the turnover floor are left out;
 // quotes: Map instrumentKey → quote with open/dayHigh/dayLow/volume. Returns every stock with its measures,
 // whether it qualifies and, if not, what it still needs.
 export function overnightScan({levels,quotes,niftyPrice,now}){
  const o=AGGRESSIVE_POLICY.overnight,niftyUp=Number.isFinite(niftyPrice)&&levels?.niftyPrevClose>0?niftyPrice>levels.niftyPrevClose:null;
  const rows=[];
  for(const [symbol,l] of Object.entries(levels?.rows??{})){
-  const q=quotes.get(l.key);if(!q||!(l.prevClose>0)||!(l.avgVolume20>0))continue;
+  const q=quotes.get(l.key);if(!q||!(l.prevClose>0)||!(l.avgVolume20>0)||!(l.avgTurnover20>=o.minTurnover20))continue;
   const ret=(q.price/l.prevClose-1)*100,volumeRatio=Number.isFinite(q.volume)?q.volume/l.avgVolume20:null;
   const range=q.dayHigh-q.dayLow,closeLocation=range>0?(q.price-q.dayLow)/range:null,newHigh=q.price>l.high20;
   const a=ret>o.minDayRetPct&&volumeRatio>=o.minVolumeRatio;
@@ -130,7 +134,7 @@ export function stepBook(previous,{now,candidates=[],quotes=new Map(),keyOf=()=>
   if(overnight&&price*qty>P.overnight.maxNotional){decide('SKIPPED',`One lot is ₹${Math.round(price*qty/1e4)/10} lakh, above the ₹${P.overnight.maxNotional/1e5} lakh cap`);continue;}
   if(qty<1){decide('SKIPPED','Price above the per-trade capital');continue;}
   const dir=c.side==='BUY'?1:-1;
-  const pos={id:`${today}:${c.symbol}:${c.setup}`,setup:c.setup,symbol:c.symbol,key,side:c.side,product:c.product,qty,entryPrice:price,entryAt:new Date(now).toISOString(),
+  const pos={id:`${today}:${c.symbol}:${c.setup}`,policy:P.id,setup:c.setup,symbol:c.symbol,key,side:c.side,product:c.product,qty,entryPrice:price,entryAt:new Date(now).toISOString(),
    stop:r2(price*(1-dir*(overnight?P.overnight.disasterStopPct:win.stopPct)/100)),target:overnight?null:r2(price*(1+dir*win.targetPct/100)),entryCharges:r2(charges(c.product,c.side,price*qty)),mark:q.price,markAt:new Date(now).toISOString(),why:c.why,
    exitBy:c.product==='equity-delivery'?sessionsAfter(today,P.swing.maxSessions):null,...(overnight?{exitAtNextOpen:true,contract:contract.description,exitOn:dayAfter(today)}:{})};
   state.positions.push(pos);traded.add(c.symbol+'|'+c.setup);held.add(c.symbol);decide('ENTERED',`${c.side} ${qty} at ₹${price}`);
@@ -153,16 +157,16 @@ export function bookSummary(state,now){
 
 // Daily reference levels for the overnight scan, read once per session from completed daily bars (up to the
 // previous session). Reads are budgeted; a partial set is completed on later minutes.
-export async function loadLevels(previous,{market,keyOf,now,budgetMs=15000,limit=6}){
+export async function loadLevels(previous,{symbols,market,keyOf,now,budgetMs=15000,limit=6}){
  const today=istDate(now),lv=previous?.date===today?structuredClone(previous):{date:today,rows:{},niftyPrevClose:null,failed:{}};
- const want=NIFTY50_UNIVERSE.members.map(m=>m.symbol).filter(s=>!lv.rows[s]&&(lv.failed[s]??0)<3),start=Date.now();
+ const want=symbols.filter(s=>!lv.rows[s]&&(lv.failed[s]??0)<3),start=Date.now();
  const read=async key=>(await market.history(key,'1d',now-45*DAY,now)).slice(-20);
  if(lv.niftyPrevClose===null)try{lv.niftyPrevClose=(await read('NSE_INDEX|Nifty 50')).at(-1)?.close??null;}catch{/* retried next minute */}
  let next=0;
  await Promise.all(Array.from({length:limit},async()=>{while(next<want.length&&Date.now()-start<budgetMs){const s=want[next++],key=keyOf(s);if(!key){lv.failed[s]=3;continue;}
-  try{const b=await read(key);if(b.length<20)throw new Error('short');lv.rows[s]={key,prevClose:b.at(-1).close,avgVolume20:b.reduce((a,x)=>a+x.volume,0)/b.length,high20:Math.max(...b.map(x=>x.high))};}
+  try{const b=await read(key);if(b.length<20)throw new Error('short');lv.rows[s]={key,prevClose:b.at(-1).close,avgVolume20:b.reduce((a,x)=>a+x.volume,0)/b.length,avgTurnover20:b.reduce((a,x)=>a+x.volume*x.close,0)/b.length,high20:Math.max(...b.map(x=>x.high))};}
   catch{lv.failed[s]=(lv.failed[s]??0)+1;}}}));
- lv.complete=Object.keys(lv.rows).length+Object.values(lv.failed).filter(n=>n>=3).length>=NIFTY50_UNIVERSE.members.length&&lv.niftyPrevClose!==null;
+ lv.complete=Object.keys(lv.rows).length+Object.values(lv.failed).filter(n=>n>=3).length>=symbols.length&&lv.niftyPrevClose!==null;
  return lv;
 }
 
@@ -175,11 +179,13 @@ export async function runAggressiveCycle({store,market,master,observation=null,b
  if(!marketOpen&&!state.positions.length&&row)return {status:'MARKET_CLOSED',open:0};
  const instruments=await master();
  const eq=new Map(instruments.filter(r=>r.segment==='NSE_EQ'&&r.instrument_type==='EQ').map(r=>[r.trading_symbol,r.instrument_key])),keyOf=s=>eq.get(s)??null;
- // Overnight scan from 10:00: levels, then one quote request for the NIFTY 50 and NIFTY itself.
+ // Overnight scan of every stock with futures. Daily levels load from the open in short budgeted batches, so the
+ // ~210 history reads are spread over the first minutes; from 10:00 one quote request covers the liquid ones and NIFTY.
+ const futuresStocks=[...new Set(instruments.filter(r=>r.segment==='NSE_FO'&&r.instrument_type==='FUT'&&r.underlying_type==='EQUITY').map(r=>r.underlying_symbol))].filter(s=>eq.has(s)).sort();
  let overnight=null,quotes=new Map(),niftyPrice=null;
- if(marketOpen&&m>=AGGRESSIVE_POLICY.overnight.watchFrom){
-  if(!state.levels?.complete||state.levels.date!==istDate(at))state.levels=await loadLevels(state.levels,{market,keyOf,now:at});
-  const keys=Object.values(state.levels.rows).map(r=>r.key);
+ if(marketOpen&&(!state.levels?.complete||state.levels.date!==istDate(at)))state.levels=await loadLevels(state.levels,{symbols:futuresStocks,market,keyOf,now:at,budgetMs:m>=AGGRESSIVE_POLICY.overnight.watchFrom?15000:8000});
+ if(marketOpen&&m>=AGGRESSIVE_POLICY.overnight.watchFrom&&state.levels){
+  const keys=Object.values(state.levels.rows).filter(r=>r.avgTurnover20>=AGGRESSIVE_POLICY.overnight.minTurnover20).map(r=>r.key);
   [quotes,niftyPrice]=await Promise.all([keys.length?market.quotes(keys,at):new Map(),market.indexPrice?market.indexPrice('NSE_INDEX|Nifty 50',at).catch(()=>null):null]);
   overnight=overnightScan({levels:state.levels,quotes,niftyPrice,now:at});state.overnight=overnight;
  }

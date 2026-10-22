@@ -22,10 +22,10 @@ function Figure({ i }: { i: TodayItem }) {
  if (i.price) return <span className="today-figure">{inr(i.price, 2)}<small>close</small></span>;
  return null;
 }
-// Tomorrow's gap: the overnight scan of the NIFTY 50, qualifying stocks first, then the closest.
+// Tomorrow's gap: the overnight scan of the stocks with futures, qualifying stocks first, then the closest.
 function OvernightPanel({ o }: { o: Overnight | null }) {
  return <section className="card grid gap-3">
-  <div className="rule-item-head"><div><h3>Tomorrow’s gap</h3><p className="caption">NIFTY 50 scanned every minute from 10:00. Stocks that qualify by the close are bought as one futures lot between 15:15 and 15:25 and sold at the next open. Over 10 years such closes were followed by an average gap of +0.32% (gap up about 6 times in 10), roughly +0.15% after futures charges; with delivery shares the charges exceed the gap.</p></div></div>
+  <div className="rule-item-head"><div><h3>Tomorrow’s gap</h3><p className="caption">Every stock with futures and ₹50 crore average daily turnover, scanned every minute from 10:00. Stocks that qualify by the close are bought as one futures lot between 15:15 and 15:25 and sold at the next open. Over 10 years such closes were followed by an average gap of +0.32% on NIFTY 50 stocks and +0.54% on other futures stocks (gap up 6 to 7 times in 10), roughly +0.15% and +0.37% after futures charges.</p></div></div>
   {!o ? <p className="text-sm muted">The scan starts at 10:00 IST on trading days.</p> : <>
    <div className="inline-facts"><span>Scanned <b>{o.scanned}</b></span><span>Qualifying <b>{o.qualifying}</b></span><span>NIFTY <b>{o.niftyUp === null ? 'unknown' : o.niftyUp ? 'up' : 'down'}</b></span><span>as of <b>{time(o.at)}</b></span></div>
    <div className="overflow-x-auto"><table className="data-table text-sm deals-table"><thead><tr><th>Stock</th><th className="text-right">Day</th><th className="text-right">Volume</th><th className="text-right hide-sm">Close in range</th><th>Status</th></tr></thead>
