@@ -242,3 +242,78 @@ export function crossunder(a,b){
  const other=levels(a,b);
  return a.map((v,i)=>i>0&&[v,other[i],a[i-1],other[i-1]].every(Number.isFinite)&&v<other[i]&&a[i-1]>=other[i-1]);
 }
+
+// ---- Technical rating (after TradingView's published "Technical Ratings" method) -------------------------------
+// Weighted MA: linear weights 1..length, newest heaviest.
+function wma(values,length){
+ const start=prefixedSeries(values),out=empty(values.length),den=length*(length+1)/2;
+ for(let i=start+length-1;i<values.length;i++){let s=0;for(let j=0;j<length;j++)s+=values[i-j]*(length-j);out[i]=s/den;}
+ return out;
+}
+const hullMa=(values,length)=>{const half=wma(values,Math.floor(length/2)),full=wma(values,length);return wma(half.map((h,i)=>Number.isNaN(h)||Number.isNaN(full[i])?NaN:2*h-full[i]),Math.round(Math.sqrt(length)));};
+const vwma=(close,volume,length)=>{const pv=sma(close.map((c,i)=>c*volume[i]),length),v=sma(volume,length);return pv.map((x,i)=>v[i]>0?x/v[i]:NaN);};
+// Raw stochastic %K of `src` against the high/low range of the last `length` bars.
+function stoch(src,high,low,length){
+ const out=empty(src.length);
+ for(let i=0;i<src.length;i++){if(i<length-1)continue;let hi=-Infinity,lo=Infinity,ok=true;for(let j=i-length+1;j<=i;j++){if(Number.isNaN(high[j])||Number.isNaN(low[j])){ok=false;break;}hi=Math.max(hi,high[j]);lo=Math.min(lo,low[j]);}
+  if(ok&&!Number.isNaN(src[i]))out[i]=hi===lo?NaN:(src[i]-lo)/(hi-lo)*100;}
+ return out;
+}
+const smaGapped=(values,length)=>values.map((_,i)=>{if(i<length-1)return NaN;let s=0;for(let j=i-length+1;j<=i;j++){if(Number.isNaN(values[j]))return NaN;s+=values[j];}return s/length;});
+function cci(high,low,close,length){
+ const tp=close.map((c,i)=>(high[i]+low[i]+c)/3),m=sma(tp,length),out=empty(close.length);
+ for(let i=length-1;i<close.length;i++){let d=0;for(let j=i-length+1;j<=i;j++)d+=Math.abs(tp[j]-m[i]);d/=length;out[i]=d>0?(tp[i]-m[i])/(0.015*d):NaN;}
+ return out;
+}
+// Wilder's directional movement: +DI, -DI and ADX (TradingView ta.dmi).
+function dmi(high,low,close,length,smoothing){
+ const n=close.length,up=empty(n),down=empty(n);
+ for(let i=1;i<n;i++){const u=high[i]-high[i-1],d=low[i-1]-low[i];up[i]=u>d&&u>0?u:0;down[i]=d>u&&d>0?d:0;}
+ const tr=trueRange(high,low,close).map((v,i)=>i===0?NaN:v),atrS=rma(tr,length),pS=rma(up,length),mS=rma(down,length);
+ const plus=pS.map((v,i)=>atrS[i]>0?100*v/atrS[i]:NaN),minus=mS.map((v,i)=>atrS[i]>0?100*v/atrS[i]:NaN);
+ const dx=plus.map((p,i)=>Number.isNaN(p)||Number.isNaN(minus[i])?NaN:p+minus[i]>0?100*Math.abs(p-minus[i])/(p+minus[i]):0);
+ return {plus,minus,adx:rma(dx,smoothing)};
+}
+function ultimate(high,low,close,f=7,m=14,s=28){
+ const n=close.length,bp=empty(n),tr=empty(n);
+ for(let i=1;i<n;i++){const lo=Math.min(low[i],close[i-1]),hi=Math.max(high[i],close[i-1]);bp[i]=close[i]-lo;tr[i]=hi-lo;}
+ const avg=len=>{const b=smaGapped(bp,len),t=smaGapped(tr,len);return b.map((x,i)=>t[i]>0?x/t[i]:NaN);};
+ const a=avg(f),b=avg(m),c=avg(s);return a.map((x,i)=>100*(4*x+2*b[i]+c[i])/7);
+}
+// Ratings: each component votes +1 (buy), -1 (sell) or 0; the moving-average and oscillator ratings are the means
+// of their votes and the rating is the mean of the two, in [-1, 1]. TradingView's bands: above 0.5 strong buy,
+// 0.1 to 0.5 buy, -0.1 to 0.1 neutral, below -0.5 strong sell. NaN until every component has its history
+// (about 200 bars, the SMA 200). Differences from TradingView: the Ichimoku leading spans are not shifted forward,
+// and the trend filter of Stoch RSI and Bull Bear Power is the close against its 50-bar SMA.
+export function technicalRating(high,low,close,volume){
+ finiteSeries(high,'high');finiteSeries(low,'low');finiteSeries(close,'close');finiteSeries(volume,'volume');
+ const n=sameLength(high,low,close,volume),vote=(b,s)=>b?1:s?-1:0,maVote=(ma,i)=>ma[i]<close[i]?1:ma[i]>close[i]?-1:0;
+ const mas=[10,20,30,50,100,200].flatMap(l=>[sma(close,l),ema(close,l)]);mas.push(vwma(close,volume,20),hullMa(close,9));
+ const mid=len=>{const h=highest(high,len),l=lowest(low,len);return h.map((x,i)=>(x+l[i])/2);};
+ const conv=mid(9),base=mid(26),lead2=mid(52),lead1=conv.map((c,i)=>(c+base[i])/2);
+ const r=rsi(close,14),k=smaGapped(stoch(close,high,low,14),3),d=smaGapped(k,3),c=cci(high,low,close,20),dm=dmi(high,low,close,14,14);
+ const hl2=high.map((h,i)=>(h+low[i])/2),ao=sma(hl2,5).map((x,i)=>x-sma(hl2,34)[i]);
+ const mom=close.map((x,i)=>i>=10?x-close[i-10]:NaN),mc=macd(close,{fast:12,slow:26,signal:9}),trend=sma(close,50);
+ const rk=smaGapped(stoch(r,r,r,14),3),rd=smaGapped(rk,3),wr=stoch(close,high,low,14).map(x=>x-100),e13=ema(close,13),bull=high.map((h,i)=>h-e13[i]),bear=low.map((l,i)=>l-e13[i]),uo=ultimate(high,low,close);
+ const rating=empty(n),maRating=empty(n),oscRating=empty(n);
+ for(let i=2;i<n;i++){
+  const p=i-1,needed=[...mas.map(m=>m[i]),lead1[i],lead2[i],r[p],k[p],d[p],c[p],dm.adx[i],dm.plus[p],dm.minus[p],ao[i-2],mom[p],mc.signal[i],trend[i],rk[p],rd[p],wr[p],bull[p],bear[p],uo[i]];
+  if(needed.some(Number.isNaN))continue;
+  const ich=vote(lead1[i]>lead2[i]&&close[i]>lead1[i]&&close[i]<base[i]&&close[p]<conv[p]&&close[i]>conv[i],lead2[i]>lead1[i]&&close[i]<lead2[i]&&close[i]>base[i]&&close[p]>conv[p]&&close[i]<conv[i]);
+  const maV=[...mas.map(m=>maVote(m,i)),ich],up=close[i]>trend[i],down=close[i]<trend[i];
+  const oscV=[vote(r[i]<30&&r[i]>r[p],r[i]>70&&r[i]<r[p]),
+   vote(k[i]<20&&d[i]<20&&k[i]>d[i]&&k[p]<d[p],k[i]>80&&d[i]>80&&k[i]<d[i]&&k[p]>d[p]),
+   vote(c[i]<-100&&c[i]>c[p],c[i]>100&&c[i]<c[p]),
+   vote(dm.adx[i]>20&&dm.plus[p]<dm.minus[p]&&dm.plus[i]>dm.minus[i],dm.adx[i]>20&&dm.plus[p]>dm.minus[p]&&dm.plus[i]<dm.minus[i]),
+   vote(ao[i]>0&&ao[p]<0||ao[i]>0&&ao[p]>0&&ao[i]>ao[p]&&ao[i-2]>ao[p],ao[i]<0&&ao[p]>0||ao[i]<0&&ao[p]<0&&ao[i]<ao[p]&&ao[i-2]<ao[p]),
+   vote(mom[i]>mom[p],mom[i]<mom[p]),
+   vote(mc.macd[i]>mc.signal[i],mc.macd[i]<mc.signal[i]),
+   vote(down&&rk[i]<20&&rd[i]<20&&rk[i]>rd[i]&&rk[p]<rd[p],up&&rk[i]>80&&rd[i]>80&&rk[i]<rd[i]&&rk[p]>rd[p]),
+   vote(wr[i]<-80&&wr[i]>wr[p],wr[i]>-20&&wr[i]<wr[p]),
+   vote(up&&bear[i]<0&&bear[i]>bear[p],down&&bull[i]>0&&bull[i]<bull[p]),
+   vote(uo[i]>70,uo[i]<30)];
+  const mean=a=>a.reduce((x,y)=>x+y,0)/a.length;
+  maRating[i]=mean(maV);oscRating[i]=mean(oscV);rating[i]=(maRating[i]+oscRating[i])/2;
+ }
+ return {rating,maRating,oscRating};
+}

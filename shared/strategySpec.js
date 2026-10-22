@@ -26,6 +26,8 @@ export const INDICATOR_TYPES = Object.freeze({
  opening_range:{params:{bars:[1,24]},source:false,outputs:['high','low','open','close','prevClose','gapPct'],intradayOnly:true},
  gap:{params:{},source:false,outputs:['pct']},
  volume_ratio:{params:{length:[2,250]},source:false,outputs:['value']},
+ // TradingView-style technical rating in [-1, 1] (shared/indicators.js technicalRating).
+ technical_rating:{params:{},source:false,outputs:['rating','ma','oscillators']},
 });
 
 const ID=/^[a-z][a-z0-9_]{0,31}$/, SYMBOL=/^[A-Z0-9&-]{1,30}$/, CLOCK=/^([01]\d|2[0-3]):[0-5]\d$/;

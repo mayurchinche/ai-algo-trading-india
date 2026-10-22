@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { atr, bollinger, crossover, crossunder, donchian, ema, macd, rma, rsi, sma, stdev, supertrend, trueRange, vwap, zlema } from '../shared/indicators.js';
+import { atr, bollinger, crossover, crossunder, donchian, ema, macd, rma, rsi, sma, stdev, supertrend, technicalRating, trueRange, vwap, zlema } from '../shared/indicators.js';
 import { simulateBacktest } from '../src/services/backtestEngine';
 import golden from './fixtures/backtest-golden.json';
 
@@ -105,4 +105,19 @@ test('backtest results are unchanged by the shared indicator migration (golden f
   for (const c of golden.cases as any[]) assert.deepEqual(simulateBacktest((golden.datasets as any)[c.dataset], c.config), c.expected);
   const strategies = new Set(golden.cases.flatMap((c: any) => c.expected.trades.map((t: any) => t.strategy)));
   assert.deepEqual([...strategies].sort(), ['Breakout', 'Mean Reversion', 'Momentum', 'Trend Following', 'Volume Pattern']);
+});
+
+test('technical rating: votes in [-1, 1], undefined before the 200-bar history, follows the trend',()=>{
+ // Deterministic noisy trends: 260 bars up, then 260 bars down.
+ let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+ const close:number[]=[];let p=100;for(let i=0;i<520;i++){p*=1+(i<260?0.004:-0.004)+(rnd()-0.5)*0.02;close.push(p);}
+ const high=close.map(c=>c*(1+rnd()*0.01)),low=close.map(c=>c*(1-rnd()*0.01)),volume=close.map(()=>1e6*(0.5+rnd()));
+ const {rating,maRating,oscRating}=technicalRating(high,low,close,volume);
+ assert.equal(rating.length,520);assert(Number.isNaN(rating[198]),'needs the SMA 200');assert(Number.isFinite(rating[210]));
+ for(let i=210;i<520;i++){assert(rating[i]>=-1&&rating[i]<=1);assert.equal(Math.round(maRating[i]*15),+(maRating[i]*15).toFixed(9),'15 MA votes');assert.equal(Math.round(oscRating[i]*11),+(oscRating[i]*11).toFixed(9),'11 oscillator votes');
+  assert.equal(rating[i],(maRating[i]+oscRating[i])/2);}
+ const avg=(a:number[],from:number,to:number)=>a.slice(from,to).reduce((x,y)=>x+y,0)/(to-from);
+ assert(avg(maRating,220,260)>0.6,'moving averages vote buy in the uptrend');assert(avg(maRating,480,520)<-0.6,'and sell in the downtrend');
+ assert(avg(rating,220,260)>avg(rating,480,520)+0.5);
+ assert.throws(()=>technicalRating(high,low,close.slice(1),volume),/equal length/);
 });

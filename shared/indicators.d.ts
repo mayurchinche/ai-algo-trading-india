@@ -17,6 +17,7 @@ export function donchian(high: Series, low: Series, length?: number): { upper: S
 export function zlema(values: Series, length: number): Series;
 export function supertrend(high: Series, low: Series, close: Series, length?: number, multiplier?: number): { line: Series; direction: Series };
 export function vwap(high: Series, low: Series, close: Series, volume: Series, sessions?: readonly unknown[]): Series;
+export function technicalRating(high: Series, low: Series, close: Series, volume: Series): { rating: Series; maRating: Series; oscRating: Series };
 export function crossover(a: Series, b: Series | number): boolean[];
 export function crossunder(a: Series, b: Series | number): boolean[];
 

@@ -156,7 +156,14 @@ const RAW=[
    entry:{all:[cmp(P('close'),bull?'crosses-above':'crosses-below',I('dc20',bull?'upper':'lower',1)),cmp(P('close'),bull?'gt':'lt',I('sma50'))]},exit:cmp(P('close'),bull?'crosses-below':'crosses-above',I('dc10',bull?'lower':'upper',1)),
    legs:[{id:'long_opt',side:'BUY',instrument:{type:'option',optionType:type,expiry:'next-month',strike:{mode:'atm-offset',steps:0}},quantity:{lots}},{id:'short_opt',side:'SELL',instrument:{type:'option',optionType:type,expiry:'next-month',strike:{mode:'atm-offset',steps:bull?2:-2}},quantity:{lots}}],
    risk:{maxHoldingDays:20}})};}),
-
+ // Parameters fixed before validation (23 Oct 2026): TradingView's own bands, no tuning.
+ {id:'short-term-technical-rating',segment:'short-term',name:'Technical rating strong buy',universe:'nifty50',timeframe:'1d',
+  rule:'Buy when the daily technical rating (15 moving-average and 11 oscillator votes, as TradingView computes its Technical Ratings) rises above 0.5, its "strong buy" band; sell when it falls below −0.1, its "sell" band, or after 60 days; 10% stop.',
+  reference:'TradingView Technical Ratings methodology (TradingView help centre, "Technical Ratings"); computed here from daily bars, not read from TradingView.',
+  build:({symbol,units})=>({schemaVersion:1,name:'Technical rating '+symbol,mode:'positional',underlying:{symbol,exchange:'NSE',kind:'equity'},timeframe:'1d',schedule:DAY,
+   indicators:[ind('tr','technical_rating',{})],
+   entry:cmp(I('tr','rating'),'crosses-above',V(0.5)),exit:cmp(I('tr','rating'),'crosses-below',V(-0.1)),
+   legs:[{id:'eq',side:'BUY',instrument:{type:'equity'},quantity:{units},stopLoss:pct(10)}],risk:{maxHoldingDays:60}})},
 ];
 // Distance from the last close to the price that would trigger each breakout-style entry, for "near a trigger"
 // watchlists. Returns null when the rule has no single price level (for example a pending moving-average cross).

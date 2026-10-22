@@ -3,7 +3,7 @@
 // (indicator warm-up, or barsAgo before the first bar). Callers must act only on `true` and must
 // pass completed bars, so a bar's own close is never used before that bar has finished.
 
-import { atr, bollinger, donchian, ema, gapPercent, highest, lowest, macd, openingRange, rsi, sma, supertrend, volumeRatio, vwap, zlema } from './indicators.js';
+import { atr, bollinger, donchian, ema, gapPercent, highest, lowest, macd, openingRange, rsi, sma, supertrend, technicalRating, volumeRatio, vwap, zlema } from './indicators.js';
 import { INDICATOR_TYPES } from './strategySpec.js';
 
 const IST_OFFSET_MS=330*60*1000;
@@ -45,6 +45,7 @@ function compute(def,price){
   case 'vwap': return {value:vwap(price.high,price.low,price.close,price.volume,price.time.map(istSession))};
   case 'gap': return {pct:gapPercent(price.open,price.close)};
   case 'volume_ratio': return {value:volumeRatio(price.volume,params.length)};
+  case 'technical_rating': {const r=technicalRating(price.high,price.low,price.close,price.volume);return {rating:r.rating,ma:r.maRating,oscillators:r.oscRating};}
   case 'opening_range': return openingRange(price.open,price.high,price.low,price.close,price.time.map(istSession),params.bars);
   default: throw new TypeError(`unsupported indicator type ${type}`);
  }
