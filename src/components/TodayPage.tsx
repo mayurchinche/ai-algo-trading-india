@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { fetchToday, type TodayResponse, type TodayItem, type ItemKind } from '../services/today';
+import { fetchToday, type TodayResponse, type TodayItem, type ItemKind, type Overnight } from '../services/today';
 import { openAnalysis, navigateTo } from '../services/specDraft';
 import { formatIST } from '../services/tradingTime';
 
@@ -8,11 +8,11 @@ const signed = (n: number | null | undefined) => n === null || n === undefined |
 const tone = (n: number | null | undefined) => !n ? '' : n > 0 ? 'positive' : 'negative';
 const time = (iso: string) => new Date(iso).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Kolkata' });
 const KIND: Record<ItemKind, [string, string]> = {
- VALIDATED: ['Validated signal', 'badge-green'], AGGRESSIVE_OPEN: ['Aggressive · open', 'badge-blue'], WATCHING: ['Watching', 'badge-amber'],
+ VALIDATED: ['Validated signal', 'badge-green'], AGGRESSIVE_OPEN: ['Aggressive · open', 'badge-blue'], OVERNIGHT: ['Gap up tomorrow', 'badge-amber'], WATCHING: ['Watching', 'badge-amber'],
  NEAR_TRIGGER: ['Near trigger', 'badge-neutral'], WAITING: ['Waiting', 'badge-neutral'], BLOCKED: ['Not taken', 'badge-neutral'], SKIPPED: ['Not taken', 'badge-neutral'], DISCOVER: ['Discover', 'badge-neutral'],
 };
 const GROUPS: [string, string, ItemKind[]][] = [
- ['all', 'All', []], ['act', 'Trading now', ['VALIDATED', 'AGGRESSIVE_OPEN']], ['watch', 'Watch next', ['WATCHING', 'NEAR_TRIGGER', 'WAITING']], ['passed', 'Passed on', ['BLOCKED', 'SKIPPED', 'DISCOVER']],
+ ['all', 'All', []], ['act', 'Trading now', ['VALIDATED', 'AGGRESSIVE_OPEN', 'OVERNIGHT']], ['watch', 'Watch next', ['WATCHING', 'NEAR_TRIGGER', 'WAITING']], ['passed', 'Passed on', ['BLOCKED', 'SKIPPED', 'DISCOVER']],
 ];
 
 function Figure({ i }: { i: TodayItem }) {
@@ -21,6 +21,18 @@ function Figure({ i }: { i: TodayItem }) {
  if (i.score !== null && i.score !== undefined) return <span className="today-figure">{Math.abs(i.score)}<small>score</small></span>;
  if (i.price) return <span className="today-figure">{inr(i.price, 2)}<small>close</small></span>;
  return null;
+}
+// Tomorrow's gap: the overnight scan of the NIFTY 50, qualifying stocks first, then the closest.
+function OvernightPanel({ o }: { o: Overnight | null }) {
+ return <section className="card grid gap-3">
+  <div className="rule-item-head"><div><h3>Tomorrow’s gap</h3><p className="caption">NIFTY 50 scanned every minute from 10:00. Stocks that qualify by the close are bought as one futures lot between 15:15 and 15:25 and sold at the next open. Over 10 years such closes were followed by an average gap of +0.32% (gap up about 6 times in 10), roughly +0.15% after futures charges; with delivery shares the charges exceed the gap.</p></div></div>
+  {!o ? <p className="text-sm muted">The scan starts at 10:00 IST on trading days.</p> : <>
+   <div className="inline-facts"><span>Scanned <b>{o.scanned}</b></span><span>Qualifying <b>{o.qualifying}</b></span><span>NIFTY <b>{o.niftyUp === null ? 'unknown' : o.niftyUp ? 'up' : 'down'}</b></span><span>as of <b>{time(o.at)}</b></span></div>
+   <div className="overflow-x-auto"><table className="data-table text-sm deals-table"><thead><tr><th>Stock</th><th className="text-right">Day</th><th className="text-right">Volume</th><th className="text-right hide-sm">Close in range</th><th>Status</th></tr></thead>
+    <tbody>{o.rows.slice(0, 10).map(r => <tr key={r.symbol} onClick={() => openAnalysis(r.symbol)} style={{ cursor: 'pointer' }}><td className="font-semibold">{r.symbol}{r.newHigh ? <small className="faint"> · 20d high</small> : null}</td><td className={`text-right ${tone(r.retPct)}`}>{signed(r.retPct)}</td><td className="text-right">{r.volumeRatio ?? '—'}×</td><td className="text-right hide-sm">{r.closeLocation === null ? '—' : Math.round(r.closeLocation * 100) + '%'}</td>
+     <td>{r.qualifies ? <span className="badge badge-amber">Qualifies</span> : <span className="text-xs muted">needs {r.needs.join(' and ')}</span>}</td></tr>)}</tbody></table></div>
+  </>}
+ </section>;
 }
 function Row({ i }: { i: TodayItem }) {
  const [label, badge] = KIND[i.kind];
@@ -63,19 +75,20 @@ export function TodayPage() {
      : <p className="text-sm muted">Nothing in this group now. Outside market hours the board shows the last session’s state; the scanners run every minute from 09:15 to 15:30 IST.</p>}
    </section>
    <div className="grid gap-4 content-start">
+    <OvernightPanel o={b?.overnight ?? null} />
     <section className="card grid gap-3">
      <div className="rule-item-head"><h3>Aggressive book</h3><span className="badge badge-amber">Experimental</span></div>
      {b ? <>
-      <p className="caption">{inr(b.policy.capitalPerTrade)} per trade · up to {b.policy.maxOpen} open · stops new entries after a {inr(b.policy.dailyLossStop)} day. Intraday: {b.policy.intraday.stopPct}% stop, {b.policy.intraday.targetPct}% target, squared off 15:15. Early breakouts: {b.policy.swing.stopPct}% stop, {b.policy.swing.targetPct}% target, up to {b.policy.swing.maxSessions} sessions.</p>
+      <p className="caption">{inr(b.policy.capitalPerTrade)} per intraday or delivery trade, one futures lot overnight (up to {b.policy.overnight.maxPositions}, lot value up to {inr(b.policy.overnight.maxNotional)}) · up to {b.policy.maxOpen} open · stops new entries after a {inr(b.policy.dailyLossStop)} day. Intraday: {b.policy.intraday.stopPct}% stop, {b.policy.intraday.targetPct}% target, squared off 15:15. Early breakouts: {b.policy.swing.stopPct}% stop, {b.policy.swing.targetPct}% target, up to {b.policy.swing.maxSessions} sessions.</p>
       {b.open.length ? <div className="grid gap-2">{b.open.map(p => <div key={p.id} className="book-pos"><div className="data-card-title"><strong>{p.symbol}</strong><span className="badge badge-neutral">{b.setups[p.setup]?.label ?? p.setup}</span></div>
-       <div className="inline-facts"><span>{p.side} {p.qty} @ <b>{inr(p.entryPrice, 2)}</b></span><span>now <b>{inr(p.mark, 2)}</b></span><span>stop <b>{inr(p.stop, 2)}</b></span><span>target <b>{inr(p.target, 2)}</b></span><span className={tone(p.openPnl)}><b>{inr(p.openPnl)}</b> ({signed(p.openPct)})</span></div></div>)}</div>
+       <div className="inline-facts"><span>{p.side} {p.qty} @ <b>{inr(p.entryPrice, 2)}</b></span><span>now <b>{inr(p.mark, 2)}</b></span><span>stop <b>{inr(p.stop, 2)}</b></span>{p.target !== null ? <span>target <b>{inr(p.target, 2)}</b></span> : <span>sells at the open on <b>{p.exitOn}</b></span>}{p.contract ? <span className="faint">{p.contract}</span> : null}<span className={tone(p.openPnl)}><b>{inr(p.openPnl)}</b> ({signed(p.openPct)})</span></div></div>)}</div>
        : <p className="text-sm muted">No open positions.</p>}
       {!!b.closedToday.length && <><p className="section-label">Closed today</p><div className="grid gap-1">{b.closedToday.map(c => <div key={c.id + c.exitAt} className="inline-facts"><b>{c.symbol}</b><span>{c.exitReason.replaceAll('_', ' ').toLowerCase()}</span><span className={tone(c.net)}><b>{inr(c.net)}</b> ({signed(c.netPct)})</span></div>)}</div></>}
       <p className="section-label">Setup scoreboard since {b.startedAt.slice(0, 10)}</p>
       {b.bySetup.length ? <table className="data-table text-sm"><thead><tr><th>Setup</th><th className="text-right">Trades</th><th className="text-right">Win rate</th><th className="text-right">Net</th></tr></thead>
        <tbody>{b.bySetup.map(s => <tr key={s.id}><td>{s.label}</td><td className="text-right">{s.trades}</td><td className="text-right">{s.winRate ?? '—'}%</td><td className={`text-right ${tone(s.net)}`}>{inr(s.net)}</td></tr>)}</tbody></table>
        : <p className="text-sm muted">No closed trades yet. Each setup needs a few weeks of trades before its record means much.</p>}
-      <details className="card-disclosure"><summary>The setups</summary><div>{Object.entries(b.setups).map(([id, s]) => <p key={id}><strong>{s.label}</strong> ({s.product === 'equity-intraday' ? 'intraday' : 'delivery'}): {s.rule}</p>)}<p>Fills use the live Upstox bid/ask with 5 bps slippage and the published broker charges. Stops and targets are checked once a minute, so a fast move can exit beyond the level.</p></div></details>
+      <details className="card-disclosure"><summary>The setups</summary><div>{Object.entries(b.setups).map(([id, s]) => <p key={id}><strong>{s.label}</strong> ({s.product === 'equity-intraday' ? 'intraday' : s.product === 'futures' ? 'futures, overnight' : 'delivery'}): {s.rule}</p>)}<p>Fills use the live Upstox bid/ask with 5 bps slippage and the published broker charges. Stops and targets are checked once a minute, so a fast move can exit beyond the level.</p></div></details>
      </> : <p className="text-sm muted">The book starts at the next market minute.</p>}
     </section>
     <section className="card grid gap-2">

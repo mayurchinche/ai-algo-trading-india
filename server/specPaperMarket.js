@@ -82,6 +82,11 @@ export function createSpecPaperMarket({read=createUpstoxReader(),master=getTradi
    if(!row)throw new MarketDataError('NEXT_FUTURE_NOT_FOUND');
    return {instrumentKey:row.instrument_key,lotSize:row.lot_size,description:row.trading_symbol,expiry:istDate(row.expiry)};
   },
+  // Last traded price of an index (indices have no order book, so quotes() leaves them out). Null when stale.
+  async indexPrice(key,now){
+   const q=Object.values(await read('/v3/market-quote/quotes?instrument_key='+encodeURIComponent(key))).find(x=>x.instrument_token===key),ms=Number(q?.last_trade_time);
+   return Number.isFinite(q?.last_price)&&q.last_price>0&&Number.isFinite(ms)&&ms<=now&&now-ms<=120000?q.last_price:null;
+  },
   async marketOpen(){const s=await read('/v2/market/status/NSE');if(typeof s?.status!=='string')throw new MarketDataError('MARKET_STATUS_INVALID');return s.status==='NORMAL_OPEN';},
  };
 }

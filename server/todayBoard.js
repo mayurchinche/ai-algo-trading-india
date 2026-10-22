@@ -6,7 +6,7 @@ import {SEGMENTS} from '../shared/tradingHorizon.js';
 import {validUntilOf,runIdFor} from './signalEngine.js';
 import {bookSummary,SETUPS} from './aggressiveBook.js';
 const r2=v=>Math.round(v*100)/100;
-const TIER={VALIDATED:0,AGGRESSIVE_OPEN:1,ENTERED:1,WATCHING:2,NEAR_TRIGGER:3,WAITING:3,BLOCKED:4,SKIPPED:4,DISCOVER:5};
+const TIER={VALIDATED:0,AGGRESSIVE_OPEN:1,ENTERED:1,OVERNIGHT:1,WATCHING:2,NEAR_TRIGGER:3,WAITING:3,BLOCKED:4,SKIPPED:4,DISCOVER:5};
 export function buildToday({now,signals=[],board=null,verdicts=[],book=null,discoveries=[],deals=[],automation=null}){
  const items=[],seen=new Set(),add=x=>{const k=x.symbol+'|'+x.kind+'|'+(x.ruleId??x.setup??'');if(seen.has(k))return;seen.add(k);items.push(x);};
  // 1. Validated signals still actionable: the validated book paper-trades these automatically.
@@ -15,7 +15,9 @@ export function buildToday({now,signals=[],board=null,verdicts=[],book=null,disc
  // 2. Aggressive book: open positions, then this minute's decisions on its candidates.
  const summary=book?bookSummary(book,now):null;
  for(const p of summary?.open??[])add({kind:'AGGRESSIVE_OPEN',symbol:p.symbol,side:p.side,setup:p.setup,title:SETUPS[p.setup]?.label??p.setup,why:p.why,status:`In the aggressive book: ${p.side} ${p.qty} at ₹${p.entryPrice}`,pnl:p.openPnl,pnlPct:p.openPct,stop:p.stop,target:p.target,price:p.mark});
- for(const d of summary?.lastCycle?.decisions??[])if(d.status!=='ENTERED')add({kind:d.status,symbol:d.symbol,side:d.side,setup:d.setup,title:SETUPS[d.setup]?.label??d.setup,why:d.why,status:d.reason,score:d.score});
+ // Tomorrow's gap: stocks qualifying for the overnight setup before the close.
+ for(const r of summary?.overnight?.rows??[])if(r.qualifies)add({kind:'OVERNIGHT',symbol:r.symbol,side:'BUY',setup:'overnight-gap',title:'Overnight gap · expected gap up tomorrow',why:`${r.rule}: ${r.retPct>0?'+':''}${r.retPct}% on ${r.volumeRatio}× volume`,status:'Qualifies now; the aggressive book buys one lot of the future 15:15–15:25 and sells at the next open',price:r.price});
+ for(const d of summary?.lastCycle?.decisions??[])if(d.status!=='ENTERED'&&d.setup!=='overnight-gap')add({kind:d.status,symbol:d.symbol,side:d.side,setup:d.setup,title:SETUPS[d.setup]?.label??d.setup,why:d.why,status:d.reason,score:d.score});
  // 3. Validated rules within reach of their trigger (daily close needed for a validated signal).
   // One row per stock; several rules near the same level are named together.
  const near=new Map();for(const b of board?.rows??[])if(b.state==='NEAR_TRIGGER'){const n=near.get(b.symbol);if(!n||b.trigger.distancePct<n.trigger.distancePct)near.set(b.symbol,{...b,names:[...(n?.names??[]),b.strategyName]});else n.names.push(b.strategyName);}
