@@ -10,6 +10,7 @@ import { SignalPopup } from './components/SignalPopup';
 import { useLiveStocks } from './hooks/useLiveStocks';
 const named = <K extends string>(load: () => Promise<Record<K, React.ComponentType<any>>>, key: K) => lazy(() => load().then(m => ({ default: m[key] })));
 const TodayPage = named(() => import('./components/TodayPage'), 'TodayPage');
+const AccuracyPage = named(() => import('./components/AccuracyPage'), 'AccuracyPage');
 const StockAnalysisPage = named(() => import('./components/StockAnalysisPage'), 'StockAnalysisPage');
 const SignalsPage = named(() => import('./components/SignalsPage'), 'SignalsPage');
 const OpeningGapsPage = named(() => import('./components/OpeningGapsPage'), 'OpeningGapsPage');
@@ -27,7 +28,7 @@ const MetalsPage = named(() => import('./components/MetalsPage'), 'MetalsPage');
 
 const INVESTING_IDS = new Set(INVESTING_TABS.map(([id]) => id));
 // Every key of `pages` below; a page missing here still works but cannot be opened from a link.
-const PAGE_IDS = [...INVESTING_IDS, 'Today', 'Analysis', 'Signals', 'Opening gaps', 'Alerts', 'Discover', 'Watch ideas', 'Paper trading', 'IPO', 'Rule builder', 'Options wizard', 'Market News', 'Pre-market', 'Portfolios', 'Metals'];
+const PAGE_IDS = [...INVESTING_IDS, 'Today', 'Accuracy', 'Analysis', 'Signals', 'Opening gaps', 'Alerts', 'Discover', 'Watch ideas', 'Paper trading', 'IPO', 'Rule builder', 'Options wizard', 'Market News', 'Pre-market', 'Portfolios', 'Metals'];
 
 export default function App() {
  const initial = parseRoute(window.location.hash, PAGE_IDS);
@@ -47,7 +48,7 @@ export default function App() {
  const investing = (tab: string) => <InvestingPage tab={tab} onTab={setActiveTab} />;
  const pages: Record<string, React.ReactNode> = {
   ...Object.fromEntries(INVESTING_TABS.map(([t]) => [t, investing(t)])),
-  'Today': <TodayPage />, 'Analysis': <StockAnalysisPage symbol={symbol} onSymbol={setSymbol} />, 'Signals': <SignalsPage />, 'Opening gaps': <OpeningGapsPage />, 'Alerts': <AlertsPage />, 'Discover': <DiscoveryPage />, 'Watch ideas': <SmartPicksPage />, 'Paper trading': <PaperTradingPage />, 'IPO': <IPOPage />,
+  'Today': <TodayPage />, 'Accuracy': <AccuracyPage />, 'Analysis': <StockAnalysisPage symbol={symbol} onSymbol={setSymbol} />, 'Signals': <SignalsPage />, 'Opening gaps': <OpeningGapsPage />, 'Alerts': <AlertsPage />, 'Discover': <DiscoveryPage />, 'Watch ideas': <SmartPicksPage />, 'Paper trading': <PaperTradingPage />, 'IPO': <IPOPage />,
   'Rule builder': <RuleBuilderPage />, 'Options wizard': <OptionsWizardPage />,
   'Market News': <MarketNewsPage segment="intraday" />, 'Pre-market': <PremarketPage />, 'Portfolios': <ResearchPortfolioPage />, 'Metals': <MetalsPage />,
  };

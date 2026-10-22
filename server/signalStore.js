@@ -2,6 +2,8 @@ import {backend,check,readAll} from './pushBackend.js';
 export function signalStore(db=backend()){return {
  validations:()=>readAll(()=>db.from('strategy_validations').select('strategy_id,symbol,verdict,computed_at,record').order('strategy_id').order('symbol')),
  // Verdicts only (no records), for counts and lookups.
+ // Verdicts with only the pooled backtest statistics (the full records are large).
+ pooledStats:()=>readAll(()=>db.from('strategy_validations').select('strategy_id,symbol,verdict,computed_at,pooled:record->pooled->stats').order('strategy_id').order('symbol')),
  verdicts:()=>readAll(()=>db.from('strategy_validations').select('strategy_id,symbol,verdict').order('strategy_id').order('symbol')),
  // Bulk and block deals of the latest recorded trading date.
  latestDeals:async()=>{const d=check(await db.from('market_deals').select('trade_date').order('trade_date',{ascending:false}).limit(1))[0]?.trade_date;return d?check(await db.from('market_deals').select('trade_date,kind,symbol,client,side,quantity,price').eq('trade_date',d).limit(1000)):[];},

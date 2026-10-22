@@ -35,6 +35,7 @@ export function apiUrl(localPath: string): string {
   if (localPath.startsWith('/api/opening-gaps?') || localPath === '/api/opening-gaps') return `${apiBase}${localPath}`;
   if (localPath.startsWith('/api/discovery?') || localPath === '/api/discovery') return `${apiBase}${localPath}`;
   if (localPath === '/api/today') return `${apiBase}${localPath}`;
+  if (localPath === '/api/accuracy') return `${apiBase}${localPath}`;
   if (!IS_PROD) return localPath;
 
   // Find matching proxy prefix (longest match first)
