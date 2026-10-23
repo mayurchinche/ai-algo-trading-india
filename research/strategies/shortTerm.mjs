@@ -36,4 +36,29 @@ export const STRATEGIES={
  'gapdown-fill-intraday':{id:'gapdown-fill-intraday',product:'equity-intraday',warmup:210,
   prepare:s=>base(s),
   signal:(s,x,i)=>{const g=(s.o[i]/s.c[i-1]-1)*100;return g<=-2&&g>=-6&&s.c[i-1]>x.sma200[i-1]?{score:-g,stop:s.o[i]*0.985,maxDays:1}:null;}},
+ // Connors "Double 7s" (Short Term Trading Strategies That Work, 2008): close is the lowest of the last 7 closes
+ // while above the 200-day average; exit when the close is the highest of the last 7. 3×ATR stop, 10 sessions.
+ 'double7':{id:'double7',product:'equity-delivery',warmup:210,
+  prepare:s=>base(s),
+  signal:(s,x,i)=>{if(s.c[i]<=x.sma200[i])return null;for(let j=i-6;j<i;j++)if(s.c[i]>=s.c[j])return null;return {score:-s.c[i]/x.sma200[i],stop:atrStop(s,x,i,3),maxDays:10};},
+  exitCondition:(s,x,i)=>{for(let j=i-6;j<i;j++)if(s.c[i]<=s.c[j])return false;return true;}},
+ // George & Hwang (J. Finance 2004) 52-week-high momentum, long-only swing form: close within 2% of the 252-day high
+ // and above the 200-day average, ranked by closeness; exit on a close below the 50-day average; 10% stop; 60 sessions.
+ 'high52-swing':{id:'high52-swing',product:'equity-delivery',warmup:260,
+  prepare:s=>{const hi=new Float64Array(s.c.length).fill(NaN);for(let i=252;i<s.c.length;i++){let h=-Infinity;for(let j=i-251;j<=i;j++)h=Math.max(h,s.h[j]);hi[i]=h;}return {...base(s),hi252:hi};},
+  signal:(s,x,i)=>s.c[i]>=x.hi252[i]*0.98&&s.c[i]>x.sma200[i]&&s.c[i-1]<x.hi252[i-1]*0.98?{score:s.c[i]/x.hi252[i],stop:s.c[i]*0.9,maxDays:60}:null,
+  exitCondition:(s,x,i)=>s.c[i]<x.sma50[i]},
+ // The app's validated "Gap-up continuation (daily)" (shared/strategyLibrary.js): a day that gaps up ≥2%, closes above its
+ // open on ≥1.5× its 50-day average volume and above the 200-day SMA; buy next session; exit on a close below the
+ // 20-day SMA; 8% stop; 40 sessions.
+ 'gapup-continuation':{id:'gapup-continuation',product:'equity-delivery',warmup:210,
+  prepare:s=>({...base(s),sma20:sma(s.c,20),vol50:sma(s.v,50)}),
+  signal:(s,x,i)=>(s.o[i]/s.c[i-1]-1)*100>=2&&s.c[i]>s.o[i]&&s.v[i]>=1.5*x.vol50[i]&&s.c[i]>x.sma200[i]?{score:s.v[i]/x.vol50[i],stop:s.c[i]*0.92,maxDays:40}:null,
+  exitCondition:(s,x,i)=>s.c[i]<x.sma20[i]},
+ // The app's validated "200-day trend following": close crosses above the 200-day SMA with the 50-day above it; exit on a
+ // close below the 200-day SMA; 20% stop.
+ 'trend200':{id:'trend200',product:'equity-delivery',warmup:210,
+  prepare:s=>base(s),
+  signal:(s,x,i)=>s.c[i]>x.sma200[i]&&s.c[i-1]<=x.sma200[i-1]&&x.sma50[i]>x.sma200[i]?{score:s.c[i]/x.sma200[i],stop:s.c[i]*0.8,maxDays:250}:null,
+  exitCondition:(s,x,i)=>s.c[i]<x.sma200[i]},
 };

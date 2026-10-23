@@ -21,3 +21,4 @@ server/sharedPaperObservation.bundle.mjs
 .env.kite
 .research/
 .planning/
+research/team/state/
