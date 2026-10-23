@@ -8,12 +8,15 @@
 //   aggressive-v3: the overnight scan covers every stock with futures (about 210, was the NIFTY 50) with 20-day
 //                  average turnover of ₹50 crore or more; the rule itself is unchanged. Tested out of sample on the
 //                  163 futures stocks outside the NIFTY 50: +0.54% average gap, positive excess in 10 of 10 years.
+//   aggressive-v4 (23 Oct 2026): Discover momentum enters from score 50 (was 60), an experiment the user asked
+//                  for so intraday paper trades occur; the 10-year replay found next-day intraday trading on
+//                  scores of 50–59 lost 0.27% per trade after charges. Everything else unchanged.
 import {orderCharges} from '../shared/brokerCharges.js';
 import {isNseTradingDay,nextNseTradingDay} from '../shared/nseCalendar.js';
 export const AGGRESSIVE_POLICY=Object.freeze({
- id:'aggressive-v3',capitalPerTrade:25000,maxOpen:5,dailyLossStop:10000,slippageBps:5,
+ id:'aggressive-v4',capitalPerTrade:25000,maxOpen:5,dailyLossStop:10000,slippageBps:5,
  // Intraday setups (MIS): squared off at 15:15.
- intraday:Object.freeze({minScore:60,minPrice:10,minTurnover:2e7,maxMovePct:12,stopPct:1.5,targetPct:3,from:560,until:870,squareOff:915}),
+ intraday:Object.freeze({minScore:50,minPrice:10,minTurnover:2e7,maxMovePct:12,stopPct:1.5,targetPct:3,from:560,until:870,squareOff:915}),
  // Early breakout of a validated daily rule (CNC): bought when the live price crosses the rule's trigger level.
  swing:Object.freeze({stopPct:5,targetPct:10,maxSessions:10,from:570,until:915}),
  // Overnight gap (stock futures, one lot): a strong close predicts a small gap up next morning. The edge measured
@@ -24,7 +27,7 @@ export const AGGRESSIVE_POLICY=Object.freeze({
 export const SETUPS=Object.freeze({
  'overnight-gap':{label:'Overnight gap',product:'futures',rule:'Before the close, buy one lot of the stock future when the stock is up more than 3% on at least twice its 20-day average volume, or closes in the top 10% of its range at a new 20-day high on twice the volume with NIFTY up; sell at the next session’s open. Scans every stock with futures and ₹50 crore average daily turnover. Measured over 10 years: average gap +0.32% on the NIFTY 50 and +0.54% on the other futures stocks (out of sample), about 0.15% and 0.37% after futures charges.'},
  'breakout-early':{label:'Early breakout',product:'equity-delivery',rule:'The live price crosses the trigger level of a validated daily breakout rule before the close confirms it.'},
- 'discover-momentum':{label:'Discover momentum',product:'equity-intraday',rule:'Discover score of 60 or more (either direction) with a matching signal, on a liquid stock without a circuit-sized move. The 10-year Discover study found next-day intraday trading on the score lost after charges; this setup measures live behaviour.'},
+ 'discover-momentum':{label:'Discover momentum',product:'equity-intraday',rule:'Discover score of 50 or more (either direction) with a matching signal, on a liquid stock without a circuit-sized move; 1.5% stop, 3% target, squared off at 15:15. An experiment: the 10-year Discover replay found next-day intraday trading on scores of 50–59 lost 0.27% per trade after charges, and this setup measures whether live entries do better.'},
 });
 const BREAKOUT_RULES=new Set(['short-term-donchian','futures-breakout-long','long-term-52w-high']);
 const DAY=86400000,r2=v=>Math.round(v*100)/100;

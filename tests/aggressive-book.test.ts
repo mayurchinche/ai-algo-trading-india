@@ -8,11 +8,12 @@ const stock=(o:any={})=>({symbol:'ABC',overallScore:64,signal:'BUY',ltp:200,avgV
 const q=(price:number,spread=0.1)=>({price,bid:price-spread/2,ask:price+spread/2});
 const keyOf=(s:string)=>'NSE_EQ|'+s;
 
-test('Discover candidates need score 60, a matching signal, ₹10, ₹2 crore turnover and no circuit-sized move',()=>{
+test('Discover candidates need score 50, a matching signal, ₹10, ₹2 crore turnover and no circuit-sized move',()=>{
  const now=at('10:00');
- const {candidates,rejected}=aggressiveCandidates({now,discoveries:[stock(),stock({symbol:'PCJ',overallScore:52,ltp:18}),stock({symbol:'LOW',ltp:8}),stock({symbol:'THIN',avgVolume:1000}),stock({symbol:'RUN',changePct:14}),stock({symbol:'MIX',signal:'HOLD'}),stock({symbol:'SHORT',overallScore:-66,signal:'STRONG_SELL'}),stock({symbol:'OLD',quoteTime:new Date(now-300000).toISOString()})]});
- assert.deepEqual(candidates.map(c=>[c.symbol,c.side]),[['ABC','BUY'],['SHORT','SELL']]);
- assert.deepEqual(Object.fromEntries(rejected.map(r=>[r.symbol,r.reason])),{PCJ:'Score 52 below 60',LOW:'Price below ₹10',THIN:'Average daily turnover below ₹2 crore',RUN:'Already moved 14% today (circuit risk)',MIX:'Signal does not match the score direction',OLD:'Quote older than 2 minutes'});
+ const {candidates,rejected}=aggressiveCandidates({now,discoveries:[stock(),stock({symbol:'PCJ',overallScore:52}),stock({symbol:'LOW',ltp:8}),stock({symbol:'THIN',avgVolume:1000}),stock({symbol:'RUN',changePct:14}),stock({symbol:'MIX',signal:'HOLD'}),stock({symbol:'SHORT',overallScore:-66,signal:'STRONG_SELL'}),stock({symbol:'OLD',quoteTime:new Date(now-300000).toISOString()})]});
+ assert.deepEqual(candidates.map(c=>[c.symbol,c.side]),[['ABC','BUY'],['PCJ','BUY'],['SHORT','SELL']],'score 52 qualifies from aggressive-v4');
+ assert.equal(aggressiveCandidates({now,discoveries:[stock({symbol:'WEAK',overallScore:48})]}).candidates.length,0,'below 50 is not considered');
+ assert.deepEqual(Object.fromEntries(rejected.map(r=>[r.symbol,r.reason])),{LOW:'Price below ₹10',THIN:'Average daily turnover below ₹2 crore',RUN:'Already moved 14% today (circuit risk)',MIX:'Signal does not match the score direction',OLD:'Quote older than 2 minutes'});
  const gaps=aggressiveCandidates({now,board:{rows:[{state:'NEAR_TRIGGER',strategyId:'short-term-donchian',strategyName:'20-day breakout',symbol:'INFY',trigger:{level:1200,condition:'next close above the 20-day high'}},{state:'NEAR_TRIGGER',strategyId:'long-term-golden-trend',symbol:'TCS',trigger:{level:1}},{state:'NEAR_TRIGGER',strategyId:'futures-breakout-long',symbol:'NIFTY',trigger:{level:1}}]}});
  assert.deepEqual(gaps.candidates.map(c=>[c.setup,c.symbol,c.product]),[['breakout-early','INFY','equity-delivery']]);
  assert.equal(aggressiveCandidates({now:at('09:17'),discoveries:[stock({quoteTime:new Date(at('09:17')).toISOString()})]}).candidates[0].blocked,'Intraday entries open at 09:20');

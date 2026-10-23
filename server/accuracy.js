@@ -10,7 +10,7 @@ const r2=v=>v===null||v===undefined||!Number.isFinite(v)?null:Math.round(v*100)/
 // Expected net % per trade for each aggressive setup, from the studies that chose it (null: no study).
 export const SETUP_EXPECTATIONS=Object.freeze({
  'overnight-gap':{netPct:0.15,winRatePct:58,source:'10-year study: +0.15% after futures charges on NIFTY 50 stocks, +0.37% on other futures stocks (docs/OVERNIGHT_GAP_STUDY.md); compared with the lower figure'},
- 'discover-momentum':{netPct:-0.34,winRatePct:null,source:'10-year Discover replay: next-day intraday trading on scores 60–69 lost 0.34% after charges'},
+ 'discover-momentum':{netPct:-0.27,winRatePct:null,source:'10-year Discover replay: next-day intraday trading on scores 50–59 lost 0.27% after charges (60–69: −0.34%)'},
  'breakout-early':{netPct:null,winRatePct:null,source:'Not backtested: entering before the close confirms a validated breakout'},
 });
 // Live statistics of per-trade returns (%), and the verdict against an expected mean.
