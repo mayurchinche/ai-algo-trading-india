@@ -15,7 +15,7 @@ export const SPEC_PAPER_VERSION='spec-paper-v2';
 export const KEEP_EVENTS=200;
 export const MAX_CYCLE_EVENTS=1000;
 const RANGES={capital:[1000,1e8],costBps:[0,100],costPerOrder:[0,1000],slippageBps:[0,100]};
-const KEYS=[...Object.keys(RANGES),'maxUnitsPerOrder','costModel','requireMargin','singleTrade','signalId'];
+const KEYS=[...Object.keys(RANGES),'maxUnitsPerOrder','costModel','requireMargin','singleTrade','signalId','joined'];
 export function validatePaperOptions(input){
  if(!input||typeof input!=='object'||Array.isArray(input)||Object.keys(input).some(k=>!KEYS.includes(k)))throw new Error('Invalid paper options');
  const o={};for(const [k,[min,max]] of Object.entries(RANGES)){const v=input[k]??(k==='capital'?undefined:0);if(typeof v!=='number'||!Number.isFinite(v)||v<min||v>max)throw new Error(`Invalid ${k}`);o[k]=v;}
@@ -24,7 +24,9 @@ export function validatePaperOptions(input){
  const requireMargin=input.requireMargin??true;if(typeof requireMargin!=='boolean')throw new Error('Invalid requireMargin');
  const singleTrade=input.singleTrade??false;if(typeof singleTrade!=='boolean')throw new Error('Invalid singleTrade');
  const signalId=input.signalId??null;if(signalId!==null&&!(typeof signalId==='string'&&/^[a-z0-9-]{1,64}:[A-Z0-9&-]{1,30}:[0-9]{10,14}$/.test(signalId)))throw new Error('Invalid signalId');
- return {...o,maxUnitsPerOrder:m,costModel,requireMargin,singleTrade,...(signalId?{signalId}:{})};
+ // joined: the run buys into a position its validated rule already holds (not at the rule's own entry signal).
+ const joined=input.joined??false;if(typeof joined!=='boolean'||(joined&&!signalId))throw new Error('Invalid joined');
+ return {...o,maxUnitsPerOrder:m,costModel,requireMargin,singleTrade,...(signalId?{signalId}:{}),...(joined?{joined}:{})};
 }
 const newPaper=now=>({version:SPEC_PAPER_VERSION,createdAt:new Date(now).toISOString(),lastBarTime:null,barsCheckedAt:null,lastCycleAt:null,cycles:0,missedBars:0,eventSeq:0,lastOutcome:null});
 export function newPaperState(spec,options,now){return {...createEngineState(spec,options),paper:newPaper(now)};}
@@ -147,12 +149,14 @@ export async function cycleRun(run,{market,now}){
  return {outcome,state,events,final:!!final,...notes};
 }
 
-export async function runSpecPaperCycle({store,market,now=Date.now,budgetMs=45000}){
+export async function runSpecPaperCycle({store,market,now=Date.now,budgetMs=45000,concurrency=5}){
  const started=now();
  let isOpen;try{isOpen=await market.marketOpen();}catch(e){return {status:'MARKET_STATUS_UNAVAILABLE',reason:errCode(e,'MARKET_STATUS_FAILED'),runs:[]};}
  if(!isOpen)return {status:'MARKET_CLOSED',runs:[]};
- const runs=(await (store.active?store.active():store.list())).filter(r=>r.status==='ACTIVE'),results=[];
- for(const run of runs){
+ const runs=(await (store.active?store.active():store.list())).filter(r=>r.status==='ACTIVE'),out=new Array(runs.length);
+ // Runs are independent; a few cycle side by side so many open positions fit the budget.
+ let next=0;
+ await Promise.all(Array.from({length:Math.min(concurrency,runs.length)},async()=>{while(next<runs.length){const k=next++,run=runs[k],results={push:x=>{out[k]=x;}};
   if(now()-started>budgetMs){results.push({id:run.id,outcome:'DEFERRED'});continue;}
   try{
    const r=await cycleRun(run,{market,now});
@@ -160,8 +164,8 @@ export async function runSpecPaperCycle({store,market,now=Date.now,budgetMs=4500
    else if(r.state&&!(await store.commit(run.id,run.version,r.state,r.final?'STOPPED':'ACTIVE',r.events))){results.push({id:run.id,outcome:'VERSION_CONFLICT'});continue;}
    results.push({id:run.id,outcome:r.outcome,events:r.events?.length??0,missedBars:r.missed??0,quotesMissing:r.quotesMissing??[],minuteBarGaps:r.barGaps??[]});
   }catch(e){results.push({id:run.id,outcome:'CYCLE_FAILED',reason:errCode(e,'UNEXPECTED_ERROR')});}
- }
- const failed=results.filter(r=>['CYCLE_FAILED','VERSION_CONFLICT'].includes(r.outcome)).length;
+ }}));
+ const results=out.filter(Boolean),failed=results.filter(r=>['CYCLE_FAILED','VERSION_CONFLICT'].includes(r.outcome)).length;
  return {status:failed?'PARTIAL':'COMPLETED',startedAt:new Date(started).toISOString(),runs:results};
 }
 

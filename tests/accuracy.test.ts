@@ -17,13 +17,13 @@ test('rules pair the pooled backtest with closed signal runs; setups pair the st
  const validations=[{strategy_id:'short-term-donchian',symbol:'INFY',verdict:'VALIDATED',computed_at:'c',pooled:{trades:900,winRate:0.42,expectancyPct:0.8,profitFactor:1.4}},{strategy_id:'short-term-donchian',symbol:'TCS',verdict:'REJECTED',computed_at:'c',pooled:{trades:900,winRate:0.42,expectancyPct:0.8,profitFactor:1.4}},
   {strategy_id:'swing-rsi2',symbol:'INFY',verdict:'REJECTED',computed_at:'c',pooled:{trades:500,winRate:0.5,expectancyPct:-0.1,profitFactor:null}}];
  const runs=[{status:'STOPPED',options:{signalId:'short-term-donchian:INFY:1'},entries:[{pnl:500,exitTime:5,reason:'EXIT',legs:[leg(1000,10)]}],paper:{lastOutcome:'TRADE_COMPLETED'}},
-  {status:'STOPPED',options:{signalId:'short-term-donchian:TCS:1'},entries:[],paper:{lastOutcome:'SIGNAL_EXPIRED'}},{status:'ACTIVE',options:{signalId:'short-term-donchian:SBIN:1'},entries:[{pnl:null,legs:[leg(1,1)]}],paper:{}},{status:'STOPPED',options:{},entries:[]}];
+  {status:'STOPPED',options:{signalId:'short-term-donchian:TCS:1'},entries:[],paper:{lastOutcome:'SIGNAL_EXPIRED'}},{status:'ACTIVE',options:{signalId:'short-term-donchian:SBIN:1'},entries:[{pnl:null,legs:[leg(1,1)]}],paper:{}},{status:'STOPPED',options:{},entries:[]},{status:'ACTIVE',options:{signalId:'short-term-donchian:LT:2',joined:true},entries:[],paper:{}},{status:'STOPPED',options:{signalId:'short-term-donchian:LT:3',joined:true},entries:[{pnl:-100,legs:[leg(1000,10)]}],paper:{lastOutcome:'TRADE_COMPLETED'}}];
  assert.equal(tradeReturnPct(runs[0].entries[0]),5);
  const book={createdAt:'2026-10-21T00:00:00Z',positions:[{setup:'overnight-gap'}],closed:[{setup:'overnight-gap',policy:'aggressive-v3',netPct:0.4,net:2000},{setup:'discover-momentum',netPct:-1,net:-250}]};
  const a:any=buildAccuracy({validations,runs,book,now:Date.parse('2026-10-23T10:00:00Z')});
  assert.deepEqual(a.rules.map((r:any)=>r.id),['short-term-donchian'],'only rules with a validated stock or a run');
  const r=a.rules[0];assert.deepEqual(r.backtest,{trades:900,winRatePct:42,avgPct:0.8,profitFactor:1.4,computedAt:'c'});
- assert.equal(r.validatedSymbols,1);assert.equal(r.live.trades,1);assert.equal(r.live.avgPct,5);assert.equal(r.open,1);assert.equal(r.expiredBeforeEntry,1);assert.equal(r.recent[0].symbol,'INFY');
+ assert.equal(r.validatedSymbols,1);assert.equal(r.live.trades,1,'joined trades are kept out of the verdict');assert.equal(r.joined.trades,1);assert.equal(r.joined.avgPct,-1);assert.equal(r.joined.open,1);assert.equal(r.live.avgPct,5);assert.equal(r.open,1);assert.equal(r.expiredBeforeEntry,1);assert.equal(r.recent.find((t:any)=>!t.joined).symbol,'INFY');
  const g=a.setups.find((s:any)=>s.id==='overnight-gap');assert.equal(g.expected.netPct,0.15);assert.equal(g.live.trades,1);assert.equal(g.open,1);assert.deepEqual(g.policies,['aggressive-v3']);assert.equal(g.net,2000);
  assert.equal(a.setups.find((s:any)=>s.id==='breakout-early').expected.netPct,null);
 });

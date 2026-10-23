@@ -3,6 +3,7 @@ import {createElement} from 'react';import {renderToStaticMarkup} from 'react-do
 import {STRATEGIES,buildStrategySpec,strategyById} from '../shared/strategyLibrary.js';
 import {segmentOfSpec} from '../shared/tradingHorizon.js';
 import {backtestSymbol,poolResults,symbolVerdict,returnStats,validationRecord,CRITERIA} from '../shared/strategyValidation.js';
+import {validatePaperOptions} from '../server/specPaperRunner.js';
 import {validationSpec,decidedAtNextSessionClose,entryDecidedOnLastBar,scanSignals,runValidation,staleStrategy,paperRunFor,runIdFor,summarizeSignals,captureMarketDay} from '../server/signalEngine.js';
 import {parseDeals,parseFlows,parseDelivery,csvRows,nseDate,createDeliveryReader} from '../server/marketIntel.js';
 import {technicalProfile,optionChainSummary,buildSwot,dealsSummary} from '../shared/stockAnalysis.js';
@@ -77,6 +78,21 @@ test('scan records validated signals once and auto-starts single-trade paper run
  assert(sig.validUntil>sig.decidedAt);assert.equal(recorded.length,1);
  assert.equal(created.length,1);assert.equal(created[0].id,runIdFor(sig.id));assert.equal(created[0].options.singleTrade,true);assert.equal(created[0].options.signalId,sig.id);assert.equal(created[0].options.costModel,'broker-tariff');
  assert.equal(created[0].spec.legs[0].quantity.units,Math.floor(100000*0.95/sig.close));
+  // Joining: with the active-run list available, the book buys into the position the rule already holds.
+ const joinedRuns:any[]=[],heldBars=[...bars,...breakout().slice(-5).map((b:any,i:number)=>({...b,time:bars.at(-1).time+(i+1)*DAY}))];
+ const joinStore={create:async(id:string,spec:any,options:any,state:any)=>{joinedRuns.push({id,spec,options,state});return {id};},active:async()=>[]};
+ const joinAt=now+5*DAY,j:any=await scanSignals({market:{history:async()=>heldBars},store:{...store,recordSignals:async(rows:any[])=>rows.length},paperStore:joinStore,now:()=>joinAt});
+ const jr=joinedRuns.find(x=>x.options.signalId.startsWith('short-term-donchian:INFY:'));assert(jr,'joined run created');assert.equal(j.joined,joinedRuns.length);
+ assert.equal(jr.options.joined,true);assert.equal(jr.state.pending.kind,'ENTRY');assert.equal(jr.state.paper.lastBarTime,heldBars.at(-1).time);assert.equal(jr.id,runIdFor(jr.options.signalId));
+ // The first cycle buys at the live ask without re-deciding the last bar.
+ const calls:string[]=[];const live={underlyingKey:async()=>'NSE_EQ|INE009A01021',bars:async()=>{calls.push('bars');return heldBars;},resolveLeg:async()=>({instrumentKey:'NSE_EQ|INE009A01021',lotSize:1,description:'INFY'}),
+  quotes:async(keys:string[],t:number)=>new Map(keys.map(k=>[k,{symbol:k,price:150,bid:149.9,ask:150.1,depth:{buy:[{price:149.9,quantity:1e6}],sell:[{price:150.1,quantity:1e6}]},timestamp:new Date(t-1000).toISOString(),source:'T'}])),
+  margin:async()=>({status:'OK',required:50000,source:'T'}),minuteBars:async()=>[],marketOpen:async()=>true};
+ const c1:any=await cycleRun({id:jr.id,status:'ACTIVE',version:0,spec:jr.spec,options:jr.options,state:jr.state},{market:live,now:()=>joinAt+60000});
+ assert.equal(c1.state.status,'OPEN');assert.equal(c1.state.entries.length,1);assert(!c1.final);assert.deepEqual(calls,[],'no bar decision on the first cycle');assert.equal(c1.state.legs[0].entry,150.17505,'live ask plus 5 bps slippage');
+ const again:any=await scanSignals({market:{history:async()=>heldBars},store:{...store,recordSignals:async(rows:any[])=>rows.length},paperStore:{...joinStore,active:async()=>[{options:jr.options}]},now:()=>joinAt});
+ assert(!again.paper.some((p:any)=>p.signal===jr.options.signalId),'one run per rule and stock');
+ assert.throws(()=>validatePaperOptions({capital:1000,joined:true}),/joined/);
  const intradayOnly:any=await scanSignals({market,store,paperStore,now:()=>now,timeframes:['15m']});assert.equal(intradayOnly.scanned,0,'an intraday scan skips daily strategies');
  assert.match(runIdFor('x:Y:1234567890'),/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/);
  const sum=summarizeSignals([{id:sig.id,recorded_at:'r',signal:sig}],[valRow('short-term-donchian','INFY')],sig.validUntil+1);

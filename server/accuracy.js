@@ -32,15 +32,17 @@ export function buildAccuracy({validations=[],runs=[],book=null,now}){
  for(const v of validations){if(!pooled.has(v.strategy_id)&&v.pooled)pooled.set(v.strategy_id,{stats:v.pooled,computedAt:v.computed_at});
   if(v.verdict==='VALIDATED')validatedSymbols.set(v.strategy_id,(validatedSymbols.get(v.strategy_id)??0)+1);}
  const byRule=new Map();
- for(const r of runs){const sid=r.options?.signalId;if(!sid)continue;const id=sid.split(':')[0],x=byRule.get(id)??{returns:[],open:0,expired:0,rejected:0,trades:[]};
+ for(const r of runs){const sid=r.options?.signalId;if(!sid)continue;const id=sid.split(':')[0],x=byRule.get(id)??{returns:[],joinedReturns:[],open:0,joinedOpen:0,expired:0,rejected:0,trades:[]},joined=!!r.options?.joined;
   const closed=(r.entries??r.state?.entries??[]).filter(e=>e.pnl!==null&&e.pnl!==undefined);
-  for(const e of closed){const p=tradeReturnPct(e);if(p!==null){x.returns.push(p);x.trades.push({symbol:sid.split(':')[1],exitTime:e.exitTime??null,reason:e.reason??null,netPct:r2(p),net:r2(e.pnl)});}}
-  const outcome=(r.paper??r.state?.paper)?.lastOutcome;if(r.status==='ACTIVE')x.open++;else if(outcome==='SIGNAL_EXPIRED')x.expired++;else if(outcome==='ENTRY_REJECTED')x.rejected++;
+  for(const e of closed){const p=tradeReturnPct(e);if(p!==null){(joined?x.joinedReturns:x.returns).push(p);x.trades.push({symbol:sid.split(':')[1],joined,exitTime:e.exitTime??null,reason:e.reason??null,netPct:r2(p),net:r2(e.pnl)});}}
+  const outcome=(r.paper??r.state?.paper)?.lastOutcome;if(r.status==='ACTIVE'){if(joined)x.joinedOpen++;else x.open++;}else if(outcome==='SIGNAL_EXPIRED')x.expired++;else if(outcome==='ENTRY_REJECTED')x.rejected++;
   byRule.set(id,x);}
- const rules=STRATEGIES.filter(s=>validatedSymbols.has(s.id)||byRule.has(s.id)).map(s=>{const p=pooled.get(s.id),x=byRule.get(s.id)??{returns:[],open:0,expired:0,rejected:0,trades:[]};
+ const rules=STRATEGIES.filter(s=>validatedSymbols.has(s.id)||byRule.has(s.id)).map(s=>{const p=pooled.get(s.id),x=byRule.get(s.id)??{returns:[],joinedReturns:[],open:0,joinedOpen:0,expired:0,rejected:0,trades:[]};
   const b=p?.stats;return {id:s.id,name:s.name,segment:s.segment,validatedSymbols:validatedSymbols.get(s.id)??0,
    backtest:b?{trades:b.trades,winRatePct:r2(b.winRate*100),avgPct:r2(b.expectancyPct),profitFactor:r2(b.profitFactor),computedAt:p.computedAt}:null,
-   live:compare(x.returns,b?.expectancyPct??null),open:x.open,expiredBeforeEntry:x.expired,entryRejected:x.rejected,recent:x.trades.slice(-5).reverse()};});
+   live:compare(x.returns,b?.expectancyPct??null),
+   // Bought into a position the rule already held: a different entry from the backtest's, so shown, not judged.
+   joined:{...compare(x.joinedReturns,null),open:x.joinedOpen},open:x.open,expiredBeforeEntry:x.expired,entryRejected:x.rejected,recent:x.trades.slice(-5).reverse()};});
  // 2. Aggressive book: each setup's closed trades against the study that chose it, split by policy.
  const closed=book?.closed??[],setups=Object.keys(SETUPS).map(id=>{const t=closed.filter(c=>c.setup===id),e=SETUP_EXPECTATIONS[id]??{netPct:null,winRatePct:null,source:''};
   const policies=[...new Set(t.map(c=>c.policy??'before aggressive-v3'))];

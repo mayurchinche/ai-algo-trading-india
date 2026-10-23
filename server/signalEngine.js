@@ -100,19 +100,19 @@ export const validUntilOf=sig=>sig.timeframe==='1d'?decidedAtNextSessionClose(si
 // Deterministic UUID v4-shaped id from a signal id, so a retried auto-paper creation is idempotent.
 export function runIdFor(signalId){const h=createHash('sha256').update('paper:'+signalId).digest('hex');return `${h.slice(0,8)}-${h.slice(8,12)}-4${h.slice(13,16)}-${((parseInt(h[16],16)&3)|8).toString(16)}${h.slice(17,20)}-${h.slice(20,32)}`;}
 // A paper run for one signal: sized to the capital, a single trade, broker tariff and margin check.
-export function paperRunFor(signal,capital){
+export function paperRunFor(signal,capital,{joined=false}={}){
  const strategy=strategyById(signal.strategyId);if(!strategy)throw new Error('Unknown strategy');
  // Derivative margin for one lot can exceed a small equity allocation; futures runs get at least ₹3 lakh.
  if(strategy.segment==='futures')capital=Math.max(capital,300000);
  const units=Math.max(1,Math.floor(capital*0.95/signal.close));
  const spec=buildStrategySpec(strategy,{symbol:signal.symbol,units,lots:1});
- const options=validatePaperOptions({capital,slippageBps:5,maxUnitsPerOrder:null,costModel:'broker-tariff',requireMargin:true,singleTrade:true,signalId:signal.id});
+ const options=validatePaperOptions({capital,slippageBps:5,maxUnitsPerOrder:null,costModel:'broker-tariff',requireMargin:true,singleTrade:true,signalId:signal.id,...(joined?{joined}:{})});
  return {id:runIdFor(signal.id),spec,options};
 }
 
 // timeframes: which strategy bar sizes to scan. Daily bars are read up to the previous session (the history
 // reader excludes today), so a daily scan in the morning acts on yesterday's close in today's session.
-export async function scanSignals({market,store,paperStore,now,budgetMs=40000,autoPaper=true,capital=100000,timeframes=['1d','15m'],lookbackBars=10,wait,saveBoard=null}){
+export async function scanSignals({market,store,paperStore,now,budgetMs=40000,autoPaper=true,joinHeld=true,maxJoined=60,capital=100000,timeframes=['1d','15m'],lookbackBars=10,wait,saveBoard=null}){
  const started=now(),validated=(await store.validations()).filter(v=>v.verdict==='VALIDATED'),out={scanned:0,signals:[],failures:[],deferred:0,paper:[],board:[]};
  const pairs=validated.map(v=>({v:v.record,s:strategyById(v.strategy_id)})).filter(p=>p.s&&timeframes.includes(p.s.timeframe));
  // One history read per instrument and bar size, shared by every strategy validated on it.
@@ -141,6 +141,26 @@ export async function scanSignals({market,store,paperStore,now,budgetMs=40000,au
  if(autoPaper)for(const sig of out.signals.filter(x=>x.validUntil>started)){
   try{const r=paperRunFor(sig,capital);await paperStore.create(r.id,r.spec,r.options,newPaperState(r.spec,r.options,now()));out.paper.push({signal:sig.id,run:r.id});}
   catch(e){out.paper.push({signal:sig.id,error:e instanceof Error&&/limit/.test(e.message)?'ACTIVE_RUN_LIMIT':'PAPER_RUN_FAILED'});}
+ }
+ // Join positions the validated daily rules already hold: the rule bought earlier (its own signal came before
+ // this book was trading or expired untraded) and still holds today, so the book buys in at today's live price
+ // and then follows the rule's exit, stop and holding limit. Marked joined; Accuracy keeps them apart from
+ // entries at the rule's own signal. One run per rule and stock; exits already decided are not joined.
+ if(autoPaper&&joinHeld&&timeframes.includes('1d')&&paperStore.active){
+  try{
+   const active=await paperStore.active(),held=new Set(active.map(r=>r.options?.signalId?.split(':').slice(0,2).join(':')).filter(Boolean));
+   const rows=out.board.filter(b=>b.state==='IN_POSITION'&&!b.exitPending&&strategyById(b.strategyId)?.timeframe==='1d'&&!held.has(b.strategyId+':'+b.symbol)&&Number.isFinite(b.since))
+    .sort((a,b)=>b.since-a.since).slice(0,Math.max(0,maxJoined-active.filter(r=>r.options?.joined).length));
+   for(const b of rows){
+    try{const r=paperRunFor({id:`${b.strategyId}:${b.symbol}:${b.since}`,strategyId:b.strategyId,symbol:b.symbol,close:b.close},capital,{joined:true});
+     const state=newPaperState(r.spec,r.options,now());state.pending={kind:'ENTRY',time:now()};state.armed=false;
+     // The last completed bar is already decided, so the first cycle buys at the live book instead of re-deciding it.
+     Object.assign(state.paper,{lastBarTime:b.barTime,barsCheckedAt:now()});
+     await paperStore.create(r.id,r.spec,r.options,state);out.paper.push({signal:r.options.signalId,run:r.id,joined:true});}
+    catch(e){out.paper.push({signal:`${b.strategyId}:${b.symbol}`,joined:true,error:e instanceof Error&&/limit/.test(e.message)?'ACTIVE_RUN_LIMIT':'PAPER_RUN_FAILED'});}
+   }
+   out.joined=rows.length;
+  }catch{out.joined='FAILED';}
  }
  return {status:out.failures.length?'PARTIAL':'COMPLETED',timeframes,validatedPairs:pairs.length,...out};
 }

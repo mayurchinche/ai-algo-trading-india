@@ -83,7 +83,7 @@ test('scheduler cycle commits state with its events, respects market hours, conf
  assert.equal((await runSpecPaperCycle({store,market:market({open:false}),now:()=>t0})).status,'MARKET_CLOSED');
  const r:any=await runSpecPaperCycle({store,market:market(),now:()=>t0+3*M});
  assert.deepEqual(r.runs.map((x:any)=>x.outcome),['STEPPED','VERSION_CONFLICT','INVALID_SPEC']);assert.equal(r.status,'PARTIAL');
- assert.deepEqual(commits[0][2],['ENTRY_DECIDED','ORDER','ENTERED']);assert.deepEqual(commits.at(-1),['r3','STOPPED',['RUN_STOPPED']]);
+ assert.deepEqual(commits.find((c:any)=>c[0]==='r1')[2],['ENTRY_DECIDED','ORDER','ENTERED']);assert.deepEqual(commits.find((c:any)=>c[0]==='r3'),['r3','STOPPED',['RUN_STOPPED']]);
  let t=t0;const slow:any=await runSpecPaperCycle({store,market:market(),now:()=>(t+=30000),budgetMs:45000});assert(slow.runs.some((x:any)=>x.outcome==='DEFERRED'));
  const failing:any=await runSpecPaperCycle({store:{list:async()=>[runs[0]],commit:async()=>({})},market:{...market(),bars:async()=>{throw new Error('secret token');}},now:()=>t0});
  assert.equal(failing.runs[0].outcome,'CYCLE_FAILED');assert(!JSON.stringify(failing).includes('secret'));
