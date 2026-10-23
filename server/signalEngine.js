@@ -1,5 +1,6 @@
 // Library signals: validation of each library strategy on history, live scanning of validated strategy-symbol
 // pairs on completed bars, automatic single-trade paper runs for new signals, and the daily market capture.
+import {enforceCaps,planCaps,capReason} from './portfolioCaps.js';
 import {createHash} from 'node:crypto';
 import {STRATEGIES,INDEX_UNDERLYINGS,buildStrategySpec,strategyById,triggerLevel} from '../shared/strategyLibrary.js';
 import {backtestSymbol,poolResults,validationRecord} from '../shared/strategyValidation.js';
@@ -137,8 +138,14 @@ export async function scanSignals({market,store,paperStore,now,budgetMs=40000,au
  if(saveBoard&&timeframes.includes('1d'))try{await saveBoard({computedAt:new Date(started).toISOString(),rows:out.board,scanned:out.scanned,failures:out.failures.length});out.boardRows=out.board.length;}catch{out.boardRows='SAVE_FAILED';}
  for(let i=0;i<out.signals.length;i+=400)out.recorded=(out.recorded??0)+await store.recordSignals(out.signals.slice(i,i+400));
  out.active=out.signals.filter(x=>x.validUntil>started).length;
+ // Portfolio limits (server/portfolioCaps.js): open runs over a limit are exited at the next live quote, and new
+ // runs are admitted only within the limits. Without the active-run list no limit can be checked and nothing opens.
+ let held=null;
+ if(autoPaper&&paperStore.active){try{if(paperStore.commit)out.capped=await enforceCaps({paperStore,now});held=planCaps(await paperStore.active()).kept.map(k=>({symbol:k.symbol}));}catch{out.capped='FAILED';}}
+ const admit=(strategyId,symbol)=>{if(!held)return paperStore.active?'LIMITS_UNAVAILABLE':null;const r=capReason(held,{strategyId,symbol});if(!r)held.push({symbol});return r;};
  // Only signals still actionable are paper-traded; expired history is recorded, not traded.
  if(autoPaper)for(const sig of out.signals.filter(x=>x.validUntil>started)){
+  const capped=admit(sig.strategyId,sig.symbol);if(capped){out.paper.push({signal:sig.id,skipped:capped});continue;}
   try{const r=paperRunFor(sig,capital);await paperStore.create(r.id,r.spec,r.options,newPaperState(r.spec,r.options,now()));out.paper.push({signal:sig.id,run:r.id});}
   catch(e){out.paper.push({signal:sig.id,error:e instanceof Error&&/limit/.test(e.message)?'ACTIVE_RUN_LIMIT':'PAPER_RUN_FAILED'});}
  }
@@ -146,11 +153,11 @@ export async function scanSignals({market,store,paperStore,now,budgetMs=40000,au
  // this book was trading or expired untraded) and still holds today, so the book buys in at today's live price
  // and then follows the rule's exit, stop and holding limit. Marked joined; Accuracy keeps them apart from
  // entries at the rule's own signal. One run per rule and stock; exits already decided are not joined.
- if(autoPaper&&joinHeld&&timeframes.includes('1d')&&paperStore.active){
+ if(autoPaper&&joinHeld&&timeframes.includes('1d')&&paperStore.active&&held){
   try{
-   const active=await paperStore.active(),held=new Set(active.map(r=>r.options?.signalId?.split(':').slice(0,2).join(':')).filter(Boolean));
-   const rows=out.board.filter(b=>b.state==='IN_POSITION'&&!b.exitPending&&strategyById(b.strategyId)?.timeframe==='1d'&&!held.has(b.strategyId+':'+b.symbol)&&Number.isFinite(b.since))
-    .sort((a,b)=>b.since-a.since).slice(0,Math.max(0,maxJoined-active.filter(r=>r.options?.joined).length));
+   const active=await paperStore.active(),open=new Set(active.map(r=>r.options?.signalId?.split(':').slice(0,2).join(':')).filter(Boolean));
+   const rows=out.board.filter(b=>b.state==='IN_POSITION'&&!b.exitPending&&strategyById(b.strategyId)?.timeframe==='1d'&&!open.has(b.strategyId+':'+b.symbol)&&Number.isFinite(b.since))
+    .sort((a,b)=>b.since-a.since).slice(0,Math.max(0,maxJoined-active.filter(r=>r.options?.joined).length)).filter(b=>{const c=admit(b.strategyId,b.symbol);if(c)out.paper.push({signal:`${b.strategyId}:${b.symbol}`,joined:true,skipped:c});return !c;});
    for(const b of rows){
     try{const r=paperRunFor({id:`${b.strategyId}:${b.symbol}:${b.since}`,strategyId:b.strategyId,symbol:b.symbol,close:b.close},capital,{joined:true});
      const state=newPaperState(r.spec,r.options,now());state.pending={kind:'ENTRY',time:now()};state.armed=false;
