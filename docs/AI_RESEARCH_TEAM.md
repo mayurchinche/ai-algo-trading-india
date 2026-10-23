@@ -8,3 +8,5 @@ Guard rails (`research/team/gates.mjs`, hash-checked; agents cannot edit it, the
 - Causality audit (truncation invariance) fails closed on look-ahead; checked by `node research/team/gates.check.mjs`.
 - Limits: worst month ≥ −4%, max DD ≥ −10%, ≥70% positive months, avg > 0, after costs.
 - Never touches live books or main; a human promotes. 3%/month may be unreachable; the loop reports that honestly.
+
+Results so far: docs/team/SCREEN_164.md (164 strategies × 2 configs, consensus mixes, momentum). Run: `node research/team/screen.mjs [--cfg B]`, `--merge`, `ensembles.mjs`, `round3.mjs`.
