@@ -105,6 +105,17 @@ test('trade statistics, options validation, candles and market paths',async()=>{
  assert.deepEqual(await mk.resolveLeg(equitySpec,{instrument:{type:'future',expiry:'current-month'}},'NSE_EQ|INE009A01021',t0),{instrumentKey:'NSE_FO|F1',lotSize:400,description:'INFY FUT',expiry:'2026-10-29'});
  await assert.rejects(mk.resolveLeg(equitySpec,{instrument:{type:'future',expiry:'next-month'}},'NSE_EQ|INE009A01021',t0),/FUTURE_NOT_FOUND/);
 });
+test('quotes are judged fresh when they arrive, not at the earlier cycle start',async()=>{
+ // The cycle starts at `start`; the request returns 3 s later with a trade 2 s after the start.
+ const start=Date.parse('2026-10-23T10:00:00+05:30'),trade=start+2000,arrived=start+3000;
+ const quote={instrument_token:'NSE_EQ|X',last_price:100,last_trade_time:String(trade),timestamp:new Date(arrived).toISOString(),depth:{buy:[{price:99.9,quantity:10}],sell:[{price:100.1,quantity:10}]},ohlc:{open:99,high:101,low:98}};
+ const idx={instrument_token:'NSE_INDEX|Nifty 50',last_price:25000,last_trade_time:String(trade)};
+ const mk=createSpecPaperMarket({clock:()=>arrived,read:async(p:string)=>p.includes('NSE_INDEX')?{a:idx}:{a:quote},master:async()=>[]});
+ assert.equal((await mk.quotes(['NSE_EQ|X'],start)).get('NSE_EQ|X')?.price,100,'a trade after the cycle start is not a future quote');
+ assert.equal(await mk.indexPrice('NSE_INDEX|Nifty 50',start),25000);
+ const late=createSpecPaperMarket({clock:()=>start+300000,read:async()=>({a:quote}),master:async()=>[]});
+ assert.equal((await late.quotes(['NSE_EQ|X'],start)).size,0,'still stale after two minutes');
+});
 test('the margin client posts only to the margin calculator and validates its reply',async()=>{
  const calls:any[]=[];const calc=createUpstoxMarginCalculator({token:()=>'tok',fetcher:(async(url:string,init:any)=>{calls.push([url,init.method,JSON.parse(init.body)]);return new Response(JSON.stringify({status:'success',data:{required_margin:1200,final_margin:1000,margins:[]}}));}) as any});
  assert.deepEqual(await calc([{instrumentKey:'K',quantity:10,side:'BUY',product:'I'}]),{status:'OK',required:1000,beforeBenefit:1200,perInstrument:[],source:'UPSTOX_MARGIN_CALCULATOR'});

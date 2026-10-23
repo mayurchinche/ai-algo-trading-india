@@ -20,7 +20,9 @@ export function parseCandles(candles,timeframe,now){
  }
  return [...byTime.values()].sort((a,b)=>a.time-b.time);
 }
-export function createSpecPaperMarket({read=createUpstoxReader(),master=getTradingInstruments,chains=createOptionChainReader({read,master}),margin=createUpstoxMarginCalculator()}={}){
+// clock: wall time when a quote response arrives. Freshness is judged then, not at the caller's earlier cycle
+// time `now`: an active stock's last trade usually falls between the two, and would look like a future quote.
+export function createSpecPaperMarket({clock=Date.now,read=createUpstoxReader(),master=getTradingInstruments,chains=createOptionChainReader({read,master}),margin=createUpstoxMarginCalculator()}={}){
  async function underlyingKey(spec){
   if(spec.underlying.kind==='index'){const k=OPTION_UNDERLYINGS[spec.underlying.symbol];if(!k)throw new MarketDataError('UNSUPPORTED_UNDERLYING');return k;}
   const row=(await master()).find(r=>r.segment==='NSE_EQ'&&r.instrument_type==='EQ'&&r.trading_symbol===spec.underlying.symbol);
@@ -37,7 +39,8 @@ export function createSpecPaperMarket({read=createUpstoxReader(),master=getTradi
   },
   async quotes(keys,now){
    if(!keys.length)return new Map();
-   return new Map(normalizeUpstoxQuotes(await read('/v3/market-quote/quotes?instrument_key='+encodeURIComponent(keys.join(','))),keys,now).map(q=>[q.symbol,q]));
+   const data=await read('/v3/market-quote/quotes?instrument_key='+encodeURIComponent(keys.join(',')));
+   return new Map(normalizeUpstoxQuotes(data,keys,Math.max(now,clock())).map(q=>[q.symbol,q]));
   },
   // Completed bars of one instrument over [fromMs, now), split into the request windows Upstox allows
   // (1 month for minute intervals up to 15, a quarter for longer intraday intervals, a decade for days).
@@ -84,7 +87,7 @@ export function createSpecPaperMarket({read=createUpstoxReader(),master=getTradi
   },
   // Last traded price of an index (indices have no order book, so quotes() leaves them out). Null when stale.
   async indexPrice(key,now){
-   const q=Object.values(await read('/v3/market-quote/quotes?instrument_key='+encodeURIComponent(key))).find(x=>x.instrument_token===key),ms=Number(q?.last_trade_time);
+   const q=Object.values(await read('/v3/market-quote/quotes?instrument_key='+encodeURIComponent(key))).find(x=>x.instrument_token===key),ms=Number(q?.last_trade_time);now=Math.max(now,clock());
    return Number.isFinite(q?.last_price)&&q.last_price>0&&Number.isFinite(ms)&&ms<=now&&now-ms<=120000?q.last_price:null;
   },
   async marketOpen(){const s=await read('/v2/market/status/NSE');if(typeof s?.status!=='string')throw new MarketDataError('MARKET_STATUS_INVALID');return s.status==='NORMAL_OPEN';},
