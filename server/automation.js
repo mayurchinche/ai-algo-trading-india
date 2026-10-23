@@ -3,7 +3,8 @@
 // background job chosen by IST minute, and records a heartbeat so the app can show what ran and when.
 //   every minute       paper runs: resting stops/targets, square-off, decisions and fills; and the alert
 //                      scanner that records strong intraday signals for the Alerts feed; then the aggressive
-//                      paper book, which uses that scan's observation
+//                      paper book, which uses that scan's observation, side by side with the gap-down fill test
+//                      book (pre-open decision at 09:15, stops, 15:15 exit)
 //   09:16 and 09:31    market day (bulk/block deals, FII/DII) and the daily-strategy signal scan
 //   every 30 minutes   daily-strategy scan again at :14 and :44 (safety net; signals are recorded once)
 //   every 15 minutes   intraday-strategy signal scan
@@ -31,12 +32,12 @@ export function backgroundJob(now){
 const failure=e=>({status:'FAILED',reason:e?.code??(e instanceof Error?e.message.slice(0,120):'UNEXPECTED_ERROR')});
 async function attempt(fn){try{return await fn();}catch(e){return failure(e);}}
 
-export async function runAutomationTick({now=Date.now,paper,alerts=null,aggressive=null,validate,scan,marketDay,fundamentals,outcomes=null,smartMoney=null,status}){
+export async function runAutomationTick({now=Date.now,paper,alerts=null,aggressive=null,gapFill=null,validate,scan,marketDay,fundamentals,outcomes=null,smartMoney=null,status}){
  const started=now(),job=backgroundJob(started),out={version:AUTOMATION_VERSION,at:new Date(started).toISOString(),job};
  // The paper cycle and the alert scanner (intraday strong-signal feed) run side by side.
  [out.paper,out.alerts]=await Promise.all([attempt(()=>paper(25000)),alerts?attempt(alerts):undefined]);
  // The aggressive book reads the alert scanner's observation of this minute, so it runs after it.
- if(aggressive)out.aggressive=await attempt(aggressive);
+ [out.aggressive,out.gapFill]=await Promise.all([aggressive?attempt(aggressive):undefined,gapFill?attempt(gapFill):undefined]);
  if(job==='daily-scan')out.dailyScan=await attempt(()=>scan(['1d']));
  else if(job==='daily'){out.marketDay=await attempt(marketDay);out.dailyScan=await attempt(()=>scan(['1d','15m']));}
  else if(job==='intraday-scan')out.scan=await attempt(()=>scan(['15m']));
@@ -53,7 +54,7 @@ export async function runAutomationTick({now=Date.now,paper,alerts=null,aggressi
  return out;
 }
 // Compact per-job summary kept in app_data so the UI can show the latest run of each job.
-export const JOBS=Object.freeze(['paper','alerts','aggressive','marketDay','dailyScan','scan','validate','fundamentals','outcomes','smartMoney']);
+export const JOBS=Object.freeze(['paper','alerts','aggressive','gapFill','marketDay','dailyScan','scan','validate','fundamentals','outcomes','smartMoney']);
 export function mergeStatus(previous,tick){
  const jobs={...(previous?.jobs??{})},summary=r=>r&&{status:r.status,...Object.fromEntries(Object.entries(r).filter(([k,v])=>k!=='status'&&(typeof v!=='object'||v===null)).slice(0,8)),
   ...(Array.isArray(r.runs)?{runs:r.runs.length,outcomes:r.runs.reduce((m,x)=>(m[x.outcome]=(m[x.outcome]||0)+1,m),{})}:{}),...(Array.isArray(r.signals)?{signals:r.signals.length}:{}),...(Array.isArray(r.failures)?{failures:r.failures.length}:{})};

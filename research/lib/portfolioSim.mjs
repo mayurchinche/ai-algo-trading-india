@@ -16,6 +16,7 @@
 //   entry at that open), exitCondition?(s,x,i)→bool decided on bar i's close}. Parameters are fixed by the
 //   strategy before simulation; the simulator has no tunable knobs that see results.
 import {orderCharges} from '../../shared/brokerCharges.js';
+// allowDay(date): optional account-level filter; false blocks new entries that day (market regime overlays).
 // entryDelayBps: extra adverse cost on entries, standing in for a fill some minutes after the open (stress test).
 export const DEFAULTS=Object.freeze({entryDelayBps:0,capital:200000,riskPct:0.5,maxPosPct:25,maxPositions:8,minTurnover:1e8,minPrice:50,dailyStopPct:1.5,monthStopPct:4});
 const slipBps=turn=>turn>=5e8?5:10;
@@ -32,7 +33,7 @@ export function simulate(strategy,{meta,series},opts={}){
   const net=value-ch-p.cost;trades.push({sym:p.S.s.symbol,entryDay:p.entryDay,exitDay:day,entry:p.entry,exit:price,qty:p.qty,net,retPct:net/p.cost*100,reason,days:p.bars});};
  for(let t=0;t<D;t++){
   const m=days[t].slice(0,7);if(m!==month){month=m;monthStart=equityPrev;monthBlocked=false;}
-  const canEnter=!blockedDay&&!monthBlocked;
+  const canEnter=!blockedDay&&!monthBlocked&&(!o.allowDay||o.allowDay(days[t]));
   // 1. Entries decided at the previous close (delivery) or this open (intraday).
   const want=[];
   if(canEnter)for(const Z of S){const i=Z.pos[t];if(i<1)continue;const k=intraday?i:i-1;// decision bar

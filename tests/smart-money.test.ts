@@ -59,8 +59,8 @@ test('the scheduler collects smart money at :27 and :57 and Today shows it with 
  assert.equal(out.items[0].smartMoney[0].kind,'PROMOTER_BUYING');assert.equal(out.smartMoney.flags,undefined);assert.equal(out.smartMoney.promoterBuying[0].symbol,'INFY');
  const res:any={status(c:number){this.code=c;return this;},json(b:any){this.body=b;return this;},setHeader(){}};
  const empty={read:async()=>null},store=()=>({signals:async()=>[],verdicts:async()=>[],latestDeals:async()=>[]});
- await createTodayHandler({signals:store as any,discovery:(()=>({day:async()=>[]})) as any,book:(()=>empty) as any,board:empty as any,status:empty as any,smart:{read:async()=>smartMoney} as any,now:()=>at})({method:'GET',headers:{host:'x'},query:{}},res);
+ await createTodayHandler({signals:store as any,discovery:(()=>({day:async()=>[]})) as any,book:(()=>empty) as any,board:empty as any,status:empty as any,smart:{read:async()=>smartMoney} as any,gap:(()=>empty) as any,now:()=>at})({method:'GET',headers:{host:'x'},query:{}},res);
  assert.equal(res.code,200);assert.equal(res.body.smartMoney.since,'2026-09-22');assert.deepEqual(res.body.unavailable,[]);
- const old:any={...res,code:0};await createTodayHandler({signals:store as any,discovery:(()=>({day:async()=>[]})) as any,book:(()=>empty) as any,board:empty as any,status:empty as any,smart:{read:async()=>({version:'old'})} as any,now:()=>at})({method:'GET',headers:{host:'x'},query:{}},old);
+ const old:any={...res,code:0};await createTodayHandler({signals:store as any,discovery:(()=>({day:async()=>[]})) as any,book:(()=>empty) as any,board:empty as any,status:empty as any,smart:{read:async()=>({version:'old'})} as any,gap:(()=>empty) as any,now:()=>at})({method:'GET',headers:{host:'x'},query:{}},old);
  assert.equal(old.body.smartMoney,null);
 });

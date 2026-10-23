@@ -18,7 +18,12 @@ export interface BookSummary {
 }
 export interface OvernightRow { symbol: string; price: number; retPct: number; volumeRatio: number | null; closeLocation: number | null; newHigh: boolean; qualifies: boolean; rule: string | null; needs: string[] }
 export interface Overnight { date: string; at: string; niftyUp: boolean | null; entryWindow: string; rows: OvernightRow[]; qualifying: number; scanned: number }
-export interface TodayResponse {
+export interface GapLeg { entry?: number; stop?: number; exit?: number; open: boolean; reason?: string; net?: number; netPct?: number; lateByPct?: number; missing?: string }
+export interface GapPosition { id: string; date: string; symbol: string; gapPct: number; qty: number; auction: GapLeg; live: GapLeg }
+export interface GapStats { trades: number; winRatePct: number | null; avgTradePct: number | null; net: number; equity: number }
+export interface GapFill { policy: { id: string; capital: number; backtest: { avgTradePct: number; winRatePct: number; avgMonthPct: number; worstMonthPct: number; maxDrawdownPct: number; source: string } }; startedAt: string; auction: GapStats; live: GapStats; avgLateByPct: number | null;
+ today: { decision: { status: string; reason?: string; candidates?: number; entered?: string[]; rejected?: { symbol: string; gapPct: number; reason: string }[] } | null; auctionNet: number; liveNet: number } | null; open: GapPosition[]; recent: GapPosition[] }
+export interface TodayResponse { gapFill?: GapFill | null;
  computedAt: string; items: TodayItem[]; book: BookSummary | null; unavailable: string[]; automation: AutomationState | null;
  coverage: { id: string; label: string; rules: number; validated: number; stocks: number }[];
  held: { symbol: string; strategyName: string; changePct?: number }[];

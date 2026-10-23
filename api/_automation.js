@@ -2,7 +2,8 @@ import {authorizeScheduler,emptySchedulerBody} from '../server/schedulerAuth.js'
 import {backend,check} from '../server/pushBackend.js';
 import {runAutomationTick,inAutomationWindow,mergeStatus,STATUS_ROW,JOBS} from '../server/automation.js';
 import {runAggressiveCycle} from '../server/aggressiveBook.js';
-import {aggressiveStore} from '../server/aggressiveStore.js';
+import {aggressiveStore,bookStore} from '../server/aggressiveStore.js';
+import {runGapFillCycle,GAPFILL_ROW} from '../server/gapFillBook.js';
 import {runSpecPaperCycle} from '../server/specPaperRunner.js';
 import {specPaperStore} from '../server/specPaperStore.js';
 import {createSpecPaperMarket} from '../server/specPaperMarket.js';
@@ -43,6 +44,8 @@ export function createAutomationHandler({now=Date.now,secret=()=>process.env.PAP
     const r=await runSharedPaperCycle({db:sharedStore('intraday'),observe,now,source:'scheduler'});return {...r,discoveriesRecorded:recorded};}:null,
    // AGGRESSIVE_BOOK_ENABLED=false pauses the experimental book without touching the validated one.
    aggressive:env.AGGRESSIVE_BOOK_ENABLED==='false'?null:async()=>runAggressiveCycle({store:aggressiveStore(),market,master:getTradingInstruments,observation,board:await strategyBoard.read().catch(()=>null),now}),
+   // Gap-down fill test book (pre-open auction vs live fills). GAPFILL_BOOK_ENABLED=false pauses it.
+   gapFill:env.GAPFILL_BOOK_ENABLED==='false'?null:()=>runGapFillCycle({store:bookStore(GAPFILL_ROW),market,master:getTradingInstruments,now}),
    outcomes:()=>updateDiscoveryOutcomes({store:discoveryStore(),market,master:getTradingInstruments,now}),
    validate:()=>runValidation({market,store:signalStore(),now}),
    scan:timeframes=>scanSignals({market,store:signalStore(),paperStore:specPaperStore(),now,timeframes,saveBoard:d=>strategyBoard.write(d),autoPaper:env.SIGNAL_AUTO_PAPER!=='false',capital:Number(env.SIGNAL_PAPER_CAPITAL)||100000}),

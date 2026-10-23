@@ -30,7 +30,7 @@ test('rules pair the pooled backtest with closed signal runs; setups pair the st
 
 test('the accuracy API reads each source independently and is routed like the other research routes',async()=>{
  const res:any={status(c:number){this.code=c;return this;},json(b:any){this.body=b;return this;},setHeader(){}};
- await createAccuracyHandler({signals:(()=>({pooledStats:async()=>[]})) as any,runs:(()=>({signalRuns:async()=>{throw new Error('down');}})) as any,book:(()=>({read:async()=>null})) as any,now:()=>0})({method:'GET',headers:{host:'x'},query:{}},res);
+ await createAccuracyHandler({signals:(()=>({pooledStats:async()=>[]})) as any,runs:(()=>({signalRuns:async()=>{throw new Error('down');}})) as any,book:(()=>({read:async()=>null})) as any,gap:(()=>({read:async()=>null})) as any,now:()=>0})({method:'GET',headers:{host:'x'},query:{}},res);
  assert.equal(res.code,200);assert.deepEqual(res.body.unavailable,['signalRuns']);assert.equal(res.body.setups.length,3);
  const bad:any={...res};await createAccuracyHandler()({method:'GET',headers:{host:'x'},query:{x:'1'}},bad);assert.equal(bad.code,400);
  assert.equal(typeof researchRoutes.accuracy,'function');

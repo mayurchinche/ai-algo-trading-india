@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { fetchAccuracy, type AccuracyResponse, type LiveStats, type Verdict } from '../services/accuracy';
 import { ScoreAccuracy } from './ScoreAccuracy';
+import { GapFillPanel } from './TodayPage';
 import { formatIST } from '../services/tradingTime';
 
 const pc = (v: number | null | undefined) => v === null || v === undefined ? '—' : `${v > 0 ? '+' : ''}${v.toFixed(2)}%`;
@@ -35,6 +36,7 @@ export function AccuracyPage() {
    <div className="overflow-x-auto"><table className="data-table text-sm deals-table"><thead><tr><th>Setup</th><th className="text-right">Expected</th><th className="text-right hide-sm">Live trades</th><th className="text-right">Live</th><th className="text-right hide-sm">Live win</th><th className="text-right hide-sm">Profit factor</th><th className="text-right hide-sm">Net ₹</th><th>Verdict</th></tr></thead>
     <tbody>{data.setups.map(s => <tr key={s.id}><td>{s.label}{s.open ? <small className="faint"> · {s.open} open</small> : null}<br /><small className="faint hide-sm">{s.expected.source}</small></td><td className="text-right">{pc(s.expected.netPct)}</td><td className="text-right hide-sm">{s.live.trades}</td><td className="text-right">{pc(s.live.avgPct)}</td><td className="text-right hide-sm">{s.live.winRatePct === null ? '—' : `${n2(s.live.winRatePct)}%`}</td><td className="text-right hide-sm">{n2(s.live.profitFactor)}</td><td className="text-right hide-sm">{s.net === null ? '—' : Math.round(s.net).toLocaleString('en-IN')}</td><td><Badge s={s.live} min={data.minTrades} /></td></tr>)}</tbody></table></div>
   </section>}
+  {data?.gapFill && <GapFillPanel g={data.gapFill} />}
   <ScoreAccuracy />
  </div>;
 }

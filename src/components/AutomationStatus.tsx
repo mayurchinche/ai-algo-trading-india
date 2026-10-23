@@ -5,6 +5,7 @@ const LABELS: [keyof AutomationState['jobs'], string, string][] = [
  ['paper', 'Paper trading cycle', 'every minute in market hours'],
  ['alerts', 'Alert scanner (strong intraday signals)', 'every minute in market hours'],
  ['aggressive', 'Aggressive paper book (experimental)', 'every minute in market hours'],
+ ['gapFill', 'Gap-down fill test (pre-open)', '09:15 decision, then every minute'],
  ['dailyScan', 'Daily signal scan', '09:16, 09:31, then :14 and :44 each hour (previous close)'],
  ['scan', 'Intraday signal scan', 'every 15 min'],
  ['validate', 'Strategy validation', 'every 5 min until each strategy is fresh (weekly)'],

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { fetchToday, type TodayResponse, type TodayItem, type ItemKind, type Overnight, type SmartMoney, type SmartRow } from '../services/today';
+import { fetchToday, type TodayResponse, type TodayItem, type ItemKind, type Overnight, type SmartMoney, type SmartRow, type GapFill } from '../services/today';
 import { openAnalysis, navigateTo } from '../services/specDraft';
 import { formatIST } from '../services/tradingTime';
 
@@ -68,6 +68,20 @@ function SmartMoneyPanel({ s }: { s: SmartMoney }) {
  </section>;
 }
 
+// Gap-down fill test: the same picks bought at the pre-open auction price and at the first live minute.
+export function GapFillPanel({ g }: { g: GapFill }) {
+ const d = g.today?.decision, row = (label: string, s: GapFill['auction']) => <tr><td>{label}</td><td className="text-right">{s.trades}</td><td className="text-right">{s.winRatePct === null ? '—' : `${s.winRatePct}%`}</td><td className={`text-right ${tone(s.avgTradePct)}`}>{signed(s.avgTradePct)}</td><td className={`text-right ${tone(s.net)}`}>{inr(s.net)}</td></tr>;
+ return <section className="card grid gap-3">
+  <div className="rule-item-head"><h3>Gap-down fill test</h3><span className="badge badge-amber">Experiment</span></div>
+  <p className="caption">At 09:15, stocks opening 2–6% below yesterday’s close (above their 200-day average, ₹10 crore daily value) are bought with ₹{(g.policy.capital / 1e5).toFixed(0)} lakh: once at the pre-open auction price, once at the first live minute; 1.5% stop, sold at 15:15. The backtest made {signed(g.policy.backtest.avgTradePct)} a trade only with auction fills; this measures whether that holds live.</p>
+  <p className="text-sm">{!d ? 'Decides at 09:15 on trading days.' : d.status === 'DECIDED' ? `Today: ${d.candidates} gapped down; bought ${d.entered?.length ? d.entered.join(', ') : 'none'}.` : `Today: ${d.status.replaceAll('_', ' ').toLowerCase()}${d.reason ? ` — ${d.reason}` : ''}.`}</p>
+  {!!g.open.length && <div className="grid gap-1">{g.open.map(p => <div key={p.id} className="inline-facts"><b>{p.symbol}</b><span>gap {signed(p.gapPct)}</span><span>{p.qty} @ auction ₹{p.auction.entry}</span>{p.live.entry ? <span>live ₹{p.live.entry} ({signed(p.live.lateByPct)})</span> : <span>no live quote</span>}</div>)}</div>}
+  <table className="data-table text-sm"><thead><tr><th>Fill</th><th className="text-right">Trades</th><th className="text-right">Win</th><th className="text-right">Avg trade</th><th className="text-right">Net</th></tr></thead>
+   <tbody>{row('Auction (backtested)', g.auction)}{row('Live first minute', g.live)}<tr><td className="faint">Backtest 2022–26</td><td /><td className="text-right faint">{g.policy.backtest.winRatePct}%</td><td className="text-right faint">{signed(g.policy.backtest.avgTradePct)}</td><td /></tr></tbody></table>
+  {g.avgLateByPct !== null && <p className="caption">Live fills averaged {signed(g.avgLateByPct)} versus the auction price.</p>}
+ </section>;
+}
+
 export function TodayPage() {
  const [data, setData] = useState<TodayResponse>(); const [error, setError] = useState(''); const [loading, setLoading] = useState(true); const [group, setGroup] = useState('all');
  const load = useCallback(() => { setLoading(true); fetchToday().then(d => { setData(d); setError(''); }).catch(e => setError(e instanceof Error ? e.message : 'Today unavailable')).finally(() => setLoading(false)); }, []);
@@ -97,6 +111,7 @@ export function TodayPage() {
      : <p className="text-sm muted">Nothing in this group now. Outside market hours the board shows the last session’s state; the scanners run every minute from 09:15 to 15:30 IST.</p>}
    </section>
    <div className="grid gap-4 content-start">
+    {data.gapFill && <GapFillPanel g={data.gapFill} />}
     <OvernightPanel o={b?.overnight ?? null} />
     <section className="card grid gap-3">
      <div className="rule-item-head"><h3>Aggressive book</h3><span className="badge badge-amber">Experimental</span></div>
