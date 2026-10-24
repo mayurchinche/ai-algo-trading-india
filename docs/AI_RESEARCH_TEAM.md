@@ -10,3 +10,5 @@ Guard rails (`research/team/gates.mjs`, hash-checked; agents cannot edit it, the
 - Never touches live books or main; a human promotes. 3%/month may be unreachable; the loop reports that honestly.
 
 Results so far: docs/team/SCREEN_164.md (164 strategies × 2 configs, consensus mixes, momentum). Run: `node research/team/screen.mjs [--cfg B]`, `--merge`, `ensembles.mjs`, `round3.mjs`.
+
+Monitor: `node research/team/monitor.mjs [--rounds 8]` runs the loop under a stall/tamper watchdog plus a periodic MONITOR agent (docs/team/MONITOR.md; STOP kills the loop). Upstox token lives in .env.worker (UPSTOX_ANALYTICS_TOKEN, git-ignored; 1-minute history verified).
